@@ -1,9 +1,12 @@
 // @ts-check
 
 const esbuild = require('esbuild');
+const fs = require('fs');
 const path = require('path');
 
 async function build(mode) {
+
+  let debounceWrite;
 
   /** @type {Parameters<typeof esbuild.build>[0]} */
   const options = {
@@ -33,6 +36,27 @@ async function build(mode) {
       'node:node:worker_threads',
 
       'ws'
+    ],
+    plugins: [
+      {
+        name: 'post-export',
+        setup(build) {
+          build.onEnd(result => {
+            clearTimeout(debounceWrite);
+            debounceWrite = setTimeout(() => {
+              const libsGenerated = fs.readFileSync(path.join(__dirname, 'libs.js'), 'utf8');
+              const libsTransformed = libsGenerated.replace(
+                /(\n\s*)require_lib\(\);(\s*\n)/g,
+                `$1var req=require_lib();$1` +
+                `if (typeof module!=='undefined' && module && module.exports) module.exports=req;$2`);
+
+              if (libsTransformed !== libsGenerated) {
+                fs.writeFileSync(path.join(__dirname, 'libs.js'), libsTransformed, 'utf8');
+              }
+            }, 10);
+          });
+        }
+      }
     ],
     outfile: 'libs.js'
   };
