@@ -1,9 +1,11 @@
+// @ts-check
+
 const esbuild = require('esbuild');
 const path = require('path');
 
 async function build(mode) {
 
-  /** @type {Parameters<typeof esbuild.build>} */
+  /** @type {Parameters<typeof esbuild.build>[0]} */
   const options = {
     entryPoints: ['lib/index.js'],
     bundle: true,
@@ -11,6 +13,7 @@ async function build(mode) {
     target: 'es6',
     loader: { '.js': 'jsx' },
     format: 'iife',
+    logLevel: 'info',
     external: [
       'fs', 'path', 'os',
       'crypto', 'tty', 'tls',
@@ -32,23 +35,23 @@ async function build(mode) {
     outfile: 'libs.js'
   };
 
-  if (`mode === 'serve`) {
+  if (mode === 'serve') {
     const ctx = await esbuild.context(options);
     const server = await ctx.serve({
-      servedir: path.resolve(__dirname, 'static'),
+      servedir: __dirname,
       fallback: 'index.html'
     });
     console.log('SERVE http://' + (server.host === '0.0.0.0' ? 'localhost' : server.host) + ':' + server.port + '/');
   } else if (mode === 'watch') {
     const ctx = await esbuild.context(options);
-    const server = await ctx.serve({
-      servedir: path.resolve(__dirname, 'static'),
-      fallback: 'index.html'
-    });
-    console.log('SERVE http://' + (server.host === '0.0.0.0' ? 'localhost' : server.host) + ':' + server.port + '/');
+    await ctx.watch();
+    console.log('WATCHING...');
   } else {
     await esbuild.build(options);
   }
 }
 
-build(!!process.argv.some(arg => /^\-*serve$/i.test(arg)));
+build(
+  process.argv.some(arg => /^\-*serve$/i.test(arg)) ? 'serve' :
+    process.argv.some(arg => /^\-*watch$/i.test(arg)) ? 'watch' :
+      undefined);
