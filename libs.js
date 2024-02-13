@@ -40783,6 +40783,16 @@ if (cid) {
     }
   });
 
+  // lib/octokit-plugin.js
+  var import_octokit_commit_multiple_files, Octokit3;
+  var init_octokit_plugin = __esm({
+    "lib/octokit-plugin.js"() {
+      init_dist_web12();
+      import_octokit_commit_multiple_files = __toESM(require_octokit_commit_multiple_files());
+      Octokit3 = Octokit2.plugin(import_octokit_commit_multiple_files.default);
+    }
+  });
+
   // lib/index.js
   var require_lib = __commonJS({
     "lib/index.js"(exports, module) {
@@ -40790,9 +40800,7 @@ if (cid) {
       init_is_promise();
       init_coldsky_agent();
       init_firehose();
-      init_dist_web12();
-      var import_octokit_commit_multiple_files = __toESM(require_octokit_commit_multiple_files());
-      var Octokit3 = Octokit2.plugin(import_octokit_commit_multiple_files.default);
+      init_octokit_plugin();
       var all = {
         likelyDID,
         shortenDID,
