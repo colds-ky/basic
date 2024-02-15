@@ -2,7 +2,7 @@
 /// <reference path="../types.d.ts" />
 
 import { getProfileBlobUrl, isPromise, likelyDID, shortenDID, shortenHandle, unwrapShortDID, unwrapShortHandle } from '.';
-import { atClient } from './core';
+import { atClient } from './at-client';
 import { throttledAsyncCache } from './throttled-async-cache';
 
 const resolveHandleCache = throttledAsyncCache(async (handle) => {

@@ -9079,19 +9079,19 @@
       var src_exports2 = {};
       __export(src_exports2, {
         APP_BSKY_GRAPH: () => APP_BSKY_GRAPH,
-        ActorNS: () => ActorNS,
-        AdminNS: () => AdminNS,
         AppBskyActorDefs: () => defs_exports5,
         AppBskyActorGetPreferences: () => getPreferences_exports,
         AppBskyActorGetProfile: () => getProfile_exports,
         AppBskyActorGetProfiles: () => getProfiles_exports,
         AppBskyActorGetSuggestions: () => getSuggestions_exports,
+        AppBskyActorNS: () => AppBskyActorNS,
         AppBskyActorProfile: () => profile_exports,
         AppBskyActorPutPreferences: () => putPreferences_exports,
         AppBskyActorSearchActors: () => searchActors_exports,
         AppBskyActorSearchActorsTypeahead: () => searchActorsTypeahead_exports,
         AppBskyEmbedExternal: () => external_exports,
         AppBskyEmbedImages: () => images_exports,
+        AppBskyEmbedNS: () => AppBskyEmbedNS,
         AppBskyEmbedRecord: () => record_exports,
         AppBskyEmbedRecordWithMedia: () => recordWithMedia_exports,
         AppBskyFeedDefs: () => defs_exports6,
@@ -9112,6 +9112,7 @@
         AppBskyFeedGetSuggestedFeeds: () => getSuggestedFeeds_exports,
         AppBskyFeedGetTimeline: () => getTimeline_exports,
         AppBskyFeedLike: () => like_exports,
+        AppBskyFeedNS: () => AppBskyFeedNS,
         AppBskyFeedPost: () => post_exports,
         AppBskyFeedRepost: () => repost_exports,
         AppBskyFeedSearchPosts: () => searchPosts_exports,
@@ -9127,23 +9128,28 @@
         AppBskyGraphGetListMutes: () => getListMutes_exports,
         AppBskyGraphGetLists: () => getLists_exports,
         AppBskyGraphGetMutes: () => getMutes_exports,
+        AppBskyGraphGetRelationships: () => getRelationships_exports,
         AppBskyGraphGetSuggestedFollowsByActor: () => getSuggestedFollowsByActor_exports,
         AppBskyGraphList: () => list_exports,
         AppBskyGraphListblock: () => listblock_exports,
         AppBskyGraphListitem: () => listitem_exports,
         AppBskyGraphMuteActor: () => muteActor_exports,
         AppBskyGraphMuteActorList: () => muteActorList_exports,
+        AppBskyGraphNS: () => AppBskyGraphNS,
         AppBskyGraphUnmuteActor: () => unmuteActor_exports,
         AppBskyGraphUnmuteActorList: () => unmuteActorList_exports,
+        AppBskyNS: () => AppBskyNS,
         AppBskyNotificationGetUnreadCount: () => getUnreadCount_exports,
         AppBskyNotificationListNotifications: () => listNotifications_exports,
+        AppBskyNotificationNS: () => AppBskyNotificationNS,
         AppBskyNotificationRegisterPush: () => registerPush_exports,
         AppBskyNotificationUpdateSeen: () => updateSeen_exports,
         AppBskyRichtextFacet: () => facet_exports,
+        AppBskyRichtextNS: () => AppBskyRichtextNS,
         AppBskyUnspeccedDefs: () => defs_exports8,
-        AppBskyUnspeccedGetPopular: () => getPopular_exports,
         AppBskyUnspeccedGetPopularFeedGenerators: () => getPopularFeedGenerators_exports,
-        AppBskyUnspeccedGetTimelineSkeleton: () => getTimelineSkeleton_exports,
+        AppBskyUnspeccedGetTaggedSuggestions: () => getTaggedSuggestions_exports,
+        AppBskyUnspeccedNS: () => AppBskyUnspeccedNS,
         AppBskyUnspeccedSearchActorsSkeleton: () => searchActorsSkeleton_exports,
         AppBskyUnspeccedSearchPostsSkeleton: () => searchPostsSkeleton_exports,
         AppNS: () => AppNS,
@@ -9151,45 +9157,54 @@
         AtpAgent: () => AtpAgent,
         AtpBaseClient: () => AtpBaseClient,
         AtpServiceClient: () => AtpServiceClient,
-        AtprotoNS: () => AtprotoNS,
         BlobRef: () => BlobRef,
         BlockRecord: () => BlockRecord,
         BskyAgent: () => BskyAgent2,
-        BskyNS: () => BskyNS,
         COM_ATPROTO_ADMIN: () => COM_ATPROTO_ADMIN,
         COM_ATPROTO_MODERATION: () => COM_ATPROTO_MODERATION,
+        ComAtprotoAdminCreateCommunicationTemplate: () => createCommunicationTemplate_exports,
         ComAtprotoAdminDefs: () => defs_exports,
         ComAtprotoAdminDeleteAccount: () => deleteAccount_exports,
+        ComAtprotoAdminDeleteCommunicationTemplate: () => deleteCommunicationTemplate_exports,
         ComAtprotoAdminDisableAccountInvites: () => disableAccountInvites_exports,
         ComAtprotoAdminDisableInviteCodes: () => disableInviteCodes_exports,
         ComAtprotoAdminEmitModerationEvent: () => emitModerationEvent_exports,
         ComAtprotoAdminEnableAccountInvites: () => enableAccountInvites_exports,
         ComAtprotoAdminGetAccountInfo: () => getAccountInfo_exports,
+        ComAtprotoAdminGetAccountInfos: () => getAccountInfos_exports,
         ComAtprotoAdminGetInviteCodes: () => getInviteCodes_exports,
         ComAtprotoAdminGetModerationEvent: () => getModerationEvent_exports,
         ComAtprotoAdminGetRecord: () => getRecord_exports,
         ComAtprotoAdminGetRepo: () => getRepo_exports,
         ComAtprotoAdminGetSubjectStatus: () => getSubjectStatus_exports,
+        ComAtprotoAdminListCommunicationTemplates: () => listCommunicationTemplates_exports,
+        ComAtprotoAdminNS: () => ComAtprotoAdminNS,
         ComAtprotoAdminQueryModerationEvents: () => queryModerationEvents_exports,
         ComAtprotoAdminQueryModerationStatuses: () => queryModerationStatuses_exports,
         ComAtprotoAdminSearchRepos: () => searchRepos_exports,
         ComAtprotoAdminSendEmail: () => sendEmail_exports,
         ComAtprotoAdminUpdateAccountEmail: () => updateAccountEmail_exports,
         ComAtprotoAdminUpdateAccountHandle: () => updateAccountHandle_exports,
+        ComAtprotoAdminUpdateCommunicationTemplate: () => updateCommunicationTemplate_exports,
         ComAtprotoAdminUpdateSubjectStatus: () => updateSubjectStatus_exports,
+        ComAtprotoIdentityNS: () => ComAtprotoIdentityNS,
         ComAtprotoIdentityResolveHandle: () => resolveHandle_exports,
         ComAtprotoIdentityUpdateHandle: () => updateHandle_exports,
         ComAtprotoLabelDefs: () => defs_exports2,
+        ComAtprotoLabelNS: () => ComAtprotoLabelNS,
         ComAtprotoLabelQueryLabels: () => queryLabels_exports,
         ComAtprotoLabelSubscribeLabels: () => subscribeLabels_exports,
         ComAtprotoModerationCreateReport: () => createReport_exports,
         ComAtprotoModerationDefs: () => defs_exports3,
+        ComAtprotoModerationNS: () => ComAtprotoModerationNS,
+        ComAtprotoNS: () => ComAtprotoNS,
         ComAtprotoRepoApplyWrites: () => applyWrites_exports,
         ComAtprotoRepoCreateRecord: () => createRecord_exports,
         ComAtprotoRepoDeleteRecord: () => deleteRecord_exports,
         ComAtprotoRepoDescribeRepo: () => describeRepo_exports,
         ComAtprotoRepoGetRecord: () => getRecord_exports2,
         ComAtprotoRepoListRecords: () => listRecords_exports,
+        ComAtprotoRepoNS: () => ComAtprotoRepoNS,
         ComAtprotoRepoPutRecord: () => putRecord_exports,
         ComAtprotoRepoStrongRef: () => strongRef_exports,
         ComAtprotoRepoUploadBlob: () => uploadBlob_exports,
@@ -9206,6 +9221,7 @@
         ComAtprotoServerGetAccountInviteCodes: () => getAccountInviteCodes_exports,
         ComAtprotoServerGetSession: () => getSession_exports,
         ComAtprotoServerListAppPasswords: () => listAppPasswords_exports,
+        ComAtprotoServerNS: () => ComAtprotoServerNS,
         ComAtprotoServerRefreshSession: () => refreshSession_exports,
         ComAtprotoServerRequestAccountDelete: () => requestAccountDelete_exports,
         ComAtprotoServerRequestEmailConfirmation: () => requestEmailConfirmation_exports,
@@ -9224,43 +9240,34 @@
         ComAtprotoSyncGetRepo: () => getRepo_exports2,
         ComAtprotoSyncListBlobs: () => listBlobs_exports,
         ComAtprotoSyncListRepos: () => listRepos_exports,
+        ComAtprotoSyncNS: () => ComAtprotoSyncNS,
         ComAtprotoSyncNotifyOfUpdate: () => notifyOfUpdate_exports,
         ComAtprotoSyncRequestCrawl: () => requestCrawl_exports,
         ComAtprotoSyncSubscribeRepos: () => subscribeRepos_exports,
+        ComAtprotoTempCheckSignupQueue: () => checkSignupQueue_exports,
         ComAtprotoTempFetchLabels: () => fetchLabels_exports,
         ComAtprotoTempImportRepo: () => importRepo_exports,
+        ComAtprotoTempNS: () => ComAtprotoTempNS,
         ComAtprotoTempPushBlob: () => pushBlob_exports,
+        ComAtprotoTempRequestPhoneVerification: () => requestPhoneVerification_exports,
         ComAtprotoTempTransferAccount: () => transferAccount_exports,
         ComNS: () => ComNS,
-        EmbedNS: () => EmbedNS,
-        FeedNS: () => FeedNS,
         FollowRecord: () => FollowRecord,
         GeneratorRecord: () => GeneratorRecord,
-        GraphNS: () => GraphNS,
-        IdentityNS: () => IdentityNS,
         LABELS: () => LABELS,
         LABEL_GROUPS: () => LABEL_GROUPS,
-        LabelNS: () => LabelNS,
         LikeRecord: () => LikeRecord,
         ListRecord: () => ListRecord,
         ListblockRecord: () => ListblockRecord,
         ListitemRecord: () => ListitemRecord,
         ModerationDecision: () => ModerationDecision,
-        ModerationNS: () => ModerationNS,
-        NotificationNS: () => NotificationNS,
         PostRecord: () => PostRecord,
         ProfileRecord: () => ProfileRecord,
-        RepoNS: () => RepoNS,
         RepostRecord: () => RepostRecord,
         RichText: () => RichText,
         RichTextSegment: () => RichTextSegment,
-        RichtextNS: () => RichtextNS,
-        ServerNS: () => ServerNS,
-        SyncNS: () => SyncNS,
-        TempNS: () => TempNS,
         ThreadgateRecord: () => ThreadgateRecord,
         UnicodeString: () => UnicodeString,
-        UnspeccedNS: () => UnspeccedNS,
         default: () => AtpAgent,
         jsonStringToLex: () => jsonStringToLex,
         jsonToLex: () => jsonToLex,
@@ -9455,7 +9462,7 @@
         constructor(uri2, base3) {
           let parsed;
           if (base3) {
-            parsed = parse2(base3);
+            parsed = parse(base3);
             if (!parsed) {
               throw new Error(`Invalid at uri: ${base3}`);
             }
@@ -9465,7 +9472,7 @@
             }
             Object.assign(parsed, relativep);
           } else {
-            parsed = parse2(uri2);
+            parsed = parse(uri2);
             if (!parsed) {
               throw new Error(`Invalid at uri: ${uri2}`);
             }
@@ -9538,7 +9545,7 @@
           return `at://${this.host}${path}${qs}${hash}`;
         }
       };
-      function parse2(str) {
+      function parse(str) {
         const match = ATP_URI_REGEX.exec(str);
         if (match) {
           return {
@@ -10134,11 +10141,11 @@
           throw result.error;
         }
         safeParse(data, params2) {
-          var _a3;
+          var _a2;
           const ctx = {
             common: {
               issues: [],
-              async: (_a3 = params2 === null || params2 === void 0 ? void 0 : params2.async) !== null && _a3 !== void 0 ? _a3 : false,
+              async: (_a2 = params2 === null || params2 === void 0 ? void 0 : params2.async) !== null && _a2 !== void 0 ? _a2 : false,
               contextualErrorMap: params2 === null || params2 === void 0 ? void 0 : params2.errorMap
             },
             path: (params2 === null || params2 === void 0 ? void 0 : params2.path) || [],
@@ -10325,11 +10332,11 @@
           }
         }
       };
-      function isValidIP(ip, version2) {
-        if ((version2 === "v4" || !version2) && ipv4Regex.test(ip)) {
+      function isValidIP(ip, version22) {
+        if ((version22 === "v4" || !version22) && ipv4Regex.test(ip)) {
           return true;
         }
-        if ((version2 === "v6" || !version2) && ipv6Regex.test(ip)) {
+        if ((version22 === "v6" || !version22) && ipv6Regex.test(ip)) {
           return true;
         }
         return false;
@@ -10484,7 +10491,7 @@
             } else if (check.kind === "url") {
               try {
                 new URL(input.data);
-              } catch (_a3) {
+              } catch (_a2) {
                 ctx = this._getOrReturnCtx(input, ctx);
                 addIssueToContext(ctx, {
                   validation: "url",
@@ -10598,7 +10605,7 @@
           return this._addCheck(__spreadValues({ kind: "ip" }, errorUtil.errToObj(options)));
         }
         datetime(options) {
-          var _a3;
+          var _a2;
           if (typeof options === "string") {
             return this._addCheck({
               kind: "datetime",
@@ -10610,7 +10617,7 @@
           return this._addCheck(__spreadValues({
             kind: "datetime",
             precision: typeof (options === null || options === void 0 ? void 0 : options.precision) === "undefined" ? null : options === null || options === void 0 ? void 0 : options.precision,
-            offset: (_a3 = options === null || options === void 0 ? void 0 : options.offset) !== null && _a3 !== void 0 ? _a3 : false
+            offset: (_a2 = options === null || options === void 0 ? void 0 : options.offset) !== null && _a2 !== void 0 ? _a2 : false
           }, errorUtil.errToObj(options === null || options === void 0 ? void 0 : options.message)));
         }
         regex(regex, message) {
@@ -10705,11 +10712,11 @@
         }
       };
       ZodString.create = (params2) => {
-        var _a3;
+        var _a2;
         return new ZodString(__spreadValues({
           checks: [],
           typeName: ZodFirstPartyTypeKind.ZodString,
-          coerce: (_a3 = params2 === null || params2 === void 0 ? void 0 : params2.coerce) !== null && _a3 !== void 0 ? _a3 : false
+          coerce: (_a2 = params2 === null || params2 === void 0 ? void 0 : params2.coerce) !== null && _a2 !== void 0 ? _a2 : false
         }, processCreateParams(params2)));
       };
       function floatSafeRemainder(val, step) {
@@ -11104,11 +11111,11 @@
         }
       };
       ZodBigInt.create = (params2) => {
-        var _a3;
+        var _a2;
         return new ZodBigInt(__spreadValues({
           checks: [],
           typeName: ZodFirstPartyTypeKind.ZodBigInt,
-          coerce: (_a3 = params2 === null || params2 === void 0 ? void 0 : params2.coerce) !== null && _a3 !== void 0 ? _a3 : false
+          coerce: (_a2 = params2 === null || params2 === void 0 ? void 0 : params2.coerce) !== null && _a2 !== void 0 ? _a2 : false
         }, processCreateParams(params2)));
       };
       var ZodBoolean = class extends ZodType {
@@ -11593,8 +11600,8 @@
             unknownKeys: "strict"
           }), message !== void 0 ? {
             errorMap: (issue, ctx) => {
-              var _a3, _b, _c, _d;
-              const defaultError = (_c = (_b = (_a3 = this._def).errorMap) === null || _b === void 0 ? void 0 : _b.call(_a3, issue, ctx).message) !== null && _c !== void 0 ? _c : ctx.defaultError;
+              var _a2, _b, _c, _d;
+              const defaultError = (_c = (_b = (_a2 = this._def).errorMap) === null || _b === void 0 ? void 0 : _b.call(_a2, issue, ctx).message) !== null && _c !== void 0 ? _c : ctx.defaultError;
               if (issue.code === "unrecognized_keys")
                 return {
                   message: (_d = errorUtil.errToObj(message).message) !== null && _d !== void 0 ? _d : defaultError
@@ -12833,10 +12840,10 @@
       var custom = (check, params2 = {}, fatal) => {
         if (check)
           return ZodAny.create().superRefine((data, ctx) => {
-            var _a3, _b;
+            var _a2, _b;
             if (!check(data)) {
               const p = typeof params2 === "function" ? params2(data) : typeof params2 === "string" ? { message: params2 } : params2;
-              const _fatal = (_b = (_a3 = p.fatal) !== null && _a3 !== void 0 ? _a3 : fatal) !== null && _b !== void 0 ? _b : true;
+              const _fatal = (_b = (_a2 = p.fatal) !== null && _a2 !== void 0 ? _a2 : fatal) !== null && _b !== void 0 ? _b : true;
               const p2 = typeof p === "string" ? { message: p } : p;
               ctx.addIssue(__spreadProps(__spreadValues({ code: "custom" }, p2), { fatal: _fatal }));
             }
@@ -13559,9 +13566,9 @@
         bitsPerChar: 5
       });
       var CID2 = class {
-        constructor(version2, code2, multihash, bytes2) {
+        constructor(version22, code2, multihash, bytes2) {
           this.code = code2;
-          this.version = version2;
+          this.version = version22;
           this.multihash = multihash;
           this.bytes = bytes2;
           this.byteOffset = bytes2.byteOffset;
@@ -13615,8 +13622,8 @@
           return other && this.code === other.code && this.version === other.version && equals22(this.multihash, other.multihash);
         }
         toString(base3) {
-          const { bytes: bytes2, version: version2, _baseCache } = this;
-          switch (version2) {
+          const { bytes: bytes2, version: version22, _baseCache } = this;
+          switch (version22) {
             case 0:
               return toStringV02(bytes2, _baseCache, base3 || base58btc2.encoder);
             default:
@@ -13659,31 +13666,31 @@
           if (value instanceof CID2) {
             return value;
           } else if (value != null && value.asCID === value) {
-            const { version: version2, code: code2, multihash, bytes: bytes2 } = value;
-            return new CID2(version2, code2, multihash, bytes2 || encodeCID2(version2, code2, multihash.bytes));
+            const { version: version22, code: code2, multihash, bytes: bytes2 } = value;
+            return new CID2(version22, code2, multihash, bytes2 || encodeCID2(version22, code2, multihash.bytes));
           } else if (value != null && value[cidSymbol2] === true) {
-            const { version: version2, multihash, code: code2 } = value;
+            const { version: version22, multihash, code: code2 } = value;
             const digest2 = decode32(multihash);
-            return CID2.create(version2, code2, digest2);
+            return CID2.create(version22, code2, digest2);
           } else {
             return null;
           }
         }
-        static create(version2, code2, digest2) {
+        static create(version22, code2, digest2) {
           if (typeof code2 !== "number") {
             throw new Error("String codecs are no longer supported");
           }
-          switch (version2) {
+          switch (version22) {
             case 0: {
               if (code2 !== DAG_PB_CODE2) {
                 throw new Error(`Version 0 CID must use dag-pb (code: ${DAG_PB_CODE2}) block encoding`);
               } else {
-                return new CID2(version2, code2, digest2, digest2.bytes);
+                return new CID2(version22, code2, digest2, digest2.bytes);
               }
             }
             case 1: {
-              const bytes2 = encodeCID2(version2, code2, digest2.bytes);
-              return new CID2(version2, code2, digest2, bytes2);
+              const bytes2 = encodeCID2(version22, code2, digest2.bytes);
+              return new CID2(version22, code2, digest2, bytes2);
             }
             default: {
               throw new Error("Invalid version");
@@ -13725,16 +13732,16 @@
             offset += length22;
             return i;
           };
-          let version2 = next();
+          let version22 = next();
           let codec = DAG_PB_CODE2;
-          if (version2 === 18) {
-            version2 = 0;
+          if (version22 === 18) {
+            version22 = 0;
             offset = 0;
-          } else if (version2 === 1) {
+          } else if (version22 === 1) {
             codec = next();
           }
-          if (version2 !== 0 && version2 !== 1) {
-            throw new RangeError(`Invalid CID version ${version2}`);
+          if (version22 !== 0 && version22 !== 1) {
+            throw new RangeError(`Invalid CID version ${version22}`);
           }
           const prefixSize = offset;
           const multihashCode = next();
@@ -13742,7 +13749,7 @@
           const size = offset + digestSize;
           const multihashSize = size - prefixSize;
           return {
-            version: version2,
+            version: version22,
             codec,
             multihashCode,
             digestSize,
@@ -13818,11 +13825,11 @@
       };
       var DAG_PB_CODE2 = 112;
       var SHA_256_CODE2 = 18;
-      var encodeCID2 = (version2, code2, multihash) => {
-        const codeOffset = encodingLength2(version2);
+      var encodeCID2 = (version22, code2, multihash) => {
+        const codeOffset = encodingLength2(version22);
         const hashOffset = codeOffset + encodingLength2(code2);
         const bytes2 = new Uint8Array(hashOffset + multihash.byteLength);
-        encodeTo2(version2, bytes2, 0);
+        encodeTo2(version22, bytes2, 0);
         encodeTo2(code2, bytes2, codeOffset);
         bytes2.set(multihash, hashOffset);
         return bytes2;
@@ -13838,9 +13845,9 @@
         enumerable: false,
         configurable: false
       };
-      var version = "0.0.0-dev";
+      var version2 = "0.0.0-dev";
       var deprecate = (range, message) => {
-        if (range.test(version)) {
+        if (range.test(version2)) {
           console.warn(message);
         } else {
           throw new Error(message);
@@ -15122,9 +15129,9 @@ if (cid) {
       var LexiconDefNotFoundError = class extends Error {
       };
       function params(lexicons2, path, def2, val) {
-        var _a3;
+        var _a2;
         const value = val && typeof val === "object" ? val : {};
-        const requiredProps = new Set((_a3 = def2.required) != null ? _a3 : []);
+        const requiredProps = new Set((_a2 = def2.required) != null ? _a2 : []);
         let resultValue = value;
         if (typeof def2.properties === "object") {
           for (const key in def2.properties) {
@@ -15165,20 +15172,20 @@ if (cid) {
         }
       }
       function assertValidXrpcInput(lexicons2, def2, value) {
-        var _a3;
-        if ((_a3 = def2.input) == null ? void 0 : _a3.schema) {
+        var _a2;
+        if ((_a2 = def2.input) == null ? void 0 : _a2.schema) {
           return assertValidOneOf(lexicons2, "Input", def2.input.schema, value, true);
         }
       }
       function assertValidXrpcOutput(lexicons2, def2, value) {
-        var _a3;
-        if ((_a3 = def2.output) == null ? void 0 : _a3.schema) {
+        var _a2;
+        if ((_a2 = def2.output) == null ? void 0 : _a2.schema) {
           return assertValidOneOf(lexicons2, "Output", def2.output.schema, value, true);
         }
       }
       function assertValidXrpcMessage(lexicons2, def2, value) {
-        var _a3;
-        if ((_a3 = def2.message) == null ? void 0 : _a3.schema) {
+        var _a2;
+        if ((_a2 = def2.message) == null ? void 0 : _a2.schema) {
           return assertValidOneOf(lexicons2, "Message", def2.message.schema, value, true);
         }
       }
@@ -15535,12 +15542,12 @@ if (cid) {
         return "get";
       }
       function constructMethodCallUri(nsid2, schema2, serviceUri, params2) {
-        var _a3, _b;
+        var _a2, _b;
         const uri2 = new URL(serviceUri);
         uri2.pathname = `/xrpc/${nsid2}`;
         if (params2) {
           for (const [key, value] of Object.entries(params2)) {
-            const paramSchema = (_b = (_a3 = schema2.parameters) == null ? void 0 : _a3.properties) == null ? void 0 : _b[key];
+            const paramSchema = (_b = (_a2 = schema2.parameters) == null ? void 0 : _a2.properties) == null ? void 0 : _b[key];
             if (!paramSchema) {
               throw new Error(`Invalid query parameter: ${key}`);
             }
@@ -15751,6 +15758,49 @@ if (cid) {
       }
       var defaultInst = new Client();
       var schemaDict = {
+        ComAtprotoAdminCreateCommunicationTemplate: {
+          lexicon: 1,
+          id: "com.atproto.admin.createCommunicationTemplate",
+          defs: {
+            main: {
+              type: "procedure",
+              description: "Administrative action to create a new, re-usable communication (email for now) template.",
+              input: {
+                encoding: "application/json",
+                schema: {
+                  type: "object",
+                  required: ["subject", "contentMarkdown", "name"],
+                  properties: {
+                    name: {
+                      type: "string",
+                      description: "Name of the template."
+                    },
+                    contentMarkdown: {
+                      type: "string",
+                      description: "Content of the template, markdown supported, can contain variable placeholders."
+                    },
+                    subject: {
+                      type: "string",
+                      description: "Subject of the message, used in emails."
+                    },
+                    createdBy: {
+                      type: "string",
+                      format: "did",
+                      description: "DID of the user who is creating the template."
+                    }
+                  }
+                }
+              },
+              output: {
+                encoding: "application/json",
+                schema: {
+                  type: "ref",
+                  ref: "lex:com.atproto.admin.defs#communicationTemplateView"
+                }
+              }
+            }
+          }
+        },
         ComAtprotoAdminDefs: {
           lexicon: 1,
           id: "com.atproto.admin.defs",
@@ -15792,7 +15842,8 @@ if (cid) {
                     "lex:com.atproto.admin.defs#modEventAcknowledge",
                     "lex:com.atproto.admin.defs#modEventEscalate",
                     "lex:com.atproto.admin.defs#modEventMute",
-                    "lex:com.atproto.admin.defs#modEventEmail"
+                    "lex:com.atproto.admin.defs#modEventEmail",
+                    "lex:com.atproto.admin.defs#modEventResolveAppeal"
                   ]
                 },
                 subject: {
@@ -15849,6 +15900,7 @@ if (cid) {
                     "lex:com.atproto.admin.defs#modEventAcknowledge",
                     "lex:com.atproto.admin.defs#modEventEscalate",
                     "lex:com.atproto.admin.defs#modEventMute",
+                    "lex:com.atproto.admin.defs#modEventEmail",
                     "lex:com.atproto.admin.defs#modEventResolveAppeal"
                   ]
                 },
@@ -16178,6 +16230,12 @@ if (cid) {
                 },
                 email: {
                   type: "string"
+                },
+                relatedRecords: {
+                  type: "array",
+                  items: {
+                    type: "unknown"
+                  }
                 },
                 indexedAt: {
                   type: "string",
@@ -16582,6 +16640,51 @@ if (cid) {
                   description: "Additional comment about the outgoing comm."
                 }
               }
+            },
+            communicationTemplateView: {
+              type: "object",
+              required: [
+                "id",
+                "name",
+                "contentMarkdown",
+                "disabled",
+                "lastUpdatedBy",
+                "createdAt",
+                "updatedAt"
+              ],
+              properties: {
+                id: {
+                  type: "string"
+                },
+                name: {
+                  type: "string",
+                  description: "Name of the template."
+                },
+                subject: {
+                  type: "string",
+                  description: "Content of the template, can contain markdown and variable placeholders."
+                },
+                contentMarkdown: {
+                  type: "string",
+                  description: "Subject of the message, used in emails."
+                },
+                disabled: {
+                  type: "boolean"
+                },
+                lastUpdatedBy: {
+                  type: "string",
+                  format: "did",
+                  description: "DID of the user who last updated the template."
+                },
+                createdAt: {
+                  type: "string",
+                  format: "datetime"
+                },
+                updatedAt: {
+                  type: "string",
+                  format: "datetime"
+                }
+              }
             }
           }
         },
@@ -16601,6 +16704,28 @@ if (cid) {
                     did: {
                       type: "string",
                       format: "did"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        ComAtprotoAdminDeleteCommunicationTemplate: {
+          lexicon: 1,
+          id: "com.atproto.admin.deleteCommunicationTemplate",
+          defs: {
+            main: {
+              type: "procedure",
+              description: "Delete a communication template.",
+              input: {
+                encoding: "application/json",
+                schema: {
+                  type: "object",
+                  required: ["id"],
+                  properties: {
+                    id: {
+                      type: "string"
                     }
                   }
                 }
@@ -16778,6 +16903,45 @@ if (cid) {
                 schema: {
                   type: "ref",
                   ref: "lex:com.atproto.admin.defs#accountView"
+                }
+              }
+            }
+          }
+        },
+        ComAtprotoAdminGetAccountInfos: {
+          lexicon: 1,
+          id: "com.atproto.admin.getAccountInfos",
+          defs: {
+            main: {
+              type: "query",
+              description: "Get details about some accounts.",
+              parameters: {
+                type: "params",
+                required: ["dids"],
+                properties: {
+                  dids: {
+                    type: "array",
+                    items: {
+                      type: "string",
+                      format: "did"
+                    }
+                  }
+                }
+              },
+              output: {
+                encoding: "application/json",
+                schema: {
+                  type: "object",
+                  required: ["infos"],
+                  properties: {
+                    infos: {
+                      type: "array",
+                      items: {
+                        type: "ref",
+                        ref: "lex:com.atproto.admin.defs#accountView"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -16973,6 +17137,32 @@ if (cid) {
             }
           }
         },
+        ComAtprotoAdminListCommunicationTemplates: {
+          lexicon: 1,
+          id: "com.atproto.admin.listCommunicationTemplates",
+          defs: {
+            main: {
+              type: "query",
+              description: "Get list of all communication templates.",
+              output: {
+                encoding: "application/json",
+                schema: {
+                  type: "object",
+                  required: ["communicationTemplates"],
+                  properties: {
+                    communicationTemplates: {
+                      type: "array",
+                      items: {
+                        type: "ref",
+                        ref: "lex:com.atproto.admin.defs#communicationTemplateView"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         ComAtprotoAdminQueryModerationEvents: {
           lexicon: 1,
           id: "com.atproto.admin.queryModerationEvents",
@@ -17000,6 +17190,16 @@ if (cid) {
                     enum: ["asc", "desc"],
                     description: "Sort direction for the events. Defaults to descending order of created at timestamp."
                   },
+                  createdAfter: {
+                    type: "string",
+                    format: "datetime",
+                    description: "Retrieve events created after a given timestamp"
+                  },
+                  createdBefore: {
+                    type: "string",
+                    format: "datetime",
+                    description: "Retrieve events created before a given timestamp"
+                  },
                   subject: {
                     type: "string",
                     format: "uri"
@@ -17014,6 +17214,34 @@ if (cid) {
                     minimum: 1,
                     maximum: 100,
                     default: 50
+                  },
+                  hasComment: {
+                    type: "boolean",
+                    description: "If true, only events with comments are returned"
+                  },
+                  comment: {
+                    type: "string",
+                    description: "If specified, only events with comments containing the keyword are returned"
+                  },
+                  addedLabels: {
+                    type: "array",
+                    items: {
+                      type: "string"
+                    },
+                    description: "If specified, only events where all of these labels were added are returned"
+                  },
+                  removedLabels: {
+                    type: "array",
+                    items: {
+                      type: "string"
+                    },
+                    description: "If specified, only events where all of these labels were removed are returned"
+                  },
+                  reportTypes: {
+                    type: "array",
+                    items: {
+                      type: "string"
+                    }
                   },
                   cursor: {
                     type: "string"
@@ -17299,6 +17527,56 @@ if (cid) {
                       format: "handle"
                     }
                   }
+                }
+              }
+            }
+          }
+        },
+        ComAtprotoAdminUpdateCommunicationTemplate: {
+          lexicon: 1,
+          id: "com.atproto.admin.updateCommunicationTemplate",
+          defs: {
+            main: {
+              type: "procedure",
+              description: "Administrative action to update an existing communication template. Allows passing partial fields to patch specific fields only.",
+              input: {
+                encoding: "application/json",
+                schema: {
+                  type: "object",
+                  required: ["id"],
+                  properties: {
+                    id: {
+                      type: "string",
+                      description: "ID of the template to be updated."
+                    },
+                    name: {
+                      type: "string",
+                      description: "Name of the template."
+                    },
+                    contentMarkdown: {
+                      type: "string",
+                      description: "Content of the template, markdown supported, can contain variable placeholders."
+                    },
+                    subject: {
+                      type: "string",
+                      description: "Subject of the message, used in emails."
+                    },
+                    updatedBy: {
+                      type: "string",
+                      format: "did",
+                      description: "DID of the user who is updating the template."
+                    },
+                    disabled: {
+                      type: "boolean"
+                    }
+                  }
+                }
+              },
+              output: {
+                encoding: "application/json",
+                schema: {
+                  type: "ref",
+                  ref: "lex:com.atproto.admin.defs#communicationTemplateView"
                 }
               }
             }
@@ -18325,6 +18603,12 @@ if (cid) {
                     inviteCode: {
                       type: "string"
                     },
+                    verificationCode: {
+                      type: "string"
+                    },
+                    verificationPhone: {
+                      type: "string"
+                    },
                     password: {
                       type: "string"
                     },
@@ -18725,6 +19009,9 @@ if (cid) {
                   required: ["availableUserDomains"],
                   properties: {
                     inviteCodeRequired: {
+                      type: "boolean"
+                    },
+                    phoneVerificationRequired: {
                       type: "boolean"
                     },
                     availableUserDomains: {
@@ -19696,6 +19983,34 @@ if (cid) {
             }
           }
         },
+        ComAtprotoTempCheckSignupQueue: {
+          lexicon: 1,
+          id: "com.atproto.temp.checkSignupQueue",
+          defs: {
+            main: {
+              type: "query",
+              description: "Check accounts location in signup queue.",
+              output: {
+                encoding: "application/json",
+                schema: {
+                  type: "object",
+                  required: ["activated"],
+                  properties: {
+                    activated: {
+                      type: "boolean"
+                    },
+                    placeInQueue: {
+                      type: "integer"
+                    },
+                    estimatedTimeMs: {
+                      type: "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         ComAtprotoTempFetchLabels: {
           lexicon: 1,
           id: "com.atproto.temp.fetchLabels",
@@ -19783,6 +20098,28 @@ if (cid) {
               },
               input: {
                 encoding: "*/*"
+              }
+            }
+          }
+        },
+        ComAtprotoTempRequestPhoneVerification: {
+          lexicon: 1,
+          id: "com.atproto.temp.requestPhoneVerification",
+          defs: {
+            main: {
+              type: "procedure",
+              description: "Request a verification code to be sent to the supplied phone number",
+              input: {
+                encoding: "application/json",
+                schema: {
+                  type: "object",
+                  required: ["phoneNumber"],
+                  properties: {
+                    phoneNumber: {
+                      type: "string"
+                    }
+                  }
+                }
               }
             }
           }
@@ -20038,7 +20375,8 @@ if (cid) {
                   "lex:app.bsky.actor.defs#savedFeedsPref",
                   "lex:app.bsky.actor.defs#personalDetailsPref",
                   "lex:app.bsky.actor.defs#feedViewPref",
-                  "lex:app.bsky.actor.defs#threadViewPref"
+                  "lex:app.bsky.actor.defs#threadViewPref",
+                  "lex:app.bsky.actor.defs#interestsPref"
                 ]
               }
             },
@@ -20136,6 +20474,22 @@ if (cid) {
                 prioritizeFollowedUsers: {
                   type: "boolean",
                   description: "Show followed users at the top of all replies."
+                }
+              }
+            },
+            interestsPref: {
+              type: "object",
+              required: ["tags"],
+              properties: {
+                tags: {
+                  type: "array",
+                  maxLength: 100,
+                  items: {
+                    type: "string",
+                    maxLength: 640,
+                    maxGraphemes: 64
+                  },
+                  description: "A list of tags which describe the account owner's interests gathered during onboarding."
                 }
               }
             }
@@ -22331,6 +22685,42 @@ if (cid) {
                   format: "at-uri"
                 }
               }
+            },
+            notFoundActor: {
+              type: "object",
+              description: "indicates that a handle or DID could not be resolved",
+              required: ["actor", "notFound"],
+              properties: {
+                actor: {
+                  type: "string",
+                  format: "at-identifier"
+                },
+                notFound: {
+                  type: "boolean",
+                  const: true
+                }
+              }
+            },
+            relationship: {
+              type: "object",
+              description: "lists the bi-directional graph relationships between one actor (not indicated in the object), and the target actors (the DID included in the object)",
+              required: ["did"],
+              properties: {
+                did: {
+                  type: "string",
+                  format: "did"
+                },
+                following: {
+                  type: "string",
+                  format: "at-uri",
+                  description: "if the actor follows this DID, this is the AT-URI of the follow record"
+                },
+                followedBy: {
+                  type: "string",
+                  format: "at-uri",
+                  description: "if the actor is followed by this DID, contains the AT-URI of the follow record"
+                }
+              }
             }
           }
         },
@@ -22732,6 +23122,63 @@ if (cid) {
                   }
                 }
               }
+            }
+          }
+        },
+        AppBskyGraphGetRelationships: {
+          lexicon: 1,
+          id: "app.bsky.graph.getRelationships",
+          defs: {
+            main: {
+              type: "query",
+              description: "Enumerates public relationships between one account, and a list of other accounts",
+              parameters: {
+                type: "params",
+                required: ["actor"],
+                properties: {
+                  actor: {
+                    type: "string",
+                    format: "at-identifier"
+                  },
+                  others: {
+                    type: "array",
+                    maxLength: 30,
+                    items: {
+                      type: "string",
+                      format: "at-identifier"
+                    }
+                  }
+                }
+              },
+              output: {
+                encoding: "application/json",
+                schema: {
+                  type: "object",
+                  required: ["relationships"],
+                  properties: {
+                    actor: {
+                      type: "string",
+                      format: "did"
+                    },
+                    relationships: {
+                      type: "array",
+                      items: {
+                        type: "union",
+                        refs: [
+                          "lex:app.bsky.graph.defs#relationship",
+                          "lex:app.bsky.graph.defs#notFoundActor"
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
+              errors: [
+                {
+                  name: "ActorNotFound",
+                  description: "the primary actor at-identifier could not be resolved"
+                }
+              ]
             }
           }
         },
@@ -23267,53 +23714,6 @@ if (cid) {
             }
           }
         },
-        AppBskyUnspeccedGetPopular: {
-          lexicon: 1,
-          id: "app.bsky.unspecced.getPopular",
-          defs: {
-            main: {
-              type: "query",
-              description: "DEPRECATED: will be removed soon. Use a feed generator alternative.",
-              parameters: {
-                type: "params",
-                properties: {
-                  includeNsfw: {
-                    type: "boolean",
-                    default: false
-                  },
-                  limit: {
-                    type: "integer",
-                    minimum: 1,
-                    maximum: 100,
-                    default: 50
-                  },
-                  cursor: {
-                    type: "string"
-                  }
-                }
-              },
-              output: {
-                encoding: "application/json",
-                schema: {
-                  type: "object",
-                  required: ["feed"],
-                  properties: {
-                    cursor: {
-                      type: "string"
-                    },
-                    feed: {
-                      type: "array",
-                      items: {
-                        type: "ref",
-                        ref: "lex:app.bsky.feed.defs#feedViewPost"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
         AppBskyUnspeccedGetPopularFeedGenerators: {
           lexicon: 1,
           id: "app.bsky.unspecced.getPopularFeedGenerators",
@@ -23360,51 +23760,50 @@ if (cid) {
             }
           }
         },
-        AppBskyUnspeccedGetTimelineSkeleton: {
+        AppBskyUnspeccedGetTaggedSuggestions: {
           lexicon: 1,
-          id: "app.bsky.unspecced.getTimelineSkeleton",
+          id: "app.bsky.unspecced.getTaggedSuggestions",
           defs: {
             main: {
               type: "query",
-              description: "DEPRECATED: a skeleton of a timeline. Unspecced and will be unavailable soon.",
+              description: "Get a list of suggestions (feeds and users) tagged with categories",
               parameters: {
                 type: "params",
-                properties: {
-                  limit: {
-                    type: "integer",
-                    minimum: 1,
-                    maximum: 100,
-                    default: 50
-                  },
-                  cursor: {
-                    type: "string"
-                  }
-                }
+                properties: {}
               },
               output: {
                 encoding: "application/json",
                 schema: {
                   type: "object",
-                  required: ["feed"],
+                  required: ["suggestions"],
                   properties: {
-                    cursor: {
-                      type: "string"
-                    },
-                    feed: {
+                    suggestions: {
                       type: "array",
                       items: {
                         type: "ref",
-                        ref: "lex:app.bsky.feed.defs#skeletonFeedPost"
+                        ref: "lex:app.bsky.unspecced.getTaggedSuggestions#suggestion"
                       }
                     }
                   }
                 }
-              },
-              errors: [
-                {
-                  name: "UnknownFeed"
+              }
+            },
+            suggestion: {
+              type: "object",
+              required: ["tag", "subjectType", "subject"],
+              properties: {
+                tag: {
+                  type: "string"
+                },
+                subjectType: {
+                  type: "string",
+                  knownValues: ["actor", "feed"]
+                },
+                subject: {
+                  type: "string",
+                  format: "uri"
                 }
-              ]
+              }
             }
           }
         },
@@ -23531,8 +23930,8 @@ if (cid) {
       };
       var schemas = Object.values(schemaDict);
       var lexicons = new Lexicons(schemas);
-      var deleteAccount_exports = {};
-      __export(deleteAccount_exports, {
+      var createCommunicationTemplate_exports = {};
+      __export(createCommunicationTemplate_exports, {
         toKnownErr: () => toKnownErr
       });
       function toKnownErr(e) {
@@ -23540,8 +23939,8 @@ if (cid) {
         }
         return e;
       }
-      var disableAccountInvites_exports = {};
-      __export(disableAccountInvites_exports, {
+      var deleteAccount_exports = {};
+      __export(deleteAccount_exports, {
         toKnownErr: () => toKnownErr2
       });
       function toKnownErr2(e) {
@@ -23549,8 +23948,8 @@ if (cid) {
         }
         return e;
       }
-      var disableInviteCodes_exports = {};
-      __export(disableInviteCodes_exports, {
+      var deleteCommunicationTemplate_exports = {};
+      __export(deleteCommunicationTemplate_exports, {
         toKnownErr: () => toKnownErr3
       });
       function toKnownErr3(e) {
@@ -23558,17 +23957,35 @@ if (cid) {
         }
         return e;
       }
+      var disableAccountInvites_exports = {};
+      __export(disableAccountInvites_exports, {
+        toKnownErr: () => toKnownErr4
+      });
+      function toKnownErr4(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
+      var disableInviteCodes_exports = {};
+      __export(disableInviteCodes_exports, {
+        toKnownErr: () => toKnownErr5
+      });
+      function toKnownErr5(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
       var emitModerationEvent_exports = {};
       __export(emitModerationEvent_exports, {
         SubjectHasActionError: () => SubjectHasActionError,
-        toKnownErr: () => toKnownErr4
+        toKnownErr: () => toKnownErr6
       });
       var SubjectHasActionError = class extends XRPCError {
         constructor(src22) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr4(e) {
+      function toKnownErr6(e) {
         if (e instanceof XRPCError) {
           if (e.error === "SubjectHasAction")
             return new SubjectHasActionError(e);
@@ -23577,24 +23994,6 @@ if (cid) {
       }
       var enableAccountInvites_exports = {};
       __export(enableAccountInvites_exports, {
-        toKnownErr: () => toKnownErr5
-      });
-      function toKnownErr5(e) {
-        if (e instanceof XRPCError) {
-        }
-        return e;
-      }
-      var getAccountInfo_exports = {};
-      __export(getAccountInfo_exports, {
-        toKnownErr: () => toKnownErr6
-      });
-      function toKnownErr6(e) {
-        if (e instanceof XRPCError) {
-        }
-        return e;
-      }
-      var getInviteCodes_exports = {};
-      __export(getInviteCodes_exports, {
         toKnownErr: () => toKnownErr7
       });
       function toKnownErr7(e) {
@@ -23602,8 +24001,8 @@ if (cid) {
         }
         return e;
       }
-      var getModerationEvent_exports = {};
-      __export(getModerationEvent_exports, {
+      var getAccountInfo_exports = {};
+      __export(getAccountInfo_exports, {
         toKnownErr: () => toKnownErr8
       });
       function toKnownErr8(e) {
@@ -23611,17 +24010,44 @@ if (cid) {
         }
         return e;
       }
+      var getAccountInfos_exports = {};
+      __export(getAccountInfos_exports, {
+        toKnownErr: () => toKnownErr9
+      });
+      function toKnownErr9(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
+      var getInviteCodes_exports = {};
+      __export(getInviteCodes_exports, {
+        toKnownErr: () => toKnownErr10
+      });
+      function toKnownErr10(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
+      var getModerationEvent_exports = {};
+      __export(getModerationEvent_exports, {
+        toKnownErr: () => toKnownErr11
+      });
+      function toKnownErr11(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
       var getRecord_exports = {};
       __export(getRecord_exports, {
         RecordNotFoundError: () => RecordNotFoundError,
-        toKnownErr: () => toKnownErr9
+        toKnownErr: () => toKnownErr12
       });
       var RecordNotFoundError = class extends XRPCError {
         constructor(src22) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr9(e) {
+      function toKnownErr12(e) {
         if (e instanceof XRPCError) {
           if (e.error === "RecordNotFound")
             return new RecordNotFoundError(e);
@@ -23631,14 +24057,14 @@ if (cid) {
       var getRepo_exports = {};
       __export(getRepo_exports, {
         RepoNotFoundError: () => RepoNotFoundError,
-        toKnownErr: () => toKnownErr10
+        toKnownErr: () => toKnownErr13
       });
       var RepoNotFoundError = class extends XRPCError {
         constructor(src22) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr10(e) {
+      function toKnownErr13(e) {
         if (e instanceof XRPCError) {
           if (e.error === "RepoNotFound")
             return new RepoNotFoundError(e);
@@ -23647,33 +24073,6 @@ if (cid) {
       }
       var getSubjectStatus_exports = {};
       __export(getSubjectStatus_exports, {
-        toKnownErr: () => toKnownErr11
-      });
-      function toKnownErr11(e) {
-        if (e instanceof XRPCError) {
-        }
-        return e;
-      }
-      var queryModerationEvents_exports = {};
-      __export(queryModerationEvents_exports, {
-        toKnownErr: () => toKnownErr12
-      });
-      function toKnownErr12(e) {
-        if (e instanceof XRPCError) {
-        }
-        return e;
-      }
-      var queryModerationStatuses_exports = {};
-      __export(queryModerationStatuses_exports, {
-        toKnownErr: () => toKnownErr13
-      });
-      function toKnownErr13(e) {
-        if (e instanceof XRPCError) {
-        }
-        return e;
-      }
-      var searchRepos_exports = {};
-      __export(searchRepos_exports, {
         toKnownErr: () => toKnownErr14
       });
       function toKnownErr14(e) {
@@ -23681,8 +24080,8 @@ if (cid) {
         }
         return e;
       }
-      var sendEmail_exports = {};
-      __export(sendEmail_exports, {
+      var listCommunicationTemplates_exports = {};
+      __export(listCommunicationTemplates_exports, {
         toKnownErr: () => toKnownErr15
       });
       function toKnownErr15(e) {
@@ -23690,8 +24089,8 @@ if (cid) {
         }
         return e;
       }
-      var updateAccountEmail_exports = {};
-      __export(updateAccountEmail_exports, {
+      var queryModerationEvents_exports = {};
+      __export(queryModerationEvents_exports, {
         toKnownErr: () => toKnownErr16
       });
       function toKnownErr16(e) {
@@ -23699,8 +24098,8 @@ if (cid) {
         }
         return e;
       }
-      var updateAccountHandle_exports = {};
-      __export(updateAccountHandle_exports, {
+      var queryModerationStatuses_exports = {};
+      __export(queryModerationStatuses_exports, {
         toKnownErr: () => toKnownErr17
       });
       function toKnownErr17(e) {
@@ -23708,8 +24107,8 @@ if (cid) {
         }
         return e;
       }
-      var updateSubjectStatus_exports = {};
-      __export(updateSubjectStatus_exports, {
+      var searchRepos_exports = {};
+      __export(searchRepos_exports, {
         toKnownErr: () => toKnownErr18
       });
       function toKnownErr18(e) {
@@ -23717,8 +24116,8 @@ if (cid) {
         }
         return e;
       }
-      var resolveHandle_exports = {};
-      __export(resolveHandle_exports, {
+      var sendEmail_exports = {};
+      __export(sendEmail_exports, {
         toKnownErr: () => toKnownErr19
       });
       function toKnownErr19(e) {
@@ -23726,8 +24125,8 @@ if (cid) {
         }
         return e;
       }
-      var updateHandle_exports = {};
-      __export(updateHandle_exports, {
+      var updateAccountEmail_exports = {};
+      __export(updateAccountEmail_exports, {
         toKnownErr: () => toKnownErr20
       });
       function toKnownErr20(e) {
@@ -23735,8 +24134,8 @@ if (cid) {
         }
         return e;
       }
-      var queryLabels_exports = {};
-      __export(queryLabels_exports, {
+      var updateAccountHandle_exports = {};
+      __export(updateAccountHandle_exports, {
         toKnownErr: () => toKnownErr21
       });
       function toKnownErr21(e) {
@@ -23744,11 +24143,56 @@ if (cid) {
         }
         return e;
       }
-      var createReport_exports = {};
-      __export(createReport_exports, {
+      var updateCommunicationTemplate_exports = {};
+      __export(updateCommunicationTemplate_exports, {
         toKnownErr: () => toKnownErr22
       });
       function toKnownErr22(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
+      var updateSubjectStatus_exports = {};
+      __export(updateSubjectStatus_exports, {
+        toKnownErr: () => toKnownErr23
+      });
+      function toKnownErr23(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
+      var resolveHandle_exports = {};
+      __export(resolveHandle_exports, {
+        toKnownErr: () => toKnownErr24
+      });
+      function toKnownErr24(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
+      var updateHandle_exports = {};
+      __export(updateHandle_exports, {
+        toKnownErr: () => toKnownErr25
+      });
+      function toKnownErr25(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
+      var queryLabels_exports = {};
+      __export(queryLabels_exports, {
+        toKnownErr: () => toKnownErr26
+      });
+      function toKnownErr26(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
+      var createReport_exports = {};
+      __export(createReport_exports, {
+        toKnownErr: () => toKnownErr27
+      });
+      function toKnownErr27(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -23759,7 +24203,7 @@ if (cid) {
         isCreate: () => isCreate,
         isDelete: () => isDelete,
         isUpdate: () => isUpdate,
-        toKnownErr: () => toKnownErr23,
+        toKnownErr: () => toKnownErr28,
         validateCreate: () => validateCreate,
         validateDelete: () => validateDelete,
         validateUpdate: () => validateUpdate
@@ -23775,7 +24219,7 @@ if (cid) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr23(e) {
+      function toKnownErr28(e) {
         if (e instanceof XRPCError) {
           if (e.error === "InvalidSwap")
             return new InvalidSwapError(e);
@@ -23803,14 +24247,14 @@ if (cid) {
       var createRecord_exports = {};
       __export(createRecord_exports, {
         InvalidSwapError: () => InvalidSwapError2,
-        toKnownErr: () => toKnownErr24
+        toKnownErr: () => toKnownErr29
       });
       var InvalidSwapError2 = class extends XRPCError {
         constructor(src22) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr24(e) {
+      function toKnownErr29(e) {
         if (e instanceof XRPCError) {
           if (e.error === "InvalidSwap")
             return new InvalidSwapError2(e);
@@ -23820,14 +24264,14 @@ if (cid) {
       var deleteRecord_exports = {};
       __export(deleteRecord_exports, {
         InvalidSwapError: () => InvalidSwapError3,
-        toKnownErr: () => toKnownErr25
+        toKnownErr: () => toKnownErr30
       });
       var InvalidSwapError3 = class extends XRPCError {
         constructor(src22) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr25(e) {
+      function toKnownErr30(e) {
         if (e instanceof XRPCError) {
           if (e.error === "InvalidSwap")
             return new InvalidSwapError3(e);
@@ -23836,18 +24280,18 @@ if (cid) {
       }
       var describeRepo_exports = {};
       __export(describeRepo_exports, {
-        toKnownErr: () => toKnownErr26
+        toKnownErr: () => toKnownErr31
       });
-      function toKnownErr26(e) {
+      function toKnownErr31(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var getRecord_exports2 = {};
       __export(getRecord_exports2, {
-        toKnownErr: () => toKnownErr27
+        toKnownErr: () => toKnownErr32
       });
-      function toKnownErr27(e) {
+      function toKnownErr32(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -23855,10 +24299,10 @@ if (cid) {
       var listRecords_exports = {};
       __export(listRecords_exports, {
         isRecord: () => isRecord,
-        toKnownErr: () => toKnownErr28,
+        toKnownErr: () => toKnownErr33,
         validateRecord: () => validateRecord
       });
-      function toKnownErr28(e) {
+      function toKnownErr33(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -23872,14 +24316,14 @@ if (cid) {
       var putRecord_exports = {};
       __export(putRecord_exports, {
         InvalidSwapError: () => InvalidSwapError4,
-        toKnownErr: () => toKnownErr29
+        toKnownErr: () => toKnownErr34
       });
       var InvalidSwapError4 = class extends XRPCError {
         constructor(src22) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr29(e) {
+      function toKnownErr34(e) {
         if (e instanceof XRPCError) {
           if (e.error === "InvalidSwap")
             return new InvalidSwapError4(e);
@@ -23888,9 +24332,9 @@ if (cid) {
       }
       var uploadBlob_exports = {};
       __export(uploadBlob_exports, {
-        toKnownErr: () => toKnownErr30
+        toKnownErr: () => toKnownErr35
       });
-      function toKnownErr30(e) {
+      function toKnownErr35(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -23901,7 +24345,7 @@ if (cid) {
         ExpiredTokenError: () => ExpiredTokenError,
         InvalidEmailError: () => InvalidEmailError,
         InvalidTokenError: () => InvalidTokenError,
-        toKnownErr: () => toKnownErr31
+        toKnownErr: () => toKnownErr36
       });
       var AccountNotFoundError = class extends XRPCError {
         constructor(src22) {
@@ -23923,7 +24367,7 @@ if (cid) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr31(e) {
+      function toKnownErr36(e) {
         if (e instanceof XRPCError) {
           if (e.error === "AccountNotFound")
             return new AccountNotFoundError(e);
@@ -23945,7 +24389,7 @@ if (cid) {
         InvalidPasswordError: () => InvalidPasswordError,
         UnresolvableDidError: () => UnresolvableDidError,
         UnsupportedDomainError: () => UnsupportedDomainError,
-        toKnownErr: () => toKnownErr32
+        toKnownErr: () => toKnownErr37
       });
       var InvalidHandleError2 = class extends XRPCError {
         constructor(src22) {
@@ -23982,7 +24426,7 @@ if (cid) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr32(e) {
+      function toKnownErr37(e) {
         if (e instanceof XRPCError) {
           if (e.error === "InvalidHandle")
             return new InvalidHandleError2(e);
@@ -24005,7 +24449,7 @@ if (cid) {
       __export(createAppPassword_exports, {
         AccountTakedownError: () => AccountTakedownError,
         isAppPassword: () => isAppPassword,
-        toKnownErr: () => toKnownErr33,
+        toKnownErr: () => toKnownErr38,
         validateAppPassword: () => validateAppPassword
       });
       var AccountTakedownError = class extends XRPCError {
@@ -24013,7 +24457,7 @@ if (cid) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr33(e) {
+      function toKnownErr38(e) {
         if (e instanceof XRPCError) {
           if (e.error === "AccountTakedown")
             return new AccountTakedownError(e);
@@ -24028,9 +24472,9 @@ if (cid) {
       }
       var createInviteCode_exports = {};
       __export(createInviteCode_exports, {
-        toKnownErr: () => toKnownErr34
+        toKnownErr: () => toKnownErr39
       });
-      function toKnownErr34(e) {
+      function toKnownErr39(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -24038,10 +24482,10 @@ if (cid) {
       var createInviteCodes_exports = {};
       __export(createInviteCodes_exports, {
         isAccountCodes: () => isAccountCodes,
-        toKnownErr: () => toKnownErr35,
+        toKnownErr: () => toKnownErr40,
         validateAccountCodes: () => validateAccountCodes
       });
-      function toKnownErr35(e) {
+      function toKnownErr40(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -24055,14 +24499,14 @@ if (cid) {
       var createSession_exports = {};
       __export(createSession_exports, {
         AccountTakedownError: () => AccountTakedownError2,
-        toKnownErr: () => toKnownErr36
+        toKnownErr: () => toKnownErr41
       });
       var AccountTakedownError2 = class extends XRPCError {
         constructor(src22) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr36(e) {
+      function toKnownErr41(e) {
         if (e instanceof XRPCError) {
           if (e.error === "AccountTakedown")
             return new AccountTakedownError2(e);
@@ -24073,7 +24517,7 @@ if (cid) {
       __export(deleteAccount_exports2, {
         ExpiredTokenError: () => ExpiredTokenError2,
         InvalidTokenError: () => InvalidTokenError2,
-        toKnownErr: () => toKnownErr37
+        toKnownErr: () => toKnownErr42
       });
       var ExpiredTokenError2 = class extends XRPCError {
         constructor(src22) {
@@ -24085,7 +24529,7 @@ if (cid) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr37(e) {
+      function toKnownErr42(e) {
         if (e instanceof XRPCError) {
           if (e.error === "ExpiredToken")
             return new ExpiredTokenError2(e);
@@ -24096,9 +24540,9 @@ if (cid) {
       }
       var deleteSession_exports = {};
       __export(deleteSession_exports, {
-        toKnownErr: () => toKnownErr38
+        toKnownErr: () => toKnownErr43
       });
-      function toKnownErr38(e) {
+      function toKnownErr43(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -24106,10 +24550,10 @@ if (cid) {
       var describeServer_exports = {};
       __export(describeServer_exports, {
         isLinks: () => isLinks,
-        toKnownErr: () => toKnownErr39,
+        toKnownErr: () => toKnownErr44,
         validateLinks: () => validateLinks
       });
-      function toKnownErr39(e) {
+      function toKnownErr44(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -24123,14 +24567,14 @@ if (cid) {
       var getAccountInviteCodes_exports = {};
       __export(getAccountInviteCodes_exports, {
         DuplicateCreateError: () => DuplicateCreateError,
-        toKnownErr: () => toKnownErr40
+        toKnownErr: () => toKnownErr45
       });
       var DuplicateCreateError = class extends XRPCError {
         constructor(src22) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr40(e) {
+      function toKnownErr45(e) {
         if (e instanceof XRPCError) {
           if (e.error === "DuplicateCreate")
             return new DuplicateCreateError(e);
@@ -24139,9 +24583,9 @@ if (cid) {
       }
       var getSession_exports = {};
       __export(getSession_exports, {
-        toKnownErr: () => toKnownErr41
+        toKnownErr: () => toKnownErr46
       });
-      function toKnownErr41(e) {
+      function toKnownErr46(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -24150,7 +24594,7 @@ if (cid) {
       __export(listAppPasswords_exports, {
         AccountTakedownError: () => AccountTakedownError3,
         isAppPassword: () => isAppPassword2,
-        toKnownErr: () => toKnownErr42,
+        toKnownErr: () => toKnownErr47,
         validateAppPassword: () => validateAppPassword2
       });
       var AccountTakedownError3 = class extends XRPCError {
@@ -24158,7 +24602,7 @@ if (cid) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr42(e) {
+      function toKnownErr47(e) {
         if (e instanceof XRPCError) {
           if (e.error === "AccountTakedown")
             return new AccountTakedownError3(e);
@@ -24174,14 +24618,14 @@ if (cid) {
       var refreshSession_exports = {};
       __export(refreshSession_exports, {
         AccountTakedownError: () => AccountTakedownError4,
-        toKnownErr: () => toKnownErr43
+        toKnownErr: () => toKnownErr48
       });
       var AccountTakedownError4 = class extends XRPCError {
         constructor(src22) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr43(e) {
+      function toKnownErr48(e) {
         if (e instanceof XRPCError) {
           if (e.error === "AccountTakedown")
             return new AccountTakedownError4(e);
@@ -24190,45 +24634,45 @@ if (cid) {
       }
       var requestAccountDelete_exports = {};
       __export(requestAccountDelete_exports, {
-        toKnownErr: () => toKnownErr44
+        toKnownErr: () => toKnownErr49
       });
-      function toKnownErr44(e) {
+      function toKnownErr49(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var requestEmailConfirmation_exports = {};
       __export(requestEmailConfirmation_exports, {
-        toKnownErr: () => toKnownErr45
+        toKnownErr: () => toKnownErr50
       });
-      function toKnownErr45(e) {
+      function toKnownErr50(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var requestEmailUpdate_exports = {};
       __export(requestEmailUpdate_exports, {
-        toKnownErr: () => toKnownErr46
+        toKnownErr: () => toKnownErr51
       });
-      function toKnownErr46(e) {
+      function toKnownErr51(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var requestPasswordReset_exports = {};
       __export(requestPasswordReset_exports, {
-        toKnownErr: () => toKnownErr47
+        toKnownErr: () => toKnownErr52
       });
-      function toKnownErr47(e) {
+      function toKnownErr52(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var reserveSigningKey_exports = {};
       __export(reserveSigningKey_exports, {
-        toKnownErr: () => toKnownErr48
+        toKnownErr: () => toKnownErr53
       });
-      function toKnownErr48(e) {
+      function toKnownErr53(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -24237,7 +24681,7 @@ if (cid) {
       __export(resetPassword_exports, {
         ExpiredTokenError: () => ExpiredTokenError3,
         InvalidTokenError: () => InvalidTokenError3,
-        toKnownErr: () => toKnownErr49
+        toKnownErr: () => toKnownErr54
       });
       var ExpiredTokenError3 = class extends XRPCError {
         constructor(src22) {
@@ -24249,7 +24693,7 @@ if (cid) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr49(e) {
+      function toKnownErr54(e) {
         if (e instanceof XRPCError) {
           if (e.error === "ExpiredToken")
             return new ExpiredTokenError3(e);
@@ -24260,9 +24704,9 @@ if (cid) {
       }
       var revokeAppPassword_exports = {};
       __export(revokeAppPassword_exports, {
-        toKnownErr: () => toKnownErr50
+        toKnownErr: () => toKnownErr55
       });
-      function toKnownErr50(e) {
+      function toKnownErr55(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -24272,7 +24716,7 @@ if (cid) {
         ExpiredTokenError: () => ExpiredTokenError4,
         InvalidTokenError: () => InvalidTokenError4,
         TokenRequiredError: () => TokenRequiredError,
-        toKnownErr: () => toKnownErr51
+        toKnownErr: () => toKnownErr56
       });
       var ExpiredTokenError4 = class extends XRPCError {
         constructor(src22) {
@@ -24289,7 +24733,7 @@ if (cid) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr51(e) {
+      function toKnownErr56(e) {
         if (e instanceof XRPCError) {
           if (e.error === "ExpiredToken")
             return new ExpiredTokenError4(e);
@@ -24302,27 +24746,27 @@ if (cid) {
       }
       var getBlob_exports = {};
       __export(getBlob_exports, {
-        toKnownErr: () => toKnownErr52
+        toKnownErr: () => toKnownErr57
       });
-      function toKnownErr52(e) {
+      function toKnownErr57(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var getBlocks_exports = {};
       __export(getBlocks_exports, {
-        toKnownErr: () => toKnownErr53
+        toKnownErr: () => toKnownErr58
       });
-      function toKnownErr53(e) {
+      function toKnownErr58(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var getCheckout_exports = {};
       __export(getCheckout_exports, {
-        toKnownErr: () => toKnownErr54
+        toKnownErr: () => toKnownErr59
       });
-      function toKnownErr54(e) {
+      function toKnownErr59(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -24330,14 +24774,14 @@ if (cid) {
       var getHead_exports = {};
       __export(getHead_exports, {
         HeadNotFoundError: () => HeadNotFoundError,
-        toKnownErr: () => toKnownErr55
+        toKnownErr: () => toKnownErr60
       });
       var HeadNotFoundError = class extends XRPCError {
         constructor(src22) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr55(e) {
+      function toKnownErr60(e) {
         if (e instanceof XRPCError) {
           if (e.error === "HeadNotFound")
             return new HeadNotFoundError(e);
@@ -24347,14 +24791,14 @@ if (cid) {
       var getLatestCommit_exports = {};
       __export(getLatestCommit_exports, {
         RepoNotFoundError: () => RepoNotFoundError2,
-        toKnownErr: () => toKnownErr56
+        toKnownErr: () => toKnownErr61
       });
       var RepoNotFoundError2 = class extends XRPCError {
         constructor(src22) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr56(e) {
+      function toKnownErr61(e) {
         if (e instanceof XRPCError) {
           if (e.error === "RepoNotFound")
             return new RepoNotFoundError2(e);
@@ -24363,27 +24807,27 @@ if (cid) {
       }
       var getRecord_exports3 = {};
       __export(getRecord_exports3, {
-        toKnownErr: () => toKnownErr57
+        toKnownErr: () => toKnownErr62
       });
-      function toKnownErr57(e) {
+      function toKnownErr62(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var getRepo_exports2 = {};
       __export(getRepo_exports2, {
-        toKnownErr: () => toKnownErr58
+        toKnownErr: () => toKnownErr63
       });
-      function toKnownErr58(e) {
+      function toKnownErr63(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var listBlobs_exports = {};
       __export(listBlobs_exports, {
-        toKnownErr: () => toKnownErr59
+        toKnownErr: () => toKnownErr64
       });
-      function toKnownErr59(e) {
+      function toKnownErr64(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -24391,10 +24835,10 @@ if (cid) {
       var listRepos_exports = {};
       __export(listRepos_exports, {
         isRepo: () => isRepo,
-        toKnownErr: () => toKnownErr60,
+        toKnownErr: () => toKnownErr65,
         validateRepo: () => validateRepo
       });
-      function toKnownErr60(e) {
+      function toKnownErr65(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -24407,45 +24851,63 @@ if (cid) {
       }
       var notifyOfUpdate_exports = {};
       __export(notifyOfUpdate_exports, {
-        toKnownErr: () => toKnownErr61
+        toKnownErr: () => toKnownErr66
       });
-      function toKnownErr61(e) {
+      function toKnownErr66(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var requestCrawl_exports = {};
       __export(requestCrawl_exports, {
-        toKnownErr: () => toKnownErr62
+        toKnownErr: () => toKnownErr67
       });
-      function toKnownErr62(e) {
+      function toKnownErr67(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
+      var checkSignupQueue_exports = {};
+      __export(checkSignupQueue_exports, {
+        toKnownErr: () => toKnownErr68
+      });
+      function toKnownErr68(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var fetchLabels_exports = {};
       __export(fetchLabels_exports, {
-        toKnownErr: () => toKnownErr63
+        toKnownErr: () => toKnownErr69
       });
-      function toKnownErr63(e) {
+      function toKnownErr69(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var importRepo_exports = {};
       __export(importRepo_exports, {
-        toKnownErr: () => toKnownErr64
+        toKnownErr: () => toKnownErr70
       });
-      function toKnownErr64(e) {
+      function toKnownErr70(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var pushBlob_exports = {};
       __export(pushBlob_exports, {
-        toKnownErr: () => toKnownErr65
+        toKnownErr: () => toKnownErr71
       });
-      function toKnownErr65(e) {
+      function toKnownErr71(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
+      var requestPhoneVerification_exports = {};
+      __export(requestPhoneVerification_exports, {
+        toKnownErr: () => toKnownErr72
+      });
+      function toKnownErr72(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -24459,7 +24921,7 @@ if (cid) {
         InvalidPasswordError: () => InvalidPasswordError2,
         UnresolvableDidError: () => UnresolvableDidError2,
         UnsupportedDomainError: () => UnsupportedDomainError2,
-        toKnownErr: () => toKnownErr66
+        toKnownErr: () => toKnownErr73
       });
       var InvalidHandleError3 = class extends XRPCError {
         constructor(src22) {
@@ -24496,7 +24958,7 @@ if (cid) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr66(e) {
+      function toKnownErr73(e) {
         if (e instanceof XRPCError) {
           if (e.error === "InvalidHandle")
             return new InvalidHandleError3(e);
@@ -24517,63 +24979,63 @@ if (cid) {
       }
       var getPreferences_exports = {};
       __export(getPreferences_exports, {
-        toKnownErr: () => toKnownErr67
+        toKnownErr: () => toKnownErr74
       });
-      function toKnownErr67(e) {
+      function toKnownErr74(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var getProfile_exports = {};
       __export(getProfile_exports, {
-        toKnownErr: () => toKnownErr68
+        toKnownErr: () => toKnownErr75
       });
-      function toKnownErr68(e) {
+      function toKnownErr75(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var getProfiles_exports = {};
       __export(getProfiles_exports, {
-        toKnownErr: () => toKnownErr69
+        toKnownErr: () => toKnownErr76
       });
-      function toKnownErr69(e) {
+      function toKnownErr76(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var getSuggestions_exports = {};
       __export(getSuggestions_exports, {
-        toKnownErr: () => toKnownErr70
+        toKnownErr: () => toKnownErr77
       });
-      function toKnownErr70(e) {
+      function toKnownErr77(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var putPreferences_exports = {};
       __export(putPreferences_exports, {
-        toKnownErr: () => toKnownErr71
+        toKnownErr: () => toKnownErr78
       });
-      function toKnownErr71(e) {
+      function toKnownErr78(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var searchActors_exports = {};
       __export(searchActors_exports, {
-        toKnownErr: () => toKnownErr72
+        toKnownErr: () => toKnownErr79
       });
-      function toKnownErr72(e) {
+      function toKnownErr79(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var searchActorsTypeahead_exports = {};
       __export(searchActorsTypeahead_exports, {
-        toKnownErr: () => toKnownErr73
+        toKnownErr: () => toKnownErr80
       });
-      function toKnownErr73(e) {
+      function toKnownErr80(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -24582,11 +25044,11 @@ if (cid) {
       __export(describeFeedGenerator_exports, {
         isFeed: () => isFeed,
         isLinks: () => isLinks2,
-        toKnownErr: () => toKnownErr74,
+        toKnownErr: () => toKnownErr81,
         validateFeed: () => validateFeed,
         validateLinks: () => validateLinks2
       });
-      function toKnownErr74(e) {
+      function toKnownErr81(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -24605,9 +25067,9 @@ if (cid) {
       }
       var getActorFeeds_exports = {};
       __export(getActorFeeds_exports, {
-        toKnownErr: () => toKnownErr75
+        toKnownErr: () => toKnownErr82
       });
-      function toKnownErr75(e) {
+      function toKnownErr82(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -24616,7 +25078,7 @@ if (cid) {
       __export(getActorLikes_exports, {
         BlockedActorError: () => BlockedActorError,
         BlockedByActorError: () => BlockedByActorError,
-        toKnownErr: () => toKnownErr76
+        toKnownErr: () => toKnownErr83
       });
       var BlockedActorError = class extends XRPCError {
         constructor(src22) {
@@ -24628,7 +25090,7 @@ if (cid) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr76(e) {
+      function toKnownErr83(e) {
         if (e instanceof XRPCError) {
           if (e.error === "BlockedActor")
             return new BlockedActorError(e);
@@ -24641,7 +25103,7 @@ if (cid) {
       __export(getAuthorFeed_exports, {
         BlockedActorError: () => BlockedActorError2,
         BlockedByActorError: () => BlockedByActorError2,
-        toKnownErr: () => toKnownErr77
+        toKnownErr: () => toKnownErr84
       });
       var BlockedActorError2 = class extends XRPCError {
         constructor(src22) {
@@ -24653,7 +25115,7 @@ if (cid) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr77(e) {
+      function toKnownErr84(e) {
         if (e instanceof XRPCError) {
           if (e.error === "BlockedActor")
             return new BlockedActorError2(e);
@@ -24665,14 +25127,14 @@ if (cid) {
       var getFeed_exports = {};
       __export(getFeed_exports, {
         UnknownFeedError: () => UnknownFeedError,
-        toKnownErr: () => toKnownErr78
+        toKnownErr: () => toKnownErr85
       });
       var UnknownFeedError = class extends XRPCError {
         constructor(src22) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr78(e) {
+      function toKnownErr85(e) {
         if (e instanceof XRPCError) {
           if (e.error === "UnknownFeed")
             return new UnknownFeedError(e);
@@ -24681,18 +25143,18 @@ if (cid) {
       }
       var getFeedGenerator_exports = {};
       __export(getFeedGenerator_exports, {
-        toKnownErr: () => toKnownErr79
+        toKnownErr: () => toKnownErr86
       });
-      function toKnownErr79(e) {
+      function toKnownErr86(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var getFeedGenerators_exports = {};
       __export(getFeedGenerators_exports, {
-        toKnownErr: () => toKnownErr80
+        toKnownErr: () => toKnownErr87
       });
-      function toKnownErr80(e) {
+      function toKnownErr87(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -24700,14 +25162,14 @@ if (cid) {
       var getFeedSkeleton_exports = {};
       __export(getFeedSkeleton_exports, {
         UnknownFeedError: () => UnknownFeedError2,
-        toKnownErr: () => toKnownErr81
+        toKnownErr: () => toKnownErr88
       });
       var UnknownFeedError2 = class extends XRPCError {
         constructor(src22) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr81(e) {
+      function toKnownErr88(e) {
         if (e instanceof XRPCError) {
           if (e.error === "UnknownFeed")
             return new UnknownFeedError2(e);
@@ -24717,10 +25179,10 @@ if (cid) {
       var getLikes_exports = {};
       __export(getLikes_exports, {
         isLike: () => isLike,
-        toKnownErr: () => toKnownErr82,
+        toKnownErr: () => toKnownErr89,
         validateLike: () => validateLike
       });
-      function toKnownErr82(e) {
+      function toKnownErr89(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -24734,14 +25196,14 @@ if (cid) {
       var getListFeed_exports = {};
       __export(getListFeed_exports, {
         UnknownListError: () => UnknownListError,
-        toKnownErr: () => toKnownErr83
+        toKnownErr: () => toKnownErr90
       });
       var UnknownListError = class extends XRPCError {
         constructor(src22) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr83(e) {
+      function toKnownErr90(e) {
         if (e instanceof XRPCError) {
           if (e.error === "UnknownList")
             return new UnknownListError(e);
@@ -24751,14 +25213,14 @@ if (cid) {
       var getPostThread_exports = {};
       __export(getPostThread_exports, {
         NotFoundError: () => NotFoundError,
-        toKnownErr: () => toKnownErr84
+        toKnownErr: () => toKnownErr91
       });
       var NotFoundError = class extends XRPCError {
         constructor(src22) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr84(e) {
+      function toKnownErr91(e) {
         if (e instanceof XRPCError) {
           if (e.error === "NotFound")
             return new NotFoundError(e);
@@ -24767,36 +25229,36 @@ if (cid) {
       }
       var getPosts_exports = {};
       __export(getPosts_exports, {
-        toKnownErr: () => toKnownErr85
+        toKnownErr: () => toKnownErr92
       });
-      function toKnownErr85(e) {
+      function toKnownErr92(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var getRepostedBy_exports = {};
       __export(getRepostedBy_exports, {
-        toKnownErr: () => toKnownErr86
+        toKnownErr: () => toKnownErr93
       });
-      function toKnownErr86(e) {
+      function toKnownErr93(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var getSuggestedFeeds_exports = {};
       __export(getSuggestedFeeds_exports, {
-        toKnownErr: () => toKnownErr87
+        toKnownErr: () => toKnownErr94
       });
-      function toKnownErr87(e) {
+      function toKnownErr94(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var getTimeline_exports = {};
       __export(getTimeline_exports, {
-        toKnownErr: () => toKnownErr88
+        toKnownErr: () => toKnownErr95
       });
-      function toKnownErr88(e) {
+      function toKnownErr95(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -24804,14 +25266,14 @@ if (cid) {
       var searchPosts_exports = {};
       __export(searchPosts_exports, {
         BadQueryStringError: () => BadQueryStringError,
-        toKnownErr: () => toKnownErr89
+        toKnownErr: () => toKnownErr96
       });
       var BadQueryStringError = class extends XRPCError {
         constructor(src22) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr89(e) {
+      function toKnownErr96(e) {
         if (e instanceof XRPCError) {
           if (e.error === "BadQueryString")
             return new BadQueryStringError(e);
@@ -24820,69 +25282,6 @@ if (cid) {
       }
       var getBlocks_exports2 = {};
       __export(getBlocks_exports2, {
-        toKnownErr: () => toKnownErr90
-      });
-      function toKnownErr90(e) {
-        if (e instanceof XRPCError) {
-        }
-        return e;
-      }
-      var getFollowers_exports = {};
-      __export(getFollowers_exports, {
-        toKnownErr: () => toKnownErr91
-      });
-      function toKnownErr91(e) {
-        if (e instanceof XRPCError) {
-        }
-        return e;
-      }
-      var getFollows_exports = {};
-      __export(getFollows_exports, {
-        toKnownErr: () => toKnownErr92
-      });
-      function toKnownErr92(e) {
-        if (e instanceof XRPCError) {
-        }
-        return e;
-      }
-      var getList_exports = {};
-      __export(getList_exports, {
-        toKnownErr: () => toKnownErr93
-      });
-      function toKnownErr93(e) {
-        if (e instanceof XRPCError) {
-        }
-        return e;
-      }
-      var getListBlocks_exports = {};
-      __export(getListBlocks_exports, {
-        toKnownErr: () => toKnownErr94
-      });
-      function toKnownErr94(e) {
-        if (e instanceof XRPCError) {
-        }
-        return e;
-      }
-      var getListMutes_exports = {};
-      __export(getListMutes_exports, {
-        toKnownErr: () => toKnownErr95
-      });
-      function toKnownErr95(e) {
-        if (e instanceof XRPCError) {
-        }
-        return e;
-      }
-      var getLists_exports = {};
-      __export(getLists_exports, {
-        toKnownErr: () => toKnownErr96
-      });
-      function toKnownErr96(e) {
-        if (e instanceof XRPCError) {
-        }
-        return e;
-      }
-      var getMutes_exports = {};
-      __export(getMutes_exports, {
         toKnownErr: () => toKnownErr97
       });
       function toKnownErr97(e) {
@@ -24890,8 +25289,8 @@ if (cid) {
         }
         return e;
       }
-      var getSuggestedFollowsByActor_exports = {};
-      __export(getSuggestedFollowsByActor_exports, {
+      var getFollowers_exports = {};
+      __export(getFollowers_exports, {
         toKnownErr: () => toKnownErr98
       });
       function toKnownErr98(e) {
@@ -24899,8 +25298,8 @@ if (cid) {
         }
         return e;
       }
-      var muteActor_exports = {};
-      __export(muteActor_exports, {
+      var getFollows_exports = {};
+      __export(getFollows_exports, {
         toKnownErr: () => toKnownErr99
       });
       function toKnownErr99(e) {
@@ -24908,8 +25307,8 @@ if (cid) {
         }
         return e;
       }
-      var muteActorList_exports = {};
-      __export(muteActorList_exports, {
+      var getList_exports = {};
+      __export(getList_exports, {
         toKnownErr: () => toKnownErr100
       });
       function toKnownErr100(e) {
@@ -24917,8 +25316,8 @@ if (cid) {
         }
         return e;
       }
-      var unmuteActor_exports = {};
-      __export(unmuteActor_exports, {
+      var getListBlocks_exports = {};
+      __export(getListBlocks_exports, {
         toKnownErr: () => toKnownErr101
       });
       function toKnownErr101(e) {
@@ -24926,8 +25325,8 @@ if (cid) {
         }
         return e;
       }
-      var unmuteActorList_exports = {};
-      __export(unmuteActorList_exports, {
+      var getListMutes_exports = {};
+      __export(getListMutes_exports, {
         toKnownErr: () => toKnownErr102
       });
       function toKnownErr102(e) {
@@ -24935,8 +25334,8 @@ if (cid) {
         }
         return e;
       }
-      var getUnreadCount_exports = {};
-      __export(getUnreadCount_exports, {
+      var getLists_exports = {};
+      __export(getLists_exports, {
         toKnownErr: () => toKnownErr103
       });
       function toKnownErr103(e) {
@@ -24944,13 +25343,93 @@ if (cid) {
         }
         return e;
       }
+      var getMutes_exports = {};
+      __export(getMutes_exports, {
+        toKnownErr: () => toKnownErr104
+      });
+      function toKnownErr104(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
+      var getRelationships_exports = {};
+      __export(getRelationships_exports, {
+        ActorNotFoundError: () => ActorNotFoundError,
+        toKnownErr: () => toKnownErr105
+      });
+      var ActorNotFoundError = class extends XRPCError {
+        constructor(src22) {
+          super(src22.status, src22.error, src22.message, src22.headers);
+        }
+      };
+      function toKnownErr105(e) {
+        if (e instanceof XRPCError) {
+          if (e.error === "ActorNotFound")
+            return new ActorNotFoundError(e);
+        }
+        return e;
+      }
+      var getSuggestedFollowsByActor_exports = {};
+      __export(getSuggestedFollowsByActor_exports, {
+        toKnownErr: () => toKnownErr106
+      });
+      function toKnownErr106(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
+      var muteActor_exports = {};
+      __export(muteActor_exports, {
+        toKnownErr: () => toKnownErr107
+      });
+      function toKnownErr107(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
+      var muteActorList_exports = {};
+      __export(muteActorList_exports, {
+        toKnownErr: () => toKnownErr108
+      });
+      function toKnownErr108(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
+      var unmuteActor_exports = {};
+      __export(unmuteActor_exports, {
+        toKnownErr: () => toKnownErr109
+      });
+      function toKnownErr109(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
+      var unmuteActorList_exports = {};
+      __export(unmuteActorList_exports, {
+        toKnownErr: () => toKnownErr110
+      });
+      function toKnownErr110(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
+      var getUnreadCount_exports = {};
+      __export(getUnreadCount_exports, {
+        toKnownErr: () => toKnownErr111
+      });
+      function toKnownErr111(e) {
+        if (e instanceof XRPCError) {
+        }
+        return e;
+      }
       var listNotifications_exports = {};
       __export(listNotifications_exports, {
         isNotification: () => isNotification,
-        toKnownErr: () => toKnownErr104,
+        toKnownErr: () => toKnownErr112,
         validateNotification: () => validateNotification
       });
-      function toKnownErr104(e) {
+      function toKnownErr112(e) {
         if (e instanceof XRPCError) {
         }
         return e;
@@ -24963,68 +25442,59 @@ if (cid) {
       }
       var registerPush_exports = {};
       __export(registerPush_exports, {
-        toKnownErr: () => toKnownErr105
+        toKnownErr: () => toKnownErr113
       });
-      function toKnownErr105(e) {
+      function toKnownErr113(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var updateSeen_exports = {};
       __export(updateSeen_exports, {
-        toKnownErr: () => toKnownErr106
+        toKnownErr: () => toKnownErr114
       });
-      function toKnownErr106(e) {
-        if (e instanceof XRPCError) {
-        }
-        return e;
-      }
-      var getPopular_exports = {};
-      __export(getPopular_exports, {
-        toKnownErr: () => toKnownErr107
-      });
-      function toKnownErr107(e) {
+      function toKnownErr114(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
       var getPopularFeedGenerators_exports = {};
       __export(getPopularFeedGenerators_exports, {
-        toKnownErr: () => toKnownErr108
+        toKnownErr: () => toKnownErr115
       });
-      function toKnownErr108(e) {
+      function toKnownErr115(e) {
         if (e instanceof XRPCError) {
         }
         return e;
       }
-      var getTimelineSkeleton_exports = {};
-      __export(getTimelineSkeleton_exports, {
-        UnknownFeedError: () => UnknownFeedError3,
-        toKnownErr: () => toKnownErr109
+      var getTaggedSuggestions_exports = {};
+      __export(getTaggedSuggestions_exports, {
+        isSuggestion: () => isSuggestion,
+        toKnownErr: () => toKnownErr116,
+        validateSuggestion: () => validateSuggestion
       });
-      var UnknownFeedError3 = class extends XRPCError {
-        constructor(src22) {
-          super(src22.status, src22.error, src22.message, src22.headers);
-        }
-      };
-      function toKnownErr109(e) {
+      function toKnownErr116(e) {
         if (e instanceof XRPCError) {
-          if (e.error === "UnknownFeed")
-            return new UnknownFeedError3(e);
         }
         return e;
+      }
+      function isSuggestion(v) {
+        return isObj2(v) && hasProp2(v, "$type") && v.$type === "app.bsky.unspecced.getTaggedSuggestions#suggestion";
+      }
+      function validateSuggestion(v) {
+        return lexicons.validate("app.bsky.unspecced.getTaggedSuggestions#suggestion", v);
       }
       var searchActorsSkeleton_exports = {};
       __export(searchActorsSkeleton_exports, {
         BadQueryStringError: () => BadQueryStringError2,
-        toKnownErr: () => toKnownErr110
+        toKnownErr: () => toKnownErr117
       });
       var BadQueryStringError2 = class extends XRPCError {
         constructor(src22) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr110(e) {
+      function toKnownErr117(e) {
         if (e instanceof XRPCError) {
           if (e.error === "BadQueryString")
             return new BadQueryStringError2(e);
@@ -25034,14 +25504,14 @@ if (cid) {
       var searchPostsSkeleton_exports = {};
       __export(searchPostsSkeleton_exports, {
         BadQueryStringError: () => BadQueryStringError3,
-        toKnownErr: () => toKnownErr111
+        toKnownErr: () => toKnownErr118
       });
       var BadQueryStringError3 = class extends XRPCError {
         constructor(src22) {
           super(src22.status, src22.error, src22.message, src22.headers);
         }
       };
-      function toKnownErr111(e) {
+      function toKnownErr118(e) {
         if (e instanceof XRPCError) {
           if (e.error === "BadQueryString")
             return new BadQueryStringError3(e);
@@ -25055,6 +25525,7 @@ if (cid) {
         REVIEWOPEN: () => REVIEWOPEN,
         isAccountView: () => isAccountView,
         isBlobView: () => isBlobView,
+        isCommunicationTemplateView: () => isCommunicationTemplateView,
         isImageDetails: () => isImageDetails,
         isModEventAcknowledge: () => isModEventAcknowledge,
         isModEventComment: () => isModEventComment,
@@ -25086,6 +25557,7 @@ if (cid) {
         isVideoDetails: () => isVideoDetails,
         validateAccountView: () => validateAccountView,
         validateBlobView: () => validateBlobView,
+        validateCommunicationTemplateView: () => validateCommunicationTemplateView,
         validateImageDetails: () => validateImageDetails,
         validateModEventAcknowledge: () => validateModEventAcknowledge,
         validateModEventComment: () => validateModEventComment,
@@ -25305,6 +25777,12 @@ if (cid) {
       function validateModEventEmail(v) {
         return lexicons.validate("com.atproto.admin.defs#modEventEmail", v);
       }
+      function isCommunicationTemplateView(v) {
+        return isObj2(v) && hasProp2(v, "$type") && v.$type === "com.atproto.admin.defs#communicationTemplateView";
+      }
+      function validateCommunicationTemplateView(v) {
+        return lexicons.validate("com.atproto.admin.defs#communicationTemplateView", v);
+      }
       var defs_exports2 = {};
       __export(defs_exports2, {
         isLabel: () => isLabel,
@@ -25454,6 +25932,7 @@ if (cid) {
         isAdultContentPref: () => isAdultContentPref,
         isContentLabelPref: () => isContentLabelPref,
         isFeedViewPref: () => isFeedViewPref,
+        isInterestsPref: () => isInterestsPref,
         isPersonalDetailsPref: () => isPersonalDetailsPref,
         isProfileView: () => isProfileView,
         isProfileViewBasic: () => isProfileViewBasic,
@@ -25464,6 +25943,7 @@ if (cid) {
         validateAdultContentPref: () => validateAdultContentPref,
         validateContentLabelPref: () => validateContentLabelPref,
         validateFeedViewPref: () => validateFeedViewPref,
+        validateInterestsPref: () => validateInterestsPref,
         validatePersonalDetailsPref: () => validatePersonalDetailsPref,
         validateProfileView: () => validateProfileView,
         validateProfileViewBasic: () => validateProfileViewBasic,
@@ -25531,6 +26011,12 @@ if (cid) {
       }
       function validateThreadViewPref(v) {
         return lexicons.validate("app.bsky.actor.defs#threadViewPref", v);
+      }
+      function isInterestsPref(v) {
+        return isObj2(v) && hasProp2(v, "$type") && v.$type === "app.bsky.actor.defs#interestsPref";
+      }
+      function validateInterestsPref(v) {
+        return lexicons.validate("app.bsky.actor.defs#interestsPref", v);
       }
       var profile_exports = {};
       __export(profile_exports, {
@@ -25920,10 +26406,14 @@ if (cid) {
         isListView: () => isListView,
         isListViewBasic: () => isListViewBasic,
         isListViewerState: () => isListViewerState,
+        isNotFoundActor: () => isNotFoundActor,
+        isRelationship: () => isRelationship,
         validateListItemView: () => validateListItemView,
         validateListView: () => validateListView,
         validateListViewBasic: () => validateListViewBasic,
-        validateListViewerState: () => validateListViewerState
+        validateListViewerState: () => validateListViewerState,
+        validateNotFoundActor: () => validateNotFoundActor,
+        validateRelationship: () => validateRelationship
       });
       function isListViewBasic(v) {
         return isObj2(v) && hasProp2(v, "$type") && v.$type === "app.bsky.graph.defs#listViewBasic";
@@ -25950,6 +26440,18 @@ if (cid) {
       }
       function validateListViewerState(v) {
         return lexicons.validate("app.bsky.graph.defs#listViewerState", v);
+      }
+      function isNotFoundActor(v) {
+        return isObj2(v) && hasProp2(v, "$type") && v.$type === "app.bsky.graph.defs#notFoundActor";
+      }
+      function validateNotFoundActor(v) {
+        return lexicons.validate("app.bsky.graph.defs#notFoundActor", v);
+      }
+      function isRelationship(v) {
+        return isObj2(v) && hasProp2(v, "$type") && v.$type === "app.bsky.graph.defs#relationship";
+      }
+      function validateRelationship(v) {
+        return lexicons.validate("app.bsky.graph.defs#relationship", v);
       }
       var follow_exports = {};
       __export(follow_exports, {
@@ -26098,448 +26600,483 @@ if (cid) {
       var ComNS = class {
         constructor(service2) {
           this._service = service2;
-          this.atproto = new AtprotoNS(service2);
+          this.atproto = new ComAtprotoNS(service2);
         }
       };
-      var AtprotoNS = class {
+      var ComAtprotoNS = class {
         constructor(service2) {
           this._service = service2;
-          this.admin = new AdminNS(service2);
-          this.identity = new IdentityNS(service2);
-          this.label = new LabelNS(service2);
-          this.moderation = new ModerationNS(service2);
-          this.repo = new RepoNS(service2);
-          this.server = new ServerNS(service2);
-          this.sync = new SyncNS(service2);
-          this.temp = new TempNS(service2);
+          this.admin = new ComAtprotoAdminNS(service2);
+          this.identity = new ComAtprotoIdentityNS(service2);
+          this.label = new ComAtprotoLabelNS(service2);
+          this.moderation = new ComAtprotoModerationNS(service2);
+          this.repo = new ComAtprotoRepoNS(service2);
+          this.server = new ComAtprotoServerNS(service2);
+          this.sync = new ComAtprotoSyncNS(service2);
+          this.temp = new ComAtprotoTempNS(service2);
         }
       };
-      var AdminNS = class {
+      var ComAtprotoAdminNS = class {
         constructor(service2) {
           this._service = service2;
+        }
+        createCommunicationTemplate(data, opts) {
+          return this._service.xrpc.call("com.atproto.admin.createCommunicationTemplate", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
+            throw toKnownErr(e);
+          });
         }
         deleteAccount(data, opts) {
           return this._service.xrpc.call("com.atproto.admin.deleteAccount", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr(e);
+            throw toKnownErr2(e);
+          });
+        }
+        deleteCommunicationTemplate(data, opts) {
+          return this._service.xrpc.call("com.atproto.admin.deleteCommunicationTemplate", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
+            throw toKnownErr3(e);
           });
         }
         disableAccountInvites(data, opts) {
           return this._service.xrpc.call("com.atproto.admin.disableAccountInvites", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr2(e);
+            throw toKnownErr4(e);
           });
         }
         disableInviteCodes(data, opts) {
           return this._service.xrpc.call("com.atproto.admin.disableInviteCodes", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr3(e);
+            throw toKnownErr5(e);
           });
         }
         emitModerationEvent(data, opts) {
           return this._service.xrpc.call("com.atproto.admin.emitModerationEvent", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr4(e);
+            throw toKnownErr6(e);
           });
         }
         enableAccountInvites(data, opts) {
           return this._service.xrpc.call("com.atproto.admin.enableAccountInvites", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr5(e);
+            throw toKnownErr7(e);
           });
         }
         getAccountInfo(params2, opts) {
           return this._service.xrpc.call("com.atproto.admin.getAccountInfo", params2, void 0, opts).catch((e) => {
-            throw toKnownErr6(e);
+            throw toKnownErr8(e);
+          });
+        }
+        getAccountInfos(params2, opts) {
+          return this._service.xrpc.call("com.atproto.admin.getAccountInfos", params2, void 0, opts).catch((e) => {
+            throw toKnownErr9(e);
           });
         }
         getInviteCodes(params2, opts) {
           return this._service.xrpc.call("com.atproto.admin.getInviteCodes", params2, void 0, opts).catch((e) => {
-            throw toKnownErr7(e);
+            throw toKnownErr10(e);
           });
         }
         getModerationEvent(params2, opts) {
           return this._service.xrpc.call("com.atproto.admin.getModerationEvent", params2, void 0, opts).catch((e) => {
-            throw toKnownErr8(e);
+            throw toKnownErr11(e);
           });
         }
         getRecord(params2, opts) {
           return this._service.xrpc.call("com.atproto.admin.getRecord", params2, void 0, opts).catch((e) => {
-            throw toKnownErr9(e);
+            throw toKnownErr12(e);
           });
         }
         getRepo(params2, opts) {
           return this._service.xrpc.call("com.atproto.admin.getRepo", params2, void 0, opts).catch((e) => {
-            throw toKnownErr10(e);
+            throw toKnownErr13(e);
           });
         }
         getSubjectStatus(params2, opts) {
           return this._service.xrpc.call("com.atproto.admin.getSubjectStatus", params2, void 0, opts).catch((e) => {
-            throw toKnownErr11(e);
+            throw toKnownErr14(e);
+          });
+        }
+        listCommunicationTemplates(params2, opts) {
+          return this._service.xrpc.call("com.atproto.admin.listCommunicationTemplates", params2, void 0, opts).catch((e) => {
+            throw toKnownErr15(e);
           });
         }
         queryModerationEvents(params2, opts) {
           return this._service.xrpc.call("com.atproto.admin.queryModerationEvents", params2, void 0, opts).catch((e) => {
-            throw toKnownErr12(e);
+            throw toKnownErr16(e);
           });
         }
         queryModerationStatuses(params2, opts) {
           return this._service.xrpc.call("com.atproto.admin.queryModerationStatuses", params2, void 0, opts).catch((e) => {
-            throw toKnownErr13(e);
+            throw toKnownErr17(e);
           });
         }
         searchRepos(params2, opts) {
           return this._service.xrpc.call("com.atproto.admin.searchRepos", params2, void 0, opts).catch((e) => {
-            throw toKnownErr14(e);
+            throw toKnownErr18(e);
           });
         }
         sendEmail(data, opts) {
           return this._service.xrpc.call("com.atproto.admin.sendEmail", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr15(e);
+            throw toKnownErr19(e);
           });
         }
         updateAccountEmail(data, opts) {
           return this._service.xrpc.call("com.atproto.admin.updateAccountEmail", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr16(e);
+            throw toKnownErr20(e);
           });
         }
         updateAccountHandle(data, opts) {
           return this._service.xrpc.call("com.atproto.admin.updateAccountHandle", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr17(e);
+            throw toKnownErr21(e);
+          });
+        }
+        updateCommunicationTemplate(data, opts) {
+          return this._service.xrpc.call("com.atproto.admin.updateCommunicationTemplate", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
+            throw toKnownErr22(e);
           });
         }
         updateSubjectStatus(data, opts) {
           return this._service.xrpc.call("com.atproto.admin.updateSubjectStatus", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr18(e);
+            throw toKnownErr23(e);
           });
         }
       };
-      var IdentityNS = class {
+      var ComAtprotoIdentityNS = class {
         constructor(service2) {
           this._service = service2;
         }
         resolveHandle(params2, opts) {
           return this._service.xrpc.call("com.atproto.identity.resolveHandle", params2, void 0, opts).catch((e) => {
-            throw toKnownErr19(e);
+            throw toKnownErr24(e);
           });
         }
         updateHandle(data, opts) {
           return this._service.xrpc.call("com.atproto.identity.updateHandle", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr20(e);
+            throw toKnownErr25(e);
           });
         }
       };
-      var LabelNS = class {
+      var ComAtprotoLabelNS = class {
         constructor(service2) {
           this._service = service2;
         }
         queryLabels(params2, opts) {
           return this._service.xrpc.call("com.atproto.label.queryLabels", params2, void 0, opts).catch((e) => {
-            throw toKnownErr21(e);
+            throw toKnownErr26(e);
           });
         }
       };
-      var ModerationNS = class {
+      var ComAtprotoModerationNS = class {
         constructor(service2) {
           this._service = service2;
         }
         createReport(data, opts) {
           return this._service.xrpc.call("com.atproto.moderation.createReport", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr22(e);
+            throw toKnownErr27(e);
           });
         }
       };
-      var RepoNS = class {
+      var ComAtprotoRepoNS = class {
         constructor(service2) {
           this._service = service2;
         }
         applyWrites(data, opts) {
           return this._service.xrpc.call("com.atproto.repo.applyWrites", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr23(e);
+            throw toKnownErr28(e);
           });
         }
         createRecord(data, opts) {
           return this._service.xrpc.call("com.atproto.repo.createRecord", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr24(e);
+            throw toKnownErr29(e);
           });
         }
         deleteRecord(data, opts) {
           return this._service.xrpc.call("com.atproto.repo.deleteRecord", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr25(e);
+            throw toKnownErr30(e);
           });
         }
         describeRepo(params2, opts) {
           return this._service.xrpc.call("com.atproto.repo.describeRepo", params2, void 0, opts).catch((e) => {
-            throw toKnownErr26(e);
+            throw toKnownErr31(e);
           });
         }
         getRecord(params2, opts) {
           return this._service.xrpc.call("com.atproto.repo.getRecord", params2, void 0, opts).catch((e) => {
-            throw toKnownErr27(e);
+            throw toKnownErr32(e);
           });
         }
         listRecords(params2, opts) {
           return this._service.xrpc.call("com.atproto.repo.listRecords", params2, void 0, opts).catch((e) => {
-            throw toKnownErr28(e);
+            throw toKnownErr33(e);
           });
         }
         putRecord(data, opts) {
           return this._service.xrpc.call("com.atproto.repo.putRecord", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr29(e);
+            throw toKnownErr34(e);
           });
         }
         uploadBlob(data, opts) {
           return this._service.xrpc.call("com.atproto.repo.uploadBlob", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr30(e);
+            throw toKnownErr35(e);
           });
         }
       };
-      var ServerNS = class {
+      var ComAtprotoServerNS = class {
         constructor(service2) {
           this._service = service2;
         }
         confirmEmail(data, opts) {
           return this._service.xrpc.call("com.atproto.server.confirmEmail", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr31(e);
+            throw toKnownErr36(e);
           });
         }
         createAccount(data, opts) {
           return this._service.xrpc.call("com.atproto.server.createAccount", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr32(e);
+            throw toKnownErr37(e);
           });
         }
         createAppPassword(data, opts) {
           return this._service.xrpc.call("com.atproto.server.createAppPassword", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr33(e);
+            throw toKnownErr38(e);
           });
         }
         createInviteCode(data, opts) {
           return this._service.xrpc.call("com.atproto.server.createInviteCode", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr34(e);
+            throw toKnownErr39(e);
           });
         }
         createInviteCodes(data, opts) {
           return this._service.xrpc.call("com.atproto.server.createInviteCodes", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr35(e);
+            throw toKnownErr40(e);
           });
         }
         createSession(data, opts) {
           return this._service.xrpc.call("com.atproto.server.createSession", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr36(e);
+            throw toKnownErr41(e);
           });
         }
         deleteAccount(data, opts) {
           return this._service.xrpc.call("com.atproto.server.deleteAccount", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr37(e);
+            throw toKnownErr42(e);
           });
         }
         deleteSession(data, opts) {
           return this._service.xrpc.call("com.atproto.server.deleteSession", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr38(e);
+            throw toKnownErr43(e);
           });
         }
         describeServer(params2, opts) {
           return this._service.xrpc.call("com.atproto.server.describeServer", params2, void 0, opts).catch((e) => {
-            throw toKnownErr39(e);
+            throw toKnownErr44(e);
           });
         }
         getAccountInviteCodes(params2, opts) {
           return this._service.xrpc.call("com.atproto.server.getAccountInviteCodes", params2, void 0, opts).catch((e) => {
-            throw toKnownErr40(e);
+            throw toKnownErr45(e);
           });
         }
         getSession(params2, opts) {
           return this._service.xrpc.call("com.atproto.server.getSession", params2, void 0, opts).catch((e) => {
-            throw toKnownErr41(e);
+            throw toKnownErr46(e);
           });
         }
         listAppPasswords(params2, opts) {
           return this._service.xrpc.call("com.atproto.server.listAppPasswords", params2, void 0, opts).catch((e) => {
-            throw toKnownErr42(e);
+            throw toKnownErr47(e);
           });
         }
         refreshSession(data, opts) {
           return this._service.xrpc.call("com.atproto.server.refreshSession", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr43(e);
+            throw toKnownErr48(e);
           });
         }
         requestAccountDelete(data, opts) {
           return this._service.xrpc.call("com.atproto.server.requestAccountDelete", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr44(e);
+            throw toKnownErr49(e);
           });
         }
         requestEmailConfirmation(data, opts) {
           return this._service.xrpc.call("com.atproto.server.requestEmailConfirmation", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr45(e);
+            throw toKnownErr50(e);
           });
         }
         requestEmailUpdate(data, opts) {
           return this._service.xrpc.call("com.atproto.server.requestEmailUpdate", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr46(e);
+            throw toKnownErr51(e);
           });
         }
         requestPasswordReset(data, opts) {
           return this._service.xrpc.call("com.atproto.server.requestPasswordReset", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr47(e);
+            throw toKnownErr52(e);
           });
         }
         reserveSigningKey(data, opts) {
           return this._service.xrpc.call("com.atproto.server.reserveSigningKey", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr48(e);
+            throw toKnownErr53(e);
           });
         }
         resetPassword(data, opts) {
           return this._service.xrpc.call("com.atproto.server.resetPassword", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr49(e);
+            throw toKnownErr54(e);
           });
         }
         revokeAppPassword(data, opts) {
           return this._service.xrpc.call("com.atproto.server.revokeAppPassword", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr50(e);
+            throw toKnownErr55(e);
           });
         }
         updateEmail(data, opts) {
           return this._service.xrpc.call("com.atproto.server.updateEmail", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr51(e);
+            throw toKnownErr56(e);
           });
         }
       };
-      var SyncNS = class {
+      var ComAtprotoSyncNS = class {
         constructor(service2) {
           this._service = service2;
         }
         getBlob(params2, opts) {
           return this._service.xrpc.call("com.atproto.sync.getBlob", params2, void 0, opts).catch((e) => {
-            throw toKnownErr52(e);
+            throw toKnownErr57(e);
           });
         }
         getBlocks(params2, opts) {
           return this._service.xrpc.call("com.atproto.sync.getBlocks", params2, void 0, opts).catch((e) => {
-            throw toKnownErr53(e);
+            throw toKnownErr58(e);
           });
         }
         getCheckout(params2, opts) {
           return this._service.xrpc.call("com.atproto.sync.getCheckout", params2, void 0, opts).catch((e) => {
-            throw toKnownErr54(e);
+            throw toKnownErr59(e);
           });
         }
         getHead(params2, opts) {
           return this._service.xrpc.call("com.atproto.sync.getHead", params2, void 0, opts).catch((e) => {
-            throw toKnownErr55(e);
+            throw toKnownErr60(e);
           });
         }
         getLatestCommit(params2, opts) {
           return this._service.xrpc.call("com.atproto.sync.getLatestCommit", params2, void 0, opts).catch((e) => {
-            throw toKnownErr56(e);
+            throw toKnownErr61(e);
           });
         }
         getRecord(params2, opts) {
           return this._service.xrpc.call("com.atproto.sync.getRecord", params2, void 0, opts).catch((e) => {
-            throw toKnownErr57(e);
+            throw toKnownErr62(e);
           });
         }
         getRepo(params2, opts) {
           return this._service.xrpc.call("com.atproto.sync.getRepo", params2, void 0, opts).catch((e) => {
-            throw toKnownErr58(e);
+            throw toKnownErr63(e);
           });
         }
         listBlobs(params2, opts) {
           return this._service.xrpc.call("com.atproto.sync.listBlobs", params2, void 0, opts).catch((e) => {
-            throw toKnownErr59(e);
+            throw toKnownErr64(e);
           });
         }
         listRepos(params2, opts) {
           return this._service.xrpc.call("com.atproto.sync.listRepos", params2, void 0, opts).catch((e) => {
-            throw toKnownErr60(e);
+            throw toKnownErr65(e);
           });
         }
         notifyOfUpdate(data, opts) {
           return this._service.xrpc.call("com.atproto.sync.notifyOfUpdate", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr61(e);
+            throw toKnownErr66(e);
           });
         }
         requestCrawl(data, opts) {
           return this._service.xrpc.call("com.atproto.sync.requestCrawl", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr62(e);
+            throw toKnownErr67(e);
           });
         }
       };
-      var TempNS = class {
+      var ComAtprotoTempNS = class {
         constructor(service2) {
           this._service = service2;
         }
+        checkSignupQueue(params2, opts) {
+          return this._service.xrpc.call("com.atproto.temp.checkSignupQueue", params2, void 0, opts).catch((e) => {
+            throw toKnownErr68(e);
+          });
+        }
         fetchLabels(params2, opts) {
           return this._service.xrpc.call("com.atproto.temp.fetchLabels", params2, void 0, opts).catch((e) => {
-            throw toKnownErr63(e);
+            throw toKnownErr69(e);
           });
         }
         importRepo(data, opts) {
           return this._service.xrpc.call("com.atproto.temp.importRepo", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr64(e);
+            throw toKnownErr70(e);
           });
         }
         pushBlob(data, opts) {
           return this._service.xrpc.call("com.atproto.temp.pushBlob", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr65(e);
+            throw toKnownErr71(e);
+          });
+        }
+        requestPhoneVerification(data, opts) {
+          return this._service.xrpc.call("com.atproto.temp.requestPhoneVerification", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
+            throw toKnownErr72(e);
           });
         }
         transferAccount(data, opts) {
           return this._service.xrpc.call("com.atproto.temp.transferAccount", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr66(e);
+            throw toKnownErr73(e);
           });
         }
       };
       var AppNS = class {
         constructor(service2) {
           this._service = service2;
-          this.bsky = new BskyNS(service2);
+          this.bsky = new AppBskyNS(service2);
         }
       };
-      var BskyNS = class {
+      var AppBskyNS = class {
         constructor(service2) {
           this._service = service2;
-          this.actor = new ActorNS(service2);
-          this.embed = new EmbedNS(service2);
-          this.feed = new FeedNS(service2);
-          this.graph = new GraphNS(service2);
-          this.notification = new NotificationNS(service2);
-          this.richtext = new RichtextNS(service2);
-          this.unspecced = new UnspeccedNS(service2);
+          this.actor = new AppBskyActorNS(service2);
+          this.embed = new AppBskyEmbedNS(service2);
+          this.feed = new AppBskyFeedNS(service2);
+          this.graph = new AppBskyGraphNS(service2);
+          this.notification = new AppBskyNotificationNS(service2);
+          this.richtext = new AppBskyRichtextNS(service2);
+          this.unspecced = new AppBskyUnspeccedNS(service2);
         }
       };
-      var ActorNS = class {
+      var AppBskyActorNS = class {
         constructor(service2) {
           this._service = service2;
           this.profile = new ProfileRecord(service2);
         }
         getPreferences(params2, opts) {
           return this._service.xrpc.call("app.bsky.actor.getPreferences", params2, void 0, opts).catch((e) => {
-            throw toKnownErr67(e);
+            throw toKnownErr74(e);
           });
         }
         getProfile(params2, opts) {
           return this._service.xrpc.call("app.bsky.actor.getProfile", params2, void 0, opts).catch((e) => {
-            throw toKnownErr68(e);
+            throw toKnownErr75(e);
           });
         }
         getProfiles(params2, opts) {
           return this._service.xrpc.call("app.bsky.actor.getProfiles", params2, void 0, opts).catch((e) => {
-            throw toKnownErr69(e);
+            throw toKnownErr76(e);
           });
         }
         getSuggestions(params2, opts) {
           return this._service.xrpc.call("app.bsky.actor.getSuggestions", params2, void 0, opts).catch((e) => {
-            throw toKnownErr70(e);
+            throw toKnownErr77(e);
           });
         }
         putPreferences(data, opts) {
           return this._service.xrpc.call("app.bsky.actor.putPreferences", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr71(e);
+            throw toKnownErr78(e);
           });
         }
         searchActors(params2, opts) {
           return this._service.xrpc.call("app.bsky.actor.searchActors", params2, void 0, opts).catch((e) => {
-            throw toKnownErr72(e);
+            throw toKnownErr79(e);
           });
         }
         searchActorsTypeahead(params2, opts) {
           return this._service.xrpc.call("app.bsky.actor.searchActorsTypeahead", params2, void 0, opts).catch((e) => {
-            throw toKnownErr73(e);
+            throw toKnownErr80(e);
           });
         }
       };
@@ -26576,12 +27113,12 @@ if (cid) {
           });
         }
       };
-      var EmbedNS = class {
+      var AppBskyEmbedNS = class {
         constructor(service2) {
           this._service = service2;
         }
       };
-      var FeedNS = class {
+      var AppBskyFeedNS = class {
         constructor(service2) {
           this._service = service2;
           this.generator = new GeneratorRecord(service2);
@@ -26592,82 +27129,82 @@ if (cid) {
         }
         describeFeedGenerator(params2, opts) {
           return this._service.xrpc.call("app.bsky.feed.describeFeedGenerator", params2, void 0, opts).catch((e) => {
-            throw toKnownErr74(e);
+            throw toKnownErr81(e);
           });
         }
         getActorFeeds(params2, opts) {
           return this._service.xrpc.call("app.bsky.feed.getActorFeeds", params2, void 0, opts).catch((e) => {
-            throw toKnownErr75(e);
+            throw toKnownErr82(e);
           });
         }
         getActorLikes(params2, opts) {
           return this._service.xrpc.call("app.bsky.feed.getActorLikes", params2, void 0, opts).catch((e) => {
-            throw toKnownErr76(e);
+            throw toKnownErr83(e);
           });
         }
         getAuthorFeed(params2, opts) {
           return this._service.xrpc.call("app.bsky.feed.getAuthorFeed", params2, void 0, opts).catch((e) => {
-            throw toKnownErr77(e);
+            throw toKnownErr84(e);
           });
         }
         getFeed(params2, opts) {
           return this._service.xrpc.call("app.bsky.feed.getFeed", params2, void 0, opts).catch((e) => {
-            throw toKnownErr78(e);
+            throw toKnownErr85(e);
           });
         }
         getFeedGenerator(params2, opts) {
           return this._service.xrpc.call("app.bsky.feed.getFeedGenerator", params2, void 0, opts).catch((e) => {
-            throw toKnownErr79(e);
+            throw toKnownErr86(e);
           });
         }
         getFeedGenerators(params2, opts) {
           return this._service.xrpc.call("app.bsky.feed.getFeedGenerators", params2, void 0, opts).catch((e) => {
-            throw toKnownErr80(e);
+            throw toKnownErr87(e);
           });
         }
         getFeedSkeleton(params2, opts) {
           return this._service.xrpc.call("app.bsky.feed.getFeedSkeleton", params2, void 0, opts).catch((e) => {
-            throw toKnownErr81(e);
+            throw toKnownErr88(e);
           });
         }
         getLikes(params2, opts) {
           return this._service.xrpc.call("app.bsky.feed.getLikes", params2, void 0, opts).catch((e) => {
-            throw toKnownErr82(e);
+            throw toKnownErr89(e);
           });
         }
         getListFeed(params2, opts) {
           return this._service.xrpc.call("app.bsky.feed.getListFeed", params2, void 0, opts).catch((e) => {
-            throw toKnownErr83(e);
+            throw toKnownErr90(e);
           });
         }
         getPostThread(params2, opts) {
           return this._service.xrpc.call("app.bsky.feed.getPostThread", params2, void 0, opts).catch((e) => {
-            throw toKnownErr84(e);
+            throw toKnownErr91(e);
           });
         }
         getPosts(params2, opts) {
           return this._service.xrpc.call("app.bsky.feed.getPosts", params2, void 0, opts).catch((e) => {
-            throw toKnownErr85(e);
+            throw toKnownErr92(e);
           });
         }
         getRepostedBy(params2, opts) {
           return this._service.xrpc.call("app.bsky.feed.getRepostedBy", params2, void 0, opts).catch((e) => {
-            throw toKnownErr86(e);
+            throw toKnownErr93(e);
           });
         }
         getSuggestedFeeds(params2, opts) {
           return this._service.xrpc.call("app.bsky.feed.getSuggestedFeeds", params2, void 0, opts).catch((e) => {
-            throw toKnownErr87(e);
+            throw toKnownErr94(e);
           });
         }
         getTimeline(params2, opts) {
           return this._service.xrpc.call("app.bsky.feed.getTimeline", params2, void 0, opts).catch((e) => {
-            throw toKnownErr88(e);
+            throw toKnownErr95(e);
           });
         }
         searchPosts(params2, opts) {
           return this._service.xrpc.call("app.bsky.feed.searchPosts", params2, void 0, opts).catch((e) => {
-            throw toKnownErr89(e);
+            throw toKnownErr96(e);
           });
         }
       };
@@ -26836,7 +27373,7 @@ if (cid) {
           });
         }
       };
-      var GraphNS = class {
+      var AppBskyGraphNS = class {
         constructor(service2) {
           this._service = service2;
           this.block = new BlockRecord(service2);
@@ -26847,67 +27384,72 @@ if (cid) {
         }
         getBlocks(params2, opts) {
           return this._service.xrpc.call("app.bsky.graph.getBlocks", params2, void 0, opts).catch((e) => {
-            throw toKnownErr90(e);
+            throw toKnownErr97(e);
           });
         }
         getFollowers(params2, opts) {
           return this._service.xrpc.call("app.bsky.graph.getFollowers", params2, void 0, opts).catch((e) => {
-            throw toKnownErr91(e);
+            throw toKnownErr98(e);
           });
         }
         getFollows(params2, opts) {
           return this._service.xrpc.call("app.bsky.graph.getFollows", params2, void 0, opts).catch((e) => {
-            throw toKnownErr92(e);
+            throw toKnownErr99(e);
           });
         }
         getList(params2, opts) {
           return this._service.xrpc.call("app.bsky.graph.getList", params2, void 0, opts).catch((e) => {
-            throw toKnownErr93(e);
+            throw toKnownErr100(e);
           });
         }
         getListBlocks(params2, opts) {
           return this._service.xrpc.call("app.bsky.graph.getListBlocks", params2, void 0, opts).catch((e) => {
-            throw toKnownErr94(e);
+            throw toKnownErr101(e);
           });
         }
         getListMutes(params2, opts) {
           return this._service.xrpc.call("app.bsky.graph.getListMutes", params2, void 0, opts).catch((e) => {
-            throw toKnownErr95(e);
+            throw toKnownErr102(e);
           });
         }
         getLists(params2, opts) {
           return this._service.xrpc.call("app.bsky.graph.getLists", params2, void 0, opts).catch((e) => {
-            throw toKnownErr96(e);
+            throw toKnownErr103(e);
           });
         }
         getMutes(params2, opts) {
           return this._service.xrpc.call("app.bsky.graph.getMutes", params2, void 0, opts).catch((e) => {
-            throw toKnownErr97(e);
+            throw toKnownErr104(e);
+          });
+        }
+        getRelationships(params2, opts) {
+          return this._service.xrpc.call("app.bsky.graph.getRelationships", params2, void 0, opts).catch((e) => {
+            throw toKnownErr105(e);
           });
         }
         getSuggestedFollowsByActor(params2, opts) {
           return this._service.xrpc.call("app.bsky.graph.getSuggestedFollowsByActor", params2, void 0, opts).catch((e) => {
-            throw toKnownErr98(e);
+            throw toKnownErr106(e);
           });
         }
         muteActor(data, opts) {
           return this._service.xrpc.call("app.bsky.graph.muteActor", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr99(e);
+            throw toKnownErr107(e);
           });
         }
         muteActorList(data, opts) {
           return this._service.xrpc.call("app.bsky.graph.muteActorList", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr100(e);
+            throw toKnownErr108(e);
           });
         }
         unmuteActor(data, opts) {
           return this._service.xrpc.call("app.bsky.graph.unmuteActor", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr101(e);
+            throw toKnownErr109(e);
           });
         }
         unmuteActorList(data, opts) {
           return this._service.xrpc.call("app.bsky.graph.unmuteActorList", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr102(e);
+            throw toKnownErr110(e);
           });
         }
       };
@@ -27076,63 +27618,58 @@ if (cid) {
           });
         }
       };
-      var NotificationNS = class {
+      var AppBskyNotificationNS = class {
         constructor(service2) {
           this._service = service2;
         }
         getUnreadCount(params2, opts) {
           return this._service.xrpc.call("app.bsky.notification.getUnreadCount", params2, void 0, opts).catch((e) => {
-            throw toKnownErr103(e);
+            throw toKnownErr111(e);
           });
         }
         listNotifications(params2, opts) {
           return this._service.xrpc.call("app.bsky.notification.listNotifications", params2, void 0, opts).catch((e) => {
-            throw toKnownErr104(e);
+            throw toKnownErr112(e);
           });
         }
         registerPush(data, opts) {
           return this._service.xrpc.call("app.bsky.notification.registerPush", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr105(e);
+            throw toKnownErr113(e);
           });
         }
         updateSeen(data, opts) {
           return this._service.xrpc.call("app.bsky.notification.updateSeen", opts == null ? void 0 : opts.qp, data, opts).catch((e) => {
-            throw toKnownErr106(e);
+            throw toKnownErr114(e);
           });
         }
       };
-      var RichtextNS = class {
+      var AppBskyRichtextNS = class {
         constructor(service2) {
           this._service = service2;
         }
       };
-      var UnspeccedNS = class {
+      var AppBskyUnspeccedNS = class {
         constructor(service2) {
           this._service = service2;
-        }
-        getPopular(params2, opts) {
-          return this._service.xrpc.call("app.bsky.unspecced.getPopular", params2, void 0, opts).catch((e) => {
-            throw toKnownErr107(e);
-          });
         }
         getPopularFeedGenerators(params2, opts) {
           return this._service.xrpc.call("app.bsky.unspecced.getPopularFeedGenerators", params2, void 0, opts).catch((e) => {
-            throw toKnownErr108(e);
+            throw toKnownErr115(e);
           });
         }
-        getTimelineSkeleton(params2, opts) {
-          return this._service.xrpc.call("app.bsky.unspecced.getTimelineSkeleton", params2, void 0, opts).catch((e) => {
-            throw toKnownErr109(e);
+        getTaggedSuggestions(params2, opts) {
+          return this._service.xrpc.call("app.bsky.unspecced.getTaggedSuggestions", params2, void 0, opts).catch((e) => {
+            throw toKnownErr116(e);
           });
         }
         searchActorsSkeleton(params2, opts) {
           return this._service.xrpc.call("app.bsky.unspecced.searchActorsSkeleton", params2, void 0, opts).catch((e) => {
-            throw toKnownErr110(e);
+            throw toKnownErr117(e);
           });
         }
         searchPostsSkeleton(params2, opts) {
           return this._service.xrpc.call("app.bsky.unspecced.searchPostsSkeleton", params2, void 0, opts).catch((e) => {
-            throw toKnownErr111(e);
+            throw toKnownErr118(e);
           });
         }
       };
@@ -27158,19 +27695,14 @@ if (cid) {
         get hasSession() {
           return !!this.session;
         }
-        setPersistSessionHandler(handler2) {
-          this._persistSession = handler2;
+        setPersistSessionHandler(handler) {
+          this._persistSession = handler;
         }
         createAccount(opts) {
           return __async(this, null, function* () {
-            var _a3, _b;
+            var _a2, _b;
             try {
-              const res = yield this.api.com.atproto.server.createAccount({
-                handle: opts.handle,
-                password: opts.password,
-                email: opts.email,
-                inviteCode: opts.inviteCode
-              });
+              const res = yield this.api.com.atproto.server.createAccount(opts);
               this.session = {
                 accessJwt: res.data.accessJwt,
                 refreshJwt: res.data.refreshJwt,
@@ -27186,7 +27718,7 @@ if (cid) {
               throw e;
             } finally {
               if (this.session) {
-                (_a3 = this._persistSession) == null ? void 0 : _a3.call(this, "create", this.session);
+                (_a2 = this._persistSession) == null ? void 0 : _a2.call(this, "create", this.session);
               } else {
                 (_b = this._persistSession) == null ? void 0 : _b.call(this, "create-failed", void 0);
               }
@@ -27195,7 +27727,7 @@ if (cid) {
         }
         login(opts) {
           return __async(this, null, function* () {
-            var _a3, _b;
+            var _a2, _b;
             try {
               const res = yield this.api.com.atproto.server.createSession({
                 identifier: opts.identifier,
@@ -27216,7 +27748,7 @@ if (cid) {
               throw e;
             } finally {
               if (this.session) {
-                (_a3 = this._persistSession) == null ? void 0 : _a3.call(this, "create", this.session);
+                (_a2 = this._persistSession) == null ? void 0 : _a2.call(this, "create", this.session);
               } else {
                 (_b = this._persistSession) == null ? void 0 : _b.call(this, "create-failed", void 0);
               }
@@ -27225,7 +27757,7 @@ if (cid) {
         }
         resumeSession(session) {
           return __async(this, null, function* () {
-            var _a3, _b, _c, _d;
+            var _a2, _b, _c, _d;
             try {
               this.session = session;
               const res = yield this.api.com.atproto.server.getSession();
@@ -27236,7 +27768,7 @@ if (cid) {
               this.session.handle = res.data.handle;
               this.session.emailConfirmed = res.data.emailConfirmed;
               this._updateApiEndpoint(res.data.didDoc);
-              (_a3 = this._persistSession) == null ? void 0 : _a3.call(this, "update", this.session);
+              (_a2 = this._persistSession) == null ? void 0 : _a2.call(this, "update", this.session);
               return res;
             } catch (e) {
               this.session = void 0;
@@ -27254,8 +27786,8 @@ if (cid) {
           });
         }
         _addAuthHeader(reqHeaders) {
-          var _a3;
-          if (!reqHeaders.authorization && ((_a3 = this.session) == null ? void 0 : _a3.accessJwt)) {
+          var _a2;
+          if (!reqHeaders.authorization && ((_a2 = this.session) == null ? void 0 : _a2.accessJwt)) {
             return __spreadProps(__spreadValues({}, reqHeaders), {
               authorization: `Bearer ${this.session.accessJwt}`
             });
@@ -27264,20 +27796,20 @@ if (cid) {
         }
         _fetch(reqUri, reqMethod, reqHeaders, reqBody) {
           return __async(this, null, function* () {
-            var _a3;
+            var _a2;
             if (!_AtpAgent.fetch) {
               throw new Error("AtpAgent fetch() method not configured");
             }
             yield this._refreshSessionPromise;
             let res = yield _AtpAgent.fetch(reqUri, reqMethod, this._addAuthHeader(reqHeaders), reqBody);
-            if (isErrorResponse(res, ["ExpiredToken"]) && ((_a3 = this.session) == null ? void 0 : _a3.refreshJwt)) {
-              yield this._refreshSession();
+            if (isErrorResponse(res, ["ExpiredToken"]) && ((_a2 = this.session) == null ? void 0 : _a2.refreshJwt)) {
+              yield this.refreshSession();
               res = yield _AtpAgent.fetch(reqUri, reqMethod, this._addAuthHeader(reqHeaders), reqBody);
             }
             return res;
           });
         }
-        _refreshSession() {
+        refreshSession() {
           return __async(this, null, function* () {
             if (this._refreshSessionPromise) {
               return this._refreshSessionPromise;
@@ -27292,11 +27824,11 @@ if (cid) {
         }
         _refreshSessionInner() {
           return __async(this, null, function* () {
-            var _a3, _b, _c;
+            var _a2, _b, _c;
             if (!_AtpAgent.fetch) {
               throw new Error("AtpAgent fetch() method not configured");
             }
-            if (!((_a3 = this.session) == null ? void 0 : _a3.refreshJwt)) {
+            if (!((_a2 = this.session) == null ? void 0 : _a2.refreshJwt)) {
               return;
             }
             const url = new URL((this.pdsUrl || this.service).origin);
@@ -27321,8 +27853,8 @@ if (cid) {
         }
         _updateApiEndpoint(didDoc) {
           if (isValidDidDoc(didDoc)) {
-            const endpoint2 = getPdsEndpoint(didDoc);
-            this.pdsUrl = endpoint2 ? new URL(endpoint2) : void 0;
+            const endpoint = getPdsEndpoint(didDoc);
+            this.pdsUrl = endpoint ? new URL(endpoint) : void 0;
           }
           this.api.xrpc.uri = this.pdsUrl || this.service;
         }
@@ -28886,7 +29418,7 @@ if (cid) {
         "\uD55C\uAD6D"
       ];
       function detectFacets(text) {
-        var _a3;
+        var _a2;
         let match;
         const facets = [];
         {
@@ -28916,7 +29448,7 @@ if (cid) {
           while (match = re.exec(text.utf16)) {
             let uri2 = match[2];
             if (!uri2.startsWith("http")) {
-              const domain = (_a3 = match.groups) == null ? void 0 : _a3.domain;
+              const domain = (_a2 = match.groups) == null ? void 0 : _a2.domain;
               if (!domain || !isValidDomain(domain)) {
                 continue;
               }
@@ -28986,8 +29518,8 @@ if (cid) {
           this.facet = facet;
         }
         get link() {
-          var _a3;
-          const link = (_a3 = this.facet) == null ? void 0 : _a3.features.find(facet_exports.isLink);
+          var _a2;
+          const link = (_a2 = this.facet) == null ? void 0 : _a2.features.find(facet_exports.isLink);
           if (facet_exports.isLink(link)) {
             return link;
           }
@@ -28997,8 +29529,8 @@ if (cid) {
           return !!this.link;
         }
         get mention() {
-          var _a3;
-          const mention = (_a3 = this.facet) == null ? void 0 : _a3.features.find(facet_exports.isMention);
+          var _a2;
+          const mention = (_a2 = this.facet) == null ? void 0 : _a2.features.find(facet_exports.isMention);
           if (facet_exports.isMention(mention)) {
             return mention;
           }
@@ -29008,8 +29540,8 @@ if (cid) {
           return !!this.mention;
         }
         get tag() {
-          var _a3;
-          const tag = (_a3 = this.facet) == null ? void 0 : _a3.features.find(facet_exports.isTag);
+          var _a2;
+          const tag = (_a2 = this.facet) == null ? void 0 : _a2.features.find(facet_exports.isTag);
           if (facet_exports.isTag(tag)) {
             return tag;
           }
@@ -29021,10 +29553,10 @@ if (cid) {
       };
       var RichText = class {
         constructor(props, opts) {
-          var _a3, _b;
+          var _a2, _b;
           this.unicodeText = new UnicodeString(props.text);
           this.facets = props.facets;
-          if (!((_a3 = this.facets) == null ? void 0 : _a3.length) && ((_b = props.entities) == null ? void 0 : _b.length)) {
+          if (!((_a2 = this.facets) == null ? void 0 : _a2.length) && ((_b = props.entities) == null ? void 0 : _b.length)) {
             this.facets = entitiesToFacets(this.unicodeText, props.entities);
           }
           if (this.facets) {
@@ -29085,9 +29617,9 @@ if (cid) {
           }
         }
         insert(insertIndex, insertText) {
-          var _a3;
+          var _a2;
           this.unicodeText = new UnicodeString(this.unicodeText.slice(0, insertIndex) + insertText + this.unicodeText.slice(insertIndex));
-          if (!((_a3 = this.facets) == null ? void 0 : _a3.length)) {
+          if (!((_a2 = this.facets) == null ? void 0 : _a2.length)) {
             return this;
           }
           const numCharsAdded = insertText.length;
@@ -29102,9 +29634,9 @@ if (cid) {
           return this;
         }
         delete(removeStartIndex, removeEndIndex) {
-          var _a3;
+          var _a2;
           this.unicodeText = new UnicodeString(this.unicodeText.slice(0, removeStartIndex) + this.unicodeText.slice(removeEndIndex));
-          if (!((_a3 = this.facets) == null ? void 0 : _a3.length)) {
+          if (!((_a2 = this.facets) == null ? void 0 : _a2.length)) {
             return this;
           }
           const numCharsRemoved = removeEndIndex - removeStartIndex;
@@ -30135,10 +30667,10 @@ if (cid) {
         }
       };
       function decideAccount(subject, opts) {
-        var _a3, _b, _c, _d, _e, _f, _g, _h, _i;
+        var _a2, _b, _c, _d, _e, _f, _g, _h, _i;
         const acc = new ModerationCauseAccumulator();
         acc.setDid(subject.did);
-        if ((_a3 = subject.viewer) == null ? void 0 : _a3.muted) {
+        if ((_a2 = subject.viewer) == null ? void 0 : _a2.muted) {
           if ((_b = subject.viewer) == null ? void 0 : _b.mutedByList) {
             acc.addMutedByList((_c = subject.viewer) == null ? void 0 : _c.mutedByList);
           } else {
@@ -30179,10 +30711,10 @@ if (cid) {
         return labels.filter((label) => label.uri.endsWith("/app.bsky.actor.profile/self"));
       }
       function decidePost(subject, opts) {
-        var _a3;
+        var _a2;
         const acc = new ModerationCauseAccumulator();
         acc.setDid(subject.author.did);
-        if ((_a3 = subject.labels) == null ? void 0 : _a3.length) {
+        if ((_a2 = subject.labels) == null ? void 0 : _a2.length) {
           for (const label of subject.labels) {
             acc.addLabel(label, opts);
           }
@@ -30190,11 +30722,11 @@ if (cid) {
         return acc.finalizeDecision(opts);
       }
       function decideQuotedPost(subject, opts) {
-        var _a3, _b, _c, _d, _e;
+        var _a2, _b, _c, _d, _e;
         const acc = new ModerationCauseAccumulator();
         if (record_exports.isViewRecord(subject.record)) {
           acc.setDid(subject.record.author.did);
-          if ((_a3 = subject.record.labels) == null ? void 0 : _a3.length) {
+          if ((_a2 = subject.record.labels) == null ? void 0 : _a2.length) {
             for (const label of subject.record.labels) {
               acc.addLabel(label, opts);
             }
@@ -30218,11 +30750,11 @@ if (cid) {
         return ModerationDecision.noop();
       }
       function decideQuotedPostWithMedia(subject, opts) {
-        var _a3, _b, _c, _d, _e;
+        var _a2, _b, _c, _d, _e;
         const acc = new ModerationCauseAccumulator();
         if (record_exports.isViewRecord(subject.record.record)) {
           acc.setDid(subject.record.record.author.did);
-          if ((_a3 = subject.record.record.labels) == null ? void 0 : _a3.length) {
+          if ((_a2 = subject.record.record.labels) == null ? void 0 : _a2.length) {
             for (const label of subject.record.record.labels) {
               acc.addLabel(label, opts);
             }
@@ -30315,7 +30847,7 @@ if (cid) {
         };
       }
       function moderateProfile(subject, opts) {
-        var _a3, _b, _c, _d;
+        var _a2, _b, _c, _d;
         const account = decideAccount(subject, opts);
         const profile = decideProfile(subject, opts);
         if (account.blurMedia) {
@@ -30330,7 +30862,7 @@ if (cid) {
         }
         let avatarBlur = false;
         let avatarNoOverride = false;
-        if ((account.blur || account.blurMedia) && ((_a3 = account.cause) == null ? void 0 : _a3.type) !== "muted") {
+        if ((account.blur || account.blurMedia) && ((_a2 = account.cause) == null ? void 0 : _a2.type) !== "muted") {
           avatarBlur = true;
           avatarNoOverride = account.noOverride || profile.noOverride;
         } else if (profile.blur || profile.blurMedia) {
@@ -30353,7 +30885,7 @@ if (cid) {
         };
       }
       function moderatePost(subject, opts) {
-        var _a3, _b;
+        var _a2, _b;
         const post = decidePost(subject, opts);
         const account = decideAccount(subject.author, opts);
         const profile = decideProfile(subject.author, opts);
@@ -30388,7 +30920,7 @@ if (cid) {
         const mergedForView = takeHighestPriorityDecision(post, account);
         const mergedQuote = takeHighestPriorityDecision(quote, quotedAccount);
         let blurAvatar = false;
-        if ((account.blur || account.blurMedia) && ((_a3 = account.cause) == null ? void 0 : _a3.type) !== "muted") {
+        if ((account.blur || account.blurMedia) && ((_a2 = account.cause) == null ? void 0 : _a2.type) !== "muted") {
           blurAvatar = true;
         } else if ((profile.blur || profile.blurMedia) && ((_b = profile.cause) == null ? void 0 : _b.type) !== "muted") {
           blurAvatar = true;
@@ -30810,7 +31342,7 @@ if (cid) {
         }
         unblockModList(uri2) {
           return __async(this, null, function* () {
-            var _a3;
+            var _a2;
             if (!this.session) {
               throw new Error("Not logged in");
             }
@@ -30818,7 +31350,7 @@ if (cid) {
               list: uri2,
               limit: 1
             });
-            if (!((_a3 = listInfo.data.list.viewer) == null ? void 0 : _a3.blocked)) {
+            if (!((_a2 = listInfo.data.list.viewer) == null ? void 0 : _a2.blocked)) {
               return;
             }
             const { rkey } = new AtUri(listInfo.data.list.viewer.blocked);
@@ -30849,7 +31381,10 @@ if (cid) {
               threadViewPrefs: __spreadValues({}, THREAD_VIEW_PREF_DEFAULTS),
               adultContentEnabled: false,
               contentLabels: {},
-              birthDate: void 0
+              birthDate: void 0,
+              interests: {
+                tags: []
+              }
             };
             const res = yield this.app.bsky.actor.getPreferences({});
             for (const pref of res.data.preferences) {
@@ -30871,11 +31406,14 @@ if (cid) {
                   prefs.birthDate = new Date(pref.birthDate);
                 }
               } else if (defs_exports5.isFeedViewPref(pref) && defs_exports5.validateFeedViewPref(pref).success) {
-                const _a3 = pref, { $type, feed } = _a3, v = __objRest(_a3, ["$type", "feed"]);
+                const _a2 = pref, { $type, feed } = _a2, v = __objRest(_a2, ["$type", "feed"]);
                 prefs.feedViewPrefs[pref.feed] = __spreadValues(__spreadValues({}, FEED_VIEW_PREF_DEFAULTS), v);
               } else if (defs_exports5.isThreadViewPref(pref) && defs_exports5.validateThreadViewPref(pref).success) {
                 const _b = pref, { $type } = _b, v = __objRest(_b, ["$type"]);
                 prefs.threadViewPrefs = __spreadValues(__spreadValues({}, prefs.threadViewPrefs), v);
+              } else if (defs_exports5.isInterestsPref(pref) && defs_exports5.validateInterestsPref(pref).success) {
+                const _c = pref, { $type } = _c, v = __objRest(_c, ["$type"]);
+                prefs.interests = __spreadValues(__spreadValues({}, prefs.interests), v);
               }
             }
             return prefs;
@@ -30995,6 +31533,17 @@ if (cid) {
                 pref = __spreadValues(__spreadValues({}, existing), pref);
               }
               return prefs.filter((p) => !defs_exports5.isThreadViewPref(p)).concat([__spreadProps(__spreadValues({}, pref), { $type: "app.bsky.actor.defs#threadViewPref" })]);
+            });
+          });
+        }
+        setInterestsPref(pref) {
+          return __async(this, null, function* () {
+            yield updatePreferences(this, (prefs) => {
+              const existing = prefs.findLast((pref2) => defs_exports5.isInterestsPref(pref2) && defs_exports5.validateInterestsPref(pref2).success);
+              if (existing) {
+                pref = __spreadValues(__spreadValues({}, existing), pref);
+              }
+              return prefs.filter((p) => !defs_exports5.isInterestsPref(p)).concat([__spreadProps(__spreadValues({}, pref), { $type: "app.bsky.actor.defs#interestsPref" })]);
             });
           });
         }
@@ -31226,14 +31775,14 @@ if (cid) {
       ColdskyAgent = class extends import_api.BskyAgent {
         /** @param {Omit<ConstructorParameters<typeof BskyAgent>[0], 'service'>} args */
         constructor(args) {
-          var _a3, _b;
+          var _a2, _b;
           super(__spreadProps(__spreadValues({}, args), {
             // most of methods work fine on bsky.social
             service: BSKY_SOCIAL_URL
           }));
           for (const key in this.com.atproto) {
             const ns = this.com.atproto[key];
-            const baseClient = (_b = (_a3 = ns._service) == null ? void 0 : _a3.xrpc) == null ? void 0 : _b.baseClient;
+            const baseClient = (_b = (_a2 = ns._service) == null ? void 0 : _a2.xrpc) == null ? void 0 : _b.baseClient;
             if (baseClient)
               this.patchBaseClient(baseClient);
           }
@@ -32528,7 +33077,7 @@ if (cid) {
           let recordIdsToRemove = [];
           let transitionsCount = 0;
           let serializationsSinceTransitionRebuild = 0;
-          this.mapEncode = function(value, encodeOptions) {
+          this.mapEncode = function(value, encodeOptions2) {
             if (this._keyMap && !this._mapped) {
               switch (value.constructor.name) {
                 case "Array":
@@ -32536,9 +33085,9 @@ if (cid) {
                   break;
               }
             }
-            return this.encode(value, encodeOptions);
+            return this.encode(value, encodeOptions2);
           };
-          this.encode = function(value, encodeOptions) {
+          this.encode = function(value, encodeOptions2) {
             if (!target) {
               target = new ByteArrayAllocate(8192);
               targetView = new DataView(target.buffer, 0, 8192);
@@ -32550,7 +33099,7 @@ if (cid) {
               targetView = new DataView(target.buffer, 0, target.length);
               safeEnd = target.length - 10;
               position2 = 0;
-            } else if (encodeOptions === REUSE_BUFFER_MODE)
+            } else if (encodeOptions2 === REUSE_BUFFER_MODE)
               position2 = position2 + 7 & 2147483640;
             start = position2;
             if (encoder.useSelfDescribedHeader) {
@@ -32628,7 +33177,7 @@ if (cid) {
                 }
               }
             }
-            throwOnIterable = encodeOptions & THROW_ON_ITERABLE;
+            throwOnIterable = encodeOptions2 & THROW_ON_ITERABLE;
             try {
               if (throwOnIterable)
                 return;
@@ -32646,7 +33195,7 @@ if (cid) {
                 referenceMap2 = null;
                 return serialized;
               }
-              if (encodeOptions & REUSE_BUFFER_MODE) {
+              if (encodeOptions2 & REUSE_BUFFER_MODE) {
                 target.start = start;
                 target.end = position2;
                 return target;
@@ -32680,7 +33229,7 @@ if (cid) {
                   return encoder.encode(value);
                 return returnBuffer;
               }
-              if (encodeOptions & RESET_BUFFER_MODE)
+              if (encodeOptions2 & RESET_BUFFER_MODE)
                 position2 = start;
             }
           };
@@ -33364,10 +33913,10 @@ if (cid) {
         }
       };
       SharedData = class {
-        constructor(structures, values, version) {
+        constructor(structures, values, version2) {
           this.structures = structures;
           this.packedValues = values;
-          this.version = version;
+          this.version = version2;
         }
       };
       BlobConstructor = typeof Blob === "undefined" ? function() {
@@ -33705,8 +34254,8 @@ if (cid) {
 
   // node_modules/multiformats/dist/src/bases/base.js
   function or(left, right) {
-    var _a3, _b;
-    return new ComposedDecoder(__spreadValues(__spreadValues({}, (_a3 = left.decoders) != null ? _a3 : { [left.prefix]: left }), (_b = right.decoders) != null ? _b : { [right.prefix]: right }));
+    var _a2, _b;
+    return new ComposedDecoder(__spreadValues(__spreadValues({}, (_a2 = left.decoders) != null ? _a2 : { [left.prefix]: left }), (_b = right.decoders) != null ? _b : { [right.prefix]: right }));
   }
   function from({ name, prefix, encode: encode5, decode: decode8 }) {
     return new Codec(name, prefix, encode5, decode8);
@@ -34101,8 +34650,8 @@ if (cid) {
 
   // node_modules/multiformats/dist/src/cid.js
   function format(link, base2) {
-    const { bytes, version } = link;
-    switch (version) {
+    const { bytes, version: version2 } = link;
+    switch (version2) {
       case 0:
         return toStringV0(bytes, baseCache(link), base2 != null ? base2 : base58btc.encoder);
       default:
@@ -34168,11 +34717,11 @@ if (cid) {
       return cid;
     }
   }
-  function encodeCID(version, code, multihash) {
-    const codeOffset = encodingLength(version);
+  function encodeCID(version2, code, multihash) {
+    const codeOffset = encodingLength(version2);
     const hashOffset = codeOffset + encodingLength(code);
     const bytes = new Uint8Array(hashOffset + multihash.byteLength);
-    encodeTo(version, bytes, 0);
+    encodeTo(version2, bytes, 0);
     encodeTo(code, bytes, codeOffset);
     bytes.set(multihash, hashOffset);
     return bytes;
@@ -34193,7 +34742,7 @@ if (cid) {
          * @param code - Code of the codec content is encoded in, see https://github.com/multiformats/multicodec/blob/master/table.csv
          * @param multihash - (Multi)hash of the of the content.
          */
-        constructor(version, code, multihash, bytes) {
+        constructor(version2, code, multihash, bytes) {
           __publicField(this, "code");
           __publicField(this, "version");
           __publicField(this, "multihash");
@@ -34201,7 +34750,7 @@ if (cid) {
           __publicField(this, "/");
           __publicField(this, _a, "CID");
           this.code = code;
-          this.version = version;
+          this.version = version2;
           this.multihash = multihash;
           this.bytes = bytes;
           this["/"] = bytes;
@@ -34296,12 +34845,12 @@ if (cid) {
           if (value instanceof _CID) {
             return value;
           } else if (value["/"] != null && value["/"] === value.bytes || value.asCID === value) {
-            const { version, code, multihash, bytes } = value;
-            return new _CID(version, code, multihash, bytes != null ? bytes : encodeCID(version, code, multihash.bytes));
+            const { version: version2, code, multihash, bytes } = value;
+            return new _CID(version2, code, multihash, bytes != null ? bytes : encodeCID(version2, code, multihash.bytes));
           } else if (value[cidSymbol] === true) {
-            const { version, multihash, code } = value;
+            const { version: version2, multihash, code } = value;
             const digest = decode5(multihash);
-            return _CID.create(version, code, digest);
+            return _CID.create(version2, code, digest);
           } else {
             return null;
           }
@@ -34311,24 +34860,24 @@ if (cid) {
          * @param code - Code of the codec content is encoded in, see https://github.com/multiformats/multicodec/blob/master/table.csv
          * @param digest - (Multi)hash of the of the content.
          */
-        static create(version, code, digest) {
+        static create(version2, code, digest) {
           if (typeof code !== "number") {
             throw new Error("String codecs are no longer supported");
           }
           if (!(digest.bytes instanceof Uint8Array)) {
             throw new Error("Invalid digest");
           }
-          switch (version) {
+          switch (version2) {
             case 0: {
               if (code !== DAG_PB_CODE) {
                 throw new Error(`Version 0 CID must use dag-pb (code: ${DAG_PB_CODE}) block encoding`);
               } else {
-                return new _CID(version, code, digest, digest.bytes);
+                return new _CID(version2, code, digest, digest.bytes);
               }
             }
             case 1: {
-              const bytes = encodeCID(version, code, digest.bytes);
-              return new _CID(version, code, digest, bytes);
+              const bytes = encodeCID(version2, code, digest.bytes);
+              return new _CID(version2, code, digest, bytes);
             }
             default: {
               throw new Error("Invalid version");
@@ -34401,23 +34950,23 @@ if (cid) {
             offset += length2;
             return i;
           };
-          let version = next();
+          let version2 = next();
           let codec = DAG_PB_CODE;
-          if (version === 18) {
-            version = 0;
+          if (version2 === 18) {
+            version2 = 0;
             offset = 0;
           } else {
             codec = next();
           }
-          if (version !== 0 && version !== 1) {
-            throw new RangeError(`Invalid CID version ${version}`);
+          if (version2 !== 0 && version2 !== 1) {
+            throw new RangeError(`Invalid CID version ${version2}`);
           }
           const prefixSize = offset;
           const multihashCode = next();
           const digestSize = next();
           const size = offset + digestSize;
           const multihashSize = size - prefixSize;
-          return { version, codec, multihashCode, digestSize, multihashSize, size };
+          return { version: version2, codec, multihashCode, digestSize, multihashSize, size };
         }
         /**
          * Takes cid in a string representation and creates an instance. If `base`
@@ -36150,19 +36699,57 @@ if (cid) {
   });
 
   // node_modules/@ipld/dag-cbor/src/index.js
+  function cidEncoder(obj) {
+    if (obj.asCID !== obj && obj["/"] !== obj.bytes) {
+      return null;
+    }
+    const cid = CID.asCID(obj);
+    if (!cid) {
+      return null;
+    }
+    const bytes = new Uint8Array(cid.bytes.byteLength + 1);
+    bytes.set(cid.bytes, 1);
+    return [
+      new Token(Type.tag, CID_CBOR_TAG),
+      new Token(Type.bytes, bytes)
+    ];
+  }
+  function undefinedEncoder() {
+    throw new Error("`undefined` is not supported by the IPLD Data Model and cannot be encoded");
+  }
+  function numberEncoder(num) {
+    if (Number.isNaN(num)) {
+      throw new Error("`NaN` is not supported by the IPLD Data Model and cannot be encoded");
+    }
+    if (num === Infinity || num === -Infinity) {
+      throw new Error("`Infinity` and `-Infinity` is not supported by the IPLD Data Model and cannot be encoded");
+    }
+    return null;
+  }
   function cidDecoder(bytes) {
     if (bytes[0] !== 0) {
       throw new Error("Invalid CID for CBOR tag 42; expected leading 0x00");
     }
     return CID.decode(bytes.subarray(1));
   }
-  var CID_CBOR_TAG, decodeOptions, decode7;
+  var CID_CBOR_TAG, _encodeOptions, encodeOptions, _decodeOptions, decodeOptions, decode7;
   var init_src2 = __esm({
     "node_modules/@ipld/dag-cbor/src/index.js"() {
       init_cborg();
       init_cid();
       CID_CBOR_TAG = 42;
-      decodeOptions = {
+      _encodeOptions = {
+        float64: true,
+        typeEncoders: {
+          Object: cidEncoder,
+          undefined: undefinedEncoder,
+          number: numberEncoder
+        }
+      };
+      encodeOptions = __spreadProps(__spreadValues({}, _encodeOptions), {
+        typeEncoders: __spreadValues({}, _encodeOptions.typeEncoders)
+      });
+      _decodeOptions = {
         allowIndefinite: false,
         coerceUndefinedToNull: true,
         allowNaN: false,
@@ -36176,8 +36763,11 @@ if (cid) {
         /** @type {import('cborg').TagDecoder[]} */
         tags: []
       };
-      decodeOptions.tags[CID_CBOR_TAG] = cidDecoder;
-      decode7 = (data) => decode6(data, decodeOptions);
+      _decodeOptions.tags[CID_CBOR_TAG] = cidDecoder;
+      decodeOptions = __spreadProps(__spreadValues({}, _decodeOptions), {
+        tags: _decodeOptions.tags.slice()
+      });
+      decode7 = (data) => decode6(data, _decodeOptions);
     }
   });
 
@@ -36585,14 +37175,14 @@ if (cid) {
         const multihash2 = decode5(bytes2);
         return CID.create(0, CIDV0_BYTES.DAG_PB, multihash2);
       }
-      const version = decodeVarint(yield reader.upTo(8), reader);
-      if (version !== 1) {
-        throw new Error(`Unexpected CID version (${version})`);
+      const version2 = decodeVarint(yield reader.upTo(8), reader);
+      if (version2 !== 1) {
+        throw new Error(`Unexpected CID version (${version2})`);
       }
       const codec = decodeVarint(yield reader.upTo(8), reader);
       const bytes = yield reader.exactly(getMultihashLength(yield reader.upTo(8)), true);
       const multihash = decode5(bytes);
-      return CID.create(version, codec, multihash);
+      return CID.create(version2, codec, multihash);
     });
   }
   function readBlockHead(reader) {
@@ -36747,10 +37337,10 @@ if (cid) {
     };
   }
   function asyncIterableReader(asyncIterable) {
-    const iterator2 = asyncIterable[Symbol.asyncIterator]();
+    const iterator = asyncIterable[Symbol.asyncIterator]();
     function readChunk() {
       return __async(this, null, function* () {
-        const next = yield iterator2.next();
+        const next = yield iterator.next();
         if (next.done) {
           return null;
         }
@@ -37023,21 +37613,21 @@ if (cid) {
         buf2.resolve();
       }
       function handleMessage(event) {
-        var _a3, _b;
+        var _a2, _b;
         const receiveTimestamp = Date.now();
-        if (typeof ((_a3 = event.data) == null ? void 0 : _a3.arrayBuffer) === "function")
+        if (typeof ((_a2 = event.data) == null ? void 0 : _a2.arrayBuffer) === "function")
           return event.data.arrayBuffer().then((arrayBuf) => convertMessageBuf(receiveTimestamp, arrayBuf));
         else if (typeof ((_b = event.data) == null ? void 0 : _b.byteLength) === "number")
           return convertMessageBuf(receiveTimestamp, event.data);
       }
       function convertMessageBuf(receiveTimestamp, messageBuf) {
         return __async(this, null, function* () {
-          var _a3, _b;
+          var _a2, _b;
           const entry = (
             /** @type {any[]} */
             decodeMultiple(new Uint8Array(messageBuf))
           );
-          if (!entry || ((_a3 = entry[0]) == null ? void 0 : _a3.op) !== 1)
+          if (!entry || ((_a2 = entry[0]) == null ? void 0 : _a2.op) !== 1)
             return;
           const commit = entry[1];
           if (!commit.blocks)
@@ -37120,9 +37710,7 @@ if (cid) {
     "lib/firehose.js"() {
       init_cbor_x();
       init_src();
-      init_coldsky_agent();
       init_reader_browser();
-      init_shorten();
       knownTypes = [
         "app.bsky.feed.like",
         "app.bsky.feed.post",
@@ -37138,3658 +37726,11 @@ if (cid) {
     }
   });
 
-  // node_modules/universal-user-agent/dist-web/index.js
-  function getUserAgent() {
-    if (typeof navigator === "object" && "userAgent" in navigator) {
-      return navigator.userAgent;
-    }
-    if (typeof process === "object" && process.version !== void 0) {
-      return `Node.js/${process.version.substr(1)} (${process.platform}; ${process.arch})`;
-    }
-    return "<environment undetectable>";
-  }
-  var init_dist_web = __esm({
-    "node_modules/universal-user-agent/dist-web/index.js"() {
-    }
-  });
-
-  // node_modules/before-after-hook/lib/register.js
-  var require_register = __commonJS({
-    "node_modules/before-after-hook/lib/register.js"(exports, module) {
-      module.exports = register;
-      function register(state, name, method, options) {
-        if (typeof method !== "function") {
-          throw new Error("method for before hook must be a function");
-        }
-        if (!options) {
-          options = {};
-        }
-        if (Array.isArray(name)) {
-          return name.reverse().reduce(function(callback, name2) {
-            return register.bind(null, state, name2, callback, options);
-          }, method)();
-        }
-        return Promise.resolve().then(function() {
-          if (!state.registry[name]) {
-            return method(options);
-          }
-          return state.registry[name].reduce(function(method2, registered) {
-            return registered.hook.bind(null, method2, options);
-          }, method)();
-        });
-      }
-    }
-  });
-
-  // node_modules/before-after-hook/lib/add.js
-  var require_add = __commonJS({
-    "node_modules/before-after-hook/lib/add.js"(exports, module) {
-      module.exports = addHook;
-      function addHook(state, kind, name, hook2) {
-        var orig = hook2;
-        if (!state.registry[name]) {
-          state.registry[name] = [];
-        }
-        if (kind === "before") {
-          hook2 = function(method, options) {
-            return Promise.resolve().then(orig.bind(null, options)).then(method.bind(null, options));
-          };
-        }
-        if (kind === "after") {
-          hook2 = function(method, options) {
-            var result;
-            return Promise.resolve().then(method.bind(null, options)).then(function(result_) {
-              result = result_;
-              return orig(result, options);
-            }).then(function() {
-              return result;
-            });
-          };
-        }
-        if (kind === "error") {
-          hook2 = function(method, options) {
-            return Promise.resolve().then(method.bind(null, options)).catch(function(error) {
-              return orig(error, options);
-            });
-          };
-        }
-        state.registry[name].push({
-          hook: hook2,
-          orig
-        });
-      }
-    }
-  });
-
-  // node_modules/before-after-hook/lib/remove.js
-  var require_remove = __commonJS({
-    "node_modules/before-after-hook/lib/remove.js"(exports, module) {
-      module.exports = removeHook;
-      function removeHook(state, name, method) {
-        if (!state.registry[name]) {
-          return;
-        }
-        var index = state.registry[name].map(function(registered) {
-          return registered.orig;
-        }).indexOf(method);
-        if (index === -1) {
-          return;
-        }
-        state.registry[name].splice(index, 1);
-      }
-    }
-  });
-
-  // node_modules/before-after-hook/index.js
-  var require_before_after_hook = __commonJS({
-    "node_modules/before-after-hook/index.js"(exports, module) {
-      var register = require_register();
-      var addHook = require_add();
-      var removeHook = require_remove();
-      var bind = Function.bind;
-      var bindable = bind.bind(bind);
-      function bindApi(hook2, state, name) {
-        var removeHookRef = bindable(removeHook, null).apply(
-          null,
-          name ? [state, name] : [state]
-        );
-        hook2.api = { remove: removeHookRef };
-        hook2.remove = removeHookRef;
-        ["before", "error", "after", "wrap"].forEach(function(kind) {
-          var args = name ? [state, kind, name] : [state, kind];
-          hook2[kind] = hook2.api[kind] = bindable(addHook, null).apply(null, args);
-        });
-      }
-      function HookSingular() {
-        var singularHookName = "h";
-        var singularHookState = {
-          registry: {}
-        };
-        var singularHook = register.bind(null, singularHookState, singularHookName);
-        bindApi(singularHook, singularHookState, singularHookName);
-        return singularHook;
-      }
-      function HookCollection() {
-        var state = {
-          registry: {}
-        };
-        var hook2 = register.bind(null, state);
-        bindApi(hook2, state);
-        return hook2;
-      }
-      var collectionHookDeprecationMessageDisplayed = false;
-      function Hook() {
-        if (!collectionHookDeprecationMessageDisplayed) {
-          console.warn(
-            '[before-after-hook]: "Hook()" repurposing warning, use "Hook.Collection()". Read more: https://git.io/upgrade-before-after-hook-to-1.4'
-          );
-          collectionHookDeprecationMessageDisplayed = true;
-        }
-        return HookCollection();
-      }
-      Hook.Singular = HookSingular.bind();
-      Hook.Collection = HookCollection.bind();
-      module.exports = Hook;
-      module.exports.Hook = Hook;
-      module.exports.Singular = Hook.Singular;
-      module.exports.Collection = Hook.Collection;
-    }
-  });
-
-  // node_modules/@octokit/endpoint/dist-web/index.js
-  function lowercaseKeys(object) {
-    if (!object) {
-      return {};
-    }
-    return Object.keys(object).reduce((newObj, key) => {
-      newObj[key.toLowerCase()] = object[key];
-      return newObj;
-    }, {});
-  }
-  function isPlainObject(value) {
-    if (typeof value !== "object" || value === null)
-      return false;
-    if (Object.prototype.toString.call(value) !== "[object Object]")
-      return false;
-    const proto = Object.getPrototypeOf(value);
-    if (proto === null)
-      return true;
-    const Ctor = Object.prototype.hasOwnProperty.call(proto, "constructor") && proto.constructor;
-    return typeof Ctor === "function" && Ctor instanceof Ctor && Function.prototype.call(Ctor) === Function.prototype.call(value);
-  }
-  function mergeDeep(defaults, options) {
-    const result = Object.assign({}, defaults);
-    Object.keys(options).forEach((key) => {
-      if (isPlainObject(options[key])) {
-        if (!(key in defaults))
-          Object.assign(result, { [key]: options[key] });
-        else
-          result[key] = mergeDeep(defaults[key], options[key]);
-      } else {
-        Object.assign(result, { [key]: options[key] });
-      }
-    });
-    return result;
-  }
-  function removeUndefinedProperties(obj) {
-    for (const key in obj) {
-      if (obj[key] === void 0) {
-        delete obj[key];
-      }
-    }
-    return obj;
-  }
-  function merge(defaults, route, options) {
-    var _a3;
-    if (typeof route === "string") {
-      let [method, url] = route.split(" ");
-      options = Object.assign(url ? { method, url } : { url: method }, options);
-    } else {
-      options = Object.assign({}, route);
-    }
-    options.headers = lowercaseKeys(options.headers);
-    removeUndefinedProperties(options);
-    removeUndefinedProperties(options.headers);
-    const mergedOptions = mergeDeep(defaults || {}, options);
-    if (options.url === "/graphql") {
-      if (defaults && ((_a3 = defaults.mediaType.previews) == null ? void 0 : _a3.length)) {
-        mergedOptions.mediaType.previews = defaults.mediaType.previews.filter(
-          (preview) => !mergedOptions.mediaType.previews.includes(preview)
-        ).concat(mergedOptions.mediaType.previews);
-      }
-      mergedOptions.mediaType.previews = (mergedOptions.mediaType.previews || []).map((preview) => preview.replace(/-preview/, ""));
-    }
-    return mergedOptions;
-  }
-  function addQueryParameters(url, parameters) {
-    const separator = /\?/.test(url) ? "&" : "?";
-    const names = Object.keys(parameters);
-    if (names.length === 0) {
-      return url;
-    }
-    return url + separator + names.map((name) => {
-      if (name === "q") {
-        return "q=" + parameters.q.split("+").map(encodeURIComponent).join("+");
-      }
-      return `${name}=${encodeURIComponent(parameters[name])}`;
-    }).join("&");
-  }
-  function removeNonChars(variableName) {
-    return variableName.replace(/^\W+|\W+$/g, "").split(/,/);
-  }
-  function extractUrlVariableNames(url) {
-    const matches = url.match(urlVariableRegex);
-    if (!matches) {
-      return [];
-    }
-    return matches.map(removeNonChars).reduce((a, b) => a.concat(b), []);
-  }
-  function omit(object, keysToOmit) {
-    const result = { __proto__: null };
-    for (const key of Object.keys(object)) {
-      if (keysToOmit.indexOf(key) === -1) {
-        result[key] = object[key];
-      }
-    }
-    return result;
-  }
-  function encodeReserved(str) {
-    return str.split(/(%[0-9A-Fa-f]{2})/g).map(function(part) {
-      if (!/%[0-9A-Fa-f]/.test(part)) {
-        part = encodeURI(part).replace(/%5B/g, "[").replace(/%5D/g, "]");
-      }
-      return part;
-    }).join("");
-  }
-  function encodeUnreserved(str) {
-    return encodeURIComponent(str).replace(/[!'()*]/g, function(c) {
-      return "%" + c.charCodeAt(0).toString(16).toUpperCase();
-    });
-  }
-  function encodeValue(operator, value, key) {
-    value = operator === "+" || operator === "#" ? encodeReserved(value) : encodeUnreserved(value);
-    if (key) {
-      return encodeUnreserved(key) + "=" + value;
-    } else {
-      return value;
-    }
-  }
-  function isDefined(value) {
-    return value !== void 0 && value !== null;
-  }
-  function isKeyOperator(operator) {
-    return operator === ";" || operator === "&" || operator === "?";
-  }
-  function getValues(context, operator, key, modifier) {
-    var value = context[key], result = [];
-    if (isDefined(value) && value !== "") {
-      if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-        value = value.toString();
-        if (modifier && modifier !== "*") {
-          value = value.substring(0, parseInt(modifier, 10));
-        }
-        result.push(
-          encodeValue(operator, value, isKeyOperator(operator) ? key : "")
-        );
-      } else {
-        if (modifier === "*") {
-          if (Array.isArray(value)) {
-            value.filter(isDefined).forEach(function(value2) {
-              result.push(
-                encodeValue(operator, value2, isKeyOperator(operator) ? key : "")
-              );
-            });
-          } else {
-            Object.keys(value).forEach(function(k) {
-              if (isDefined(value[k])) {
-                result.push(encodeValue(operator, value[k], k));
-              }
-            });
-          }
-        } else {
-          const tmp = [];
-          if (Array.isArray(value)) {
-            value.filter(isDefined).forEach(function(value2) {
-              tmp.push(encodeValue(operator, value2));
-            });
-          } else {
-            Object.keys(value).forEach(function(k) {
-              if (isDefined(value[k])) {
-                tmp.push(encodeUnreserved(k));
-                tmp.push(encodeValue(operator, value[k].toString()));
-              }
-            });
-          }
-          if (isKeyOperator(operator)) {
-            result.push(encodeUnreserved(key) + "=" + tmp.join(","));
-          } else if (tmp.length !== 0) {
-            result.push(tmp.join(","));
-          }
-        }
-      }
-    } else {
-      if (operator === ";") {
-        if (isDefined(value)) {
-          result.push(encodeUnreserved(key));
-        }
-      } else if (value === "" && (operator === "&" || operator === "?")) {
-        result.push(encodeUnreserved(key) + "=");
-      } else if (value === "") {
-        result.push("");
-      }
-    }
-    return result;
-  }
-  function parseUrl(template) {
-    return {
-      expand: expand.bind(null, template)
-    };
-  }
-  function expand(template, context) {
-    var operators = ["+", "#", ".", "/", ";", "?", "&"];
-    template = template.replace(
-      /\{([^\{\}]+)\}|([^\{\}]+)/g,
-      function(_, expression, literal) {
-        if (expression) {
-          let operator = "";
-          const values = [];
-          if (operators.indexOf(expression.charAt(0)) !== -1) {
-            operator = expression.charAt(0);
-            expression = expression.substr(1);
-          }
-          expression.split(/,/g).forEach(function(variable) {
-            var tmp = /([^:\*]*)(?::(\d+)|(\*))?/.exec(variable);
-            values.push(getValues(context, operator, tmp[1], tmp[2] || tmp[3]));
-          });
-          if (operator && operator !== "+") {
-            var separator = ",";
-            if (operator === "?") {
-              separator = "&";
-            } else if (operator !== "#") {
-              separator = operator;
-            }
-            return (values.length !== 0 ? operator : "") + values.join(separator);
-          } else {
-            return values.join(",");
-          }
-        } else {
-          return encodeReserved(literal);
-        }
-      }
-    );
-    if (template === "/") {
-      return template;
-    } else {
-      return template.replace(/\/$/, "");
-    }
-  }
-  function parse(options) {
-    var _a3;
-    let method = options.method.toUpperCase();
-    let url = (options.url || "/").replace(/:([a-z]\w+)/g, "{$1}");
-    let headers = Object.assign({}, options.headers);
-    let body;
-    let parameters = omit(options, [
-      "method",
-      "baseUrl",
-      "url",
-      "headers",
-      "request",
-      "mediaType"
-    ]);
-    const urlVariableNames = extractUrlVariableNames(url);
-    url = parseUrl(url).expand(parameters);
-    if (!/^http/.test(url)) {
-      url = options.baseUrl + url;
-    }
-    const omittedParameters = Object.keys(options).filter((option) => urlVariableNames.includes(option)).concat("baseUrl");
-    const remainingParameters = omit(parameters, omittedParameters);
-    const isBinaryRequest = /application\/octet-stream/i.test(headers.accept);
-    if (!isBinaryRequest) {
-      if (options.mediaType.format) {
-        headers.accept = headers.accept.split(/,/).map(
-          (format2) => format2.replace(
-            /application\/vnd(\.\w+)(\.v3)?(\.\w+)?(\+json)?$/,
-            `application/vnd$1$2.${options.mediaType.format}`
-          )
-        ).join(",");
-      }
-      if (url.endsWith("/graphql")) {
-        if ((_a3 = options.mediaType.previews) == null ? void 0 : _a3.length) {
-          const previewsFromAcceptHeader = headers.accept.match(/[\w-]+(?=-preview)/g) || [];
-          headers.accept = previewsFromAcceptHeader.concat(options.mediaType.previews).map((preview) => {
-            const format2 = options.mediaType.format ? `.${options.mediaType.format}` : "+json";
-            return `application/vnd.github.${preview}-preview${format2}`;
-          }).join(",");
-        }
-      }
-    }
-    if (["GET", "HEAD"].includes(method)) {
-      url = addQueryParameters(url, remainingParameters);
-    } else {
-      if ("data" in remainingParameters) {
-        body = remainingParameters.data;
-      } else {
-        if (Object.keys(remainingParameters).length) {
-          body = remainingParameters;
-        }
-      }
-    }
-    if (!headers["content-type"] && typeof body !== "undefined") {
-      headers["content-type"] = "application/json; charset=utf-8";
-    }
-    if (["PATCH", "PUT"].includes(method) && typeof body === "undefined") {
-      body = "";
-    }
-    return Object.assign(
-      { method, url, headers },
-      typeof body !== "undefined" ? { body } : null,
-      options.request ? { request: options.request } : null
-    );
-  }
-  function endpointWithDefaults(defaults, route, options) {
-    return parse(merge(defaults, route, options));
-  }
-  function withDefaults(oldDefaults, newDefaults) {
-    const DEFAULTS2 = merge(oldDefaults, newDefaults);
-    const endpoint2 = endpointWithDefaults.bind(null, DEFAULTS2);
-    return Object.assign(endpoint2, {
-      DEFAULTS: DEFAULTS2,
-      defaults: withDefaults.bind(null, DEFAULTS2),
-      merge: merge.bind(null, DEFAULTS2),
-      parse
-    });
-  }
-  var VERSION, userAgent, DEFAULTS, urlVariableRegex, endpoint;
-  var init_dist_web2 = __esm({
-    "node_modules/@octokit/endpoint/dist-web/index.js"() {
-      init_dist_web();
-      VERSION = "9.0.4";
-      userAgent = `octokit-endpoint.js/${VERSION} ${getUserAgent()}`;
-      DEFAULTS = {
-        method: "GET",
-        baseUrl: "https://api.github.com",
-        headers: {
-          accept: "application/vnd.github.v3+json",
-          "user-agent": userAgent
-        },
-        mediaType: {
-          format: ""
-        }
-      };
-      urlVariableRegex = /\{[^}]+\}/g;
-      endpoint = withDefaults(null, DEFAULTS);
-    }
-  });
-
-  // node_modules/deprecation/dist-web/index.js
-  var Deprecation;
-  var init_dist_web3 = __esm({
-    "node_modules/deprecation/dist-web/index.js"() {
-      Deprecation = class extends Error {
-        constructor(message) {
-          super(message);
-          if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, this.constructor);
-          }
-          this.name = "Deprecation";
-        }
-      };
-    }
-  });
-
-  // node_modules/wrappy/wrappy.js
-  var require_wrappy = __commonJS({
-    "node_modules/wrappy/wrappy.js"(exports, module) {
-      module.exports = wrappy;
-      function wrappy(fn, cb) {
-        if (fn && cb)
-          return wrappy(fn)(cb);
-        if (typeof fn !== "function")
-          throw new TypeError("need wrapper function");
-        Object.keys(fn).forEach(function(k) {
-          wrapper[k] = fn[k];
-        });
-        return wrapper;
-        function wrapper() {
-          var args = new Array(arguments.length);
-          for (var i = 0; i < args.length; i++) {
-            args[i] = arguments[i];
-          }
-          var ret = fn.apply(this, args);
-          var cb2 = args[args.length - 1];
-          if (typeof ret === "function" && ret !== cb2) {
-            Object.keys(cb2).forEach(function(k) {
-              ret[k] = cb2[k];
-            });
-          }
-          return ret;
-        }
-      }
-    }
-  });
-
-  // node_modules/once/once.js
-  var require_once = __commonJS({
-    "node_modules/once/once.js"(exports, module) {
-      var wrappy = require_wrappy();
-      module.exports = wrappy(once2);
-      module.exports.strict = wrappy(onceStrict);
-      once2.proto = once2(function() {
-        Object.defineProperty(Function.prototype, "once", {
-          value: function() {
-            return once2(this);
-          },
-          configurable: true
-        });
-        Object.defineProperty(Function.prototype, "onceStrict", {
-          value: function() {
-            return onceStrict(this);
-          },
-          configurable: true
-        });
-      });
-      function once2(fn) {
-        var f = function() {
-          if (f.called)
-            return f.value;
-          f.called = true;
-          return f.value = fn.apply(this, arguments);
-        };
-        f.called = false;
-        return f;
-      }
-      function onceStrict(fn) {
-        var f = function() {
-          if (f.called)
-            throw new Error(f.onceError);
-          f.called = true;
-          return f.value = fn.apply(this, arguments);
-        };
-        var name = fn.name || "Function wrapped with `once`";
-        f.onceError = name + " shouldn't be called more than once";
-        f.called = false;
-        return f;
-      }
-    }
-  });
-
-  // node_modules/@octokit/request-error/dist-web/index.js
-  var import_once, logOnceCode, logOnceHeaders, RequestError;
-  var init_dist_web4 = __esm({
-    "node_modules/@octokit/request-error/dist-web/index.js"() {
-      init_dist_web3();
-      import_once = __toESM(require_once());
-      logOnceCode = (0, import_once.default)((deprecation) => console.warn(deprecation));
-      logOnceHeaders = (0, import_once.default)((deprecation) => console.warn(deprecation));
-      RequestError = class extends Error {
-        constructor(message, statusCode, options) {
-          super(message);
-          if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, this.constructor);
-          }
-          this.name = "HttpError";
-          this.status = statusCode;
-          let headers;
-          if ("headers" in options && typeof options.headers !== "undefined") {
-            headers = options.headers;
-          }
-          if ("response" in options) {
-            this.response = options.response;
-            headers = options.response.headers;
-          }
-          const requestCopy = Object.assign({}, options.request);
-          if (options.request.headers.authorization) {
-            requestCopy.headers = Object.assign({}, options.request.headers, {
-              authorization: options.request.headers.authorization.replace(
-                / .*$/,
-                " [REDACTED]"
-              )
-            });
-          }
-          requestCopy.url = requestCopy.url.replace(/\bclient_secret=\w+/g, "client_secret=[REDACTED]").replace(/\baccess_token=\w+/g, "access_token=[REDACTED]");
-          this.request = requestCopy;
-          Object.defineProperty(this, "code", {
-            get() {
-              logOnceCode(
-                new Deprecation(
-                  "[@octokit/request-error] `error.code` is deprecated, use `error.status`."
-                )
-              );
-              return statusCode;
-            }
-          });
-          Object.defineProperty(this, "headers", {
-            get() {
-              logOnceHeaders(
-                new Deprecation(
-                  "[@octokit/request-error] `error.headers` is deprecated, use `error.response.headers`."
-                )
-              );
-              return headers || {};
-            }
-          });
-        }
-      };
-    }
-  });
-
-  // node_modules/@octokit/request/dist-web/index.js
-  function isPlainObject2(value) {
-    if (typeof value !== "object" || value === null)
-      return false;
-    if (Object.prototype.toString.call(value) !== "[object Object]")
-      return false;
-    const proto = Object.getPrototypeOf(value);
-    if (proto === null)
-      return true;
-    const Ctor = Object.prototype.hasOwnProperty.call(proto, "constructor") && proto.constructor;
-    return typeof Ctor === "function" && Ctor instanceof Ctor && Function.prototype.call(Ctor) === Function.prototype.call(value);
-  }
-  function getBufferResponse(response) {
-    return response.arrayBuffer();
-  }
-  function fetchWrapper(requestOptions) {
-    var _a3, _b, _c;
-    const log = requestOptions.request && requestOptions.request.log ? requestOptions.request.log : console;
-    const parseSuccessResponseBody = ((_a3 = requestOptions.request) == null ? void 0 : _a3.parseSuccessResponseBody) !== false;
-    if (isPlainObject2(requestOptions.body) || Array.isArray(requestOptions.body)) {
-      requestOptions.body = JSON.stringify(requestOptions.body);
-    }
-    let headers = {};
-    let status;
-    let url;
-    let { fetch: fetch2 } = globalThis;
-    if ((_b = requestOptions.request) == null ? void 0 : _b.fetch) {
-      fetch2 = requestOptions.request.fetch;
-    }
-    if (!fetch2) {
-      throw new Error(
-        "fetch is not set. Please pass a fetch implementation as new Octokit({ request: { fetch }}). Learn more at https://github.com/octokit/octokit.js/#fetch-missing"
-      );
-    }
-    return fetch2(requestOptions.url, __spreadValues({
-      method: requestOptions.method,
-      body: requestOptions.body,
-      headers: requestOptions.headers,
-      signal: (_c = requestOptions.request) == null ? void 0 : _c.signal
-    }, requestOptions.body && { duplex: "half" })).then((response) => __async(this, null, function* () {
-      url = response.url;
-      status = response.status;
-      for (const keyAndValue of response.headers) {
-        headers[keyAndValue[0]] = keyAndValue[1];
-      }
-      if ("deprecation" in headers) {
-        const matches = headers.link && headers.link.match(/<([^>]+)>; rel="deprecation"/);
-        const deprecationLink = matches && matches.pop();
-        log.warn(
-          `[@octokit/request] "${requestOptions.method} ${requestOptions.url}" is deprecated. It is scheduled to be removed on ${headers.sunset}${deprecationLink ? `. See ${deprecationLink}` : ""}`
-        );
-      }
-      if (status === 204 || status === 205) {
-        return;
-      }
-      if (requestOptions.method === "HEAD") {
-        if (status < 400) {
-          return;
-        }
-        throw new RequestError(response.statusText, status, {
-          response: {
-            url,
-            status,
-            headers,
-            data: void 0
-          },
-          request: requestOptions
-        });
-      }
-      if (status === 304) {
-        throw new RequestError("Not modified", status, {
-          response: {
-            url,
-            status,
-            headers,
-            data: yield getResponseData(response)
-          },
-          request: requestOptions
-        });
-      }
-      if (status >= 400) {
-        const data = yield getResponseData(response);
-        const error = new RequestError(toErrorMessage(data), status, {
-          response: {
-            url,
-            status,
-            headers,
-            data
-          },
-          request: requestOptions
-        });
-        throw error;
-      }
-      return parseSuccessResponseBody ? yield getResponseData(response) : response.body;
-    })).then((data) => {
-      return {
-        status,
-        url,
-        headers,
-        data
-      };
-    }).catch((error) => {
-      if (error instanceof RequestError)
-        throw error;
-      else if (error.name === "AbortError")
-        throw error;
-      let message = error.message;
-      if (error.name === "TypeError" && "cause" in error) {
-        if (error.cause instanceof Error) {
-          message = error.cause.message;
-        } else if (typeof error.cause === "string") {
-          message = error.cause;
-        }
-      }
-      throw new RequestError(message, 500, {
-        request: requestOptions
-      });
-    });
-  }
-  function getResponseData(response) {
-    return __async(this, null, function* () {
-      const contentType = response.headers.get("content-type");
-      if (/application\/json/.test(contentType)) {
-        return response.json().catch(() => response.text()).catch(() => "");
-      }
-      if (!contentType || /^text\/|charset=utf-8$/.test(contentType)) {
-        return response.text();
-      }
-      return getBufferResponse(response);
-    });
-  }
-  function toErrorMessage(data) {
-    if (typeof data === "string")
-      return data;
-    if ("message" in data) {
-      if (Array.isArray(data.errors)) {
-        return `${data.message}: ${data.errors.map(JSON.stringify).join(", ")}`;
-      }
-      return data.message;
-    }
-    return `Unknown error: ${JSON.stringify(data)}`;
-  }
-  function withDefaults2(oldEndpoint, newDefaults) {
-    const endpoint2 = oldEndpoint.defaults(newDefaults);
-    const newApi = function(route, parameters) {
-      const endpointOptions = endpoint2.merge(route, parameters);
-      if (!endpointOptions.request || !endpointOptions.request.hook) {
-        return fetchWrapper(endpoint2.parse(endpointOptions));
-      }
-      const request2 = (route2, parameters2) => {
-        return fetchWrapper(
-          endpoint2.parse(endpoint2.merge(route2, parameters2))
-        );
-      };
-      Object.assign(request2, {
-        endpoint: endpoint2,
-        defaults: withDefaults2.bind(null, endpoint2)
-      });
-      return endpointOptions.request.hook(request2, endpointOptions);
-    };
-    return Object.assign(newApi, {
-      endpoint: endpoint2,
-      defaults: withDefaults2.bind(null, endpoint2)
-    });
-  }
-  var VERSION2, request;
-  var init_dist_web5 = __esm({
-    "node_modules/@octokit/request/dist-web/index.js"() {
-      init_dist_web2();
-      init_dist_web();
-      init_dist_web4();
-      VERSION2 = "8.1.6";
-      request = withDefaults2(endpoint, {
-        headers: {
-          "user-agent": `octokit-request.js/${VERSION2} ${getUserAgent()}`
-        }
-      });
-    }
-  });
-
-  // node_modules/@octokit/graphql/dist-web/index.js
-  function _buildMessageForResponseErrors(data) {
-    return `Request failed due to following response errors:
-` + data.errors.map((e) => ` - ${e.message}`).join("\n");
-  }
-  function graphql(request2, query, options) {
-    if (options) {
-      if (typeof query === "string" && "query" in options) {
-        return Promise.reject(
-          new Error(`[@octokit/graphql] "query" cannot be used as variable name`)
-        );
-      }
-      for (const key in options) {
-        if (!FORBIDDEN_VARIABLE_OPTIONS.includes(key))
-          continue;
-        return Promise.reject(
-          new Error(
-            `[@octokit/graphql] "${key}" cannot be used as variable name`
-          )
-        );
-      }
-    }
-    const parsedOptions = typeof query === "string" ? Object.assign({ query }, options) : query;
-    const requestOptions = Object.keys(
-      parsedOptions
-    ).reduce((result, key) => {
-      if (NON_VARIABLE_OPTIONS.includes(key)) {
-        result[key] = parsedOptions[key];
-        return result;
-      }
-      if (!result.variables) {
-        result.variables = {};
-      }
-      result.variables[key] = parsedOptions[key];
-      return result;
-    }, {});
-    const baseUrl = parsedOptions.baseUrl || request2.endpoint.DEFAULTS.baseUrl;
-    if (GHES_V3_SUFFIX_REGEX.test(baseUrl)) {
-      requestOptions.url = baseUrl.replace(GHES_V3_SUFFIX_REGEX, "/api/graphql");
-    }
-    return request2(requestOptions).then((response) => {
-      if (response.data.errors) {
-        const headers = {};
-        for (const key of Object.keys(response.headers)) {
-          headers[key] = response.headers[key];
-        }
-        throw new GraphqlResponseError(
-          requestOptions,
-          headers,
-          response.data
-        );
-      }
-      return response.data.data;
-    });
-  }
-  function withDefaults3(request2, newDefaults) {
-    const newRequest = request2.defaults(newDefaults);
-    const newApi = (query, options) => {
-      return graphql(newRequest, query, options);
-    };
-    return Object.assign(newApi, {
-      defaults: withDefaults3.bind(null, newRequest),
-      endpoint: newRequest.endpoint
-    });
-  }
-  function withCustomRequest(customRequest) {
-    return withDefaults3(customRequest, {
-      method: "POST",
-      url: "/graphql"
-    });
-  }
-  var VERSION3, GraphqlResponseError, NON_VARIABLE_OPTIONS, FORBIDDEN_VARIABLE_OPTIONS, GHES_V3_SUFFIX_REGEX, graphql2;
-  var init_dist_web6 = __esm({
-    "node_modules/@octokit/graphql/dist-web/index.js"() {
-      init_dist_web5();
-      init_dist_web();
-      VERSION3 = "7.0.2";
-      GraphqlResponseError = class extends Error {
-        constructor(request2, headers, response) {
-          super(_buildMessageForResponseErrors(response));
-          this.request = request2;
-          this.headers = headers;
-          this.response = response;
-          this.name = "GraphqlResponseError";
-          this.errors = response.errors;
-          this.data = response.data;
-          if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, this.constructor);
-          }
-        }
-      };
-      NON_VARIABLE_OPTIONS = [
-        "method",
-        "baseUrl",
-        "url",
-        "headers",
-        "request",
-        "query",
-        "mediaType"
-      ];
-      FORBIDDEN_VARIABLE_OPTIONS = ["query", "method", "url"];
-      GHES_V3_SUFFIX_REGEX = /\/api\/v3\/?$/;
-      graphql2 = withDefaults3(request, {
-        headers: {
-          "user-agent": `octokit-graphql.js/${VERSION3} ${getUserAgent()}`
-        },
-        method: "POST",
-        url: "/graphql"
-      });
-    }
-  });
-
-  // node_modules/@octokit/auth-token/dist-web/index.js
-  function auth(token) {
-    return __async(this, null, function* () {
-      const isApp = token.split(/\./).length === 3;
-      const isInstallation = REGEX_IS_INSTALLATION_LEGACY.test(token) || REGEX_IS_INSTALLATION.test(token);
-      const isUserToServer = REGEX_IS_USER_TO_SERVER.test(token);
-      const tokenType = isApp ? "app" : isInstallation ? "installation" : isUserToServer ? "user-to-server" : "oauth";
-      return {
-        type: "token",
-        token,
-        tokenType
-      };
-    });
-  }
-  function withAuthorizationPrefix(token) {
-    if (token.split(/\./).length === 3) {
-      return `bearer ${token}`;
-    }
-    return `token ${token}`;
-  }
-  function hook(token, request2, route, parameters) {
-    return __async(this, null, function* () {
-      const endpoint2 = request2.endpoint.merge(
-        route,
-        parameters
-      );
-      endpoint2.headers.authorization = withAuthorizationPrefix(token);
-      return request2(endpoint2);
-    });
-  }
-  var REGEX_IS_INSTALLATION_LEGACY, REGEX_IS_INSTALLATION, REGEX_IS_USER_TO_SERVER, createTokenAuth;
-  var init_dist_web7 = __esm({
-    "node_modules/@octokit/auth-token/dist-web/index.js"() {
-      REGEX_IS_INSTALLATION_LEGACY = /^v1\./;
-      REGEX_IS_INSTALLATION = /^ghs_/;
-      REGEX_IS_USER_TO_SERVER = /^ghu_/;
-      createTokenAuth = function createTokenAuth2(token) {
-        if (!token) {
-          throw new Error("[@octokit/auth-token] No token passed to createTokenAuth");
-        }
-        if (typeof token !== "string") {
-          throw new Error(
-            "[@octokit/auth-token] Token passed to createTokenAuth is not a string"
-          );
-        }
-        token = token.replace(/^(token|bearer) +/i, "");
-        return Object.assign(auth.bind(null, token), {
-          hook: hook.bind(null, token)
-        });
-      };
-    }
-  });
-
-  // node_modules/@octokit/core/dist-web/index.js
-  var import_before_after_hook, VERSION4, noop, consoleWarn, consoleError, userAgentTrail, _a2, Octokit;
-  var init_dist_web8 = __esm({
-    "node_modules/@octokit/core/dist-web/index.js"() {
-      init_dist_web();
-      import_before_after_hook = __toESM(require_before_after_hook());
-      init_dist_web5();
-      init_dist_web6();
-      init_dist_web7();
-      VERSION4 = "5.0.2";
-      noop = () => {
-      };
-      consoleWarn = console.warn.bind(console);
-      consoleError = console.error.bind(console);
-      userAgentTrail = `octokit-core.js/${VERSION4} ${getUserAgent()}`;
-      Octokit = (_a2 = class {
-        static defaults(defaults) {
-          const OctokitWithDefaults = class extends this {
-            constructor(...args) {
-              const options = args[0] || {};
-              if (typeof defaults === "function") {
-                super(defaults(options));
-                return;
-              }
-              super(
-                Object.assign(
-                  {},
-                  defaults,
-                  options,
-                  options.userAgent && defaults.userAgent ? {
-                    userAgent: `${options.userAgent} ${defaults.userAgent}`
-                  } : null
-                )
-              );
-            }
-          };
-          return OctokitWithDefaults;
-        }
-        /**
-         * Attach a plugin (or many) to your Octokit instance.
-         *
-         * @example
-         * const API = Octokit.plugin(plugin1, plugin2, plugin3, ...)
-         */
-        static plugin(...newPlugins) {
-          var _a3;
-          const currentPlugins = this.plugins;
-          const NewOctokit = (_a3 = class extends this {
-          }, _a3.plugins = currentPlugins.concat(
-            newPlugins.filter((plugin) => !currentPlugins.includes(plugin))
-          ), _a3);
-          return NewOctokit;
-        }
-        constructor(options = {}) {
-          const hook2 = new import_before_after_hook.Collection();
-          const requestDefaults = {
-            baseUrl: request.endpoint.DEFAULTS.baseUrl,
-            headers: {},
-            request: Object.assign({}, options.request, {
-              // @ts-ignore internal usage only, no need to type
-              hook: hook2.bind(null, "request")
-            }),
-            mediaType: {
-              previews: [],
-              format: ""
-            }
-          };
-          requestDefaults.headers["user-agent"] = options.userAgent ? `${options.userAgent} ${userAgentTrail}` : userAgentTrail;
-          if (options.baseUrl) {
-            requestDefaults.baseUrl = options.baseUrl;
-          }
-          if (options.previews) {
-            requestDefaults.mediaType.previews = options.previews;
-          }
-          if (options.timeZone) {
-            requestDefaults.headers["time-zone"] = options.timeZone;
-          }
-          this.request = request.defaults(requestDefaults);
-          this.graphql = withCustomRequest(this.request).defaults(requestDefaults);
-          this.log = Object.assign(
-            {
-              debug: noop,
-              info: noop,
-              warn: consoleWarn,
-              error: consoleError
-            },
-            options.log
-          );
-          this.hook = hook2;
-          if (!options.authStrategy) {
-            if (!options.auth) {
-              this.auth = () => __async(this, null, function* () {
-                return {
-                  type: "unauthenticated"
-                };
-              });
-            } else {
-              const auth2 = createTokenAuth(options.auth);
-              hook2.wrap("request", auth2.hook);
-              this.auth = auth2;
-            }
-          } else {
-            const _a3 = options, { authStrategy } = _a3, otherOptions = __objRest(_a3, ["authStrategy"]);
-            const auth2 = authStrategy(
-              Object.assign(
-                {
-                  request: this.request,
-                  log: this.log,
-                  // we pass the current octokit instance as well as its constructor options
-                  // to allow for authentication strategies that return a new octokit instance
-                  // that shares the same internal state as the current one. The original
-                  // requirement for this was the "event-octokit" authentication strategy
-                  // of https://github.com/probot/octokit-auth-probot.
-                  octokit: this,
-                  octokitOptions: otherOptions
-                },
-                options.auth
-              )
-            );
-            hook2.wrap("request", auth2.hook);
-            this.auth = auth2;
-          }
-          const classConstructor = this.constructor;
-          for (let i = 0; i < classConstructor.plugins.length; ++i) {
-            Object.assign(this, classConstructor.plugins[i](this, options));
-          }
-        }
-      }, _a2.VERSION = VERSION4, _a2.plugins = [], _a2);
-    }
-  });
-
-  // node_modules/@octokit/plugin-request-log/dist-web/index.js
-  function requestLog(octokit) {
-    octokit.hook.wrap("request", (request2, options) => {
-      octokit.log.debug("request", options);
-      const start = Date.now();
-      const requestOptions = octokit.request.endpoint.parse(options);
-      const path = requestOptions.url.replace(options.baseUrl, "");
-      return request2(options).then((response) => {
-        octokit.log.info(
-          `${requestOptions.method} ${path} - ${response.status} in ${Date.now() - start}ms`
-        );
-        return response;
-      }).catch((error) => {
-        octokit.log.info(
-          `${requestOptions.method} ${path} - ${error.status} in ${Date.now() - start}ms`
-        );
-        throw error;
-      });
-    });
-  }
-  var VERSION5;
-  var init_dist_web9 = __esm({
-    "node_modules/@octokit/plugin-request-log/dist-web/index.js"() {
-      VERSION5 = "4.0.0";
-      requestLog.VERSION = VERSION5;
-    }
-  });
-
-  // node_modules/@octokit/plugin-paginate-rest/dist-web/index.js
-  function normalizePaginatedListResponse(response) {
-    if (!response.data) {
-      return __spreadProps(__spreadValues({}, response), {
-        data: []
-      });
-    }
-    const responseNeedsNormalization = "total_count" in response.data && !("url" in response.data);
-    if (!responseNeedsNormalization)
-      return response;
-    const incompleteResults = response.data.incomplete_results;
-    const repositorySelection = response.data.repository_selection;
-    const totalCount = response.data.total_count;
-    delete response.data.incomplete_results;
-    delete response.data.repository_selection;
-    delete response.data.total_count;
-    const namespaceKey = Object.keys(response.data)[0];
-    const data = response.data[namespaceKey];
-    response.data = data;
-    if (typeof incompleteResults !== "undefined") {
-      response.data.incomplete_results = incompleteResults;
-    }
-    if (typeof repositorySelection !== "undefined") {
-      response.data.repository_selection = repositorySelection;
-    }
-    response.data.total_count = totalCount;
-    return response;
-  }
-  function iterator(octokit, route, parameters) {
-    const options = typeof route === "function" ? route.endpoint(parameters) : octokit.request.endpoint(route, parameters);
-    const requestMethod = typeof route === "function" ? route : octokit.request;
-    const method = options.method;
-    const headers = options.headers;
-    let url = options.url;
-    return {
-      [Symbol.asyncIterator]: () => ({
-        next() {
-          return __async(this, null, function* () {
-            if (!url)
-              return { done: true };
-            try {
-              const response = yield requestMethod({ method, url, headers });
-              const normalizedResponse = normalizePaginatedListResponse(response);
-              url = ((normalizedResponse.headers.link || "").match(
-                /<([^>]+)>;\s*rel="next"/
-              ) || [])[1];
-              return { value: normalizedResponse };
-            } catch (error) {
-              if (error.status !== 409)
-                throw error;
-              url = "";
-              return {
-                value: {
-                  status: 200,
-                  headers: {},
-                  data: []
-                }
-              };
-            }
-          });
-        }
-      })
-    };
-  }
-  function paginate(octokit, route, parameters, mapFn) {
-    if (typeof parameters === "function") {
-      mapFn = parameters;
-      parameters = void 0;
-    }
-    return gather(
-      octokit,
-      [],
-      iterator(octokit, route, parameters)[Symbol.asyncIterator](),
-      mapFn
-    );
-  }
-  function gather(octokit, results, iterator2, mapFn) {
-    return iterator2.next().then((result) => {
-      if (result.done) {
-        return results;
-      }
-      let earlyExit = false;
-      function done() {
-        earlyExit = true;
-      }
-      results = results.concat(
-        mapFn ? mapFn(result.value, done) : result.value.data
-      );
-      if (earlyExit) {
-        return results;
-      }
-      return gather(octokit, results, iterator2, mapFn);
-    });
-  }
-  function paginateRest(octokit) {
-    return {
-      paginate: Object.assign(paginate.bind(null, octokit), {
-        iterator: iterator.bind(null, octokit)
-      })
-    };
-  }
-  var VERSION6, composePaginateRest;
-  var init_dist_web10 = __esm({
-    "node_modules/@octokit/plugin-paginate-rest/dist-web/index.js"() {
-      VERSION6 = "9.1.5";
-      composePaginateRest = Object.assign(paginate, {
-        iterator
-      });
-      paginateRest.VERSION = VERSION6;
-    }
-  });
-
-  // node_modules/@octokit/plugin-rest-endpoint-methods/dist-web/index.js
-  function endpointsToMethods(octokit) {
-    const newMethods = {};
-    for (const scope of endpointMethodsMap.keys()) {
-      newMethods[scope] = new Proxy({ octokit, scope, cache: {} }, handler);
-    }
-    return newMethods;
-  }
-  function decorate(octokit, scope, methodName, defaults, decorations) {
-    const requestWithDefaults = octokit.request.defaults(defaults);
-    function withDecorations(...args) {
-      let options = requestWithDefaults.endpoint.merge(...args);
-      if (decorations.mapToData) {
-        options = Object.assign({}, options, {
-          data: options[decorations.mapToData],
-          [decorations.mapToData]: void 0
-        });
-        return requestWithDefaults(options);
-      }
-      if (decorations.renamed) {
-        const [newScope, newMethodName] = decorations.renamed;
-        octokit.log.warn(
-          `octokit.${scope}.${methodName}() has been renamed to octokit.${newScope}.${newMethodName}()`
-        );
-      }
-      if (decorations.deprecated) {
-        octokit.log.warn(decorations.deprecated);
-      }
-      if (decorations.renamedParameters) {
-        const options2 = requestWithDefaults.endpoint.merge(...args);
-        for (const [name, alias] of Object.entries(
-          decorations.renamedParameters
-        )) {
-          if (name in options2) {
-            octokit.log.warn(
-              `"${name}" parameter is deprecated for "octokit.${scope}.${methodName}()". Use "${alias}" instead`
-            );
-            if (!(alias in options2)) {
-              options2[alias] = options2[name];
-            }
-            delete options2[name];
-          }
-        }
-        return requestWithDefaults(options2);
-      }
-      return requestWithDefaults(...args);
-    }
-    return Object.assign(withDecorations, requestWithDefaults);
-  }
-  function restEndpointMethods(octokit) {
-    const api = endpointsToMethods(octokit);
-    return {
-      rest: api
-    };
-  }
-  function legacyRestEndpointMethods(octokit) {
-    const api = endpointsToMethods(octokit);
-    return __spreadProps(__spreadValues({}, api), {
-      rest: api
-    });
-  }
-  var VERSION7, Endpoints, endpoints_default, endpointMethodsMap, handler;
-  var init_dist_web11 = __esm({
-    "node_modules/@octokit/plugin-rest-endpoint-methods/dist-web/index.js"() {
-      VERSION7 = "10.2.0";
-      Endpoints = {
-        actions: {
-          addCustomLabelsToSelfHostedRunnerForOrg: [
-            "POST /orgs/{org}/actions/runners/{runner_id}/labels"
-          ],
-          addCustomLabelsToSelfHostedRunnerForRepo: [
-            "POST /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"
-          ],
-          addSelectedRepoToOrgSecret: [
-            "PUT /orgs/{org}/actions/secrets/{secret_name}/repositories/{repository_id}"
-          ],
-          addSelectedRepoToOrgVariable: [
-            "PUT /orgs/{org}/actions/variables/{name}/repositories/{repository_id}"
-          ],
-          approveWorkflowRun: [
-            "POST /repos/{owner}/{repo}/actions/runs/{run_id}/approve"
-          ],
-          cancelWorkflowRun: [
-            "POST /repos/{owner}/{repo}/actions/runs/{run_id}/cancel"
-          ],
-          createEnvironmentVariable: [
-            "POST /repositories/{repository_id}/environments/{environment_name}/variables"
-          ],
-          createOrUpdateEnvironmentSecret: [
-            "PUT /repositories/{repository_id}/environments/{environment_name}/secrets/{secret_name}"
-          ],
-          createOrUpdateOrgSecret: ["PUT /orgs/{org}/actions/secrets/{secret_name}"],
-          createOrUpdateRepoSecret: [
-            "PUT /repos/{owner}/{repo}/actions/secrets/{secret_name}"
-          ],
-          createOrgVariable: ["POST /orgs/{org}/actions/variables"],
-          createRegistrationTokenForOrg: [
-            "POST /orgs/{org}/actions/runners/registration-token"
-          ],
-          createRegistrationTokenForRepo: [
-            "POST /repos/{owner}/{repo}/actions/runners/registration-token"
-          ],
-          createRemoveTokenForOrg: ["POST /orgs/{org}/actions/runners/remove-token"],
-          createRemoveTokenForRepo: [
-            "POST /repos/{owner}/{repo}/actions/runners/remove-token"
-          ],
-          createRepoVariable: ["POST /repos/{owner}/{repo}/actions/variables"],
-          createWorkflowDispatch: [
-            "POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches"
-          ],
-          deleteActionsCacheById: [
-            "DELETE /repos/{owner}/{repo}/actions/caches/{cache_id}"
-          ],
-          deleteActionsCacheByKey: [
-            "DELETE /repos/{owner}/{repo}/actions/caches{?key,ref}"
-          ],
-          deleteArtifact: [
-            "DELETE /repos/{owner}/{repo}/actions/artifacts/{artifact_id}"
-          ],
-          deleteEnvironmentSecret: [
-            "DELETE /repositories/{repository_id}/environments/{environment_name}/secrets/{secret_name}"
-          ],
-          deleteEnvironmentVariable: [
-            "DELETE /repositories/{repository_id}/environments/{environment_name}/variables/{name}"
-          ],
-          deleteOrgSecret: ["DELETE /orgs/{org}/actions/secrets/{secret_name}"],
-          deleteOrgVariable: ["DELETE /orgs/{org}/actions/variables/{name}"],
-          deleteRepoSecret: [
-            "DELETE /repos/{owner}/{repo}/actions/secrets/{secret_name}"
-          ],
-          deleteRepoVariable: [
-            "DELETE /repos/{owner}/{repo}/actions/variables/{name}"
-          ],
-          deleteSelfHostedRunnerFromOrg: [
-            "DELETE /orgs/{org}/actions/runners/{runner_id}"
-          ],
-          deleteSelfHostedRunnerFromRepo: [
-            "DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}"
-          ],
-          deleteWorkflowRun: ["DELETE /repos/{owner}/{repo}/actions/runs/{run_id}"],
-          deleteWorkflowRunLogs: [
-            "DELETE /repos/{owner}/{repo}/actions/runs/{run_id}/logs"
-          ],
-          disableSelectedRepositoryGithubActionsOrganization: [
-            "DELETE /orgs/{org}/actions/permissions/repositories/{repository_id}"
-          ],
-          disableWorkflow: [
-            "PUT /repos/{owner}/{repo}/actions/workflows/{workflow_id}/disable"
-          ],
-          downloadArtifact: [
-            "GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}"
-          ],
-          downloadJobLogsForWorkflowRun: [
-            "GET /repos/{owner}/{repo}/actions/jobs/{job_id}/logs"
-          ],
-          downloadWorkflowRunAttemptLogs: [
-            "GET /repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}/logs"
-          ],
-          downloadWorkflowRunLogs: [
-            "GET /repos/{owner}/{repo}/actions/runs/{run_id}/logs"
-          ],
-          enableSelectedRepositoryGithubActionsOrganization: [
-            "PUT /orgs/{org}/actions/permissions/repositories/{repository_id}"
-          ],
-          enableWorkflow: [
-            "PUT /repos/{owner}/{repo}/actions/workflows/{workflow_id}/enable"
-          ],
-          forceCancelWorkflowRun: [
-            "POST /repos/{owner}/{repo}/actions/runs/{run_id}/force-cancel"
-          ],
-          generateRunnerJitconfigForOrg: [
-            "POST /orgs/{org}/actions/runners/generate-jitconfig"
-          ],
-          generateRunnerJitconfigForRepo: [
-            "POST /repos/{owner}/{repo}/actions/runners/generate-jitconfig"
-          ],
-          getActionsCacheList: ["GET /repos/{owner}/{repo}/actions/caches"],
-          getActionsCacheUsage: ["GET /repos/{owner}/{repo}/actions/cache/usage"],
-          getActionsCacheUsageByRepoForOrg: [
-            "GET /orgs/{org}/actions/cache/usage-by-repository"
-          ],
-          getActionsCacheUsageForOrg: ["GET /orgs/{org}/actions/cache/usage"],
-          getAllowedActionsOrganization: [
-            "GET /orgs/{org}/actions/permissions/selected-actions"
-          ],
-          getAllowedActionsRepository: [
-            "GET /repos/{owner}/{repo}/actions/permissions/selected-actions"
-          ],
-          getArtifact: ["GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}"],
-          getEnvironmentPublicKey: [
-            "GET /repositories/{repository_id}/environments/{environment_name}/secrets/public-key"
-          ],
-          getEnvironmentSecret: [
-            "GET /repositories/{repository_id}/environments/{environment_name}/secrets/{secret_name}"
-          ],
-          getEnvironmentVariable: [
-            "GET /repositories/{repository_id}/environments/{environment_name}/variables/{name}"
-          ],
-          getGithubActionsDefaultWorkflowPermissionsOrganization: [
-            "GET /orgs/{org}/actions/permissions/workflow"
-          ],
-          getGithubActionsDefaultWorkflowPermissionsRepository: [
-            "GET /repos/{owner}/{repo}/actions/permissions/workflow"
-          ],
-          getGithubActionsPermissionsOrganization: [
-            "GET /orgs/{org}/actions/permissions"
-          ],
-          getGithubActionsPermissionsRepository: [
-            "GET /repos/{owner}/{repo}/actions/permissions"
-          ],
-          getJobForWorkflowRun: ["GET /repos/{owner}/{repo}/actions/jobs/{job_id}"],
-          getOrgPublicKey: ["GET /orgs/{org}/actions/secrets/public-key"],
-          getOrgSecret: ["GET /orgs/{org}/actions/secrets/{secret_name}"],
-          getOrgVariable: ["GET /orgs/{org}/actions/variables/{name}"],
-          getPendingDeploymentsForRun: [
-            "GET /repos/{owner}/{repo}/actions/runs/{run_id}/pending_deployments"
-          ],
-          getRepoPermissions: [
-            "GET /repos/{owner}/{repo}/actions/permissions",
-            {},
-            { renamed: ["actions", "getGithubActionsPermissionsRepository"] }
-          ],
-          getRepoPublicKey: ["GET /repos/{owner}/{repo}/actions/secrets/public-key"],
-          getRepoSecret: ["GET /repos/{owner}/{repo}/actions/secrets/{secret_name}"],
-          getRepoVariable: ["GET /repos/{owner}/{repo}/actions/variables/{name}"],
-          getReviewsForRun: [
-            "GET /repos/{owner}/{repo}/actions/runs/{run_id}/approvals"
-          ],
-          getSelfHostedRunnerForOrg: ["GET /orgs/{org}/actions/runners/{runner_id}"],
-          getSelfHostedRunnerForRepo: [
-            "GET /repos/{owner}/{repo}/actions/runners/{runner_id}"
-          ],
-          getWorkflow: ["GET /repos/{owner}/{repo}/actions/workflows/{workflow_id}"],
-          getWorkflowAccessToRepository: [
-            "GET /repos/{owner}/{repo}/actions/permissions/access"
-          ],
-          getWorkflowRun: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}"],
-          getWorkflowRunAttempt: [
-            "GET /repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}"
-          ],
-          getWorkflowRunUsage: [
-            "GET /repos/{owner}/{repo}/actions/runs/{run_id}/timing"
-          ],
-          getWorkflowUsage: [
-            "GET /repos/{owner}/{repo}/actions/workflows/{workflow_id}/timing"
-          ],
-          listArtifactsForRepo: ["GET /repos/{owner}/{repo}/actions/artifacts"],
-          listEnvironmentSecrets: [
-            "GET /repositories/{repository_id}/environments/{environment_name}/secrets"
-          ],
-          listEnvironmentVariables: [
-            "GET /repositories/{repository_id}/environments/{environment_name}/variables"
-          ],
-          listJobsForWorkflowRun: [
-            "GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs"
-          ],
-          listJobsForWorkflowRunAttempt: [
-            "GET /repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}/jobs"
-          ],
-          listLabelsForSelfHostedRunnerForOrg: [
-            "GET /orgs/{org}/actions/runners/{runner_id}/labels"
-          ],
-          listLabelsForSelfHostedRunnerForRepo: [
-            "GET /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"
-          ],
-          listOrgSecrets: ["GET /orgs/{org}/actions/secrets"],
-          listOrgVariables: ["GET /orgs/{org}/actions/variables"],
-          listRepoOrganizationSecrets: [
-            "GET /repos/{owner}/{repo}/actions/organization-secrets"
-          ],
-          listRepoOrganizationVariables: [
-            "GET /repos/{owner}/{repo}/actions/organization-variables"
-          ],
-          listRepoSecrets: ["GET /repos/{owner}/{repo}/actions/secrets"],
-          listRepoVariables: ["GET /repos/{owner}/{repo}/actions/variables"],
-          listRepoWorkflows: ["GET /repos/{owner}/{repo}/actions/workflows"],
-          listRunnerApplicationsForOrg: ["GET /orgs/{org}/actions/runners/downloads"],
-          listRunnerApplicationsForRepo: [
-            "GET /repos/{owner}/{repo}/actions/runners/downloads"
-          ],
-          listSelectedReposForOrgSecret: [
-            "GET /orgs/{org}/actions/secrets/{secret_name}/repositories"
-          ],
-          listSelectedReposForOrgVariable: [
-            "GET /orgs/{org}/actions/variables/{name}/repositories"
-          ],
-          listSelectedRepositoriesEnabledGithubActionsOrganization: [
-            "GET /orgs/{org}/actions/permissions/repositories"
-          ],
-          listSelfHostedRunnersForOrg: ["GET /orgs/{org}/actions/runners"],
-          listSelfHostedRunnersForRepo: ["GET /repos/{owner}/{repo}/actions/runners"],
-          listWorkflowRunArtifacts: [
-            "GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts"
-          ],
-          listWorkflowRuns: [
-            "GET /repos/{owner}/{repo}/actions/workflows/{workflow_id}/runs"
-          ],
-          listWorkflowRunsForRepo: ["GET /repos/{owner}/{repo}/actions/runs"],
-          reRunJobForWorkflowRun: [
-            "POST /repos/{owner}/{repo}/actions/jobs/{job_id}/rerun"
-          ],
-          reRunWorkflow: ["POST /repos/{owner}/{repo}/actions/runs/{run_id}/rerun"],
-          reRunWorkflowFailedJobs: [
-            "POST /repos/{owner}/{repo}/actions/runs/{run_id}/rerun-failed-jobs"
-          ],
-          removeAllCustomLabelsFromSelfHostedRunnerForOrg: [
-            "DELETE /orgs/{org}/actions/runners/{runner_id}/labels"
-          ],
-          removeAllCustomLabelsFromSelfHostedRunnerForRepo: [
-            "DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"
-          ],
-          removeCustomLabelFromSelfHostedRunnerForOrg: [
-            "DELETE /orgs/{org}/actions/runners/{runner_id}/labels/{name}"
-          ],
-          removeCustomLabelFromSelfHostedRunnerForRepo: [
-            "DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}/labels/{name}"
-          ],
-          removeSelectedRepoFromOrgSecret: [
-            "DELETE /orgs/{org}/actions/secrets/{secret_name}/repositories/{repository_id}"
-          ],
-          removeSelectedRepoFromOrgVariable: [
-            "DELETE /orgs/{org}/actions/variables/{name}/repositories/{repository_id}"
-          ],
-          reviewCustomGatesForRun: [
-            "POST /repos/{owner}/{repo}/actions/runs/{run_id}/deployment_protection_rule"
-          ],
-          reviewPendingDeploymentsForRun: [
-            "POST /repos/{owner}/{repo}/actions/runs/{run_id}/pending_deployments"
-          ],
-          setAllowedActionsOrganization: [
-            "PUT /orgs/{org}/actions/permissions/selected-actions"
-          ],
-          setAllowedActionsRepository: [
-            "PUT /repos/{owner}/{repo}/actions/permissions/selected-actions"
-          ],
-          setCustomLabelsForSelfHostedRunnerForOrg: [
-            "PUT /orgs/{org}/actions/runners/{runner_id}/labels"
-          ],
-          setCustomLabelsForSelfHostedRunnerForRepo: [
-            "PUT /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"
-          ],
-          setGithubActionsDefaultWorkflowPermissionsOrganization: [
-            "PUT /orgs/{org}/actions/permissions/workflow"
-          ],
-          setGithubActionsDefaultWorkflowPermissionsRepository: [
-            "PUT /repos/{owner}/{repo}/actions/permissions/workflow"
-          ],
-          setGithubActionsPermissionsOrganization: [
-            "PUT /orgs/{org}/actions/permissions"
-          ],
-          setGithubActionsPermissionsRepository: [
-            "PUT /repos/{owner}/{repo}/actions/permissions"
-          ],
-          setSelectedReposForOrgSecret: [
-            "PUT /orgs/{org}/actions/secrets/{secret_name}/repositories"
-          ],
-          setSelectedReposForOrgVariable: [
-            "PUT /orgs/{org}/actions/variables/{name}/repositories"
-          ],
-          setSelectedRepositoriesEnabledGithubActionsOrganization: [
-            "PUT /orgs/{org}/actions/permissions/repositories"
-          ],
-          setWorkflowAccessToRepository: [
-            "PUT /repos/{owner}/{repo}/actions/permissions/access"
-          ],
-          updateEnvironmentVariable: [
-            "PATCH /repositories/{repository_id}/environments/{environment_name}/variables/{name}"
-          ],
-          updateOrgVariable: ["PATCH /orgs/{org}/actions/variables/{name}"],
-          updateRepoVariable: [
-            "PATCH /repos/{owner}/{repo}/actions/variables/{name}"
-          ]
-        },
-        activity: {
-          checkRepoIsStarredByAuthenticatedUser: ["GET /user/starred/{owner}/{repo}"],
-          deleteRepoSubscription: ["DELETE /repos/{owner}/{repo}/subscription"],
-          deleteThreadSubscription: [
-            "DELETE /notifications/threads/{thread_id}/subscription"
-          ],
-          getFeeds: ["GET /feeds"],
-          getRepoSubscription: ["GET /repos/{owner}/{repo}/subscription"],
-          getThread: ["GET /notifications/threads/{thread_id}"],
-          getThreadSubscriptionForAuthenticatedUser: [
-            "GET /notifications/threads/{thread_id}/subscription"
-          ],
-          listEventsForAuthenticatedUser: ["GET /users/{username}/events"],
-          listNotificationsForAuthenticatedUser: ["GET /notifications"],
-          listOrgEventsForAuthenticatedUser: [
-            "GET /users/{username}/events/orgs/{org}"
-          ],
-          listPublicEvents: ["GET /events"],
-          listPublicEventsForRepoNetwork: ["GET /networks/{owner}/{repo}/events"],
-          listPublicEventsForUser: ["GET /users/{username}/events/public"],
-          listPublicOrgEvents: ["GET /orgs/{org}/events"],
-          listReceivedEventsForUser: ["GET /users/{username}/received_events"],
-          listReceivedPublicEventsForUser: [
-            "GET /users/{username}/received_events/public"
-          ],
-          listRepoEvents: ["GET /repos/{owner}/{repo}/events"],
-          listRepoNotificationsForAuthenticatedUser: [
-            "GET /repos/{owner}/{repo}/notifications"
-          ],
-          listReposStarredByAuthenticatedUser: ["GET /user/starred"],
-          listReposStarredByUser: ["GET /users/{username}/starred"],
-          listReposWatchedByUser: ["GET /users/{username}/subscriptions"],
-          listStargazersForRepo: ["GET /repos/{owner}/{repo}/stargazers"],
-          listWatchedReposForAuthenticatedUser: ["GET /user/subscriptions"],
-          listWatchersForRepo: ["GET /repos/{owner}/{repo}/subscribers"],
-          markNotificationsAsRead: ["PUT /notifications"],
-          markRepoNotificationsAsRead: ["PUT /repos/{owner}/{repo}/notifications"],
-          markThreadAsRead: ["PATCH /notifications/threads/{thread_id}"],
-          setRepoSubscription: ["PUT /repos/{owner}/{repo}/subscription"],
-          setThreadSubscription: [
-            "PUT /notifications/threads/{thread_id}/subscription"
-          ],
-          starRepoForAuthenticatedUser: ["PUT /user/starred/{owner}/{repo}"],
-          unstarRepoForAuthenticatedUser: ["DELETE /user/starred/{owner}/{repo}"]
-        },
-        apps: {
-          addRepoToInstallation: [
-            "PUT /user/installations/{installation_id}/repositories/{repository_id}",
-            {},
-            { renamed: ["apps", "addRepoToInstallationForAuthenticatedUser"] }
-          ],
-          addRepoToInstallationForAuthenticatedUser: [
-            "PUT /user/installations/{installation_id}/repositories/{repository_id}"
-          ],
-          checkToken: ["POST /applications/{client_id}/token"],
-          createFromManifest: ["POST /app-manifests/{code}/conversions"],
-          createInstallationAccessToken: [
-            "POST /app/installations/{installation_id}/access_tokens"
-          ],
-          deleteAuthorization: ["DELETE /applications/{client_id}/grant"],
-          deleteInstallation: ["DELETE /app/installations/{installation_id}"],
-          deleteToken: ["DELETE /applications/{client_id}/token"],
-          getAuthenticated: ["GET /app"],
-          getBySlug: ["GET /apps/{app_slug}"],
-          getInstallation: ["GET /app/installations/{installation_id}"],
-          getOrgInstallation: ["GET /orgs/{org}/installation"],
-          getRepoInstallation: ["GET /repos/{owner}/{repo}/installation"],
-          getSubscriptionPlanForAccount: [
-            "GET /marketplace_listing/accounts/{account_id}"
-          ],
-          getSubscriptionPlanForAccountStubbed: [
-            "GET /marketplace_listing/stubbed/accounts/{account_id}"
-          ],
-          getUserInstallation: ["GET /users/{username}/installation"],
-          getWebhookConfigForApp: ["GET /app/hook/config"],
-          getWebhookDelivery: ["GET /app/hook/deliveries/{delivery_id}"],
-          listAccountsForPlan: ["GET /marketplace_listing/plans/{plan_id}/accounts"],
-          listAccountsForPlanStubbed: [
-            "GET /marketplace_listing/stubbed/plans/{plan_id}/accounts"
-          ],
-          listInstallationReposForAuthenticatedUser: [
-            "GET /user/installations/{installation_id}/repositories"
-          ],
-          listInstallationRequestsForAuthenticatedApp: [
-            "GET /app/installation-requests"
-          ],
-          listInstallations: ["GET /app/installations"],
-          listInstallationsForAuthenticatedUser: ["GET /user/installations"],
-          listPlans: ["GET /marketplace_listing/plans"],
-          listPlansStubbed: ["GET /marketplace_listing/stubbed/plans"],
-          listReposAccessibleToInstallation: ["GET /installation/repositories"],
-          listSubscriptionsForAuthenticatedUser: ["GET /user/marketplace_purchases"],
-          listSubscriptionsForAuthenticatedUserStubbed: [
-            "GET /user/marketplace_purchases/stubbed"
-          ],
-          listWebhookDeliveries: ["GET /app/hook/deliveries"],
-          redeliverWebhookDelivery: [
-            "POST /app/hook/deliveries/{delivery_id}/attempts"
-          ],
-          removeRepoFromInstallation: [
-            "DELETE /user/installations/{installation_id}/repositories/{repository_id}",
-            {},
-            { renamed: ["apps", "removeRepoFromInstallationForAuthenticatedUser"] }
-          ],
-          removeRepoFromInstallationForAuthenticatedUser: [
-            "DELETE /user/installations/{installation_id}/repositories/{repository_id}"
-          ],
-          resetToken: ["PATCH /applications/{client_id}/token"],
-          revokeInstallationAccessToken: ["DELETE /installation/token"],
-          scopeToken: ["POST /applications/{client_id}/token/scoped"],
-          suspendInstallation: ["PUT /app/installations/{installation_id}/suspended"],
-          unsuspendInstallation: [
-            "DELETE /app/installations/{installation_id}/suspended"
-          ],
-          updateWebhookConfigForApp: ["PATCH /app/hook/config"]
-        },
-        billing: {
-          getGithubActionsBillingOrg: ["GET /orgs/{org}/settings/billing/actions"],
-          getGithubActionsBillingUser: [
-            "GET /users/{username}/settings/billing/actions"
-          ],
-          getGithubPackagesBillingOrg: ["GET /orgs/{org}/settings/billing/packages"],
-          getGithubPackagesBillingUser: [
-            "GET /users/{username}/settings/billing/packages"
-          ],
-          getSharedStorageBillingOrg: [
-            "GET /orgs/{org}/settings/billing/shared-storage"
-          ],
-          getSharedStorageBillingUser: [
-            "GET /users/{username}/settings/billing/shared-storage"
-          ]
-        },
-        checks: {
-          create: ["POST /repos/{owner}/{repo}/check-runs"],
-          createSuite: ["POST /repos/{owner}/{repo}/check-suites"],
-          get: ["GET /repos/{owner}/{repo}/check-runs/{check_run_id}"],
-          getSuite: ["GET /repos/{owner}/{repo}/check-suites/{check_suite_id}"],
-          listAnnotations: [
-            "GET /repos/{owner}/{repo}/check-runs/{check_run_id}/annotations"
-          ],
-          listForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/check-runs"],
-          listForSuite: [
-            "GET /repos/{owner}/{repo}/check-suites/{check_suite_id}/check-runs"
-          ],
-          listSuitesForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/check-suites"],
-          rerequestRun: [
-            "POST /repos/{owner}/{repo}/check-runs/{check_run_id}/rerequest"
-          ],
-          rerequestSuite: [
-            "POST /repos/{owner}/{repo}/check-suites/{check_suite_id}/rerequest"
-          ],
-          setSuitesPreferences: [
-            "PATCH /repos/{owner}/{repo}/check-suites/preferences"
-          ],
-          update: ["PATCH /repos/{owner}/{repo}/check-runs/{check_run_id}"]
-        },
-        codeScanning: {
-          deleteAnalysis: [
-            "DELETE /repos/{owner}/{repo}/code-scanning/analyses/{analysis_id}{?confirm_delete}"
-          ],
-          getAlert: [
-            "GET /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}",
-            {},
-            { renamedParameters: { alert_id: "alert_number" } }
-          ],
-          getAnalysis: [
-            "GET /repos/{owner}/{repo}/code-scanning/analyses/{analysis_id}"
-          ],
-          getCodeqlDatabase: [
-            "GET /repos/{owner}/{repo}/code-scanning/codeql/databases/{language}"
-          ],
-          getDefaultSetup: ["GET /repos/{owner}/{repo}/code-scanning/default-setup"],
-          getSarif: ["GET /repos/{owner}/{repo}/code-scanning/sarifs/{sarif_id}"],
-          listAlertInstances: [
-            "GET /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/instances"
-          ],
-          listAlertsForOrg: ["GET /orgs/{org}/code-scanning/alerts"],
-          listAlertsForRepo: ["GET /repos/{owner}/{repo}/code-scanning/alerts"],
-          listAlertsInstances: [
-            "GET /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/instances",
-            {},
-            { renamed: ["codeScanning", "listAlertInstances"] }
-          ],
-          listCodeqlDatabases: [
-            "GET /repos/{owner}/{repo}/code-scanning/codeql/databases"
-          ],
-          listRecentAnalyses: ["GET /repos/{owner}/{repo}/code-scanning/analyses"],
-          updateAlert: [
-            "PATCH /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}"
-          ],
-          updateDefaultSetup: [
-            "PATCH /repos/{owner}/{repo}/code-scanning/default-setup"
-          ],
-          uploadSarif: ["POST /repos/{owner}/{repo}/code-scanning/sarifs"]
-        },
-        codesOfConduct: {
-          getAllCodesOfConduct: ["GET /codes_of_conduct"],
-          getConductCode: ["GET /codes_of_conduct/{key}"]
-        },
-        codespaces: {
-          addRepositoryForSecretForAuthenticatedUser: [
-            "PUT /user/codespaces/secrets/{secret_name}/repositories/{repository_id}"
-          ],
-          addSelectedRepoToOrgSecret: [
-            "PUT /orgs/{org}/codespaces/secrets/{secret_name}/repositories/{repository_id}"
-          ],
-          checkPermissionsForDevcontainer: [
-            "GET /repos/{owner}/{repo}/codespaces/permissions_check"
-          ],
-          codespaceMachinesForAuthenticatedUser: [
-            "GET /user/codespaces/{codespace_name}/machines"
-          ],
-          createForAuthenticatedUser: ["POST /user/codespaces"],
-          createOrUpdateOrgSecret: [
-            "PUT /orgs/{org}/codespaces/secrets/{secret_name}"
-          ],
-          createOrUpdateRepoSecret: [
-            "PUT /repos/{owner}/{repo}/codespaces/secrets/{secret_name}"
-          ],
-          createOrUpdateSecretForAuthenticatedUser: [
-            "PUT /user/codespaces/secrets/{secret_name}"
-          ],
-          createWithPrForAuthenticatedUser: [
-            "POST /repos/{owner}/{repo}/pulls/{pull_number}/codespaces"
-          ],
-          createWithRepoForAuthenticatedUser: [
-            "POST /repos/{owner}/{repo}/codespaces"
-          ],
-          deleteForAuthenticatedUser: ["DELETE /user/codespaces/{codespace_name}"],
-          deleteFromOrganization: [
-            "DELETE /orgs/{org}/members/{username}/codespaces/{codespace_name}"
-          ],
-          deleteOrgSecret: ["DELETE /orgs/{org}/codespaces/secrets/{secret_name}"],
-          deleteRepoSecret: [
-            "DELETE /repos/{owner}/{repo}/codespaces/secrets/{secret_name}"
-          ],
-          deleteSecretForAuthenticatedUser: [
-            "DELETE /user/codespaces/secrets/{secret_name}"
-          ],
-          exportForAuthenticatedUser: [
-            "POST /user/codespaces/{codespace_name}/exports"
-          ],
-          getCodespacesForUserInOrg: [
-            "GET /orgs/{org}/members/{username}/codespaces"
-          ],
-          getExportDetailsForAuthenticatedUser: [
-            "GET /user/codespaces/{codespace_name}/exports/{export_id}"
-          ],
-          getForAuthenticatedUser: ["GET /user/codespaces/{codespace_name}"],
-          getOrgPublicKey: ["GET /orgs/{org}/codespaces/secrets/public-key"],
-          getOrgSecret: ["GET /orgs/{org}/codespaces/secrets/{secret_name}"],
-          getPublicKeyForAuthenticatedUser: [
-            "GET /user/codespaces/secrets/public-key"
-          ],
-          getRepoPublicKey: [
-            "GET /repos/{owner}/{repo}/codespaces/secrets/public-key"
-          ],
-          getRepoSecret: [
-            "GET /repos/{owner}/{repo}/codespaces/secrets/{secret_name}"
-          ],
-          getSecretForAuthenticatedUser: [
-            "GET /user/codespaces/secrets/{secret_name}"
-          ],
-          listDevcontainersInRepositoryForAuthenticatedUser: [
-            "GET /repos/{owner}/{repo}/codespaces/devcontainers"
-          ],
-          listForAuthenticatedUser: ["GET /user/codespaces"],
-          listInOrganization: [
-            "GET /orgs/{org}/codespaces",
-            {},
-            { renamedParameters: { org_id: "org" } }
-          ],
-          listInRepositoryForAuthenticatedUser: [
-            "GET /repos/{owner}/{repo}/codespaces"
-          ],
-          listOrgSecrets: ["GET /orgs/{org}/codespaces/secrets"],
-          listRepoSecrets: ["GET /repos/{owner}/{repo}/codespaces/secrets"],
-          listRepositoriesForSecretForAuthenticatedUser: [
-            "GET /user/codespaces/secrets/{secret_name}/repositories"
-          ],
-          listSecretsForAuthenticatedUser: ["GET /user/codespaces/secrets"],
-          listSelectedReposForOrgSecret: [
-            "GET /orgs/{org}/codespaces/secrets/{secret_name}/repositories"
-          ],
-          preFlightWithRepoForAuthenticatedUser: [
-            "GET /repos/{owner}/{repo}/codespaces/new"
-          ],
-          publishForAuthenticatedUser: [
-            "POST /user/codespaces/{codespace_name}/publish"
-          ],
-          removeRepositoryForSecretForAuthenticatedUser: [
-            "DELETE /user/codespaces/secrets/{secret_name}/repositories/{repository_id}"
-          ],
-          removeSelectedRepoFromOrgSecret: [
-            "DELETE /orgs/{org}/codespaces/secrets/{secret_name}/repositories/{repository_id}"
-          ],
-          repoMachinesForAuthenticatedUser: [
-            "GET /repos/{owner}/{repo}/codespaces/machines"
-          ],
-          setRepositoriesForSecretForAuthenticatedUser: [
-            "PUT /user/codespaces/secrets/{secret_name}/repositories"
-          ],
-          setSelectedReposForOrgSecret: [
-            "PUT /orgs/{org}/codespaces/secrets/{secret_name}/repositories"
-          ],
-          startForAuthenticatedUser: ["POST /user/codespaces/{codespace_name}/start"],
-          stopForAuthenticatedUser: ["POST /user/codespaces/{codespace_name}/stop"],
-          stopInOrganization: [
-            "POST /orgs/{org}/members/{username}/codespaces/{codespace_name}/stop"
-          ],
-          updateForAuthenticatedUser: ["PATCH /user/codespaces/{codespace_name}"]
-        },
-        copilot: {
-          addCopilotForBusinessSeatsForTeams: [
-            "POST /orgs/{org}/copilot/billing/selected_teams"
-          ],
-          addCopilotForBusinessSeatsForUsers: [
-            "POST /orgs/{org}/copilot/billing/selected_users"
-          ],
-          cancelCopilotSeatAssignmentForTeams: [
-            "DELETE /orgs/{org}/copilot/billing/selected_teams"
-          ],
-          cancelCopilotSeatAssignmentForUsers: [
-            "DELETE /orgs/{org}/copilot/billing/selected_users"
-          ],
-          getCopilotOrganizationDetails: ["GET /orgs/{org}/copilot/billing"],
-          getCopilotSeatDetailsForUser: [
-            "GET /orgs/{org}/members/{username}/copilot"
-          ],
-          listCopilotSeats: ["GET /orgs/{org}/copilot/billing/seats"]
-        },
-        dependabot: {
-          addSelectedRepoToOrgSecret: [
-            "PUT /orgs/{org}/dependabot/secrets/{secret_name}/repositories/{repository_id}"
-          ],
-          createOrUpdateOrgSecret: [
-            "PUT /orgs/{org}/dependabot/secrets/{secret_name}"
-          ],
-          createOrUpdateRepoSecret: [
-            "PUT /repos/{owner}/{repo}/dependabot/secrets/{secret_name}"
-          ],
-          deleteOrgSecret: ["DELETE /orgs/{org}/dependabot/secrets/{secret_name}"],
-          deleteRepoSecret: [
-            "DELETE /repos/{owner}/{repo}/dependabot/secrets/{secret_name}"
-          ],
-          getAlert: ["GET /repos/{owner}/{repo}/dependabot/alerts/{alert_number}"],
-          getOrgPublicKey: ["GET /orgs/{org}/dependabot/secrets/public-key"],
-          getOrgSecret: ["GET /orgs/{org}/dependabot/secrets/{secret_name}"],
-          getRepoPublicKey: [
-            "GET /repos/{owner}/{repo}/dependabot/secrets/public-key"
-          ],
-          getRepoSecret: [
-            "GET /repos/{owner}/{repo}/dependabot/secrets/{secret_name}"
-          ],
-          listAlertsForEnterprise: [
-            "GET /enterprises/{enterprise}/dependabot/alerts"
-          ],
-          listAlertsForOrg: ["GET /orgs/{org}/dependabot/alerts"],
-          listAlertsForRepo: ["GET /repos/{owner}/{repo}/dependabot/alerts"],
-          listOrgSecrets: ["GET /orgs/{org}/dependabot/secrets"],
-          listRepoSecrets: ["GET /repos/{owner}/{repo}/dependabot/secrets"],
-          listSelectedReposForOrgSecret: [
-            "GET /orgs/{org}/dependabot/secrets/{secret_name}/repositories"
-          ],
-          removeSelectedRepoFromOrgSecret: [
-            "DELETE /orgs/{org}/dependabot/secrets/{secret_name}/repositories/{repository_id}"
-          ],
-          setSelectedReposForOrgSecret: [
-            "PUT /orgs/{org}/dependabot/secrets/{secret_name}/repositories"
-          ],
-          updateAlert: [
-            "PATCH /repos/{owner}/{repo}/dependabot/alerts/{alert_number}"
-          ]
-        },
-        dependencyGraph: {
-          createRepositorySnapshot: [
-            "POST /repos/{owner}/{repo}/dependency-graph/snapshots"
-          ],
-          diffRange: [
-            "GET /repos/{owner}/{repo}/dependency-graph/compare/{basehead}"
-          ],
-          exportSbom: ["GET /repos/{owner}/{repo}/dependency-graph/sbom"]
-        },
-        emojis: { get: ["GET /emojis"] },
-        gists: {
-          checkIsStarred: ["GET /gists/{gist_id}/star"],
-          create: ["POST /gists"],
-          createComment: ["POST /gists/{gist_id}/comments"],
-          delete: ["DELETE /gists/{gist_id}"],
-          deleteComment: ["DELETE /gists/{gist_id}/comments/{comment_id}"],
-          fork: ["POST /gists/{gist_id}/forks"],
-          get: ["GET /gists/{gist_id}"],
-          getComment: ["GET /gists/{gist_id}/comments/{comment_id}"],
-          getRevision: ["GET /gists/{gist_id}/{sha}"],
-          list: ["GET /gists"],
-          listComments: ["GET /gists/{gist_id}/comments"],
-          listCommits: ["GET /gists/{gist_id}/commits"],
-          listForUser: ["GET /users/{username}/gists"],
-          listForks: ["GET /gists/{gist_id}/forks"],
-          listPublic: ["GET /gists/public"],
-          listStarred: ["GET /gists/starred"],
-          star: ["PUT /gists/{gist_id}/star"],
-          unstar: ["DELETE /gists/{gist_id}/star"],
-          update: ["PATCH /gists/{gist_id}"],
-          updateComment: ["PATCH /gists/{gist_id}/comments/{comment_id}"]
-        },
-        git: {
-          createBlob: ["POST /repos/{owner}/{repo}/git/blobs"],
-          createCommit: ["POST /repos/{owner}/{repo}/git/commits"],
-          createRef: ["POST /repos/{owner}/{repo}/git/refs"],
-          createTag: ["POST /repos/{owner}/{repo}/git/tags"],
-          createTree: ["POST /repos/{owner}/{repo}/git/trees"],
-          deleteRef: ["DELETE /repos/{owner}/{repo}/git/refs/{ref}"],
-          getBlob: ["GET /repos/{owner}/{repo}/git/blobs/{file_sha}"],
-          getCommit: ["GET /repos/{owner}/{repo}/git/commits/{commit_sha}"],
-          getRef: ["GET /repos/{owner}/{repo}/git/ref/{ref}"],
-          getTag: ["GET /repos/{owner}/{repo}/git/tags/{tag_sha}"],
-          getTree: ["GET /repos/{owner}/{repo}/git/trees/{tree_sha}"],
-          listMatchingRefs: ["GET /repos/{owner}/{repo}/git/matching-refs/{ref}"],
-          updateRef: ["PATCH /repos/{owner}/{repo}/git/refs/{ref}"]
-        },
-        gitignore: {
-          getAllTemplates: ["GET /gitignore/templates"],
-          getTemplate: ["GET /gitignore/templates/{name}"]
-        },
-        interactions: {
-          getRestrictionsForAuthenticatedUser: ["GET /user/interaction-limits"],
-          getRestrictionsForOrg: ["GET /orgs/{org}/interaction-limits"],
-          getRestrictionsForRepo: ["GET /repos/{owner}/{repo}/interaction-limits"],
-          getRestrictionsForYourPublicRepos: [
-            "GET /user/interaction-limits",
-            {},
-            { renamed: ["interactions", "getRestrictionsForAuthenticatedUser"] }
-          ],
-          removeRestrictionsForAuthenticatedUser: ["DELETE /user/interaction-limits"],
-          removeRestrictionsForOrg: ["DELETE /orgs/{org}/interaction-limits"],
-          removeRestrictionsForRepo: [
-            "DELETE /repos/{owner}/{repo}/interaction-limits"
-          ],
-          removeRestrictionsForYourPublicRepos: [
-            "DELETE /user/interaction-limits",
-            {},
-            { renamed: ["interactions", "removeRestrictionsForAuthenticatedUser"] }
-          ],
-          setRestrictionsForAuthenticatedUser: ["PUT /user/interaction-limits"],
-          setRestrictionsForOrg: ["PUT /orgs/{org}/interaction-limits"],
-          setRestrictionsForRepo: ["PUT /repos/{owner}/{repo}/interaction-limits"],
-          setRestrictionsForYourPublicRepos: [
-            "PUT /user/interaction-limits",
-            {},
-            { renamed: ["interactions", "setRestrictionsForAuthenticatedUser"] }
-          ]
-        },
-        issues: {
-          addAssignees: [
-            "POST /repos/{owner}/{repo}/issues/{issue_number}/assignees"
-          ],
-          addLabels: ["POST /repos/{owner}/{repo}/issues/{issue_number}/labels"],
-          checkUserCanBeAssigned: ["GET /repos/{owner}/{repo}/assignees/{assignee}"],
-          checkUserCanBeAssignedToIssue: [
-            "GET /repos/{owner}/{repo}/issues/{issue_number}/assignees/{assignee}"
-          ],
-          create: ["POST /repos/{owner}/{repo}/issues"],
-          createComment: [
-            "POST /repos/{owner}/{repo}/issues/{issue_number}/comments"
-          ],
-          createLabel: ["POST /repos/{owner}/{repo}/labels"],
-          createMilestone: ["POST /repos/{owner}/{repo}/milestones"],
-          deleteComment: [
-            "DELETE /repos/{owner}/{repo}/issues/comments/{comment_id}"
-          ],
-          deleteLabel: ["DELETE /repos/{owner}/{repo}/labels/{name}"],
-          deleteMilestone: [
-            "DELETE /repos/{owner}/{repo}/milestones/{milestone_number}"
-          ],
-          get: ["GET /repos/{owner}/{repo}/issues/{issue_number}"],
-          getComment: ["GET /repos/{owner}/{repo}/issues/comments/{comment_id}"],
-          getEvent: ["GET /repos/{owner}/{repo}/issues/events/{event_id}"],
-          getLabel: ["GET /repos/{owner}/{repo}/labels/{name}"],
-          getMilestone: ["GET /repos/{owner}/{repo}/milestones/{milestone_number}"],
-          list: ["GET /issues"],
-          listAssignees: ["GET /repos/{owner}/{repo}/assignees"],
-          listComments: ["GET /repos/{owner}/{repo}/issues/{issue_number}/comments"],
-          listCommentsForRepo: ["GET /repos/{owner}/{repo}/issues/comments"],
-          listEvents: ["GET /repos/{owner}/{repo}/issues/{issue_number}/events"],
-          listEventsForRepo: ["GET /repos/{owner}/{repo}/issues/events"],
-          listEventsForTimeline: [
-            "GET /repos/{owner}/{repo}/issues/{issue_number}/timeline"
-          ],
-          listForAuthenticatedUser: ["GET /user/issues"],
-          listForOrg: ["GET /orgs/{org}/issues"],
-          listForRepo: ["GET /repos/{owner}/{repo}/issues"],
-          listLabelsForMilestone: [
-            "GET /repos/{owner}/{repo}/milestones/{milestone_number}/labels"
-          ],
-          listLabelsForRepo: ["GET /repos/{owner}/{repo}/labels"],
-          listLabelsOnIssue: [
-            "GET /repos/{owner}/{repo}/issues/{issue_number}/labels"
-          ],
-          listMilestones: ["GET /repos/{owner}/{repo}/milestones"],
-          lock: ["PUT /repos/{owner}/{repo}/issues/{issue_number}/lock"],
-          removeAllLabels: [
-            "DELETE /repos/{owner}/{repo}/issues/{issue_number}/labels"
-          ],
-          removeAssignees: [
-            "DELETE /repos/{owner}/{repo}/issues/{issue_number}/assignees"
-          ],
-          removeLabel: [
-            "DELETE /repos/{owner}/{repo}/issues/{issue_number}/labels/{name}"
-          ],
-          setLabels: ["PUT /repos/{owner}/{repo}/issues/{issue_number}/labels"],
-          unlock: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/lock"],
-          update: ["PATCH /repos/{owner}/{repo}/issues/{issue_number}"],
-          updateComment: ["PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}"],
-          updateLabel: ["PATCH /repos/{owner}/{repo}/labels/{name}"],
-          updateMilestone: [
-            "PATCH /repos/{owner}/{repo}/milestones/{milestone_number}"
-          ]
-        },
-        licenses: {
-          get: ["GET /licenses/{license}"],
-          getAllCommonlyUsed: ["GET /licenses"],
-          getForRepo: ["GET /repos/{owner}/{repo}/license"]
-        },
-        markdown: {
-          render: ["POST /markdown"],
-          renderRaw: [
-            "POST /markdown/raw",
-            { headers: { "content-type": "text/plain; charset=utf-8" } }
-          ]
-        },
-        meta: {
-          get: ["GET /meta"],
-          getAllVersions: ["GET /versions"],
-          getOctocat: ["GET /octocat"],
-          getZen: ["GET /zen"],
-          root: ["GET /"]
-        },
-        migrations: {
-          cancelImport: [
-            "DELETE /repos/{owner}/{repo}/import",
-            {},
-            {
-              deprecated: "octokit.rest.migrations.cancelImport() is deprecated, see https://docs.github.com/rest/migrations/source-imports#cancel-an-import"
-            }
-          ],
-          deleteArchiveForAuthenticatedUser: [
-            "DELETE /user/migrations/{migration_id}/archive"
-          ],
-          deleteArchiveForOrg: [
-            "DELETE /orgs/{org}/migrations/{migration_id}/archive"
-          ],
-          downloadArchiveForOrg: [
-            "GET /orgs/{org}/migrations/{migration_id}/archive"
-          ],
-          getArchiveForAuthenticatedUser: [
-            "GET /user/migrations/{migration_id}/archive"
-          ],
-          getCommitAuthors: [
-            "GET /repos/{owner}/{repo}/import/authors",
-            {},
-            {
-              deprecated: "octokit.rest.migrations.getCommitAuthors() is deprecated, see https://docs.github.com/rest/migrations/source-imports#get-commit-authors"
-            }
-          ],
-          getImportStatus: [
-            "GET /repos/{owner}/{repo}/import",
-            {},
-            {
-              deprecated: "octokit.rest.migrations.getImportStatus() is deprecated, see https://docs.github.com/rest/migrations/source-imports#get-an-import-status"
-            }
-          ],
-          getLargeFiles: [
-            "GET /repos/{owner}/{repo}/import/large_files",
-            {},
-            {
-              deprecated: "octokit.rest.migrations.getLargeFiles() is deprecated, see https://docs.github.com/rest/migrations/source-imports#get-large-files"
-            }
-          ],
-          getStatusForAuthenticatedUser: ["GET /user/migrations/{migration_id}"],
-          getStatusForOrg: ["GET /orgs/{org}/migrations/{migration_id}"],
-          listForAuthenticatedUser: ["GET /user/migrations"],
-          listForOrg: ["GET /orgs/{org}/migrations"],
-          listReposForAuthenticatedUser: [
-            "GET /user/migrations/{migration_id}/repositories"
-          ],
-          listReposForOrg: ["GET /orgs/{org}/migrations/{migration_id}/repositories"],
-          listReposForUser: [
-            "GET /user/migrations/{migration_id}/repositories",
-            {},
-            { renamed: ["migrations", "listReposForAuthenticatedUser"] }
-          ],
-          mapCommitAuthor: [
-            "PATCH /repos/{owner}/{repo}/import/authors/{author_id}",
-            {},
-            {
-              deprecated: "octokit.rest.migrations.mapCommitAuthor() is deprecated, see https://docs.github.com/rest/migrations/source-imports#map-a-commit-author"
-            }
-          ],
-          setLfsPreference: [
-            "PATCH /repos/{owner}/{repo}/import/lfs",
-            {},
-            {
-              deprecated: "octokit.rest.migrations.setLfsPreference() is deprecated, see https://docs.github.com/rest/migrations/source-imports#update-git-lfs-preference"
-            }
-          ],
-          startForAuthenticatedUser: ["POST /user/migrations"],
-          startForOrg: ["POST /orgs/{org}/migrations"],
-          startImport: [
-            "PUT /repos/{owner}/{repo}/import",
-            {},
-            {
-              deprecated: "octokit.rest.migrations.startImport() is deprecated, see https://docs.github.com/rest/migrations/source-imports#start-an-import"
-            }
-          ],
-          unlockRepoForAuthenticatedUser: [
-            "DELETE /user/migrations/{migration_id}/repos/{repo_name}/lock"
-          ],
-          unlockRepoForOrg: [
-            "DELETE /orgs/{org}/migrations/{migration_id}/repos/{repo_name}/lock"
-          ],
-          updateImport: [
-            "PATCH /repos/{owner}/{repo}/import",
-            {},
-            {
-              deprecated: "octokit.rest.migrations.updateImport() is deprecated, see https://docs.github.com/rest/migrations/source-imports#update-an-import"
-            }
-          ]
-        },
-        orgs: {
-          addSecurityManagerTeam: [
-            "PUT /orgs/{org}/security-managers/teams/{team_slug}"
-          ],
-          blockUser: ["PUT /orgs/{org}/blocks/{username}"],
-          cancelInvitation: ["DELETE /orgs/{org}/invitations/{invitation_id}"],
-          checkBlockedUser: ["GET /orgs/{org}/blocks/{username}"],
-          checkMembershipForUser: ["GET /orgs/{org}/members/{username}"],
-          checkPublicMembershipForUser: ["GET /orgs/{org}/public_members/{username}"],
-          convertMemberToOutsideCollaborator: [
-            "PUT /orgs/{org}/outside_collaborators/{username}"
-          ],
-          createInvitation: ["POST /orgs/{org}/invitations"],
-          createOrUpdateCustomProperties: ["PATCH /orgs/{org}/properties/schema"],
-          createOrUpdateCustomPropertiesValuesForRepos: [
-            "PATCH /orgs/{org}/properties/values"
-          ],
-          createOrUpdateCustomProperty: [
-            "PUT /orgs/{org}/properties/schema/{custom_property_name}"
-          ],
-          createWebhook: ["POST /orgs/{org}/hooks"],
-          delete: ["DELETE /orgs/{org}"],
-          deleteWebhook: ["DELETE /orgs/{org}/hooks/{hook_id}"],
-          enableOrDisableSecurityProductOnAllOrgRepos: [
-            "POST /orgs/{org}/{security_product}/{enablement}"
-          ],
-          get: ["GET /orgs/{org}"],
-          getAllCustomProperties: ["GET /orgs/{org}/properties/schema"],
-          getCustomProperty: [
-            "GET /orgs/{org}/properties/schema/{custom_property_name}"
-          ],
-          getMembershipForAuthenticatedUser: ["GET /user/memberships/orgs/{org}"],
-          getMembershipForUser: ["GET /orgs/{org}/memberships/{username}"],
-          getWebhook: ["GET /orgs/{org}/hooks/{hook_id}"],
-          getWebhookConfigForOrg: ["GET /orgs/{org}/hooks/{hook_id}/config"],
-          getWebhookDelivery: [
-            "GET /orgs/{org}/hooks/{hook_id}/deliveries/{delivery_id}"
-          ],
-          list: ["GET /organizations"],
-          listAppInstallations: ["GET /orgs/{org}/installations"],
-          listBlockedUsers: ["GET /orgs/{org}/blocks"],
-          listCustomPropertiesValuesForRepos: ["GET /orgs/{org}/properties/values"],
-          listFailedInvitations: ["GET /orgs/{org}/failed_invitations"],
-          listForAuthenticatedUser: ["GET /user/orgs"],
-          listForUser: ["GET /users/{username}/orgs"],
-          listInvitationTeams: ["GET /orgs/{org}/invitations/{invitation_id}/teams"],
-          listMembers: ["GET /orgs/{org}/members"],
-          listMembershipsForAuthenticatedUser: ["GET /user/memberships/orgs"],
-          listOutsideCollaborators: ["GET /orgs/{org}/outside_collaborators"],
-          listPatGrantRepositories: [
-            "GET /orgs/{org}/personal-access-tokens/{pat_id}/repositories"
-          ],
-          listPatGrantRequestRepositories: [
-            "GET /orgs/{org}/personal-access-token-requests/{pat_request_id}/repositories"
-          ],
-          listPatGrantRequests: ["GET /orgs/{org}/personal-access-token-requests"],
-          listPatGrants: ["GET /orgs/{org}/personal-access-tokens"],
-          listPendingInvitations: ["GET /orgs/{org}/invitations"],
-          listPublicMembers: ["GET /orgs/{org}/public_members"],
-          listSecurityManagerTeams: ["GET /orgs/{org}/security-managers"],
-          listWebhookDeliveries: ["GET /orgs/{org}/hooks/{hook_id}/deliveries"],
-          listWebhooks: ["GET /orgs/{org}/hooks"],
-          pingWebhook: ["POST /orgs/{org}/hooks/{hook_id}/pings"],
-          redeliverWebhookDelivery: [
-            "POST /orgs/{org}/hooks/{hook_id}/deliveries/{delivery_id}/attempts"
-          ],
-          removeCustomProperty: [
-            "DELETE /orgs/{org}/properties/schema/{custom_property_name}"
-          ],
-          removeMember: ["DELETE /orgs/{org}/members/{username}"],
-          removeMembershipForUser: ["DELETE /orgs/{org}/memberships/{username}"],
-          removeOutsideCollaborator: [
-            "DELETE /orgs/{org}/outside_collaborators/{username}"
-          ],
-          removePublicMembershipForAuthenticatedUser: [
-            "DELETE /orgs/{org}/public_members/{username}"
-          ],
-          removeSecurityManagerTeam: [
-            "DELETE /orgs/{org}/security-managers/teams/{team_slug}"
-          ],
-          reviewPatGrantRequest: [
-            "POST /orgs/{org}/personal-access-token-requests/{pat_request_id}"
-          ],
-          reviewPatGrantRequestsInBulk: [
-            "POST /orgs/{org}/personal-access-token-requests"
-          ],
-          setMembershipForUser: ["PUT /orgs/{org}/memberships/{username}"],
-          setPublicMembershipForAuthenticatedUser: [
-            "PUT /orgs/{org}/public_members/{username}"
-          ],
-          unblockUser: ["DELETE /orgs/{org}/blocks/{username}"],
-          update: ["PATCH /orgs/{org}"],
-          updateMembershipForAuthenticatedUser: [
-            "PATCH /user/memberships/orgs/{org}"
-          ],
-          updatePatAccess: ["POST /orgs/{org}/personal-access-tokens/{pat_id}"],
-          updatePatAccesses: ["POST /orgs/{org}/personal-access-tokens"],
-          updateWebhook: ["PATCH /orgs/{org}/hooks/{hook_id}"],
-          updateWebhookConfigForOrg: ["PATCH /orgs/{org}/hooks/{hook_id}/config"]
-        },
-        packages: {
-          deletePackageForAuthenticatedUser: [
-            "DELETE /user/packages/{package_type}/{package_name}"
-          ],
-          deletePackageForOrg: [
-            "DELETE /orgs/{org}/packages/{package_type}/{package_name}"
-          ],
-          deletePackageForUser: [
-            "DELETE /users/{username}/packages/{package_type}/{package_name}"
-          ],
-          deletePackageVersionForAuthenticatedUser: [
-            "DELETE /user/packages/{package_type}/{package_name}/versions/{package_version_id}"
-          ],
-          deletePackageVersionForOrg: [
-            "DELETE /orgs/{org}/packages/{package_type}/{package_name}/versions/{package_version_id}"
-          ],
-          deletePackageVersionForUser: [
-            "DELETE /users/{username}/packages/{package_type}/{package_name}/versions/{package_version_id}"
-          ],
-          getAllPackageVersionsForAPackageOwnedByAnOrg: [
-            "GET /orgs/{org}/packages/{package_type}/{package_name}/versions",
-            {},
-            { renamed: ["packages", "getAllPackageVersionsForPackageOwnedByOrg"] }
-          ],
-          getAllPackageVersionsForAPackageOwnedByTheAuthenticatedUser: [
-            "GET /user/packages/{package_type}/{package_name}/versions",
-            {},
-            {
-              renamed: [
-                "packages",
-                "getAllPackageVersionsForPackageOwnedByAuthenticatedUser"
-              ]
-            }
-          ],
-          getAllPackageVersionsForPackageOwnedByAuthenticatedUser: [
-            "GET /user/packages/{package_type}/{package_name}/versions"
-          ],
-          getAllPackageVersionsForPackageOwnedByOrg: [
-            "GET /orgs/{org}/packages/{package_type}/{package_name}/versions"
-          ],
-          getAllPackageVersionsForPackageOwnedByUser: [
-            "GET /users/{username}/packages/{package_type}/{package_name}/versions"
-          ],
-          getPackageForAuthenticatedUser: [
-            "GET /user/packages/{package_type}/{package_name}"
-          ],
-          getPackageForOrganization: [
-            "GET /orgs/{org}/packages/{package_type}/{package_name}"
-          ],
-          getPackageForUser: [
-            "GET /users/{username}/packages/{package_type}/{package_name}"
-          ],
-          getPackageVersionForAuthenticatedUser: [
-            "GET /user/packages/{package_type}/{package_name}/versions/{package_version_id}"
-          ],
-          getPackageVersionForOrganization: [
-            "GET /orgs/{org}/packages/{package_type}/{package_name}/versions/{package_version_id}"
-          ],
-          getPackageVersionForUser: [
-            "GET /users/{username}/packages/{package_type}/{package_name}/versions/{package_version_id}"
-          ],
-          listDockerMigrationConflictingPackagesForAuthenticatedUser: [
-            "GET /user/docker/conflicts"
-          ],
-          listDockerMigrationConflictingPackagesForOrganization: [
-            "GET /orgs/{org}/docker/conflicts"
-          ],
-          listDockerMigrationConflictingPackagesForUser: [
-            "GET /users/{username}/docker/conflicts"
-          ],
-          listPackagesForAuthenticatedUser: ["GET /user/packages"],
-          listPackagesForOrganization: ["GET /orgs/{org}/packages"],
-          listPackagesForUser: ["GET /users/{username}/packages"],
-          restorePackageForAuthenticatedUser: [
-            "POST /user/packages/{package_type}/{package_name}/restore{?token}"
-          ],
-          restorePackageForOrg: [
-            "POST /orgs/{org}/packages/{package_type}/{package_name}/restore{?token}"
-          ],
-          restorePackageForUser: [
-            "POST /users/{username}/packages/{package_type}/{package_name}/restore{?token}"
-          ],
-          restorePackageVersionForAuthenticatedUser: [
-            "POST /user/packages/{package_type}/{package_name}/versions/{package_version_id}/restore"
-          ],
-          restorePackageVersionForOrg: [
-            "POST /orgs/{org}/packages/{package_type}/{package_name}/versions/{package_version_id}/restore"
-          ],
-          restorePackageVersionForUser: [
-            "POST /users/{username}/packages/{package_type}/{package_name}/versions/{package_version_id}/restore"
-          ]
-        },
-        projects: {
-          addCollaborator: ["PUT /projects/{project_id}/collaborators/{username}"],
-          createCard: ["POST /projects/columns/{column_id}/cards"],
-          createColumn: ["POST /projects/{project_id}/columns"],
-          createForAuthenticatedUser: ["POST /user/projects"],
-          createForOrg: ["POST /orgs/{org}/projects"],
-          createForRepo: ["POST /repos/{owner}/{repo}/projects"],
-          delete: ["DELETE /projects/{project_id}"],
-          deleteCard: ["DELETE /projects/columns/cards/{card_id}"],
-          deleteColumn: ["DELETE /projects/columns/{column_id}"],
-          get: ["GET /projects/{project_id}"],
-          getCard: ["GET /projects/columns/cards/{card_id}"],
-          getColumn: ["GET /projects/columns/{column_id}"],
-          getPermissionForUser: [
-            "GET /projects/{project_id}/collaborators/{username}/permission"
-          ],
-          listCards: ["GET /projects/columns/{column_id}/cards"],
-          listCollaborators: ["GET /projects/{project_id}/collaborators"],
-          listColumns: ["GET /projects/{project_id}/columns"],
-          listForOrg: ["GET /orgs/{org}/projects"],
-          listForRepo: ["GET /repos/{owner}/{repo}/projects"],
-          listForUser: ["GET /users/{username}/projects"],
-          moveCard: ["POST /projects/columns/cards/{card_id}/moves"],
-          moveColumn: ["POST /projects/columns/{column_id}/moves"],
-          removeCollaborator: [
-            "DELETE /projects/{project_id}/collaborators/{username}"
-          ],
-          update: ["PATCH /projects/{project_id}"],
-          updateCard: ["PATCH /projects/columns/cards/{card_id}"],
-          updateColumn: ["PATCH /projects/columns/{column_id}"]
-        },
-        pulls: {
-          checkIfMerged: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/merge"],
-          create: ["POST /repos/{owner}/{repo}/pulls"],
-          createReplyForReviewComment: [
-            "POST /repos/{owner}/{repo}/pulls/{pull_number}/comments/{comment_id}/replies"
-          ],
-          createReview: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews"],
-          createReviewComment: [
-            "POST /repos/{owner}/{repo}/pulls/{pull_number}/comments"
-          ],
-          deletePendingReview: [
-            "DELETE /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}"
-          ],
-          deleteReviewComment: [
-            "DELETE /repos/{owner}/{repo}/pulls/comments/{comment_id}"
-          ],
-          dismissReview: [
-            "PUT /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}/dismissals"
-          ],
-          get: ["GET /repos/{owner}/{repo}/pulls/{pull_number}"],
-          getReview: [
-            "GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}"
-          ],
-          getReviewComment: ["GET /repos/{owner}/{repo}/pulls/comments/{comment_id}"],
-          list: ["GET /repos/{owner}/{repo}/pulls"],
-          listCommentsForReview: [
-            "GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}/comments"
-          ],
-          listCommits: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/commits"],
-          listFiles: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/files"],
-          listRequestedReviewers: [
-            "GET /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers"
-          ],
-          listReviewComments: [
-            "GET /repos/{owner}/{repo}/pulls/{pull_number}/comments"
-          ],
-          listReviewCommentsForRepo: ["GET /repos/{owner}/{repo}/pulls/comments"],
-          listReviews: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews"],
-          merge: ["PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge"],
-          removeRequestedReviewers: [
-            "DELETE /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers"
-          ],
-          requestReviewers: [
-            "POST /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers"
-          ],
-          submitReview: [
-            "POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}/events"
-          ],
-          update: ["PATCH /repos/{owner}/{repo}/pulls/{pull_number}"],
-          updateBranch: [
-            "PUT /repos/{owner}/{repo}/pulls/{pull_number}/update-branch"
-          ],
-          updateReview: [
-            "PUT /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}"
-          ],
-          updateReviewComment: [
-            "PATCH /repos/{owner}/{repo}/pulls/comments/{comment_id}"
-          ]
-        },
-        rateLimit: { get: ["GET /rate_limit"] },
-        reactions: {
-          createForCommitComment: [
-            "POST /repos/{owner}/{repo}/comments/{comment_id}/reactions"
-          ],
-          createForIssue: [
-            "POST /repos/{owner}/{repo}/issues/{issue_number}/reactions"
-          ],
-          createForIssueComment: [
-            "POST /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions"
-          ],
-          createForPullRequestReviewComment: [
-            "POST /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions"
-          ],
-          createForRelease: [
-            "POST /repos/{owner}/{repo}/releases/{release_id}/reactions"
-          ],
-          createForTeamDiscussionCommentInOrg: [
-            "POST /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}/reactions"
-          ],
-          createForTeamDiscussionInOrg: [
-            "POST /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/reactions"
-          ],
-          deleteForCommitComment: [
-            "DELETE /repos/{owner}/{repo}/comments/{comment_id}/reactions/{reaction_id}"
-          ],
-          deleteForIssue: [
-            "DELETE /repos/{owner}/{repo}/issues/{issue_number}/reactions/{reaction_id}"
-          ],
-          deleteForIssueComment: [
-            "DELETE /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions/{reaction_id}"
-          ],
-          deleteForPullRequestComment: [
-            "DELETE /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions/{reaction_id}"
-          ],
-          deleteForRelease: [
-            "DELETE /repos/{owner}/{repo}/releases/{release_id}/reactions/{reaction_id}"
-          ],
-          deleteForTeamDiscussion: [
-            "DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/reactions/{reaction_id}"
-          ],
-          deleteForTeamDiscussionComment: [
-            "DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}/reactions/{reaction_id}"
-          ],
-          listForCommitComment: [
-            "GET /repos/{owner}/{repo}/comments/{comment_id}/reactions"
-          ],
-          listForIssue: ["GET /repos/{owner}/{repo}/issues/{issue_number}/reactions"],
-          listForIssueComment: [
-            "GET /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions"
-          ],
-          listForPullRequestReviewComment: [
-            "GET /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions"
-          ],
-          listForRelease: [
-            "GET /repos/{owner}/{repo}/releases/{release_id}/reactions"
-          ],
-          listForTeamDiscussionCommentInOrg: [
-            "GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}/reactions"
-          ],
-          listForTeamDiscussionInOrg: [
-            "GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/reactions"
-          ]
-        },
-        repos: {
-          acceptInvitation: [
-            "PATCH /user/repository_invitations/{invitation_id}",
-            {},
-            { renamed: ["repos", "acceptInvitationForAuthenticatedUser"] }
-          ],
-          acceptInvitationForAuthenticatedUser: [
-            "PATCH /user/repository_invitations/{invitation_id}"
-          ],
-          addAppAccessRestrictions: [
-            "POST /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps",
-            {},
-            { mapToData: "apps" }
-          ],
-          addCollaborator: ["PUT /repos/{owner}/{repo}/collaborators/{username}"],
-          addStatusCheckContexts: [
-            "POST /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts",
-            {},
-            { mapToData: "contexts" }
-          ],
-          addTeamAccessRestrictions: [
-            "POST /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams",
-            {},
-            { mapToData: "teams" }
-          ],
-          addUserAccessRestrictions: [
-            "POST /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users",
-            {},
-            { mapToData: "users" }
-          ],
-          checkAutomatedSecurityFixes: [
-            "GET /repos/{owner}/{repo}/automated-security-fixes"
-          ],
-          checkCollaborator: ["GET /repos/{owner}/{repo}/collaborators/{username}"],
-          checkVulnerabilityAlerts: [
-            "GET /repos/{owner}/{repo}/vulnerability-alerts"
-          ],
-          codeownersErrors: ["GET /repos/{owner}/{repo}/codeowners/errors"],
-          compareCommits: ["GET /repos/{owner}/{repo}/compare/{base}...{head}"],
-          compareCommitsWithBasehead: [
-            "GET /repos/{owner}/{repo}/compare/{basehead}"
-          ],
-          createAutolink: ["POST /repos/{owner}/{repo}/autolinks"],
-          createCommitComment: [
-            "POST /repos/{owner}/{repo}/commits/{commit_sha}/comments"
-          ],
-          createCommitSignatureProtection: [
-            "POST /repos/{owner}/{repo}/branches/{branch}/protection/required_signatures"
-          ],
-          createCommitStatus: ["POST /repos/{owner}/{repo}/statuses/{sha}"],
-          createDeployKey: ["POST /repos/{owner}/{repo}/keys"],
-          createDeployment: ["POST /repos/{owner}/{repo}/deployments"],
-          createDeploymentBranchPolicy: [
-            "POST /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies"
-          ],
-          createDeploymentProtectionRule: [
-            "POST /repos/{owner}/{repo}/environments/{environment_name}/deployment_protection_rules"
-          ],
-          createDeploymentStatus: [
-            "POST /repos/{owner}/{repo}/deployments/{deployment_id}/statuses"
-          ],
-          createDispatchEvent: ["POST /repos/{owner}/{repo}/dispatches"],
-          createForAuthenticatedUser: ["POST /user/repos"],
-          createFork: ["POST /repos/{owner}/{repo}/forks"],
-          createInOrg: ["POST /orgs/{org}/repos"],
-          createOrUpdateEnvironment: [
-            "PUT /repos/{owner}/{repo}/environments/{environment_name}"
-          ],
-          createOrUpdateFileContents: ["PUT /repos/{owner}/{repo}/contents/{path}"],
-          createOrgRuleset: ["POST /orgs/{org}/rulesets"],
-          createPagesDeployment: ["POST /repos/{owner}/{repo}/pages/deployment"],
-          createPagesSite: ["POST /repos/{owner}/{repo}/pages"],
-          createRelease: ["POST /repos/{owner}/{repo}/releases"],
-          createRepoRuleset: ["POST /repos/{owner}/{repo}/rulesets"],
-          createTagProtection: ["POST /repos/{owner}/{repo}/tags/protection"],
-          createUsingTemplate: [
-            "POST /repos/{template_owner}/{template_repo}/generate"
-          ],
-          createWebhook: ["POST /repos/{owner}/{repo}/hooks"],
-          declineInvitation: [
-            "DELETE /user/repository_invitations/{invitation_id}",
-            {},
-            { renamed: ["repos", "declineInvitationForAuthenticatedUser"] }
-          ],
-          declineInvitationForAuthenticatedUser: [
-            "DELETE /user/repository_invitations/{invitation_id}"
-          ],
-          delete: ["DELETE /repos/{owner}/{repo}"],
-          deleteAccessRestrictions: [
-            "DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions"
-          ],
-          deleteAdminBranchProtection: [
-            "DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins"
-          ],
-          deleteAnEnvironment: [
-            "DELETE /repos/{owner}/{repo}/environments/{environment_name}"
-          ],
-          deleteAutolink: ["DELETE /repos/{owner}/{repo}/autolinks/{autolink_id}"],
-          deleteBranchProtection: [
-            "DELETE /repos/{owner}/{repo}/branches/{branch}/protection"
-          ],
-          deleteCommitComment: ["DELETE /repos/{owner}/{repo}/comments/{comment_id}"],
-          deleteCommitSignatureProtection: [
-            "DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_signatures"
-          ],
-          deleteDeployKey: ["DELETE /repos/{owner}/{repo}/keys/{key_id}"],
-          deleteDeployment: [
-            "DELETE /repos/{owner}/{repo}/deployments/{deployment_id}"
-          ],
-          deleteDeploymentBranchPolicy: [
-            "DELETE /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies/{branch_policy_id}"
-          ],
-          deleteFile: ["DELETE /repos/{owner}/{repo}/contents/{path}"],
-          deleteInvitation: [
-            "DELETE /repos/{owner}/{repo}/invitations/{invitation_id}"
-          ],
-          deleteOrgRuleset: ["DELETE /orgs/{org}/rulesets/{ruleset_id}"],
-          deletePagesSite: ["DELETE /repos/{owner}/{repo}/pages"],
-          deletePullRequestReviewProtection: [
-            "DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews"
-          ],
-          deleteRelease: ["DELETE /repos/{owner}/{repo}/releases/{release_id}"],
-          deleteReleaseAsset: [
-            "DELETE /repos/{owner}/{repo}/releases/assets/{asset_id}"
-          ],
-          deleteRepoRuleset: ["DELETE /repos/{owner}/{repo}/rulesets/{ruleset_id}"],
-          deleteTagProtection: [
-            "DELETE /repos/{owner}/{repo}/tags/protection/{tag_protection_id}"
-          ],
-          deleteWebhook: ["DELETE /repos/{owner}/{repo}/hooks/{hook_id}"],
-          disableAutomatedSecurityFixes: [
-            "DELETE /repos/{owner}/{repo}/automated-security-fixes"
-          ],
-          disableDeploymentProtectionRule: [
-            "DELETE /repos/{owner}/{repo}/environments/{environment_name}/deployment_protection_rules/{protection_rule_id}"
-          ],
-          disablePrivateVulnerabilityReporting: [
-            "DELETE /repos/{owner}/{repo}/private-vulnerability-reporting"
-          ],
-          disableVulnerabilityAlerts: [
-            "DELETE /repos/{owner}/{repo}/vulnerability-alerts"
-          ],
-          downloadArchive: [
-            "GET /repos/{owner}/{repo}/zipball/{ref}",
-            {},
-            { renamed: ["repos", "downloadZipballArchive"] }
-          ],
-          downloadTarballArchive: ["GET /repos/{owner}/{repo}/tarball/{ref}"],
-          downloadZipballArchive: ["GET /repos/{owner}/{repo}/zipball/{ref}"],
-          enableAutomatedSecurityFixes: [
-            "PUT /repos/{owner}/{repo}/automated-security-fixes"
-          ],
-          enablePrivateVulnerabilityReporting: [
-            "PUT /repos/{owner}/{repo}/private-vulnerability-reporting"
-          ],
-          enableVulnerabilityAlerts: [
-            "PUT /repos/{owner}/{repo}/vulnerability-alerts"
-          ],
-          generateReleaseNotes: [
-            "POST /repos/{owner}/{repo}/releases/generate-notes"
-          ],
-          get: ["GET /repos/{owner}/{repo}"],
-          getAccessRestrictions: [
-            "GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions"
-          ],
-          getAdminBranchProtection: [
-            "GET /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins"
-          ],
-          getAllDeploymentProtectionRules: [
-            "GET /repos/{owner}/{repo}/environments/{environment_name}/deployment_protection_rules"
-          ],
-          getAllEnvironments: ["GET /repos/{owner}/{repo}/environments"],
-          getAllStatusCheckContexts: [
-            "GET /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts"
-          ],
-          getAllTopics: ["GET /repos/{owner}/{repo}/topics"],
-          getAppsWithAccessToProtectedBranch: [
-            "GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps"
-          ],
-          getAutolink: ["GET /repos/{owner}/{repo}/autolinks/{autolink_id}"],
-          getBranch: ["GET /repos/{owner}/{repo}/branches/{branch}"],
-          getBranchProtection: [
-            "GET /repos/{owner}/{repo}/branches/{branch}/protection"
-          ],
-          getBranchRules: ["GET /repos/{owner}/{repo}/rules/branches/{branch}"],
-          getClones: ["GET /repos/{owner}/{repo}/traffic/clones"],
-          getCodeFrequencyStats: ["GET /repos/{owner}/{repo}/stats/code_frequency"],
-          getCollaboratorPermissionLevel: [
-            "GET /repos/{owner}/{repo}/collaborators/{username}/permission"
-          ],
-          getCombinedStatusForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/status"],
-          getCommit: ["GET /repos/{owner}/{repo}/commits/{ref}"],
-          getCommitActivityStats: ["GET /repos/{owner}/{repo}/stats/commit_activity"],
-          getCommitComment: ["GET /repos/{owner}/{repo}/comments/{comment_id}"],
-          getCommitSignatureProtection: [
-            "GET /repos/{owner}/{repo}/branches/{branch}/protection/required_signatures"
-          ],
-          getCommunityProfileMetrics: ["GET /repos/{owner}/{repo}/community/profile"],
-          getContent: ["GET /repos/{owner}/{repo}/contents/{path}"],
-          getContributorsStats: ["GET /repos/{owner}/{repo}/stats/contributors"],
-          getCustomDeploymentProtectionRule: [
-            "GET /repos/{owner}/{repo}/environments/{environment_name}/deployment_protection_rules/{protection_rule_id}"
-          ],
-          getCustomPropertiesValues: ["GET /repos/{owner}/{repo}/properties/values"],
-          getDeployKey: ["GET /repos/{owner}/{repo}/keys/{key_id}"],
-          getDeployment: ["GET /repos/{owner}/{repo}/deployments/{deployment_id}"],
-          getDeploymentBranchPolicy: [
-            "GET /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies/{branch_policy_id}"
-          ],
-          getDeploymentStatus: [
-            "GET /repos/{owner}/{repo}/deployments/{deployment_id}/statuses/{status_id}"
-          ],
-          getEnvironment: [
-            "GET /repos/{owner}/{repo}/environments/{environment_name}"
-          ],
-          getLatestPagesBuild: ["GET /repos/{owner}/{repo}/pages/builds/latest"],
-          getLatestRelease: ["GET /repos/{owner}/{repo}/releases/latest"],
-          getOrgRuleSuite: ["GET /orgs/{org}/rulesets/rule-suites/{rule_suite_id}"],
-          getOrgRuleSuites: ["GET /orgs/{org}/rulesets/rule-suites"],
-          getOrgRuleset: ["GET /orgs/{org}/rulesets/{ruleset_id}"],
-          getOrgRulesets: ["GET /orgs/{org}/rulesets"],
-          getPages: ["GET /repos/{owner}/{repo}/pages"],
-          getPagesBuild: ["GET /repos/{owner}/{repo}/pages/builds/{build_id}"],
-          getPagesHealthCheck: ["GET /repos/{owner}/{repo}/pages/health"],
-          getParticipationStats: ["GET /repos/{owner}/{repo}/stats/participation"],
-          getPullRequestReviewProtection: [
-            "GET /repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews"
-          ],
-          getPunchCardStats: ["GET /repos/{owner}/{repo}/stats/punch_card"],
-          getReadme: ["GET /repos/{owner}/{repo}/readme"],
-          getReadmeInDirectory: ["GET /repos/{owner}/{repo}/readme/{dir}"],
-          getRelease: ["GET /repos/{owner}/{repo}/releases/{release_id}"],
-          getReleaseAsset: ["GET /repos/{owner}/{repo}/releases/assets/{asset_id}"],
-          getReleaseByTag: ["GET /repos/{owner}/{repo}/releases/tags/{tag}"],
-          getRepoRuleSuite: [
-            "GET /repos/{owner}/{repo}/rulesets/rule-suites/{rule_suite_id}"
-          ],
-          getRepoRuleSuites: ["GET /repos/{owner}/{repo}/rulesets/rule-suites"],
-          getRepoRuleset: ["GET /repos/{owner}/{repo}/rulesets/{ruleset_id}"],
-          getRepoRulesets: ["GET /repos/{owner}/{repo}/rulesets"],
-          getStatusChecksProtection: [
-            "GET /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks"
-          ],
-          getTeamsWithAccessToProtectedBranch: [
-            "GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams"
-          ],
-          getTopPaths: ["GET /repos/{owner}/{repo}/traffic/popular/paths"],
-          getTopReferrers: ["GET /repos/{owner}/{repo}/traffic/popular/referrers"],
-          getUsersWithAccessToProtectedBranch: [
-            "GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users"
-          ],
-          getViews: ["GET /repos/{owner}/{repo}/traffic/views"],
-          getWebhook: ["GET /repos/{owner}/{repo}/hooks/{hook_id}"],
-          getWebhookConfigForRepo: [
-            "GET /repos/{owner}/{repo}/hooks/{hook_id}/config"
-          ],
-          getWebhookDelivery: [
-            "GET /repos/{owner}/{repo}/hooks/{hook_id}/deliveries/{delivery_id}"
-          ],
-          listActivities: ["GET /repos/{owner}/{repo}/activity"],
-          listAutolinks: ["GET /repos/{owner}/{repo}/autolinks"],
-          listBranches: ["GET /repos/{owner}/{repo}/branches"],
-          listBranchesForHeadCommit: [
-            "GET /repos/{owner}/{repo}/commits/{commit_sha}/branches-where-head"
-          ],
-          listCollaborators: ["GET /repos/{owner}/{repo}/collaborators"],
-          listCommentsForCommit: [
-            "GET /repos/{owner}/{repo}/commits/{commit_sha}/comments"
-          ],
-          listCommitCommentsForRepo: ["GET /repos/{owner}/{repo}/comments"],
-          listCommitStatusesForRef: [
-            "GET /repos/{owner}/{repo}/commits/{ref}/statuses"
-          ],
-          listCommits: ["GET /repos/{owner}/{repo}/commits"],
-          listContributors: ["GET /repos/{owner}/{repo}/contributors"],
-          listCustomDeploymentRuleIntegrations: [
-            "GET /repos/{owner}/{repo}/environments/{environment_name}/deployment_protection_rules/apps"
-          ],
-          listDeployKeys: ["GET /repos/{owner}/{repo}/keys"],
-          listDeploymentBranchPolicies: [
-            "GET /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies"
-          ],
-          listDeploymentStatuses: [
-            "GET /repos/{owner}/{repo}/deployments/{deployment_id}/statuses"
-          ],
-          listDeployments: ["GET /repos/{owner}/{repo}/deployments"],
-          listForAuthenticatedUser: ["GET /user/repos"],
-          listForOrg: ["GET /orgs/{org}/repos"],
-          listForUser: ["GET /users/{username}/repos"],
-          listForks: ["GET /repos/{owner}/{repo}/forks"],
-          listInvitations: ["GET /repos/{owner}/{repo}/invitations"],
-          listInvitationsForAuthenticatedUser: ["GET /user/repository_invitations"],
-          listLanguages: ["GET /repos/{owner}/{repo}/languages"],
-          listPagesBuilds: ["GET /repos/{owner}/{repo}/pages/builds"],
-          listPublic: ["GET /repositories"],
-          listPullRequestsAssociatedWithCommit: [
-            "GET /repos/{owner}/{repo}/commits/{commit_sha}/pulls"
-          ],
-          listReleaseAssets: [
-            "GET /repos/{owner}/{repo}/releases/{release_id}/assets"
-          ],
-          listReleases: ["GET /repos/{owner}/{repo}/releases"],
-          listTagProtection: ["GET /repos/{owner}/{repo}/tags/protection"],
-          listTags: ["GET /repos/{owner}/{repo}/tags"],
-          listTeams: ["GET /repos/{owner}/{repo}/teams"],
-          listWebhookDeliveries: [
-            "GET /repos/{owner}/{repo}/hooks/{hook_id}/deliveries"
-          ],
-          listWebhooks: ["GET /repos/{owner}/{repo}/hooks"],
-          merge: ["POST /repos/{owner}/{repo}/merges"],
-          mergeUpstream: ["POST /repos/{owner}/{repo}/merge-upstream"],
-          pingWebhook: ["POST /repos/{owner}/{repo}/hooks/{hook_id}/pings"],
-          redeliverWebhookDelivery: [
-            "POST /repos/{owner}/{repo}/hooks/{hook_id}/deliveries/{delivery_id}/attempts"
-          ],
-          removeAppAccessRestrictions: [
-            "DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps",
-            {},
-            { mapToData: "apps" }
-          ],
-          removeCollaborator: [
-            "DELETE /repos/{owner}/{repo}/collaborators/{username}"
-          ],
-          removeStatusCheckContexts: [
-            "DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts",
-            {},
-            { mapToData: "contexts" }
-          ],
-          removeStatusCheckProtection: [
-            "DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks"
-          ],
-          removeTeamAccessRestrictions: [
-            "DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams",
-            {},
-            { mapToData: "teams" }
-          ],
-          removeUserAccessRestrictions: [
-            "DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users",
-            {},
-            { mapToData: "users" }
-          ],
-          renameBranch: ["POST /repos/{owner}/{repo}/branches/{branch}/rename"],
-          replaceAllTopics: ["PUT /repos/{owner}/{repo}/topics"],
-          requestPagesBuild: ["POST /repos/{owner}/{repo}/pages/builds"],
-          setAdminBranchProtection: [
-            "POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins"
-          ],
-          setAppAccessRestrictions: [
-            "PUT /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps",
-            {},
-            { mapToData: "apps" }
-          ],
-          setStatusCheckContexts: [
-            "PUT /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts",
-            {},
-            { mapToData: "contexts" }
-          ],
-          setTeamAccessRestrictions: [
-            "PUT /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams",
-            {},
-            { mapToData: "teams" }
-          ],
-          setUserAccessRestrictions: [
-            "PUT /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users",
-            {},
-            { mapToData: "users" }
-          ],
-          testPushWebhook: ["POST /repos/{owner}/{repo}/hooks/{hook_id}/tests"],
-          transfer: ["POST /repos/{owner}/{repo}/transfer"],
-          update: ["PATCH /repos/{owner}/{repo}"],
-          updateBranchProtection: [
-            "PUT /repos/{owner}/{repo}/branches/{branch}/protection"
-          ],
-          updateCommitComment: ["PATCH /repos/{owner}/{repo}/comments/{comment_id}"],
-          updateDeploymentBranchPolicy: [
-            "PUT /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies/{branch_policy_id}"
-          ],
-          updateInformationAboutPagesSite: ["PUT /repos/{owner}/{repo}/pages"],
-          updateInvitation: [
-            "PATCH /repos/{owner}/{repo}/invitations/{invitation_id}"
-          ],
-          updateOrgRuleset: ["PUT /orgs/{org}/rulesets/{ruleset_id}"],
-          updatePullRequestReviewProtection: [
-            "PATCH /repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews"
-          ],
-          updateRelease: ["PATCH /repos/{owner}/{repo}/releases/{release_id}"],
-          updateReleaseAsset: [
-            "PATCH /repos/{owner}/{repo}/releases/assets/{asset_id}"
-          ],
-          updateRepoRuleset: ["PUT /repos/{owner}/{repo}/rulesets/{ruleset_id}"],
-          updateStatusCheckPotection: [
-            "PATCH /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks",
-            {},
-            { renamed: ["repos", "updateStatusCheckProtection"] }
-          ],
-          updateStatusCheckProtection: [
-            "PATCH /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks"
-          ],
-          updateWebhook: ["PATCH /repos/{owner}/{repo}/hooks/{hook_id}"],
-          updateWebhookConfigForRepo: [
-            "PATCH /repos/{owner}/{repo}/hooks/{hook_id}/config"
-          ],
-          uploadReleaseAsset: [
-            "POST /repos/{owner}/{repo}/releases/{release_id}/assets{?name,label}",
-            { baseUrl: "https://uploads.github.com" }
-          ]
-        },
-        search: {
-          code: ["GET /search/code"],
-          commits: ["GET /search/commits"],
-          issuesAndPullRequests: ["GET /search/issues"],
-          labels: ["GET /search/labels"],
-          repos: ["GET /search/repositories"],
-          topics: ["GET /search/topics"],
-          users: ["GET /search/users"]
-        },
-        secretScanning: {
-          getAlert: [
-            "GET /repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}"
-          ],
-          listAlertsForEnterprise: [
-            "GET /enterprises/{enterprise}/secret-scanning/alerts"
-          ],
-          listAlertsForOrg: ["GET /orgs/{org}/secret-scanning/alerts"],
-          listAlertsForRepo: ["GET /repos/{owner}/{repo}/secret-scanning/alerts"],
-          listLocationsForAlert: [
-            "GET /repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}/locations"
-          ],
-          updateAlert: [
-            "PATCH /repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}"
-          ]
-        },
-        securityAdvisories: {
-          createPrivateVulnerabilityReport: [
-            "POST /repos/{owner}/{repo}/security-advisories/reports"
-          ],
-          createRepositoryAdvisory: [
-            "POST /repos/{owner}/{repo}/security-advisories"
-          ],
-          createRepositoryAdvisoryCveRequest: [
-            "POST /repos/{owner}/{repo}/security-advisories/{ghsa_id}/cve"
-          ],
-          getGlobalAdvisory: ["GET /advisories/{ghsa_id}"],
-          getRepositoryAdvisory: [
-            "GET /repos/{owner}/{repo}/security-advisories/{ghsa_id}"
-          ],
-          listGlobalAdvisories: ["GET /advisories"],
-          listOrgRepositoryAdvisories: ["GET /orgs/{org}/security-advisories"],
-          listRepositoryAdvisories: ["GET /repos/{owner}/{repo}/security-advisories"],
-          updateRepositoryAdvisory: [
-            "PATCH /repos/{owner}/{repo}/security-advisories/{ghsa_id}"
-          ]
-        },
-        teams: {
-          addOrUpdateMembershipForUserInOrg: [
-            "PUT /orgs/{org}/teams/{team_slug}/memberships/{username}"
-          ],
-          addOrUpdateProjectPermissionsInOrg: [
-            "PUT /orgs/{org}/teams/{team_slug}/projects/{project_id}"
-          ],
-          addOrUpdateRepoPermissionsInOrg: [
-            "PUT /orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}"
-          ],
-          checkPermissionsForProjectInOrg: [
-            "GET /orgs/{org}/teams/{team_slug}/projects/{project_id}"
-          ],
-          checkPermissionsForRepoInOrg: [
-            "GET /orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}"
-          ],
-          create: ["POST /orgs/{org}/teams"],
-          createDiscussionCommentInOrg: [
-            "POST /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments"
-          ],
-          createDiscussionInOrg: ["POST /orgs/{org}/teams/{team_slug}/discussions"],
-          deleteDiscussionCommentInOrg: [
-            "DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}"
-          ],
-          deleteDiscussionInOrg: [
-            "DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}"
-          ],
-          deleteInOrg: ["DELETE /orgs/{org}/teams/{team_slug}"],
-          getByName: ["GET /orgs/{org}/teams/{team_slug}"],
-          getDiscussionCommentInOrg: [
-            "GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}"
-          ],
-          getDiscussionInOrg: [
-            "GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}"
-          ],
-          getMembershipForUserInOrg: [
-            "GET /orgs/{org}/teams/{team_slug}/memberships/{username}"
-          ],
-          list: ["GET /orgs/{org}/teams"],
-          listChildInOrg: ["GET /orgs/{org}/teams/{team_slug}/teams"],
-          listDiscussionCommentsInOrg: [
-            "GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments"
-          ],
-          listDiscussionsInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions"],
-          listForAuthenticatedUser: ["GET /user/teams"],
-          listMembersInOrg: ["GET /orgs/{org}/teams/{team_slug}/members"],
-          listPendingInvitationsInOrg: [
-            "GET /orgs/{org}/teams/{team_slug}/invitations"
-          ],
-          listProjectsInOrg: ["GET /orgs/{org}/teams/{team_slug}/projects"],
-          listReposInOrg: ["GET /orgs/{org}/teams/{team_slug}/repos"],
-          removeMembershipForUserInOrg: [
-            "DELETE /orgs/{org}/teams/{team_slug}/memberships/{username}"
-          ],
-          removeProjectInOrg: [
-            "DELETE /orgs/{org}/teams/{team_slug}/projects/{project_id}"
-          ],
-          removeRepoInOrg: [
-            "DELETE /orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}"
-          ],
-          updateDiscussionCommentInOrg: [
-            "PATCH /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}"
-          ],
-          updateDiscussionInOrg: [
-            "PATCH /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}"
-          ],
-          updateInOrg: ["PATCH /orgs/{org}/teams/{team_slug}"]
-        },
-        users: {
-          addEmailForAuthenticated: [
-            "POST /user/emails",
-            {},
-            { renamed: ["users", "addEmailForAuthenticatedUser"] }
-          ],
-          addEmailForAuthenticatedUser: ["POST /user/emails"],
-          addSocialAccountForAuthenticatedUser: ["POST /user/social_accounts"],
-          block: ["PUT /user/blocks/{username}"],
-          checkBlocked: ["GET /user/blocks/{username}"],
-          checkFollowingForUser: ["GET /users/{username}/following/{target_user}"],
-          checkPersonIsFollowedByAuthenticated: ["GET /user/following/{username}"],
-          createGpgKeyForAuthenticated: [
-            "POST /user/gpg_keys",
-            {},
-            { renamed: ["users", "createGpgKeyForAuthenticatedUser"] }
-          ],
-          createGpgKeyForAuthenticatedUser: ["POST /user/gpg_keys"],
-          createPublicSshKeyForAuthenticated: [
-            "POST /user/keys",
-            {},
-            { renamed: ["users", "createPublicSshKeyForAuthenticatedUser"] }
-          ],
-          createPublicSshKeyForAuthenticatedUser: ["POST /user/keys"],
-          createSshSigningKeyForAuthenticatedUser: ["POST /user/ssh_signing_keys"],
-          deleteEmailForAuthenticated: [
-            "DELETE /user/emails",
-            {},
-            { renamed: ["users", "deleteEmailForAuthenticatedUser"] }
-          ],
-          deleteEmailForAuthenticatedUser: ["DELETE /user/emails"],
-          deleteGpgKeyForAuthenticated: [
-            "DELETE /user/gpg_keys/{gpg_key_id}",
-            {},
-            { renamed: ["users", "deleteGpgKeyForAuthenticatedUser"] }
-          ],
-          deleteGpgKeyForAuthenticatedUser: ["DELETE /user/gpg_keys/{gpg_key_id}"],
-          deletePublicSshKeyForAuthenticated: [
-            "DELETE /user/keys/{key_id}",
-            {},
-            { renamed: ["users", "deletePublicSshKeyForAuthenticatedUser"] }
-          ],
-          deletePublicSshKeyForAuthenticatedUser: ["DELETE /user/keys/{key_id}"],
-          deleteSocialAccountForAuthenticatedUser: ["DELETE /user/social_accounts"],
-          deleteSshSigningKeyForAuthenticatedUser: [
-            "DELETE /user/ssh_signing_keys/{ssh_signing_key_id}"
-          ],
-          follow: ["PUT /user/following/{username}"],
-          getAuthenticated: ["GET /user"],
-          getByUsername: ["GET /users/{username}"],
-          getContextForUser: ["GET /users/{username}/hovercard"],
-          getGpgKeyForAuthenticated: [
-            "GET /user/gpg_keys/{gpg_key_id}",
-            {},
-            { renamed: ["users", "getGpgKeyForAuthenticatedUser"] }
-          ],
-          getGpgKeyForAuthenticatedUser: ["GET /user/gpg_keys/{gpg_key_id}"],
-          getPublicSshKeyForAuthenticated: [
-            "GET /user/keys/{key_id}",
-            {},
-            { renamed: ["users", "getPublicSshKeyForAuthenticatedUser"] }
-          ],
-          getPublicSshKeyForAuthenticatedUser: ["GET /user/keys/{key_id}"],
-          getSshSigningKeyForAuthenticatedUser: [
-            "GET /user/ssh_signing_keys/{ssh_signing_key_id}"
-          ],
-          list: ["GET /users"],
-          listBlockedByAuthenticated: [
-            "GET /user/blocks",
-            {},
-            { renamed: ["users", "listBlockedByAuthenticatedUser"] }
-          ],
-          listBlockedByAuthenticatedUser: ["GET /user/blocks"],
-          listEmailsForAuthenticated: [
-            "GET /user/emails",
-            {},
-            { renamed: ["users", "listEmailsForAuthenticatedUser"] }
-          ],
-          listEmailsForAuthenticatedUser: ["GET /user/emails"],
-          listFollowedByAuthenticated: [
-            "GET /user/following",
-            {},
-            { renamed: ["users", "listFollowedByAuthenticatedUser"] }
-          ],
-          listFollowedByAuthenticatedUser: ["GET /user/following"],
-          listFollowersForAuthenticatedUser: ["GET /user/followers"],
-          listFollowersForUser: ["GET /users/{username}/followers"],
-          listFollowingForUser: ["GET /users/{username}/following"],
-          listGpgKeysForAuthenticated: [
-            "GET /user/gpg_keys",
-            {},
-            { renamed: ["users", "listGpgKeysForAuthenticatedUser"] }
-          ],
-          listGpgKeysForAuthenticatedUser: ["GET /user/gpg_keys"],
-          listGpgKeysForUser: ["GET /users/{username}/gpg_keys"],
-          listPublicEmailsForAuthenticated: [
-            "GET /user/public_emails",
-            {},
-            { renamed: ["users", "listPublicEmailsForAuthenticatedUser"] }
-          ],
-          listPublicEmailsForAuthenticatedUser: ["GET /user/public_emails"],
-          listPublicKeysForUser: ["GET /users/{username}/keys"],
-          listPublicSshKeysForAuthenticated: [
-            "GET /user/keys",
-            {},
-            { renamed: ["users", "listPublicSshKeysForAuthenticatedUser"] }
-          ],
-          listPublicSshKeysForAuthenticatedUser: ["GET /user/keys"],
-          listSocialAccountsForAuthenticatedUser: ["GET /user/social_accounts"],
-          listSocialAccountsForUser: ["GET /users/{username}/social_accounts"],
-          listSshSigningKeysForAuthenticatedUser: ["GET /user/ssh_signing_keys"],
-          listSshSigningKeysForUser: ["GET /users/{username}/ssh_signing_keys"],
-          setPrimaryEmailVisibilityForAuthenticated: [
-            "PATCH /user/email/visibility",
-            {},
-            { renamed: ["users", "setPrimaryEmailVisibilityForAuthenticatedUser"] }
-          ],
-          setPrimaryEmailVisibilityForAuthenticatedUser: [
-            "PATCH /user/email/visibility"
-          ],
-          unblock: ["DELETE /user/blocks/{username}"],
-          unfollow: ["DELETE /user/following/{username}"],
-          updateAuthenticated: ["PATCH /user"]
-        }
-      };
-      endpoints_default = Endpoints;
-      endpointMethodsMap = /* @__PURE__ */ new Map();
-      for (const [scope, endpoints] of Object.entries(endpoints_default)) {
-        for (const [methodName, endpoint2] of Object.entries(endpoints)) {
-          const [route, defaults, decorations] = endpoint2;
-          const [method, url] = route.split(/ /);
-          const endpointDefaults = Object.assign(
-            {
-              method,
-              url
-            },
-            defaults
-          );
-          if (!endpointMethodsMap.has(scope)) {
-            endpointMethodsMap.set(scope, /* @__PURE__ */ new Map());
-          }
-          endpointMethodsMap.get(scope).set(methodName, {
-            scope,
-            methodName,
-            endpointDefaults,
-            decorations
-          });
-        }
-      }
-      handler = {
-        has({ scope }, methodName) {
-          return endpointMethodsMap.get(scope).has(methodName);
-        },
-        getOwnPropertyDescriptor(target2, methodName) {
-          return {
-            value: this.get(target2, methodName),
-            // ensures method is in the cache
-            configurable: true,
-            writable: true,
-            enumerable: true
-          };
-        },
-        defineProperty(target2, methodName, descriptor) {
-          Object.defineProperty(target2.cache, methodName, descriptor);
-          return true;
-        },
-        deleteProperty(target2, methodName) {
-          delete target2.cache[methodName];
-          return true;
-        },
-        ownKeys({ scope }) {
-          return [...endpointMethodsMap.get(scope).keys()];
-        },
-        set(target2, methodName, value) {
-          return target2.cache[methodName] = value;
-        },
-        get({ octokit, scope, cache: cache2 }, methodName) {
-          if (cache2[methodName]) {
-            return cache2[methodName];
-          }
-          const method = endpointMethodsMap.get(scope).get(methodName);
-          if (!method) {
-            return void 0;
-          }
-          const { endpointDefaults, decorations } = method;
-          if (decorations) {
-            cache2[methodName] = decorate(
-              octokit,
-              scope,
-              methodName,
-              endpointDefaults,
-              decorations
-            );
-          } else {
-            cache2[methodName] = octokit.request.defaults(endpointDefaults);
-          }
-          return cache2[methodName];
-        }
-      };
-      restEndpointMethods.VERSION = VERSION7;
-      legacyRestEndpointMethods.VERSION = VERSION7;
-    }
-  });
-
-  // node_modules/@octokit/rest/dist-web/index.js
-  var VERSION8, Octokit2;
-  var init_dist_web12 = __esm({
-    "node_modules/@octokit/rest/dist-web/index.js"() {
-      init_dist_web8();
-      init_dist_web9();
-      init_dist_web10();
-      init_dist_web11();
-      VERSION8 = "20.0.2";
-      Octokit2 = Octokit.plugin(
-        requestLog,
-        legacyRestEndpointMethods,
-        paginateRest
-      ).defaults({
-        userAgent: `octokit-rest.js/${VERSION8}`
-      });
-    }
-  });
-
-  // node_modules/is-base64/is-base64.js
-  var require_is_base64 = __commonJS({
-    "node_modules/is-base64/is-base64.js"(exports, module) {
-      (function(root) {
-        "use strict";
-        function isBase64(v, opts) {
-          if (v instanceof Boolean || typeof v === "boolean") {
-            return false;
-          }
-          if (!(opts instanceof Object)) {
-            opts = {};
-          }
-          if (opts.allowEmpty === false && v === "") {
-            return false;
-          }
-          var regex = "(?:[A-Za-z0-9+\\/]{4})*(?:[A-Za-z0-9+\\/]{2}==|[A-Za-z0-9+/]{3}=)?";
-          var mimeRegex = "(data:\\w+\\/[a-zA-Z\\+\\-\\.]+;base64,)";
-          if (opts.mimeRequired === true) {
-            regex = mimeRegex + regex;
-          } else if (opts.allowMime === true) {
-            regex = mimeRegex + "?" + regex;
-          }
-          if (opts.paddingRequired === false) {
-            regex = "(?:[A-Za-z0-9+\\/]{4})*(?:[A-Za-z0-9+\\/]{2}(==)?|[A-Za-z0-9+\\/]{3}=?)?";
-          }
-          return new RegExp("^" + regex + "$", "gi").test(v);
-        }
-        if (typeof exports !== "undefined") {
-          if (typeof module !== "undefined" && module.exports) {
-            exports = module.exports = isBase64;
-          }
-          exports.isBase64 = isBase64;
-        } else if (typeof define === "function" && define.amd) {
-          define([], function() {
-            return isBase64;
-          });
-        } else {
-          root.isBase64 = isBase64;
-        }
-      })(exports);
-    }
-  });
-
-  // node_modules/octokit-commit-multiple-files/create-or-update-files.js
-  var require_create_or_update_files = __commonJS({
-    "node_modules/octokit-commit-multiple-files/create-or-update-files.js"(exports, module) {
-      var isBase64 = require_is_base64();
-      module.exports = function(octokit, opts) {
-        return new Promise((resolve, reject) => __async(this, null, function* () {
-          try {
-            for (const req of ["owner", "repo", "branch"]) {
-              if (!opts[req]) {
-                return reject(`'${req}' is a required parameter`);
-              }
-            }
-            if (!opts.changes || !opts.changes.length) {
-              return reject("No changes provided");
-            }
-            if (!opts.batchSize) {
-              opts.batchSize = 1;
-            }
-            if (typeof opts.batchSize !== "number") {
-              return reject(`batchSize must be a number`);
-            }
-            let {
-              owner,
-              repo,
-              base: base2,
-              branch: branchName,
-              createBranch,
-              committer,
-              author,
-              changes,
-              batchSize,
-              forkFromBaseBranch
-            } = opts;
-            let branchAlreadyExists = true;
-            let baseTree;
-            baseTree = yield loadRef(octokit, owner, repo, branchName);
-            if (!baseTree || forkFromBaseBranch) {
-              if (!createBranch && !baseTree) {
-                return reject(
-                  `The branch '${branchName}' doesn't exist and createBranch is 'false'`
-                );
-              }
-              if (!baseTree) {
-                branchAlreadyExists = false;
-              }
-              if (!base2) {
-                base2 = (yield octokit.rest.repos.get({
-                  owner,
-                  repo
-                })).data.default_branch;
-              }
-              baseTree = yield loadRef(octokit, owner, repo, base2);
-              if (!baseTree) {
-                return reject(`The branch '${base2}' doesn't exist`);
-              }
-            }
-            const commits = [];
-            for (const change of changes) {
-              const message = change.message;
-              if (!message) {
-                return reject(`changes[].message is a required parameter`);
-              }
-              const hasFiles = change.files && Object.keys(change.files).length > 0;
-              const hasFilesToDelete = Array.isArray(change.filesToDelete) && change.filesToDelete.length > 0;
-              if (!hasFiles && !hasFilesToDelete) {
-                return reject(
-                  `either changes[].files or changes[].filesToDelete are required`
-                );
-              }
-              const treeItems = [];
-              if (hasFilesToDelete) {
-                for (const batch of chunk(change.filesToDelete, batchSize)) {
-                  yield Promise.all(
-                    batch.map((fileName) => __async(this, null, function* () {
-                      const exists = yield fileExistsInRepo(
-                        octokit,
-                        owner,
-                        repo,
-                        fileName,
-                        baseTree
-                      );
-                      if (!exists && !change.ignoreDeletionFailures) {
-                        return reject(
-                          `The file ${fileName} could not be found in the repo`
-                        );
-                      }
-                      if (exists) {
-                        treeItems.push({
-                          path: fileName,
-                          sha: null,
-                          // sha as null implies that the file should be deleted
-                          mode: "100644",
-                          type: "commit"
-                        });
-                      }
-                    }))
-                  );
-                }
-              }
-              for (const batch of chunk(Object.keys(change.files), batchSize)) {
-                yield Promise.all(
-                  batch.map((fileName) => __async(this, null, function* () {
-                    const properties = change.files[fileName] || "";
-                    const contents = properties.contents || properties;
-                    const mode = properties.mode || "100644";
-                    const type = properties.type || "blob";
-                    if (!contents) {
-                      return reject(`No file contents provided for ${fileName}`);
-                    }
-                    const fileSha = yield createBlob(
-                      octokit,
-                      owner,
-                      repo,
-                      contents,
-                      type
-                    );
-                    treeItems.push({
-                      path: fileName,
-                      sha: fileSha,
-                      mode,
-                      type
-                    });
-                  }))
-                );
-              }
-              if (treeItems.length === 0) {
-                continue;
-              }
-              const tree = yield createTree(
-                octokit,
-                owner,
-                repo,
-                treeItems,
-                baseTree
-              );
-              const commit = yield createCommit(
-                octokit,
-                owner,
-                repo,
-                committer,
-                author,
-                message,
-                tree,
-                baseTree
-              );
-              baseTree = commit.sha;
-              commits.push(commit);
-            }
-            let action = "createRef";
-            let updateRefBase = "refs/";
-            if (branchAlreadyExists) {
-              action = "updateRef";
-              updateRefBase = "";
-            }
-            yield octokit.rest.git[action]({
-              owner,
-              repo,
-              force: true,
-              ref: `${updateRefBase}heads/${branchName}`,
-              sha: baseTree
-            });
-            return resolve({ commits });
-          } catch (e) {
-            return reject(e);
-          }
-        }));
-      };
-      function fileExistsInRepo(octokit, owner, repo, path, branch) {
-        return __async(this, null, function* () {
-          try {
-            yield octokit.rest.repos.getContent({
-              method: "HEAD",
-              owner,
-              repo,
-              path,
-              ref: branch
-            });
-            return true;
-          } catch (e) {
-            return false;
-          }
-        });
-      }
-      function createCommit(octokit, owner, repo, committer, author, message, tree, baseTree) {
-        return __async(this, null, function* () {
-          return (yield octokit.rest.git.createCommit({
-            owner,
-            repo,
-            message,
-            committer,
-            author,
-            tree: tree.sha,
-            parents: [baseTree]
-          })).data;
-        });
-      }
-      function createTree(octokit, owner, repo, treeItems, baseTree) {
-        return __async(this, null, function* () {
-          return (yield octokit.rest.git.createTree({
-            owner,
-            repo,
-            tree: treeItems,
-            base_tree: baseTree
-          })).data;
-        });
-      }
-      function createBlob(octokit, owner, repo, contents, type) {
-        return __async(this, null, function* () {
-          if (type === "commit") {
-            return contents;
-          } else {
-            let content = contents;
-            if (!isBase64(content)) {
-              content = Buffer.from(contents).toString("base64");
-            }
-            const file = (yield octokit.rest.git.createBlob({
-              owner,
-              repo,
-              content,
-              encoding: "base64"
-            })).data;
-            return file.sha;
-          }
-        });
-      }
-      function loadRef(octokit, owner, repo, ref) {
-        return __async(this, null, function* () {
-          try {
-            const x = yield octokit.rest.git.getRef({
-              owner,
-              repo,
-              ref: `heads/${ref}`
-            });
-            return x.data.object.sha;
-          } catch (e) {
-          }
-        });
-      }
-      var chunk = (input, size) => {
-        return input.reduce((arr, item, idx) => {
-          return idx % size === 0 ? [...arr, [item]] : [...arr.slice(0, -1), [...arr.slice(-1)[0], item]];
-        }, []);
-      };
-    }
-  });
-
-  // node_modules/octokit-commit-multiple-files/index.js
-  var require_octokit_commit_multiple_files = __commonJS({
-    "node_modules/octokit-commit-multiple-files/index.js"(exports, module) {
-      var plugin = require_create_or_update_files();
-      module.exports = function(octokit) {
-        return {
-          createOrUpdateFiles: plugin.bind(null, octokit)
-        };
-      };
-    }
-  });
-
-  // lib/octokit-plugin.js
-  var import_octokit_commit_multiple_files, Octokit3;
-  var init_octokit_plugin = __esm({
-    "lib/octokit-plugin.js"() {
-      init_dist_web12();
-      import_octokit_commit_multiple_files = __toESM(require_octokit_commit_multiple_files());
-      Octokit3 = Octokit2.plugin(import_octokit_commit_multiple_files.default);
+  // package.json
+  var version;
+  var init_package = __esm({
+    "package.json"() {
+      version = "0.1.7";
     }
   });
 
@@ -40800,8 +37741,9 @@ if (cid) {
       init_is_promise();
       init_coldsky_agent();
       init_firehose();
-      init_octokit_plugin();
+      init_package();
       var all = {
+        version,
         likelyDID,
         shortenDID,
         shortenHandle,
@@ -40820,16 +37762,13 @@ if (cid) {
             for (const key in all) {
               module.exports[key] = all[key];
             }
-            module.exports["Octokit"] = Octokit3;
           }
           return;
         }
         if (typeof window !== "undefined" && window) {
           window["coldsky"] = all;
-          window["Octokit"] = Octokit3;
         } else if (typeof global !== "undefined" && global) {
           global["coldsky"] = all;
-          global["Octokit"] = Octokit3;
         }
       }
     }
