@@ -37730,7 +37730,295 @@ if (cid) {
   var version;
   var init_package = __esm({
     "package.json"() {
-      version = "0.1.7";
+      version = "0.1.8";
+    }
+  });
+
+  // lib/firehose-short-dids.js
+  function firehoseShortDIDs(filterShortDIDs) {
+    return __asyncGenerator(this, null, function* () {
+      var _a2;
+      let shortDIDs = {};
+      let addedAny = false;
+      let lastHealth = Date.now();
+      let errorCount = 0;
+      while (true) {
+        try {
+          try {
+            for (var iter = __forAwait(firehose()), more, temp, error; more = !(temp = yield new __await(iter.next())).done; more = false) {
+              const block = temp.value;
+              lastHealth = Date.now();
+              if (!(block == null ? void 0 : block.length))
+                continue;
+              for (const entry of block) {
+                if (!((_a2 = entry.messages) == null ? void 0 : _a2.length))
+                  continue;
+                for (const msg of entry.messages) {
+                  collectShortDIDs(msg);
+                }
+              }
+              if (addedAny) {
+                const report = shortDIDs;
+                shortDIDs = {};
+                addedAny = false;
+                yield report;
+              }
+            }
+          } catch (temp) {
+            error = [temp];
+          } finally {
+            try {
+              more && (temp = iter.return) && (yield new __await(temp.call(iter)));
+            } finally {
+              if (error)
+                throw error[0];
+            }
+          }
+        } catch (error2) {
+          errorCount++;
+          const now = Date.now();
+          let waitFor = Math.min(
+            3e4,
+            Math.max(300, (now - lastHealth) / 3)
+          ) * (0.7 + Math.random() * 0.6);
+          console.error("firehose error " + errorCount + ", retry in " + waitFor + "ms ", error2);
+          yield { error: (
+            /** @type {Error} */
+            error2
+          ), errorCount, waitUntil: now + waitFor };
+          return new Promise((resolve) => setTimeout(resolve, waitFor));
+        }
+      }
+      function collectShortDIDs(msg) {
+        var _a3, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n;
+        addShortDID(msg.repo);
+        switch (msg.$type) {
+          case "app.bsky.feed.like":
+            addShortDID((_b = breakFeedUri((_a3 = msg.subject) == null ? void 0 : _a3.uri)) == null ? void 0 : _b.shortDID);
+            return;
+          case "app.bsky.feed.post":
+            addShortDID((_e = breakFeedUri((_d = (_c = msg.reply) == null ? void 0 : _c.parent) == null ? void 0 : _d.uri)) == null ? void 0 : _e.shortDID);
+            addShortDID((_h = breakFeedUri((_g = (_f = msg.reply) == null ? void 0 : _f.root) == null ? void 0 : _g.uri)) == null ? void 0 : _h.shortDID);
+            if (((_i = msg.embed) == null ? void 0 : _i.$type) === "app.bsky.embed.record")
+              addShortDID((_l = breakFeedUri(
+                /** @type {*} */
+                (_k = (_j = msg.embed) == null ? void 0 : _j.record) == null ? void 0 : _k.uri
+              )) == null ? void 0 : _l.shortDID);
+            return;
+          case "app.bsky.feed.repost":
+            addShortDID((_n = breakFeedUri((_m = msg.subject) == null ? void 0 : _m.uri)) == null ? void 0 : _n.shortDID);
+            return;
+          case "app.bsky.feed.threadgate":
+            return;
+          case "app.bsky.graph.follow":
+            addShortDID(msg.subject);
+            return;
+          case "app.bsky.graph.block":
+            addShortDID(msg.subject);
+            return;
+          case "app.bsky.graph.list":
+            return;
+          case "app.bsky.graph.listitem":
+            addShortDID(msg.subject);
+            return;
+          case "app.bsky.actor.profile":
+            return;
+        }
+      }
+      function addShortDID(did, ratio) {
+        if (!did)
+          return;
+        const shortDID = shortenDID(did);
+        let increment = (typeof filterShortDIDs === "function" ? filterShortDIDs(did) : 1) * (ratio || 1);
+        if (!increment)
+          return;
+        shortDIDs[shortDID] = (shortDIDs[shortDID] || 0) + increment;
+        addedAny = true;
+      }
+    });
+  }
+  var init_firehose_short_dids = __esm({
+    "lib/firehose-short-dids.js"() {
+      init_firehose();
+      init_shorten();
+    }
+  });
+
+  // src/api/akpa.js
+  function streamBuffer(callback) {
+    return __asyncGenerator(this, null, function* () {
+      let finallyTrigger = () => {
+      };
+      let stop = false;
+      let buffer2;
+      let continueTrigger = () => {
+      };
+      let continuePromise = new Promise((resolve) => continueTrigger = resolve);
+      let yieldPassedTrigger = () => {
+      };
+      let yieldPassedPromise = new Promise((resolve) => yieldPassedTrigger = resolve);
+      let rejectError;
+      const args = {
+        yield: yieldFn,
+        reject,
+        complete,
+        isEnded: false,
+        finally: new Promise((resolve) => finallyTrigger = resolve)
+      };
+      callback(args);
+      try {
+        while (!stop) {
+          yield new __await(continuePromise);
+          if (rejectError)
+            throw rejectError.error;
+          if (stop)
+            return;
+          continuePromise = new Promise((resolve) => continueTrigger = resolve);
+          const yieldBuffer = buffer2;
+          buffer2 = void 0;
+          if (yieldBuffer) {
+            yield yieldBuffer;
+            const yieldCompleted = yieldPassedTrigger;
+            yieldPassedPromise = new Promise((resolve) => yieldPassedTrigger = resolve);
+            yieldCompleted();
+          }
+        }
+      } finally {
+        finallyTrigger();
+      }
+      function yieldFn(item, combine2) {
+        if (stop) {
+          console.error("Cannot yield after complete.");
+          return (
+            /** @type Promise<void> */
+            new Promise((resolve) => resolve())
+          );
+        }
+        if (rejectError) {
+          console.error("Cannot yield after reject.");
+          return (
+            /** @type Promise<void> */
+            new Promise((resolve) => resolve())
+          );
+        }
+        if (typeof combine2 === "function") {
+          buffer2 = combine2(buffer2, item);
+        } else {
+          if (!buffer2)
+            buffer2 = /** @type {TBuffer} */
+            [];
+          buffer2.push(item);
+        }
+        continueTrigger();
+        return yieldPassedPromise;
+      }
+      function reject(error) {
+        if (stop) {
+          console.error("Cannot reject after complete.");
+          return;
+        }
+        if (rejectError) {
+          console.error("Cannot reject after reject.");
+          return;
+        }
+        rejectError = { error };
+        args.isEnded = true;
+      }
+      function complete() {
+        stop = true;
+        args.isEnded = true;
+        continueTrigger();
+      }
+    });
+  }
+  var init_akpa = __esm({
+    "src/api/akpa.js"() {
+    }
+  });
+
+  // src/api/retry-fetch.js
+  var init_retry_fetch = __esm({
+    "src/api/retry-fetch.js"() {
+    }
+  });
+
+  // lib/plc-directory.js
+  function plcDirectory(since, overrides) {
+    return __asyncGenerator(this, null, function* () {
+      const useFetch = (overrides == null ? void 0 : overrides.fetch) || fetch;
+      return streamBuffer((stream) => __async(this, null, function* () {
+        const EXPORT_URL = "https://plc.directory/export";
+        let sinceTime;
+        if (since) {
+          if (typeof since === "string") {
+            since = new Date(since);
+          } else if (typeof since === "number") {
+            since = new Date(since);
+          }
+          if (Number.isFinite(since.getTime()))
+            sinceTime = since.toISOString();
+        }
+        const lastChunkLines = /* @__PURE__ */ new Set();
+        let lastWaitedForConsumptionAt = Date.now();
+        let collectedEntriesSinceLastWaitedForConsumption = 0;
+        while (true) {
+          const nextChunkRe = yield useFetch(
+            EXPORT_URL + (sinceTime ? "?since=" + sinceTime : "")
+          );
+          if (stream.isEnded)
+            return;
+          const nextChunkText = yield nextChunkRe.text();
+          const chunkLines = nextChunkText.split("\n");
+          let overlap = 0;
+          const nextChunkEnitres = [];
+          for (const line of chunkLines) {
+            if (lastChunkLines.has(line)) {
+              overlap++;
+              continue;
+            }
+            nextChunkEnitres.push(JSON.parse(line));
+          }
+          if (nextChunkEnitres.length) {
+            lastChunkLines.clear();
+            for (const line of chunkLines) {
+              lastChunkLines.add(line);
+            }
+            collectedEntriesSinceLastWaitedForConsumption += nextChunkEnitres.length;
+          }
+          const waitForConsumption = stream.yield({ entries: nextChunkEnitres });
+          if (stream.isEnded)
+            return;
+          const shouldWaitForConsumption = collectedEntriesSinceLastWaitedForConsumption > FETCH_AHEAD_COUNT_MAX || Date.now() - lastWaitedForConsumptionAt > FETCH_AHEAD_MSEC_MAX || !nextChunkEnitres.length;
+          if (shouldWaitForConsumption) {
+            yield waitForConsumption;
+            if (stream.isEnded)
+              return;
+          }
+          let nextSinceTime;
+          for (let i = 0; i < nextChunkEnitres.length; i++) {
+            const entry = nextChunkEnitres[nextChunkEnitres.length - i - 1];
+            if (entry.createdAt) {
+              const timestamp = new Date(entry.createdAt);
+              if (!nextSinceTime || timestamp.getTime()) {
+                nextSinceTime = timestamp;
+              } else if (nextSinceTime && timestamp.getTime() && timestamp.getTime() < nextSinceTime.getTime()) {
+                sinceTime = timestamp.toISOString();
+                break;
+              }
+            }
+          }
+        }
+      }));
+    });
+  }
+  var FETCH_AHEAD_MSEC_MAX, FETCH_AHEAD_COUNT_MAX;
+  var init_plc_directory = __esm({
+    "lib/plc-directory.js"() {
+      init_akpa();
+      init_retry_fetch();
+      init_shorten();
+      FETCH_AHEAD_MSEC_MAX = 1e4;
+      FETCH_AHEAD_COUNT_MAX = 1e4;
     }
   });
 
@@ -37742,6 +38030,8 @@ if (cid) {
       init_coldsky_agent();
       init_firehose();
       init_package();
+      init_firehose_short_dids();
+      init_plc_directory();
       var all = {
         version,
         likelyDID,
@@ -37753,7 +38043,9 @@ if (cid) {
         breakPostURL,
         isPromise,
         ColdskyAgent,
-        firehose
+        plcDirectory,
+        firehose,
+        firehoseShortDIDs
       };
       checkApplyGlobal();
       function checkApplyGlobal() {
