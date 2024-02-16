@@ -19,6 +19,8 @@ export async function pullPLCDirectoryCompact() {
     }
   }
 
+  let lastSave = Date.now();
+
   console.log('Pulling PLC directory...');
   let lastChunkEntry;
   for await (const chunk of plcDirectoryCompact(maxDate - 1000)) {
@@ -47,10 +49,12 @@ export async function pullPLCDirectoryCompact() {
       else dirEntry.push(historyEntry);
     }
 
-
-    console.log('saving...');
-    saveAllDirectoryFiles(directoryPath, wholeDirectory);
-    console.log('OK.\n\n');
+    if (Date.now() > lastSave + 40000) {
+      console.log('saving...');
+      saveAllDirectoryFiles(directoryPath, wholeDirectory);
+      console.log('OK.\n\n');
+      lastSave = Date.now();
+    }
   }
 }
 
