@@ -1,12 +1,10 @@
 (() => {
-  var __create = Object.create;
   var __defProp = Object.defineProperty;
   var __defProps = Object.defineProperties;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
   var __getOwnPropNames = Object.getOwnPropertyNames;
   var __getOwnPropSymbols = Object.getOwnPropertySymbols;
-  var __getProtoOf = Object.getPrototypeOf;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
   var __propIsEnum = Object.prototype.propertyIsEnumerable;
   var __knownSymbol = (name, symbol) => {
@@ -32,6 +30,16 @@
       return require.apply(this, arguments);
     throw Error('Dynamic require of "' + x + '" is not supported');
   });
+  var __esm = (fn, res) => function __init() {
+    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+  };
+  var __commonJS = (cb, mod) => function __require2() {
+    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  };
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
   var __copyProps = (to, from, except, desc) => {
     if (from && typeof from === "object" || typeof from === "function") {
       for (let key of __getOwnPropNames(from))
@@ -40,14 +48,11 @@
     }
     return to;
   };
-  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-    // If the importer is in node compatibility mode or this is not an ESM
-    // file that has been converted to a CommonJS file using a Babel-
-    // compatible transform (i.e. "__esModule" has not been set), then set
-    // "default" to the CommonJS "module.exports" for node compatibility.
-    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-    mod
-  ));
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+  var __publicField = (obj, key, value) => {
+    __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+    return value;
+  };
   var __async = (__this, __arguments, generator) => {
     return new Promise((resolve, reject) => {
       var fulfilled = (value) => {
@@ -86,10 +91,6 @@
     return generator = generator.apply(__this, __arguments), it[__knownSymbol("asyncIterator")] = () => it, method("next"), method("throw"), method("return"), it;
   };
   var __forAwait = (obj, it, method) => (it = obj[__knownSymbol("asyncIterator")]) ? it.call(obj) : (obj = obj[__knownSymbol("iterator")](), it = {}, method = (key, fn) => (fn = obj[key]) && (it[key] = (arg) => new Promise((yes, no, done) => (arg = fn.call(obj, arg), done = arg.done, Promise.resolve(arg.value).then((value) => yes({ value, done }), no)))), method("next"), method("return"), it);
-
-  // src/api/indexing/pull-plc-directory.js
-  var import_fs = __toESM(__require("fs"));
-  var import_path = __toESM(__require("path"));
 
   // src/api/akpa.js
   function streamBuffer(callback) {
@@ -178,6 +179,10 @@
       }
     });
   }
+  var init_akpa = __esm({
+    "src/api/akpa.js"() {
+    }
+  });
 
   // src/api/retry-fetch.js
   function retryFetch(req, init, ...rest) {
@@ -251,23 +256,25 @@
     );
   }
   function wrapCorsProxy(url) {
-    const dt = Date.now();
-    const wrappedURL = "https://corsproxy.com/?" + url + (url.indexOf("?") < 0 ? "?" : "&") + "t" + dt + "=" + (dt + 1);
+    const dt2 = Date.now();
+    const wrappedURL = "https://corsproxy.com/?" + url + (url.indexOf("?") < 0 ? "?" : "&") + "t" + dt2 + "=" + (dt2 + 1);
     return wrappedURL;
   }
+  var init_retry_fetch = __esm({
+    "src/api/retry-fetch.js"() {
+    }
+  });
 
   // lib/shorten.js
   function shortenDID(did) {
     return did && /** @type {T} */
     (did.replace(_shortenDID_Regex, "").toLowerCase() || void 0);
   }
-  var _shortenDID_Regex = /^did\:plc\:/;
   function shortenHandle(handle) {
     handle = cheapNormalizeHandle(handle);
     return handle && /** @type {T} */
     (handle.replace(_shortenHandle_Regex, "").toLowerCase() || void 0);
   }
-  var _shortenHandle_Regex = /\.bsky\.social$/;
   function cheapNormalizeHandle(handle) {
     handle = handle && handle.trim().toLowerCase();
     if (handle && handle.charCodeAt(0) === 64)
@@ -302,6 +309,8 @@
     return pdc.replace(/^https:\/\//, "").replace(/host\.bsky\.network$/, "");
   }
   function parseTimestampOffset(dtOffsetStr) {
+    if (!dtOffsetStr)
+      return void 0;
     let offset = 0;
     let lead = 0;
     const plusPos = dtOffsetStr.indexOf("+");
@@ -354,7 +363,6 @@
       return;
     return { shortDID: match[1], postID: match[2] };
   }
-  var _breakPostURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/post\/([a-z0-9]+)$/;
   function breakFeedUri(uri) {
     if (!uri)
       return;
@@ -363,11 +371,17 @@
       return;
     return { shortDID: match[2], postID: match[3] };
   }
-  var _breakFeedUri_Regex = /^at\:\/\/(did:plc:)?([a-z0-9]+)\/[a-z\.]+\/?(.*)?$/;
+  var _shortenDID_Regex, _shortenHandle_Regex, _breakPostURL_Regex, _breakFeedUri_Regex;
+  var init_shorten = __esm({
+    "lib/shorten.js"() {
+      _shortenDID_Regex = /^did\:plc\:/;
+      _shortenHandle_Regex = /\.bsky\.social$/;
+      _breakPostURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/post\/([a-z0-9]+)$/;
+      _breakFeedUri_Regex = /^at\:\/\/(did:plc:)?([a-z0-9]+)\/[a-z\.]+\/?(.*)?$/;
+    }
+  });
 
   // lib/plc-directory.js
-  var FETCH_AHEAD_MSEC_MAX = 1e4;
-  var FETCH_AHEAD_COUNT_MAX = 1e4;
   function plcDirectory(since, overrides) {
     const useFetch = (overrides == null ? void 0 : overrides.fetch) || fetch;
     return streamBuffer((stream) => __async(this, null, function* () {
@@ -481,225 +495,456 @@
       }
     });
   }
+  var FETCH_AHEAD_MSEC_MAX, FETCH_AHEAD_COUNT_MAX;
+  var init_plc_directory = __esm({
+    "lib/plc-directory.js"() {
+      init_akpa();
+      init_retry_fetch();
+      init_shorten();
+      FETCH_AHEAD_MSEC_MAX = 1e4;
+      FETCH_AHEAD_COUNT_MAX = 1e4;
+    }
+  });
 
-  // src/api/indexing/pull-plc-directory.js
-  var alertIfRecent = new Date(2023, 11, 1);
-  function pullPLCDirectoryCompact() {
-    return __async(this, null, function* () {
-      console.log("PLC directory CACHE");
-      const directoryPath = import_path.default.resolve(__dirname, "src/api/indexing/repos/directory");
-      console.log("Reading new directory files now...");
-      const wholeDirectory = readAllDirectoryFiles(directoryPath);
-      let maxDate = 0;
-      let maxContext;
-      for (const [shortDID, history] of Object.entries(wholeDirectory)) {
-        for (const entry of history) {
-          if (entry.timestamp > maxDate) {
-            if (entry.timestamp > alertIfRecent.getTime()) {
-              console.log(shortDID, history);
-              throw new Error("Incorrect timestamp! " + new Date(entry.timestamp));
-            }
-            maxDate = entry.timestamp;
-            maxContext = { [shortDID]: history };
-          }
-        }
+  // src/api/indexing/persistence.js
+  function parseRegistrationStore(file, jsonText) {
+    const bucketMap = JSON.parse(jsonText);
+    const store = createEmptyStore(file);
+    let carryTimestamp = 0;
+    for (const shortDID in bucketMap) {
+      if (shortDID === "next")
+        store.next = bucketMap.next;
+      const registrationHistory = bucketMap[shortDID];
+      for (const entry in registrationHistory) {
+        if (!carryTimestamp)
+          carryTimestamp = new Date(entry).getTime();
+        else
+          carryTimestamp += parseTimestampOffset(entry) || 0;
+        break;
       }
-      console.log("last: ", new Date(maxDate), " ", maxContext);
-      console.log("Saving in new format...");
-      yield saveAllDirectoryFiles(directoryPath, wholeDirectory);
-      let lastSave = Date.now();
-      console.log("Pulling PLC directory: ", new Date(maxDate), "...");
-      let lastChunkEntry;
-      try {
-        for (var iter = __forAwait(plcDirectoryCompact(maxDate - 1e3, { fetch: (req, opts) => retryFetch(req, __spreadProps(__spreadValues({}, opts), { nocorsproxy: true })) })), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
-          const chunk = temp.value;
-          if (!chunk.entries.length) {
-            console.log("No new entries, last ", lastChunkEntry || new Date(maxDate));
-            continue;
-          }
-          lastChunkEntry = chunk.entries[chunk.entries.length - 1];
-          console.log(
-            chunk.entries.length,
-            __spreadProps(__spreadValues({}, chunk.entries[0]), { timestamp: new Date(chunk.entries[0].timestamp).toISOString() }),
-            "...",
-            __spreadProps(__spreadValues({}, chunk.entries[chunk.entries.length - 1]), { timestamp: new Date(chunk.entries[chunk.entries.length - 1].timestamp).toISOString() })
-          );
-          for (const entry of chunk.entries) {
-            const historyEntry = {
-              timestamp: entry.timestamp,
-              shortHandle: !entry.shortHandle ? void 0 : entry.shortHandle.length > 20 ? entry.shortHandle.slice(0, 15) + ".." + entry.shortHandle.slice(-3) : entry.shortHandle,
-              shortPDC: entry.shortPDC
-            };
-            const dirEntry = wholeDirectory[entry.shortDID];
-            if (!dirEntry)
-              wholeDirectory[entry.shortDID] = [historyEntry];
-            else
-              dirEntry.push(historyEntry);
-          }
-          if (Date.now() > lastSave + 4e4) {
-            console.log("saving new format...");
-            yield saveAllDirectoryFiles(directoryPath, wholeDirectory);
-            console.log("OK.\n\n");
-            lastSave = Date.now();
-          }
-        }
-      } catch (temp) {
-        error = [temp];
-      } finally {
-        try {
-          more && (temp = iter.return) && (yield temp.call(iter));
-        } finally {
-          if (error)
-            throw error[0];
-        }
-      }
-    });
-  }
-  function saveAllDirectoryFiles(directoryPath, wholeDirectory) {
-    return __async(this, null, function* () {
-      const shortDIDsRaw = Object.keys(wholeDirectory);
-      const shortDIDsOrdered = shortDIDsRaw.slice().sort((shortDID1, shortDID2) => wholeDirectory[shortDID1][0].timestamp - wholeDirectory[shortDID2][0].timestamp);
-      let bucket = [];
-      for (const shortDID of shortDIDsOrdered) {
-        if (bucket.length >= 5e4) {
-          saveBucket(shortDID);
-          yield new Promise((resolve) => setTimeout(resolve, 10));
-        }
-        bucket.push(shortDID);
-      }
-      saveBucket();
-      function saveBucket(nextShortDID) {
-        const localPath = getTimestampFilePath(wholeDirectory[bucket[0]][0].timestamp);
-        const filePath = import_path.default.resolve(directoryPath, localPath);
-        process.stdout.write(" " + localPath);
-        const saveJSON = stringifyDIDs(bucket, wholeDirectory, nextShortDID);
-        if (!import_fs.default.existsSync(import_path.default.dirname(filePath)))
-          import_fs.default.mkdirSync(import_path.default.dirname(filePath), { recursive: true });
-        process.stdout.write(".");
-        const curTxt = !import_fs.default.existsSync(filePath) ? void 0 : import_fs.default.readFileSync(filePath, "utf-8");
-        if (curTxt !== saveJSON) {
-          process.stdout.write(".");
-          import_fs.default.writeFileSync(filePath, saveJSON);
-        }
-        process.stdout.write(".");
-        bucket = [];
-      }
-    });
-  }
-  function stringifyDIDs(shortDIDs, wholeDirectory, nextShortDID) {
-    let saveJSON = "{\n";
-    let carryTimestamp;
-    let commaBeforeNextEntry = false;
-    for (const shortDID of shortDIDs) {
-      if (commaBeforeNextEntry)
-        saveJSON += ",\n";
-      else
-        commaBeforeNextEntry = true;
-      saveJSON += JSON.stringify(shortDID) + ":{";
-      const history = wholeDirectory[shortDID];
-      let timestamp = carryTimestamp;
+      const registrationEntry = {
+        created: carryTimestamp,
+        updates: registrationHistory
+      };
+      updateRanges(carryTimestamp, store);
+      updateLatestCreation(carryTimestamp, store);
+      let carryHistoryOffset = 0;
       let firstHistoryEntry = true;
-      for (let iEntry = 0; iEntry < history.length; iEntry++) {
-        const entry = history[iEntry];
-        const prevEntry = !iEntry ? void 0 : history[iEntry - 1];
-        if (iEntry && // always include the first entry
-        (prevEntry == null ? void 0 : prevEntry.shortHandle) === entry.shortHandle && (prevEntry == null ? void 0 : prevEntry.shortPDC) === entry.shortPDC)
-          continue;
+      for (const dateOrTimestamp in registrationHistory) {
         if (firstHistoryEntry) {
           firstHistoryEntry = false;
-          carryTimestamp = entry.timestamp;
-        } else {
-          saveJSON += ",";
-        }
-        const timestampStr = timestamp ? timestampOffsetToString(entry.timestamp - timestamp) : new Date(entry.timestamp).toISOString();
-        timestamp = entry.timestamp;
-        saveJSON += JSON.stringify(timestampStr) + ":" + JSON.stringify({
-          h: entry.shortHandle === (prevEntry == null ? void 0 : prevEntry.shortHandle) ? void 0 : entry.shortHandle,
-          p: entry.shortPDC === (prevEntry == null ? void 0 : prevEntry.shortPDC) ? void 0 : entry.shortPDC
-        });
-      }
-      saveJSON += "}";
-    }
-    if (nextShortDID) {
-      const nextHistory = wholeDirectory[nextShortDID];
-      const nextFilePath = getTimestampFilePath(nextHistory[0].timestamp);
-      saveJSON += ",\n" + JSON.stringify("next") + ":" + JSON.stringify(".." + nextFilePath);
-    }
-    saveJSON += "\n}\n";
-    return saveJSON;
-  }
-  function getTimestampFilePath(timestamp) {
-    const dt = new Date(timestamp);
-    const path2 = dt.getUTCFullYear() + "/" + (dt.getUTCMonth() + 1) + "-" + dt.getUTCDate() + "-" + dt.getUTCHours() + (100 + dt.getMinutes()).toString().slice(1) + (100 + dt.getSeconds()).toString().slice(1) + ".json";
-    return path2;
-  }
-  function readAllDirectoryFiles(directoryPath) {
-    let localPath = import_path.default.relative(
-      directoryPath,
-      import_fs.default.readdirSync(import_path.default.join(directoryPath, "2022")).map((f) => import_path.default.resolve(directoryPath, "2022", f)).filter((f) => f.endsWith(".json"))[0]
-    );
-    const wholeDirectory = {};
-    let filesCount = 0;
-    let chCount = 0;
-    while (localPath) {
-      const directoryJSON = import_path.default.join(directoryPath, localPath.replace(/^\.\.\/?/, ""));
-      if (!import_fs.default.existsSync(directoryJSON))
-        break;
-      process.stdout.write(" " + localPath);
-      localPath = void 0;
-      const txt = import_fs.default.readFileSync(directoryJSON, "utf-8");
-      chCount += txt.length;
-      process.stdout.write("..");
-      const directoryObj = JSON.parse(txt);
-      process.stdout.write(".");
-      let carryTimestamp = 0;
-      for (const [shortDID, history] of Object.entries(directoryObj)) {
-        if (shortDID === "next") {
-          localPath = history;
-          if ((localPath == null ? void 0 : localPath.startsWith("..")) && !localPath.startsWith("../"))
-            localPath = "../" + localPath.slice(2);
           continue;
         }
-        const historyList = wholeDirectory[shortDID] = [];
-        let firstHistoryEntry = true;
-        let timestamp = carryTimestamp;
-        for (const [dateStr, compact] of Object.entries(history)) {
-          if (!carryTimestamp) {
-            timestamp = carryTimestamp = new Date(dateStr).getTime();
-            firstHistoryEntry = false;
-          } else if (firstHistoryEntry) {
-            firstHistoryEntry = false;
-            carryTimestamp += parseTimestampOffset(dateStr);
-            timestamp = carryTimestamp;
-          } else {
-            timestamp += parseTimestampOffset(dateStr);
+        carryHistoryOffset += parseTimestampOffset(dateOrTimestamp) || 0;
+        updateRanges(carryTimestamp + carryHistoryOffset, store);
+      }
+      store.set(shortDID, registrationEntry);
+    }
+    return store;
+  }
+  function deriveStoreFilenameFromTimestamp(prevTimestamp, timestamp) {
+    const dt2 = new Date(timestamp);
+    const dtPrev = prevTimestamp ? new Date(prevTimestamp) : void 0;
+    let filename = dt2.getUTCFullYear() + "-" + (101 + dt2.getUTCMonth()).toString().slice(1) + "/" + dt2.getUTCDate();
+    if (dt2.getUTCFullYear() === (dtPrev == null ? void 0 : dtPrev.getUTCFullYear()) && dt2.getUTCMonth() === (dtPrev == null ? void 0 : dtPrev.getUTCMonth()) && dt2.getUTCDate() === (dtPrev == null ? void 0 : dtPrev.getUTCDate())) {
+      filename += "-" + dt2.getUTCHours().toString().slice(1) + (101 + dt2.getUTCMinutes()).toString().slice(1);
+      if (dt2.getUTCHours() === dtPrev.getUTCHours() && dt2.getUTCMinutes() === dtPrev.getUTCMinutes()) {
+        filename += "-" + (101 + dt2.getUTCSeconds()).toString().slice(1);
+        if (dt2.getUTCSeconds() === dtPrev.getUTCSeconds()) {
+          filename += "_" + (1001 + dt2.getUTCMilliseconds()).toString().slice(1);
+          if (dt2.getUTCMilliseconds() === dtPrev.getUTCMilliseconds()) {
+            filename += "-" + Math.random().toString(36).slice(2, 4);
           }
-          if (timestamp > alertIfRecent.getTime()) {
-            console.log(shortDID, history);
-            throw new Error("Incorrect timestamp! " + new Date(timestamp));
-          }
-          historyList.push({
-            timestamp,
-            shortHandle: compact.h,
-            shortPDC: compact.p
-          });
         }
       }
-      filesCount++;
     }
-    console.log(" " + filesCount + " files " + chCount + " characters");
-    return wholeDirectory;
+    return filename;
   }
+  function createEmptyStore(file) {
+    const store = (
+      /** @type {RegistrationStore} */
+      new MapExtended()
+    );
+    store.file = file;
+    return store;
+  }
+  function updateRanges(timestamp, store) {
+    if (!timestamp)
+      return;
+    if (!store.earliestRegistration || timestamp < store.earliestRegistration)
+      store.earliestRegistration = timestamp;
+    if (!store.latestAction || timestamp > store.latestAction)
+      store.latestAction = timestamp;
+  }
+  function updateLatestCreation(createdTimestamp, store) {
+    if (!createdTimestamp)
+      return;
+    if (!store.latestRegistration || createdTimestamp > store.latestRegistration)
+      store.latestRegistration = createdTimestamp;
+  }
+  var MapExtended;
+  var init_persistence = __esm({
+    "src/api/indexing/persistence.js"() {
+      init_shorten();
+      MapExtended = class extends Map {
+        constructor() {
+          super(...arguments);
+          __publicField(this, "file", "");
+          __publicField(this, "next");
+          __publicField(this, "earliestRegistration");
+          __publicField(this, "latestRegistration");
+          __publicField(this, "latestAction");
+        }
+      };
+    }
+  });
 
-  // src/index.js
-  function pullPLCDirectoryLocal() {
-    return __async(this, null, function* () {
-      console.log("Pulling PLC directory...");
+  // src/api/indexing/indexing-run.js
+  var indexing_run_exports = {};
+  __export(indexing_run_exports, {
+    indexingRun: () => indexingRun
+  });
+  function indexingRun(_0) {
+    return __asyncGenerator(this, arguments, function* ({ read, fetch: useFetch }) {
+      let stores = [];
+      const storeByShortDID = /* @__PURE__ */ new Map();
+      let maxDate = (/* @__PURE__ */ new Date("2022-11-01")).getTime();
       try {
-        for (var iter = __forAwait(plcDirectoryCompact()), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
+        for (var iter = __forAwait(loadAllStores({ read })), more, temp, error; more = !(temp = yield new __await(iter.next())).done; more = false) {
+          const progress = temp.value;
+          stores = progress.stores;
+          if (progress.latestAction)
+            maxDate = progress.latestAction;
+          for (const store of stores) {
+            for (const shortDID of store.keys()) {
+              storeByShortDID.set(shortDID, store);
+            }
+          }
+          yield progress;
+        }
+      } catch (temp) {
+        error = [temp];
+      } finally {
+        try {
+          more && (temp = iter.return) && (yield new __await(temp.call(iter)));
+        } finally {
+          if (error)
+            throw error[0];
+        }
+      }
+      if (!useFetch)
+        useFetch = (req, opts) => retryFetch(req, __spreadProps(__spreadValues({}, opts), { nocorsproxy: true }));
+      try {
+        for (var iter2 = __forAwait(pullDirectory({ stores, storeByShortDID, startDate: maxDate, fetch: useFetch })), more2, temp2, error2; more2 = !(temp2 = yield new __await(iter2.next())).done; more2 = false) {
+          const progress = temp2.value;
+          stores = progress.stores;
+          yield progress;
+        }
+      } catch (temp2) {
+        error2 = [temp2];
+      } finally {
+        try {
+          more2 && (temp2 = iter2.return) && (yield new __await(temp2.call(iter2)));
+        } finally {
+          if (error2)
+            throw error2[0];
+        }
+      }
+    });
+  }
+  function pullDirectory(_0) {
+    return __asyncGenerator(this, arguments, function* ({ stores, storeByShortDID, startDate, fetch: fetch2 }) {
+      try {
+        for (var iter = __forAwait(plcDirectoryCompact(startDate, { fetch: fetch2 })), more, temp, error; more = !(temp = yield new __await(iter.next())).done; more = false) {
           const chunk = temp.value;
-          console.log(chunk.entries.length, chunk.entries[0], "...", chunk.entries[chunk.entries.length - 1]);
+          const affectedShortDIDs = /* @__PURE__ */ new Set();
+          const affectedStores = /* @__PURE__ */ new Set();
+          let earliestRegistration;
+          let latestRegistration;
+          let latestAction;
+          let addedShortDIDs = [];
+          for (const entry of chunk.entries) {
+            affectedShortDIDs.add(entry.shortDID);
+            const historyChange = {
+              h: clampShortHandle(entry.shortHandle),
+              p: entry.shortPDC
+            };
+            const existingStore = storeByShortDID.get(entry.shortDID);
+            if (existingStore) {
+              affectedStores.add(existingStore);
+              const existingHistory = (
+                /** @type {RegistrationHistory} */
+                existingStore.get(entry.shortDID)
+              );
+              addHistoryToExistingShortDID(existingHistory, historyChange, entry);
+              if (!latestAction || entry.timestamp > latestAction)
+                latestAction = entry.timestamp;
+            } else {
+              const history = {
+                created: entry.timestamp,
+                updates: {
+                  [new Date(entry.timestamp).toISOString()]: historyChange
+                }
+              };
+              addedShortDIDs.push(entry.shortDID);
+              if (!earliestRegistration || entry.timestamp < earliestRegistration)
+                earliestRegistration = entry.timestamp;
+              if (!latestRegistration || entry.timestamp > latestRegistration)
+                latestRegistration = entry.timestamp;
+              if (!latestAction || entry.timestamp > latestAction)
+                latestAction = entry.timestamp;
+              const { store, insertStoreAt } = findStoreToAddTimestamp(stores, entry.timestamp);
+              if (store) {
+                affectedStores.add(store);
+                if (!store.latestRegistration || entry.timestamp >= store.latestRegistration) {
+                  addNewShortDIDToExistingStoreEnd(store, history, entry);
+                } else {
+                  addNewShortDIDToExistingStoreMiddle(store, history, entry);
+                }
+              } else {
+                const { newStore, prevStore } = createNewStoreAddShortDID(stores, insertStoreAt, history, entry);
+                storeByShortDID.set(entry.shortDID, newStore);
+                stores.push(newStore);
+                affectedStores.add(newStore);
+                if (prevStore)
+                  affectedStores.add(prevStore);
+              }
+            }
+          }
+          yield {
+            stores,
+            loadedAllStores: true,
+            addedShortDIDs,
+            affectedShortDIDs: Array.from(affectedShortDIDs),
+            affectedStores: Array.from(affectedStores),
+            earliestRegistration,
+            latestRegistration,
+            latestAction
+          };
+        }
+      } catch (temp) {
+        error = [temp];
+      } finally {
+        try {
+          more && (temp = iter.return) && (yield new __await(temp.call(iter)));
+        } finally {
+          if (error)
+            throw error[0];
+        }
+      }
+    });
+  }
+  function addHistoryToExistingShortDID(history, historyChange, entry) {
+    let firstHistoryEntry = true;
+    let carryTimestamp = history.created;
+    for (const dateOrTimestamp in history.updates) {
+      let carryTimestampNext = firstHistoryEntry ? carryTimestamp : carryTimestamp = parseTimestampOffset(dateOrTimestamp) || 0;
+      if (firstHistoryEntry)
+        firstHistoryEntry = false;
+      if (carryTimestamp > entry.timestamp) {
+        console.warn(
+          "Past history update? ",
+          {
+            entry,
+            history,
+            carryTimestamp: new Date(carryTimestamp),
+            carryTimestampNext: new Date(carryTimestampNext)
+          }
+        );
+        const newUpdates = {};
+        for (const prevDateOrTimestamp in history.updates) {
+          if (prevDateOrTimestamp === dateOrTimestamp)
+            newUpdates[timestampOffsetToString(entry.timestamp)] = historyChange;
+          newUpdates[prevDateOrTimestamp] = history.updates[prevDateOrTimestamp];
+        }
+        return;
+      }
+      carryTimestamp = carryTimestampNext;
+    }
+    history.updates[timestampOffsetToString(entry.timestamp)] = historyChange;
+  }
+  function addNewShortDIDToExistingStoreEnd(store, history, entry) {
+    store.set(entry.shortDID, history);
+    if (!store.earliestRegistration)
+      store.earliestRegistration = entry.timestamp;
+    store.latestRegistration = entry.timestamp;
+    if (!store.latestAction || entry.timestamp > store.latestAction)
+      store.latestAction = entry.timestamp;
+  }
+  function addNewShortDIDToExistingStoreMiddle(store, history, entry) {
+    const entries = Array.from(store.entries());
+    store.clear();
+    for (const [existingShortDID, existingHistory] of entries) {
+      if (entry.timestamp >= existingHistory.created)
+        store.set(entry.shortDID, history);
+      store.set(existingShortDID, existingHistory);
+    }
+    if (!store.has(entry.shortDID)) {
+      console.warn(
+        "This shortDID should not appear at the end according to latestCreation " + new Date(
+          /** @type {number} */
+          store.latestRegistration
+        ) + " being after" + new Date(history.created),
+        { entry, store }
+      );
+      store.set(entry.shortDID, history);
+    }
+    if (!store.latestAction || entry.timestamp > store.latestAction)
+      store.latestAction = entry.timestamp;
+  }
+  function createNewStoreAddShortDID(stores, insertStoreAt, history, entry) {
+    var _a;
+    const prevStore = stores[insertStoreAt - 1];
+    const file = deriveStoreFilenameFromTimestamp(
+      (_a = prevStore == null ? void 0 : prevStore.values().next().value) == null ? void 0 : _a.created,
+      entry.timestamp
+    );
+    const newStore = createEmptyStore(file);
+    newStore.next = prevStore == null ? void 0 : prevStore.next;
+    if (prevStore)
+      prevStore.next = file;
+    newStore.latestAction = newStore.latestRegistration = newStore.earliestRegistration = entry.timestamp;
+    newStore.set(entry.shortDID, history);
+    return { newStore, prevStore };
+  }
+  function findStoreToAddTimestamp(stores, timestamp) {
+    if (!(stores == null ? void 0 : stores.length))
+      return { insertStoreAt: 0 };
+    const latestStore = stores[stores.length - 1];
+    if (!latestStore.earliestRegistration || timestamp >= latestStore.earliestRegistration || stores.length === 1) {
+      if (latestStore.size < MAX_STORE_SIZE)
+        return { store: latestStore };
+      else
+        return { insertStoreAt: stores.length };
+    }
+    const monthStartTimestamp = getMonthStart(timestamp);
+    for (let storeIndex = stores.length - 1; storeIndex > 0; storeIndex--) {
+      const tryStore = stores[storeIndex];
+      if (timestamp < (tryStore.earliestRegistration || 0))
+        continue;
+      if (timestamp < (tryStore.latestAction || 0))
+        return { store: tryStore };
+      const nextStore = stores[storeIndex + 1];
+      const monthStartNext = getMonthStart(nextStore.earliestRegistration || 0);
+      if (monthStartTimestamp === monthStartNext) {
+        if (nextStore.size < MAX_STORE_SIZE * 1.2)
+          return { store: nextStore };
+        else
+          return { insertStoreAt: storeIndex + 1 };
+      } else {
+        return { insertStoreAt: storeIndex + 1 };
+      }
+    }
+    return { insertStoreAt: 0 };
+  }
+  function getMonthStart(timestamp) {
+    dt.setTime(timestamp);
+    dt.setUTCDate(1);
+    dt.setUTCHours(0);
+    dt.setUTCMinutes(0);
+    dt.setUTCSeconds(0);
+    dt.setUTCMilliseconds(0);
+    return dt.getTime();
+  }
+  function clampShortHandle(shortHandle) {
+    let clampShortHandle2 = shortHandle;
+    if (clampShortHandle2 && clampShortHandle2.length > 30)
+      clampShortHandle2 = clampShortHandle2.slice(0, 25) + "..." + clampShortHandle2.slice(-2);
+    return clampShortHandle2;
+  }
+  function loadAllStores(_0) {
+    return __asyncGenerator(this, arguments, function* ({ read }) {
+      const inceptionText = yield new __await(read("inception.json"));
+      let next = inceptionText ? JSON.parse(inceptionText).next : void 0;
+      if (!next)
+        return yield { stores: [], loadedAllStores: true };
+      const stores = [];
+      let earliestRegistration;
+      let latestRegistration;
+      let latestAction;
+      while (next) {
+        const storeText = yield new __await(read(next));
+        if (!storeText)
           break;
+        const store = parseRegistrationStore(next, storeText);
+        const affectedShortDIDs = Array.from(store.keys());
+        if (!earliestRegistration || store.earliestRegistration && store.earliestRegistration < earliestRegistration)
+          earliestRegistration = store.earliestRegistration;
+        if (!latestRegistration || store.latestRegistration && store.latestRegistration > latestRegistration)
+          latestRegistration = store.latestRegistration;
+        if (!latestAction || store.latestAction && store.latestAction > latestAction)
+          latestAction = store.latestAction;
+        stores.push(store);
+        if (!store.next) {
+          yield {
+            loadedAllStores: true,
+            stores,
+            // last yield, return raw underlying array
+            earliestRegistration,
+            latestRegistration,
+            latestAction,
+            affectedStores: [store],
+            affectedShortDIDs,
+            addedShortDIDs: affectedShortDIDs
+          };
+          return;
+        }
+        next = store.next;
+        yield {
+          loadedAllStores: false,
+          stores: stores.slice(),
+          earliestRegistration,
+          latestRegistration,
+          latestAction,
+          affectedStores: [store],
+          affectedShortDIDs
+        };
+      }
+      yield {
+        loadedAllStores: true,
+        stores,
+        // last yield, return raw underlying array
+        earliestRegistration,
+        latestRegistration,
+        latestAction
+        // no affectedStores or affectedShortDIDs - last read was empty
+      };
+    });
+  }
+  var MAX_STORE_SIZE, dt;
+  var init_indexing_run = __esm({
+    "src/api/indexing/indexing-run.js"() {
+      init_plc_directory();
+      init_shorten();
+      init_retry_fetch();
+      init_persistence();
+      MAX_STORE_SIZE = 5e4;
+      dt = /* @__PURE__ */ new Date();
+    }
+  });
+
+  // src/api/indexing/pull-plc-directory.js
+  function pullPLCDirectoryCompact() {
+    return __async(this, null, function* () {
+      const fs = __require("fs");
+      const path = __require("path");
+      const { indexingRun: indexingRun2 } = (init_indexing_run(), __toCommonJS(indexing_run_exports));
+      console.log("PLC directory CACHE");
+      const directoryPath = path.resolve(__dirname, "src/api/indexing/repos/directory");
+      const run = indexingRun2({
+        read: (localPath) => new Promise((resolve, reject) => {
+          const filePath = path.resolve(directoryPath, localPath.replace(/^\//, ""));
+          fs.readFile(filePath, "utf8", (err, data) => {
+            if (err)
+              reject(err);
+            else
+              resolve(data);
+          });
+        })
+      });
+      try {
+        for (var iter = __forAwait(run), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
+          const progress = temp.value;
         }
       } catch (temp) {
         error = [temp];
@@ -713,10 +958,70 @@
       }
     });
   }
-  if (typeof __require === "function" && typeof process !== "undefined" && typeof process.exit === "function") {
-    pullPLCDirectoryCompact();
-  } else {
-    pullPLCDirectoryLocal();
-  }
+  var alertIfRecent;
+  var init_pull_plc_directory = __esm({
+    "src/api/indexing/pull-plc-directory.js"() {
+      alertIfRecent = new Date(2023, 11, 1);
+    }
+  });
+
+  // src/api/indexing/index.js
+  var init_indexing = __esm({
+    "src/api/indexing/index.js"() {
+      init_indexing_run();
+    }
+  });
+
+  // src/index.js
+  var require_src = __commonJS({
+    "src/index.js"(exports, module) {
+      init_pull_plc_directory();
+      init_indexing();
+      function pullPLCDirectoryLocal() {
+        return __async(this, null, function* () {
+          console.log("Pulling PLC directory...");
+          const run = indexingRun({
+            read: (localPath) => __async(this, null, function* () {
+              try {
+                const re = yield fetch(
+                  location.protocol + "//history.dids.colds.ky/" + localPath.replace(/^\//, "")
+                );
+                if (re.status !== 200)
+                  return;
+                const text = yield re.text();
+                return text;
+              } catch (fetchError) {
+                console.warn(localPath, fetchError);
+              }
+            })
+          });
+          try {
+            for (var iter = __forAwait(run), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
+              const progress = temp.value;
+              console.log(progress);
+            }
+          } catch (temp) {
+            error = [temp];
+          } finally {
+            try {
+              more && (temp = iter.return) && (yield temp.call(iter));
+            } finally {
+              if (error)
+                throw error[0];
+            }
+          }
+        });
+      }
+      if (typeof __require === "function" && typeof process !== "undefined" && typeof process.exit === "function") {
+        if (__require.main === module)
+          pullPLCDirectoryCompact();
+        else
+          module.exports = { indexingRun };
+      } else {
+        pullPLCDirectoryLocal();
+      }
+    }
+  });
+  require_src();
 })();
 //# sourceMappingURL=index.js.map

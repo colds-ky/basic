@@ -12,7 +12,7 @@ const baseOptions = {
   target: 'es6',
   loader: { '.js': 'jsx' },
   format: 'iife',
-  logLevel: 'info',
+  //logLevel: 'info',
   external: [
     'fs', 'path', 'os',
     'crypto', 'tty', 'tls',
@@ -31,9 +31,23 @@ const baseOptions = {
   //outfile: 'libs.js'
 };
 
-async function buildLib(mode) {
+let lastPrinted = 0;
+function printBanner(text) {
+  const dt = new Date();
+  let bannerText =
+    dt.getHours() + ':' + (100 + dt.getMinutes()).toString().slice(1) + ':' + (100 + dt.getSeconds()).toString().slice(1) + ' ' +
+    text + ' ';
+  while (bannerText.length < 30)
+    bannerText += '=';
 
-  let debounceWrite;
+  if (Date.now() - lastPrinted > 3000) bannerText = '\n' + bannerText;
+  if (Date.now() - lastPrinted > 10000) bannerText = '\n' + bannerText;
+
+  console.log(bannerText);
+  lastPrinted = dt.getTime();
+}
+
+async function buildLib(mode) {
 
   const options = {
     ...baseOptions,
@@ -41,20 +55,24 @@ async function buildLib(mode) {
     plugins: [
       {
         name: 'post-export',
+        /** @param {esbuild.PluginBuild} build */
         setup(build) {
+          build.onStart(() => {
+            printBanner('LIBS.JS');
+          }),
           build.onEnd(result => {
-            clearTimeout(debounceWrite);
-            debounceWrite = setTimeout(() => {
-              const libsGenerated = fs.readFileSync(path.join(__dirname, 'libs.js'), 'utf8');
+            const libsJSEntry = result.outputFiles?.find(file => file.path.endsWith('libs.js'));
+            if (libsJSEntry) {
+              const libsGenerated = libsJSEntry.text;
               const libsTransformed = libsGenerated.replace(
                 /(\n\s*)require_lib\(\);(\s*\n)/g,
                 `$1var req=require_lib();$1` +
                 `if (typeof module!=='undefined' && module && module.exports) module.exports=req;$2`);
 
               if (libsTransformed !== libsGenerated) {
-                fs.writeFileSync(path.join(__dirname, 'libs.js'), libsTransformed, 'utf8');
+                libsJSEntry.contents = Buffer.from(libsTransformed, 'utf8');
               }
-            }, 10);
+            }
           });
         }
       }
@@ -76,7 +94,17 @@ async function buildSite(mode) {
   const options = {
     ...baseOptions,
     entryPoints: ['src/index.js'],
-    outfile: 'index.js'
+    outfile: 'index.js',
+    plugins: [
+      {
+        name: 'post-export',
+        /** @param {esbuild.PluginBuild} build */
+        setup(build) {
+          build.onStart(result => {
+            printBanner('SITE');
+          });
+        }
+      }]
   };
 
   if (mode === 'serve') {
@@ -85,7 +113,8 @@ async function buildSite(mode) {
       servedir: __dirname,
       fallback: 'index.html'
     });
-    console.log('SERVE http://' + (server.host === '0.0.0.0' ? 'localhost' : server.host) + ':' + server.port + '/');
+    await ctx.watch();
+    console.log('SERVING SITE http://' + (server.host === '0.0.0.0' ? 'localhost' : server.host) + ':' + server.port + '/');
   } else if (mode === 'watch') {
     const ctx = await esbuild.context(options);
     await ctx.watch();
