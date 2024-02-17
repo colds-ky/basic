@@ -179,6 +179,83 @@
     });
   }
 
+  // src/api/retry-fetch.js
+  function retryFetch(req, init, ...rest) {
+    return __async(this, null, function* () {
+      let corsproxyMightBeNeeded = ((init == null ? void 0 : init.method) || "").toUpperCase() === "get";
+      if (req.nocorsproxy || (init == null ? void 0 : init.nocorsproxy))
+        corsproxyMightBeNeeded = false;
+      const started = Date.now();
+      let tryCount = 0;
+      while (true) {
+        try {
+          const useCors = tryCount && corsproxyMightBeNeeded && Math.random() > 0.5;
+          const re = useCors ? yield fetchWithCors(req, init) : yield fetch(req, init, ...rest);
+          if (re.status >= 200 && re.status < 400 || re.status === 404) {
+            if (!useCors)
+              corsproxyMightBeNeeded = false;
+            return re;
+          }
+          retry(new Error("HTTP" + re.status + " " + re.statusText));
+        } catch (e) {
+          yield retry(e);
+        }
+      }
+      function retry(error) {
+        tryCount++;
+        let onretry = req.onretry || (init == null ? void 0 : init.onretry);
+        const now = Date.now();
+        let waitFor = Math.min(
+          3e4,
+          Math.max(300, (now - started) / 3)
+        ) * (0.7 + Math.random() * 0.6);
+        if (typeof onretry === "function") {
+          const args = { error, started, tryCount, waitUntil: now + waitFor };
+          onretry(args);
+          if (args.waitUntil >= now)
+            waitFor = args.waitUntil - now;
+        }
+        console.warn(
+          tryCount + " error" + (tryCount > 1 ? "s" : "") + ", retry in ",
+          waitFor,
+          "ms ",
+          req,
+          error
+        );
+        return new Promise((resolve) => setTimeout(resolve, waitFor));
+      }
+    });
+  }
+  function fetchWithCors(req, init, ...rest) {
+    if (typeof req === "string") {
+      req = wrapCorsProxy(req);
+    } else if (req instanceof Request) {
+      req = new Request(wrapCorsProxy(req.url), req);
+    } else if (req instanceof URL) {
+      req = new URL(wrapCorsProxy(req.href));
+    } else {
+      req = __spreadProps(__spreadValues(
+        {},
+        /** @type {*} */
+        req
+      ), {
+        url: wrapCorsProxy(
+          /** @type {*} */
+          req.url
+        )
+      });
+    }
+    return (
+      /** @type {*} */
+      fetch(req, init, ...rest)
+    );
+  }
+  function wrapCorsProxy(url) {
+    const dt = Date.now();
+    const wrappedURL = "https://corsproxy.com/?" + url + (url.indexOf("?") < 0 ? "?" : "&") + "t" + dt + "=" + (dt + 1);
+    return wrappedURL;
+  }
+
   // lib/shorten.js
   function shortenDID(did) {
     return did && /** @type {T} */
@@ -265,6 +342,8 @@
         }
       }
     }
+    if (str.lastIndexOf("0", 0) === 0)
+      str = str.slice(1);
     return str;
   }
   function breakPostURL(url) {
@@ -404,24 +483,35 @@
   }
 
   // src/api/indexing/pull-plc-directory.js
+  var alertIfRecent = new Date(2023, 11, 1);
   function pullPLCDirectoryCompact() {
     return __async(this, null, function* () {
       console.log("PLC directory CACHE");
       const directoryPath = import_path.default.resolve(__dirname, "src/api/indexing/repos/directory");
-      console.log("Reading directory files...");
+      console.log("Reading new directory files now...");
       const wholeDirectory = readAllDirectoryFiles(directoryPath);
       let maxDate = 0;
-      for (const history of Object.values(wholeDirectory)) {
+      let maxContext;
+      for (const [shortDID, history] of Object.entries(wholeDirectory)) {
         for (const entry of history) {
-          if (entry.timestamp > maxDate)
+          if (entry.timestamp > maxDate) {
+            if (entry.timestamp > alertIfRecent.getTime()) {
+              console.log(shortDID, history);
+              throw new Error("Incorrect timestamp! " + new Date(entry.timestamp));
+            }
             maxDate = entry.timestamp;
+            maxContext = { [shortDID]: history };
+          }
         }
       }
+      console.log("last: ", new Date(maxDate), " ", maxContext);
+      console.log("Saving in new format...");
+      yield saveAllDirectoryFiles(directoryPath, wholeDirectory);
       let lastSave = Date.now();
-      console.log("Pulling PLC directory...");
+      console.log("Pulling PLC directory: ", new Date(maxDate), "...");
       let lastChunkEntry;
       try {
-        for (var iter = __forAwait(plcDirectoryCompact(maxDate - 1e3)), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
+        for (var iter = __forAwait(plcDirectoryCompact(maxDate - 1e3, { fetch: (req, opts) => retryFetch(req, __spreadProps(__spreadValues({}, opts), { nocorsproxy: true })) })), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
           const chunk = temp.value;
           if (!chunk.entries.length) {
             console.log("No new entries, last ", lastChunkEntry || new Date(maxDate));
@@ -437,7 +527,7 @@
           for (const entry of chunk.entries) {
             const historyEntry = {
               timestamp: entry.timestamp,
-              shortHandle: entry.shortHandle,
+              shortHandle: !entry.shortHandle ? void 0 : entry.shortHandle.length > 20 ? entry.shortHandle.slice(0, 15) + ".." + entry.shortHandle.slice(-3) : entry.shortHandle,
               shortPDC: entry.shortPDC
             };
             const dirEntry = wholeDirectory[entry.shortDID];
@@ -447,8 +537,8 @@
               dirEntry.push(historyEntry);
           }
           if (Date.now() > lastSave + 4e4) {
-            console.log("saving...");
-            saveAllDirectoryFiles(directoryPath, wholeDirectory);
+            console.log("saving new format...");
+            yield saveAllDirectoryFiles(directoryPath, wholeDirectory);
             console.log("OK.\n\n");
             lastSave = Date.now();
           }
@@ -466,86 +556,137 @@
     });
   }
   function saveAllDirectoryFiles(directoryPath, wholeDirectory) {
-    const byMonth = {};
-    for (const [did, history] of Object.entries(wholeDirectory)) {
-      const dt = new Date(history[0].timestamp);
-      const yearMonth = dt.getUTCFullYear() + "/" + (dt.getUTCMonth() + 1);
-      const monthMap = byMonth[yearMonth] || (byMonth[yearMonth] = {});
-      monthMap[did] = history;
-    }
-    for (const [yearMonth, monthMap] of Object.entries(byMonth)) {
-      const directoryJSON = import_path.default.join(directoryPath, yearMonth + ".json");
-      if (!import_fs.default.existsSync(import_path.default.dirname(directoryJSON)))
-        import_fs.default.mkdirSync(import_path.default.dirname(directoryJSON), { recursive: true });
-      let saveJSON = "{\n";
-      let carryTimestamp = Date.UTC(parseInt(yearMonth.split("/")[0]), parseInt(yearMonth.split("/")[1]) - 1, 1, 0, 0, 0, 0);
-      let firstShortDID = true;
-      const orderDIDs = Object.keys(monthMap).sort((shortDID1, shortDID2) => monthMap[shortDID1][0].timestamp - monthMap[shortDID2][0].timestamp);
-      for (const shortDID of orderDIDs) {
-        if (firstShortDID)
-          firstShortDID = false;
-        else
-          saveJSON += ",\n";
-        saveJSON += JSON.stringify(shortDID) + ":{";
-        const history = monthMap[shortDID];
-        let timestamp = carryTimestamp;
-        let first = true;
-        for (const entry of history) {
-          if (first) {
-            first = false;
-            carryTimestamp = entry.timestamp;
-          } else {
-            saveJSON += ",";
-          }
-          const dtOffset = timestampOffsetToString(entry.timestamp - timestamp);
-          timestamp = entry.timestamp;
-          saveJSON += JSON.stringify(dtOffset) + ":" + JSON.stringify({
-            h: !entry.shortHandle ? void 0 : entry.shortHandle.length > 20 ? entry.shortHandle.slice(0, 15) + ".." + entry.shortHandle.slice(-3) : entry.shortHandle,
-            p: entry.shortPDC
-          });
+    return __async(this, null, function* () {
+      const shortDIDsRaw = Object.keys(wholeDirectory);
+      const shortDIDsOrdered = shortDIDsRaw.slice().sort((did1, did2) => wholeDirectory[did1][0].timestamp - wholeDirectory[did2][0].timestamp);
+      let bucket = [];
+      for (const shortDID of shortDIDsOrdered) {
+        if (bucket.length >= 5e4) {
+          saveBucket(shortDID);
+          yield new Promise((resolve) => setTimeout(resolve, 10));
         }
-        saveJSON += "}";
+        bucket.push(shortDID);
       }
-      saveJSON += "\n}\n";
-      import_fs.default.writeFileSync(directoryJSON, saveJSON);
+      saveBucket();
+      function saveBucket(nextShortDID) {
+        const localPath = getTimestampFilePath(wholeDirectory[bucket[0]][0].timestamp);
+        const filePath = import_path.default.resolve(directoryPath, localPath);
+        process.stdout.write(" " + localPath);
+        const saveJSON = stringifyDIDs(bucket, wholeDirectory, nextShortDID);
+        if (!import_fs.default.existsSync(import_path.default.dirname(filePath)))
+          import_fs.default.mkdirSync(import_path.default.dirname(filePath), { recursive: true });
+        process.stdout.write(".");
+        const curTxt = !import_fs.default.existsSync(filePath) ? void 0 : import_fs.default.readFileSync(filePath, "utf-8");
+        if (curTxt !== saveJSON) {
+          process.stdout.write(".");
+          import_fs.default.writeFileSync(filePath, saveJSON);
+        }
+        process.stdout.write(".");
+        bucket = [];
+      }
+    });
+  }
+  function stringifyDIDs(shortDIDs, wholeDirectory, nextShortDID) {
+    let saveJSON = "{\n";
+    let carryTimestamp;
+    let commaBeforeNextEntry = false;
+    for (const shortDID of shortDIDs) {
+      if (commaBeforeNextEntry)
+        saveJSON += ",\n";
+      else
+        commaBeforeNextEntry = true;
+      saveJSON += JSON.stringify(shortDID) + ":{";
+      const history = wholeDirectory[shortDID];
+      let timestamp = carryTimestamp;
+      let firstHistoryEntry = true;
+      for (let iEntry = 0; iEntry < history.length; iEntry++) {
+        const entry = history[iEntry];
+        const prevEntry = !iEntry ? void 0 : history[iEntry - 1];
+        if ((prevEntry == null ? void 0 : prevEntry.shortHandle) === entry.shortHandle && (prevEntry == null ? void 0 : prevEntry.shortPDC) === entry.shortPDC)
+          continue;
+        if (firstHistoryEntry) {
+          firstHistoryEntry = false;
+          carryTimestamp = entry.timestamp;
+        } else {
+          saveJSON += ",";
+        }
+        const timestampStr = timestamp ? timestampOffsetToString(entry.timestamp - timestamp) : new Date(entry.timestamp).toISOString();
+        timestamp = entry.timestamp;
+        saveJSON += JSON.stringify(timestampStr) + ":" + JSON.stringify({
+          h: entry.shortHandle === (prevEntry == null ? void 0 : prevEntry.shortHandle) ? void 0 : entry.shortHandle,
+          p: entry.shortPDC === (prevEntry == null ? void 0 : prevEntry.shortPDC) ? void 0 : entry.shortPDC
+        });
+      }
+      saveJSON += "}";
     }
+    if (nextShortDID) {
+      const nextHistory = wholeDirectory[nextShortDID];
+      const nextFilePath = getTimestampFilePath(nextHistory[0].timestamp);
+      saveJSON += ",\n" + JSON.stringify("next") + ":" + JSON.stringify(".." + nextFilePath);
+    }
+    saveJSON += "\n}\n";
+    return saveJSON;
+  }
+  function getTimestampFilePath(timestamp) {
+    const dt = new Date(timestamp);
+    const path2 = dt.getUTCFullYear() + "/" + (dt.getUTCMonth() + 1) + "-" + dt.getUTCDate() + "-" + dt.getUTCHours() + (100 + dt.getMinutes()).toString().slice(1) + (100 + dt.getSeconds()).toString().slice(1) + ".json";
+    return path2;
   }
   function readAllDirectoryFiles(directoryPath) {
-    let year = 2022, month = 11;
-    const untilYear = (/* @__PURE__ */ new Date()).getUTCFullYear(), untilMonth = (/* @__PURE__ */ new Date()).getUTCMonth() + 1;
+    let localPath = import_path.default.relative(
+      directoryPath,
+      import_fs.default.readdirSync(import_path.default.join(directoryPath, "2022")).map((f) => import_path.default.resolve(directoryPath, "2022", f)).filter((f) => f.endsWith(".json"))[0]
+    );
     const wholeDirectory = {};
-    while (year < untilYear || year === untilYear && month <= untilMonth) {
-      const monthStr = month.toString();
-      const directoryJSON = import_path.default.join(directoryPath, year.toString(), monthStr + ".json");
-      if (import_fs.default.existsSync(directoryJSON)) {
-        const directoryObj = JSON.parse(import_fs.default.readFileSync(directoryJSON, "utf-8"));
-        let carryTimestamp = Date.UTC(year, month - 1, 1, 0, 0, 0, 0);
-        for (const [did, history] of Object.entries(directoryObj)) {
-          if (!wholeDirectory[did])
-            wholeDirectory[did] = [];
-          let first = true;
-          let timestamp = carryTimestamp;
-          for (const [dtOffsetStr, compact] of Object.entries(history)) {
-            const dtOffset = parseTimestampOffset(dtOffsetStr);
-            if (first) {
-              carryTimestamp += dtOffset;
-              first = false;
-            }
-            timestamp += dtOffset;
-            wholeDirectory[did].push({
-              timestamp,
-              shortHandle: !compact.h ? void 0 : compact.h.length > 20 ? compact.h.slice(0, 15) + ".." + compact.h.slice(-3) : compact.h,
-              shortPDC: compact.p
-            });
+    let filesCount = 0;
+    let chCount = 0;
+    while (localPath) {
+      const directoryJSON = import_path.default.join(directoryPath, localPath.replace(/^\.\.\/?/, ""));
+      if (!import_fs.default.existsSync(directoryJSON))
+        break;
+      process.stdout.write(" " + localPath);
+      localPath = void 0;
+      const txt = import_fs.default.readFileSync(directoryJSON, "utf-8");
+      chCount += txt.length;
+      process.stdout.write("..");
+      const directoryObj = JSON.parse(txt);
+      process.stdout.write(".");
+      let carryTimestamp = 0;
+      for (const [did, history] of Object.entries(directoryObj)) {
+        if (did === "next") {
+          localPath = history;
+          if ((localPath == null ? void 0 : localPath.startsWith("..")) && !localPath.startsWith("../"))
+            localPath = "../" + localPath.slice(2);
+          continue;
+        }
+        const historyList = wholeDirectory[did] = [];
+        let firstHistoryEntry = true;
+        let timestamp = carryTimestamp;
+        for (const [dateStr, compact] of Object.entries(history)) {
+          if (!carryTimestamp) {
+            timestamp = carryTimestamp = new Date(dateStr).getTime();
+            firstHistoryEntry = false;
+          } else if (firstHistoryEntry) {
+            firstHistoryEntry = false;
+            carryTimestamp += parseTimestampOffset(dateStr);
+            timestamp = carryTimestamp;
+          } else {
+            timestamp += parseTimestampOffset(dateStr);
           }
+          if (timestamp > alertIfRecent.getTime()) {
+            console.log(did, history);
+            throw new Error("Incorrect timestamp! " + new Date(timestamp));
+          }
+          historyList.push({
+            timestamp,
+            shortHandle: compact.h,
+            shortPDC: compact.p
+          });
         }
       }
-      month++;
-      if (month > 12) {
-        year++;
-        month = 1;
-      }
+      filesCount++;
     }
+    console.log(" " + filesCount + " files " + chCount + " characters");
     return wholeDirectory;
   }
 
