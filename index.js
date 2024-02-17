@@ -558,7 +558,7 @@
   function saveAllDirectoryFiles(directoryPath, wholeDirectory) {
     return __async(this, null, function* () {
       const shortDIDsRaw = Object.keys(wholeDirectory);
-      const shortDIDsOrdered = shortDIDsRaw.slice().sort((did1, did2) => wholeDirectory[did1][0].timestamp - wholeDirectory[did2][0].timestamp);
+      const shortDIDsOrdered = shortDIDsRaw.slice().sort((shortDID1, shortDID2) => wholeDirectory[shortDID1][0].timestamp - wholeDirectory[shortDID2][0].timestamp);
       let bucket = [];
       for (const shortDID of shortDIDsOrdered) {
         if (bucket.length >= 5e4) {
@@ -602,7 +602,8 @@
       for (let iEntry = 0; iEntry < history.length; iEntry++) {
         const entry = history[iEntry];
         const prevEntry = !iEntry ? void 0 : history[iEntry - 1];
-        if ((prevEntry == null ? void 0 : prevEntry.shortHandle) === entry.shortHandle && (prevEntry == null ? void 0 : prevEntry.shortPDC) === entry.shortPDC)
+        if (iEntry && // always include the first entry
+        (prevEntry == null ? void 0 : prevEntry.shortHandle) === entry.shortHandle && (prevEntry == null ? void 0 : prevEntry.shortPDC) === entry.shortPDC)
           continue;
         if (firstHistoryEntry) {
           firstHistoryEntry = false;
@@ -652,14 +653,14 @@
       const directoryObj = JSON.parse(txt);
       process.stdout.write(".");
       let carryTimestamp = 0;
-      for (const [did, history] of Object.entries(directoryObj)) {
-        if (did === "next") {
+      for (const [shortDID, history] of Object.entries(directoryObj)) {
+        if (shortDID === "next") {
           localPath = history;
           if ((localPath == null ? void 0 : localPath.startsWith("..")) && !localPath.startsWith("../"))
             localPath = "../" + localPath.slice(2);
           continue;
         }
-        const historyList = wholeDirectory[did] = [];
+        const historyList = wholeDirectory[shortDID] = [];
         let firstHistoryEntry = true;
         let timestamp = carryTimestamp;
         for (const [dateStr, compact] of Object.entries(history)) {
@@ -674,7 +675,7 @@
             timestamp += parseTimestampOffset(dateStr);
           }
           if (timestamp > alertIfRecent.getTime()) {
-            console.log(did, history);
+            console.log(shortDID, history);
             throw new Error("Incorrect timestamp! " + new Date(timestamp));
           }
           historyList.push({
