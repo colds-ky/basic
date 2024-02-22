@@ -1,5 +1,7 @@
 // @ts-check
 
+import { stringifyRegistrationStore } from './persistence';
+
 export async function pullPLCDirectoryCompact() {
   const fs = require('fs');
   const path = require('path');
@@ -8,7 +10,7 @@ export async function pullPLCDirectoryCompact() {
 
   console.log('PLC directory CACHE');
 
-  const directoryPath = path.resolve(__dirname, 'src/api/indexing/repos/directory');
+  const directoryPath = path.resolve(__dirname, 'src/api/indexing/repos');
   const rootPath = path.resolve(directoryPath, 'colds-ky-dids-history.github.io');
 
   const run = indexingRun({
@@ -35,6 +37,19 @@ export async function pullPLCDirectoryCompact() {
     if (progress.affectedShortDIDs) reportProgress.affectedShortDIDs = progress.affectedShortDIDs.length;
 
     console.log(reportProgress);
+    console.log('  WRITE>>');
+
+    if (progress.affectedStores) {
+      for (const sto of progress.affectedStores) {
+        const filePath = path.resolve(directoryPath, sto.file + '.json');
+        process.stdout.write('  ' + filePath);
+        const json = stringifyRegistrationStore(sto);
+        fs.writeFileSync(filePath, json);
+        console.log();
+      }
+    }
+
+    console.log(' OK');
   }
 }
 
