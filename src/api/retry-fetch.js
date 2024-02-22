@@ -16,7 +16,9 @@
  */
 export async function retryFetch(req, init, ...rest) {
   // only allow GET requests to use corsproxy
-  let corsproxyMightBeNeeded = (init?.method || '').toUpperCase() === 'get';
+  let corsproxyMightBeNeeded =
+    !init?.method ||
+    (init?.method || '').toUpperCase() === 'get';
   if (req.nocorsproxy || init?.nocorsproxy) corsproxyMightBeNeeded = false;
 
   const started = Date.now();
@@ -25,7 +27,7 @@ export async function retryFetch(req, init, ...rest) {
 
     try {
       const useCors = tryCount && corsproxyMightBeNeeded && Math.random() > 0.5;
-      const re = useCors ? await fetchWithCors(req, init) : await fetch(req, init, ...rest);
+      const re = useCors ? await fetchWithCors(req, init) : await /** @type {*} */(fetch)(req, init, ...rest);
 
       if (re.status >= 200 && re.status < 400 ||
         re.status === 404) {
@@ -96,7 +98,7 @@ function fetchWithCors(req, init, ...rest) {
 function wrapCorsProxy(url) {
   const dt = Date.now();
   const wrappedURL =
-    'https://corsproxy.com/?' + url +
+    'https://corsproxy.io/?' + url +
     (url.indexOf('?') < 0 ? '?' : '&') + 't' + dt + '=' + (dt + 1);
   return wrappedURL;
 }

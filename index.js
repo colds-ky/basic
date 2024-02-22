@@ -33,9 +33,6 @@
   var __esm = (fn, res) => function __init() {
     return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
   };
-  var __commonJS = (cb, mod) => function __require2() {
-    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
-  };
   var __export = (target, all) => {
     for (var name in all)
       __defProp(target, name, { get: all[name], enumerable: true });
@@ -187,7 +184,7 @@
   // src/api/retry-fetch.js
   function retryFetch(req, init, ...rest) {
     return __async(this, null, function* () {
-      let corsproxyMightBeNeeded = ((init == null ? void 0 : init.method) || "").toUpperCase() === "get";
+      let corsproxyMightBeNeeded = !(init == null ? void 0 : init.method) || ((init == null ? void 0 : init.method) || "").toUpperCase() === "get";
       if (req.nocorsproxy || (init == null ? void 0 : init.nocorsproxy))
         corsproxyMightBeNeeded = false;
       const started = Date.now();
@@ -195,7 +192,10 @@
       while (true) {
         try {
           const useCors = tryCount && corsproxyMightBeNeeded && Math.random() > 0.5;
-          const re = useCors ? yield fetchWithCors(req, init) : yield fetch(req, init, ...rest);
+          const re = useCors ? yield fetchWithCors(req, init) : yield (
+            /** @type {*} */
+            fetch(req, init, ...rest)
+          );
           if (re.status >= 200 && re.status < 400 || re.status === 404) {
             if (!useCors)
               corsproxyMightBeNeeded = false;
@@ -257,7 +257,7 @@
   }
   function wrapCorsProxy(url) {
     const dt2 = Date.now();
-    const wrappedURL = "https://corsproxy.com/?" + url + (url.indexOf("?") < 0 ? "?" : "&") + "t" + dt2 + "=" + (dt2 + 1);
+    const wrappedURL = "https://corsproxy.io/?" + url + (url.indexOf("?") < 0 ? "?" : "&") + "t" + dt2 + "=" + (dt2 + 1);
     return wrappedURL;
   }
   var init_retry_fetch = __esm({
@@ -664,6 +664,10 @@
           let latestAction;
           let addedShortDIDs = [];
           for (const entry of chunk.entries) {
+            if (affectedShortDIDs.has(entry.shortDID) && !storeByShortDID.has(entry.shortDID)) {
+              console.warn("How is it possible for affectedShortDIDs.has(entry.shortDID) but not storeByShortDID.has(entry.shortDID) ", entry.shortDID);
+              console.log();
+            }
             affectedShortDIDs.add(entry.shortDID);
             const historyChange = {
               h: clampShortHandle(entry.shortHandle),
@@ -687,6 +691,10 @@
                 }
               };
               addedShortDIDs.push(entry.shortDID);
+              if (addedShortDIDs.length > affectedShortDIDs.size) {
+                console.warn("How is it possible for [", addedShortDIDs.length, "]addedShortDIDs.length > [" + affectedShortDIDs.size + "]affectedShortDIDs.size");
+                console.log();
+              }
               if (!earliestRegistration || entry.timestamp < earliestRegistration)
                 earliestRegistration = entry.timestamp;
               if (!latestRegistration || entry.timestamp > latestRegistration)
@@ -701,6 +709,8 @@
                 } else {
                   addNewShortDIDToExistingStoreMiddle(store, history, entry);
                 }
+                storeByShortDID.set(entry.shortDID, store);
+                affectedStores.add(store);
               } else {
                 const { newStore, prevStore } = createNewStoreAddShortDID(stores, insertStoreAt, history, entry);
                 storeByShortDID.set(entry.shortDID, newStore);
@@ -812,7 +822,8 @@
       return { insertStoreAt: 0 };
     const latestStore = stores[stores.length - 1];
     if (!latestStore.earliestRegistration || timestamp >= latestStore.earliestRegistration || stores.length === 1) {
-      if (latestStore.size < MAX_STORE_SIZE)
+      const canAddToExistingStore = latestStore.size < MAX_STORE_SIZE && getMonthStart(latestStore.latestRegistration) === getMonthStart(timestamp);
+      if (canAddToExistingStore)
         return { store: latestStore };
       else
         return { insertStoreAt: stores.length };
@@ -931,12 +942,17 @@
       const { indexingRun: indexingRun2 } = (init_indexing_run(), __toCommonJS(indexing_run_exports));
       console.log("PLC directory CACHE");
       const directoryPath = path.resolve(__dirname, "src/api/indexing/repos/directory");
+      const rootPath = path.resolve(directoryPath, "colds-ky-dids-history.github.io");
       const run = indexingRun2({
         read: (localPath) => new Promise((resolve, reject) => {
-          const filePath = path.resolve(directoryPath, localPath.replace(/^\//, ""));
+          const normalizeLocalPath = localPath.replace(/^\//, "");
+          const filePath = path.resolve(
+            /^20/.test(normalizeLocalPath) ? directoryPath : rootPath,
+            normalizeLocalPath
+          );
           fs.readFile(filePath, "utf8", (err, data) => {
             if (err)
-              reject(err);
+              resolve(void 0);
             else
               resolve(data);
           });
@@ -945,6 +961,20 @@
       try {
         for (var iter = __forAwait(run), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
           const progress = temp.value;
+          const reportProgress = {};
+          if (progress.affectedStores)
+            reportProgress.affectedStores = progress.affectedStores.map((store) => store.file);
+          if (progress.earliestRegistration)
+            reportProgress.earliestRegistration = new Date(progress.earliestRegistration);
+          if (progress.latestRegistration)
+            reportProgress.latestRegistration = new Date(progress.latestRegistration);
+          if (progress.latestAction)
+            reportProgress.latestAction = new Date(progress.latestAction);
+          if (progress.addedShortDIDs)
+            reportProgress.addedShortDIDs = progress.addedShortDIDs.length;
+          if (progress.affectedShortDIDs)
+            reportProgress.affectedShortDIDs = progress.affectedShortDIDs.length;
+          console.log(reportProgress);
         }
       } catch (temp) {
         error = [temp];
@@ -958,70 +988,66 @@
       }
     });
   }
-  var alertIfRecent;
-  var init_pull_plc_directory = __esm({
-    "src/api/indexing/pull-plc-directory.js"() {
-      alertIfRecent = new Date(2023, 11, 1);
-    }
-  });
 
   // src/api/indexing/index.js
-  var init_indexing = __esm({
-    "src/api/indexing/index.js"() {
-      init_indexing_run();
-    }
-  });
+  init_indexing_run();
 
   // src/index.js
-  var require_src = __commonJS({
-    "src/index.js"(exports, module) {
-      init_pull_plc_directory();
-      init_indexing();
-      function pullPLCDirectoryLocal() {
-        return __async(this, null, function* () {
-          console.log("Pulling PLC directory...");
-          const run = indexingRun({
-            read: (localPath) => __async(this, null, function* () {
-              try {
-                const re = yield fetch(
-                  location.protocol + "//history.dids.colds.ky/" + localPath.replace(/^\//, "")
-                );
-                if (re.status !== 200)
-                  return;
-                const text = yield re.text();
-                return text;
-              } catch (fetchError) {
-                console.warn(localPath, fetchError);
-              }
-            })
-          });
+  init_retry_fetch();
+  function pullPLCDirectoryLocal() {
+    return __async(this, null, function* () {
+      var _a, _b;
+      console.log("Pulling PLC directory...");
+      const run = indexingRun({
+        read: (localPath) => __async(this, null, function* () {
           try {
-            for (var iter = __forAwait(run), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
-              const progress = temp.value;
-              console.log(progress);
-            }
-          } catch (temp) {
-            error = [temp];
-          } finally {
-            try {
-              more && (temp = iter.return) && (yield temp.call(iter));
-            } finally {
-              if (error)
-                throw error[0];
-            }
+            const re = yield fetch(
+              location.protocol + "//history.dids.colds.ky/" + localPath.replace(/^\//, "")
+            );
+            if (re.status !== 200)
+              return;
+            const text = yield re.text();
+            return text;
+          } catch (fetchError) {
+            console.warn(localPath, fetchError);
           }
-        });
+        }),
+        fetch: retryFetch
+      });
+      let count = 0;
+      try {
+        for (var iter = __forAwait(run), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
+          const progress = temp.value;
+          console.log(__spreadProps(__spreadValues({
+            progress
+          }, progress), {
+            earliestRegistration: progress.earliestRegistration && new Date(progress.earliestRegistration),
+            latestRegistration: progress.latestRegistration && new Date(progress.latestRegistration),
+            latestAction: progress.latestAction && new Date(progress.latestAction),
+            affectedStores: (_a = progress.affectedStores) == null ? void 0 : _a.map((store) => store.file),
+            stores: (_b = progress.stores) == null ? void 0 : _b.map((store) => store.file)
+          }));
+          console.log("\n\n\n");
+          count++;
+        }
+      } catch (temp) {
+        error = [temp];
+      } finally {
+        try {
+          more && (temp = iter.return) && (yield temp.call(iter));
+        } finally {
+          if (error)
+            throw error[0];
+        }
       }
-      if (typeof __require === "function" && typeof process !== "undefined" && typeof process.exit === "function") {
-        if (__require.main === module)
-          pullPLCDirectoryCompact();
-        else
-          module.exports = { indexingRun };
-      } else {
-        pullPLCDirectoryLocal();
-      }
-    }
-  });
-  require_src();
+    });
+  }
+  if (typeof __require === "function" && typeof process !== "undefined" && typeof process.exit === "function") {
+    console.log("node");
+    pullPLCDirectoryCompact();
+  } else {
+    console.log("browser");
+    pullPLCDirectoryLocal();
+  }
 })();
 //# sourceMappingURL=index.js.map

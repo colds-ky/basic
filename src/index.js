@@ -2,6 +2,7 @@
 
 import { pullPLCDirectoryCompact } from './api/indexing/pull-plc-directory';
 import { indexingRun } from './api/indexing';
+import { retryFetch } from './api/retry-fetch';
 
 async function pullPLCDirectoryLocal() {
   console.log('Pulling PLC directory...');
@@ -20,17 +21,38 @@ async function pullPLCDirectoryLocal() {
       } catch (fetchError) {
         console.warn(localPath, fetchError);
       }
-    }
+    },
+    fetch: retryFetch,
   });
 
+  let count = 0;
   for await (const progress of run) {
-    console.log(progress);
+    console.log({
+      progress,
+      ...progress,
+      earliestRegistration: progress.earliestRegistration && new Date(progress.earliestRegistration),
+      latestRegistration: progress.latestRegistration && new Date(progress.latestRegistration),
+      latestAction: progress.latestAction && new Date(progress.latestAction),
+      affectedStores: progress.affectedStores?.map(store => store.file),
+      stores: progress.stores?.map(store => store.file),
+    });
+    console.log('\n\n\n');
+    count++;
+    // if (count >= 5)
+    //   break;
   }
 }
 
 if (typeof require === 'function' && typeof process !== 'undefined' && typeof process.exit === 'function') {
-  if (require.main === module) pullPLCDirectoryCompact();
-  else module.exports = { indexingRun }
+  console.log('node');
+  // if (require.main === module) {
+  //   console.log('main: run the pullPLCDirectoryCompact');
+  pullPLCDirectoryCompact();
+  // } else {
+  //   console.log('require.main: ', { ['require.main']: require.main, ['module']: module })
+  //   module.exports = { indexingRun }
+  // }
 } else {
+  console.log('browser');
   pullPLCDirectoryLocal();
 }
