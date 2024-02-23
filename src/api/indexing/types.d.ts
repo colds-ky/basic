@@ -17,10 +17,13 @@ type RegistrationStore = Map<string, RegistrationHistory> & {
 
 interface RegistrationHistory {
   created: number;
-  updates: { [timestampOrOffset: string]: HistoryChange };
+  updates: HistoryChange[];
 }
 
 interface HistoryChange {
+  /** timestampOrOffset */
+  t: string;
+
   /** shortHandle */
   h?: string;
 

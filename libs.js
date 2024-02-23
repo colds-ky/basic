@@ -200,11 +200,12 @@
       return;
     return { shortDID: match[2], postID: match[3] };
   }
-  var _shortenDID_Regex, _shortenHandle_Regex, _breakPostURL_Regex, _breakFeedUri_Regex;
+  var _shortenDID_Regex, _shortenHandle_Regex, offsetTooLarge, _breakPostURL_Regex, _breakFeedUri_Regex;
   var init_shorten = __esm({
     "lib/shorten.js"() {
       _shortenDID_Regex = /^did\:plc\:/;
       _shortenHandle_Regex = /\.bsky\.social$/;
+      offsetTooLarge = Date.UTC(2022, 1, 1);
       _breakPostURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/post\/([a-z0-9]+)$/;
       _breakFeedUri_Regex = /^at\:\/\/(did:plc:)?([a-z0-9]+)\/[a-z\.]+\/?(.*)?$/;
     }

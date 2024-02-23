@@ -7,10 +7,14 @@ import { parseTimestampOffset } from '../../../lib/shorten';
 class MapExtended extends Map {
   file = '';
   next = undefined;
-  earliestRegistration = undefined;
-  latestRegistration = undefined;
-  latestAction = undefined;
+  earliestRegistration = 0;
+  latestRegistration = 0;
+  latestAction = 0;
 }
+
+/**
+ * @typedef {Record<string, HistoryChange[]> & { next?: string }} PersistedStore
+ */
 
 /**
  * @param {string} file
@@ -18,19 +22,23 @@ class MapExtended extends Map {
  * @returns {RegistrationStore}
  */
 export function parseRegistrationStore(file, jsonText) {
+  /** @type {PersistedStore} */
   const bucketMap = JSON.parse(jsonText);
 
   const store = createEmptyStore(file);
 
   let carryTimestamp = 0;
   for (const shortDID in bucketMap) {
-    if (shortDID === 'next') store.next = bucketMap.next;
+    if (shortDID === 'next') {
+      store.next = bucketMap.next;
+      continue;
+    }
 
-    /** @type {RegistrationHistory['updates']} */
+    /** @type {HistoryChange[]} */
     const registrationHistory = bucketMap[shortDID];
-    for (const entry in registrationHistory) {
-      if (!carryTimestamp) carryTimestamp = new Date(entry).getTime();
-      else carryTimestamp += parseTimestampOffset(entry) || 0;
+    for (const entry of registrationHistory) {
+      if (!carryTimestamp) carryTimestamp = new Date(entry.t).getTime();
+      else carryTimestamp += parseTimestampOffset(entry.t) || 0;
       break;
     }
 
@@ -145,6 +153,8 @@ export function stringifyRegistrationStore(store) {
       ',\n"' + shortDID + '":' + JSON.stringify(registrationEntry.updates);
     first = false;
   }
+
+  if (store.has('next')) throw new Error('How come store has NEXT?');
 
   if (store.next) jsonText += ',\n"next":' + JSON.stringify(store.next);
   jsonText += '\n}\n';
