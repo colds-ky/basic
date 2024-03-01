@@ -1083,7 +1083,7 @@
       try {
         for (var iter = __forAwait(run), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
           const progress = temp.value;
-          const reportProgress = { registrations: 0 };
+          const reportProgress = {};
           if (progress.affectedStores)
             reportProgress.affectedStores = progress.affectedStores.map((store) => store.file);
           if (progress.earliestRegistration)
@@ -1097,6 +1097,7 @@
           if (progress.affectedShortDIDs)
             reportProgress.affectedShortDIDs = progress.affectedShortDIDs.length;
           if (progress.stores) {
+            reportProgress.registrations = 0;
             for (const sto of progress.stores)
               reportProgress.registrations += sto.size;
           }
