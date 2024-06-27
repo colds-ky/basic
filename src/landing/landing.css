@@ -45,4 +45,6 @@
 .landing .landing-bottom-bar {
   grid-row: 5;
   padding: 0.2em;
+  font-family: sans-serif;
+  color: silver;
 }

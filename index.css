@@ -19,9 +19,9 @@
   bottom: -20em;
   margin: 1em;
   padding: 1em;
-  border: solid 1px silver;
-  background: white;
-  box-shadow: 1px 1px 4px #00000033;
+  border: solid 1px #e9da8a;
+  background: #fffbeb;
+  box-shadow: 2px 4px 10px #00000014;
   border-radius: 0.5em;
   max-width: 20em;
   animation: 13s linear 1s forwards slidetop;
@@ -37,10 +37,19 @@
 }
 @keyframes slidetop {
   from {
-    transform: translateY(0);
+    transform: translateY(0) rotate(-4deg);
+  }
+  25% {
+    transform: translateY(-35vh) rotate(+5deg);
+  }
+  50% {
+    transform: translateY(-70vh) rotate(-7deg);
+  }
+  75% {
+    transform: translateY(-105vh) rotate(+5deg);
   }
   to {
-    transform: translateY(-140vh);
+    transform: translateY(-140vh) rotate(-5deg);
   }
 }
 
@@ -94,5 +103,7 @@
 .landing .landing-bottom-bar {
   grid-row: 5;
   padding: 0.2em;
+  font-family: sans-serif;
+  color: silver;
 }
 /*# sourceMappingURL=index.css.map */
