@@ -963,8 +963,8 @@
 	  value: true
 	});
 	ZodError$1.ZodError = ZodError$1.quotelessJson = ZodError$1.ZodIssueCode = void 0;
-	const util_1$T = util$7;
-	ZodError$1.ZodIssueCode = util_1$T.util.arrayToEnum(["invalid_type", "invalid_literal", "custom", "invalid_union", "invalid_union_discriminator", "invalid_enum_value", "unrecognized_keys", "invalid_arguments", "invalid_return_type", "invalid_date", "invalid_string", "too_small", "too_big", "invalid_intersection_types", "not_multiple_of", "not_finite"]);
+	const util_1$U = util$7;
+	ZodError$1.ZodIssueCode = util_1$U.util.arrayToEnum(["invalid_type", "invalid_literal", "custom", "invalid_union", "invalid_union_discriminator", "invalid_enum_value", "unrecognized_keys", "invalid_arguments", "invalid_return_type", "invalid_date", "invalid_string", "too_small", "too_big", "invalid_intersection_types", "not_multiple_of", "not_finite"]);
 	const quotelessJson = obj => {
 	  const json = JSON.stringify(obj, null, 2);
 	  return json.replace(/"([^"]+)":/g, "$1:");
@@ -1051,7 +1051,7 @@
 	    return this.message;
 	  }
 	  get message() {
-	    return JSON.stringify(this.issues, util_1$T.util.jsonStringifyReplacer, 2);
+	    return JSON.stringify(this.issues, util_1$U.util.jsonStringifyReplacer, 2);
 	  }
 	  get isEmpty() {
 	    return this.issues.length === 0;
@@ -1085,32 +1085,32 @@
 	Object.defineProperty(en, "__esModule", {
 	  value: true
 	});
-	const util_1$S = util$7;
+	const util_1$T = util$7;
 	const ZodError_1 = ZodError$1;
 	const errorMap = (issue, _ctx) => {
 	  let message;
 	  switch (issue.code) {
 	    case ZodError_1.ZodIssueCode.invalid_type:
-	      if (issue.received === util_1$S.ZodParsedType.undefined) {
+	      if (issue.received === util_1$T.ZodParsedType.undefined) {
 	        message = "Required";
 	      } else {
 	        message = `Expected ${issue.expected}, received ${issue.received}`;
 	      }
 	      break;
 	    case ZodError_1.ZodIssueCode.invalid_literal:
-	      message = `Invalid literal value, expected ${JSON.stringify(issue.expected, util_1$S.util.jsonStringifyReplacer)}`;
+	      message = `Invalid literal value, expected ${JSON.stringify(issue.expected, util_1$T.util.jsonStringifyReplacer)}`;
 	      break;
 	    case ZodError_1.ZodIssueCode.unrecognized_keys:
-	      message = `Unrecognized key(s) in object: ${util_1$S.util.joinValues(issue.keys, ", ")}`;
+	      message = `Unrecognized key(s) in object: ${util_1$T.util.joinValues(issue.keys, ", ")}`;
 	      break;
 	    case ZodError_1.ZodIssueCode.invalid_union:
 	      message = `Invalid input`;
 	      break;
 	    case ZodError_1.ZodIssueCode.invalid_union_discriminator:
-	      message = `Invalid discriminator value. Expected ${util_1$S.util.joinValues(issue.options)}`;
+	      message = `Invalid discriminator value. Expected ${util_1$T.util.joinValues(issue.options)}`;
 	      break;
 	    case ZodError_1.ZodIssueCode.invalid_enum_value:
-	      message = `Invalid enum value. Expected ${util_1$S.util.joinValues(issue.options)}, received '${issue.received}'`;
+	      message = `Invalid enum value. Expected ${util_1$T.util.joinValues(issue.options)}, received '${issue.received}'`;
 	      break;
 	    case ZodError_1.ZodIssueCode.invalid_arguments:
 	      message = `Invalid function arguments`;
@@ -1133,7 +1133,7 @@
 	        } else if ("endsWith" in issue.validation) {
 	          message = `Invalid input: must end with "${issue.validation.endsWith}"`;
 	        } else {
-	          util_1$S.util.assertNever(issue.validation);
+	          util_1$T.util.assertNever(issue.validation);
 	        }
 	      } else if (issue.validation !== "regex") {
 	        message = `Invalid ${issue.validation}`;
@@ -1161,7 +1161,7 @@
 	      break;
 	    default:
 	      message = _ctx.defaultError;
-	      util_1$S.util.assertNever(issue);
+	      util_1$T.util.assertNever(issue);
 	  }
 	  return {
 	    message
@@ -5539,7 +5539,7 @@
 	  value: true
 	});
 	tid.TID = void 0;
-	const util_1$R = util$5;
+	const util_1$S = util$5;
 	const TID_LEN = 13;
 	let lastTimestamp = 0;
 	let timestampCount = 0;
@@ -5587,7 +5587,7 @@
 	  }
 	  static fromTime(timestamp, clockid) {
 	    // base32 encode with encoding variant sort (s32)
-	    const str = `${(0, util_1$R.s32encode)(timestamp)}${(0, util_1$R.s32encode)(clockid).padStart(2, '2')}`;
+	    const str = `${(0, util_1$S.s32encode)(timestamp)}${(0, util_1$S.s32encode)(clockid).padStart(2, '2')}`;
 	    return new TID(str);
 	  }
 	  static fromStr(str) {
@@ -5603,10 +5603,10 @@
 	    return dedash(str).length === TID_LEN;
 	  }
 	  timestamp() {
-	    return (0, util_1$R.s32decode)(this.str.slice(0, 11));
+	    return (0, util_1$S.s32decode)(this.str.slice(0, 11));
 	  }
 	  clockid() {
-	    return (0, util_1$R.s32decode)(this.str.slice(11, 13));
+	    return (0, util_1$S.s32decode)(this.str.slice(11, 13));
 	  }
 	  formatted() {
 	    const str = this.toString();
@@ -7303,7 +7303,7 @@ if (cid) {
 	  value: true
 	});
 	retry$1.backoffMs = retry$1.retry = void 0;
-	const util_1$Q = util$5;
+	const util_1$R = util$5;
 	async function retry(fn, opts = {}) {
 	  const {
 	    maxRetries = 3,
@@ -7321,7 +7321,7 @@ if (cid) {
 	      if (willRetry) {
 	        retries += 1;
 	        if (waitMs !== 0) {
-	          await (0, util_1$Q.wait)(waitMs);
+	          await (0, util_1$R.wait)(waitMs);
 	        }
 	      } else {
 	        doneError = err;
@@ -10727,78 +10727,72 @@ if (cid) {
 
 	var dist$1 = {};
 
-	var hasRequiredDist;
-	function requireDist() {
-	  if (hasRequiredDist) return dist$1;
-	  hasRequiredDist = 1;
-	  (function (exports) {
-	    (() => {
+	(function (exports) {
+	  (() => {
 
-	      var e = {
-	          d: (t, r) => {
-	            for (var n in r) e.o(r, n) && !e.o(t, n) && Object.defineProperty(t, n, {
-	              enumerable: !0,
-	              get: r[n]
-	            });
-	          },
-	          o: (e, t) => Object.prototype.hasOwnProperty.call(e, t),
-	          r: e => {
-	            "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {
-	              value: "Module"
-	            }), Object.defineProperty(e, "__esModule", {
-	              value: !0
-	            });
-	          }
+	    var e = {
+	        d: (t, r) => {
+	          for (var n in r) e.o(r, n) && !e.o(t, n) && Object.defineProperty(t, n, {
+	            enumerable: !0,
+	            get: r[n]
+	          });
 	        },
-	        t = {};
-	      function r(e, t) {
-	        return void 0 === t && (t = "-"), new RegExp("^(?!0{4}" + t + "0{2}" + t + "0{2})((?=[0-9]{4}" + t + "(((0[^2])|1[0-2])|02(?=" + t + "(([0-1][0-9])|2[0-8])))" + t + "[0-9]{2})|(?=((([13579][26])|([2468][048])|(0[48]))0{2})|([0-9]{2}((((0|[2468])[48])|[2468][048])|([13579][26])))" + t + "02" + t + "29))([0-9]{4})" + t + "(?!((0[469])|11)" + t + "31)((0[1,3-9]|1[0-2])|(02(?!" + t + "3)))" + t + "(0[1-9]|[1-2][0-9]|3[0-1])$").test(e);
-	      }
-	      function n(e) {
-	        var t = /\D/.exec(e);
-	        return t ? t[0] : "";
-	      }
-	      function i(e, t, r) {
-	        void 0 === t && (t = ":"), void 0 === r && (r = !1);
-	        var i = new RegExp("^([0-1]|2(?=([0-3])|4" + t + "00))[0-9]" + t + "[0-5][0-9](" + t + "([0-5]|6(?=0))[0-9])?(.[0-9]{1,9})?$");
-	        if (!r || !/[Z+\-]/.test(e)) return i.test(e);
-	        if (/Z$/.test(e)) return i.test(e.replace("Z", ""));
-	        var o = e.includes("+"),
-	          a = e.split(/[+-]/),
-	          u = a[0],
-	          d = a[1];
-	        return i.test(u) && function (e, t, r) {
-	          return void 0 === r && (r = ":"), new RegExp(t ? "^(0(?!(2" + r + "4)|0" + r + "3)|1(?=([0-1]|2(?=" + r + "[04])|[34](?=" + r + "0))))([03469](?=" + r + "[03])|[17](?=" + r + "0)|2(?=" + r + "[04])|5(?=" + r + "[034])|8(?=" + r + "[04]))" + r + "([03](?=0)|4(?=5))[05]$" : "^(0(?=[^0])|1(?=[0-2]))([39](?=" + r + "[03])|[0-24-8](?=" + r + "00))" + r + "[03]0$").test(e);
-	        }(d, o, n(d));
-	      }
-	      function o(e) {
-	        var t = e.split("T"),
-	          o = t[0],
-	          a = t[1],
-	          u = r(o, n(o));
-	        if (!a) return !1;
-	        var d,
-	          s = (d = a.match(/([^Z+\-\d])(?=\d+\1)/), Array.isArray(d) ? d[0] : "");
-	        return u && i(a, s, !0);
-	      }
-	      function a(e, t) {
-	        return void 0 === t && (t = "-"), new RegExp("^[0-9]{4}" + t + "(0(?=[^0])|1(?=[0-2]))[0-9]$").test(e);
-	      }
-	      e.r(t), e.d(t, {
-	        isValidDate: () => r,
-	        isValidISODateString: () => o,
-	        isValidTime: () => i,
-	        isValidYearMonth: () => a
-	      });
-	      var u = exports;
-	      for (var d in t) u[d] = t[d];
-	      t.__esModule && Object.defineProperty(u, "__esModule", {
-	        value: !0
-	      });
-	    })();
-	  })(dist$1);
-	  return dist$1;
-	}
+	        o: (e, t) => Object.prototype.hasOwnProperty.call(e, t),
+	        r: e => {
+	          "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {
+	            value: "Module"
+	          }), Object.defineProperty(e, "__esModule", {
+	            value: !0
+	          });
+	        }
+	      },
+	      t = {};
+	    function r(e, t) {
+	      return void 0 === t && (t = "-"), new RegExp("^(?!0{4}" + t + "0{2}" + t + "0{2})((?=[0-9]{4}" + t + "(((0[^2])|1[0-2])|02(?=" + t + "(([0-1][0-9])|2[0-8])))" + t + "[0-9]{2})|(?=((([13579][26])|([2468][048])|(0[48]))0{2})|([0-9]{2}((((0|[2468])[48])|[2468][048])|([13579][26])))" + t + "02" + t + "29))([0-9]{4})" + t + "(?!((0[469])|11)" + t + "31)((0[1,3-9]|1[0-2])|(02(?!" + t + "3)))" + t + "(0[1-9]|[1-2][0-9]|3[0-1])$").test(e);
+	    }
+	    function n(e) {
+	      var t = /\D/.exec(e);
+	      return t ? t[0] : "";
+	    }
+	    function i(e, t, r) {
+	      void 0 === t && (t = ":"), void 0 === r && (r = !1);
+	      var i = new RegExp("^([0-1]|2(?=([0-3])|4" + t + "00))[0-9]" + t + "[0-5][0-9](" + t + "([0-5]|6(?=0))[0-9])?(.[0-9]{1,9})?$");
+	      if (!r || !/[Z+\-]/.test(e)) return i.test(e);
+	      if (/Z$/.test(e)) return i.test(e.replace("Z", ""));
+	      var o = e.includes("+"),
+	        a = e.split(/[+-]/),
+	        u = a[0],
+	        d = a[1];
+	      return i.test(u) && function (e, t, r) {
+	        return void 0 === r && (r = ":"), new RegExp(t ? "^(0(?!(2" + r + "4)|0" + r + "3)|1(?=([0-1]|2(?=" + r + "[04])|[34](?=" + r + "0))))([03469](?=" + r + "[03])|[17](?=" + r + "0)|2(?=" + r + "[04])|5(?=" + r + "[034])|8(?=" + r + "[04]))" + r + "([03](?=0)|4(?=5))[05]$" : "^(0(?=[^0])|1(?=[0-2]))([39](?=" + r + "[03])|[0-24-8](?=" + r + "00))" + r + "[03]0$").test(e);
+	      }(d, o, n(d));
+	    }
+	    function o(e) {
+	      var t = e.split("T"),
+	        o = t[0],
+	        a = t[1],
+	        u = r(o, n(o));
+	      if (!a) return !1;
+	      var d,
+	        s = (d = a.match(/([^Z+\-\d])(?=\d+\1)/), Array.isArray(d) ? d[0] : "");
+	      return u && i(a, s, !0);
+	    }
+	    function a(e, t) {
+	      return void 0 === t && (t = "-"), new RegExp("^[0-9]{4}" + t + "(0(?=[^0])|1(?=[0-2]))[0-9]$").test(e);
+	    }
+	    e.r(t), e.d(t, {
+	      isValidDate: () => r,
+	      isValidISODateString: () => o,
+	      isValidTime: () => i,
+	      isValidYearMonth: () => a
+	    });
+	    var u = exports;
+	    for (var d in t) u[d] = t[d];
+	    t.__esModule && Object.defineProperty(u, "__esModule", {
+	      value: !0
+	    });
+	  })();
+	})(dist$1);
 
 	var hasRequiredFormats;
 	function requireFormats() {
@@ -10808,7 +10802,7 @@ if (cid) {
 	    value: true
 	  });
 	  formats.language = formats.cid = formats.nsid = formats.atIdentifier = formats.handle = formats.did = formats.atUri = formats.uri = formats.datetime = void 0;
-	  const iso_datestring_validator_1 = requireDist();
+	  const iso_datestring_validator_1 = dist$1;
 	  const cid_1 = require$$1;
 	  const types_1 = requireTypes();
 	  const syntax_1 = dist$4;
@@ -12123,7 +12117,7 @@ if (cid) {
 	  value: true
 	});
 	validation.assertValidXrpcMessage = validation.assertValidXrpcOutput = validation.assertValidXrpcInput = validation.assertValidXrpcParams = validation.assertValidRecord = void 0;
-	const util_1$P = requireUtil();
+	const util_1$Q = requireUtil();
 	const ComplexValidators$1 = __importStar$2(requireComplex());
 	const XrpcValidators = __importStar$2(xrpc);
 	function assertValidRecord(lexicons, def, value) {
@@ -12143,21 +12137,21 @@ if (cid) {
 	function assertValidXrpcInput(lexicons, def, value) {
 	  if (def.input?.schema) {
 	    // loop: all input schema definitions
-	    return (0, util_1$P.assertValidOneOf)(lexicons, 'Input', def.input.schema, value, true);
+	    return (0, util_1$Q.assertValidOneOf)(lexicons, 'Input', def.input.schema, value, true);
 	  }
 	}
 	validation.assertValidXrpcInput = assertValidXrpcInput;
 	function assertValidXrpcOutput(lexicons, def, value) {
 	  if (def.output?.schema) {
 	    // loop: all output schema definitions
-	    return (0, util_1$P.assertValidOneOf)(lexicons, 'Output', def.output.schema, value, true);
+	    return (0, util_1$Q.assertValidOneOf)(lexicons, 'Output', def.output.schema, value, true);
 	  }
 	}
 	validation.assertValidXrpcOutput = assertValidXrpcOutput;
 	function assertValidXrpcMessage(lexicons, def, value) {
 	  if (def.message?.schema) {
 	    // loop: all output schema definitions
-	    return (0, util_1$P.assertValidOneOf)(lexicons, 'Message', def.message.schema, value, true);
+	    return (0, util_1$Q.assertValidOneOf)(lexicons, 'Message', def.message.schema, value, true);
 	  }
 	}
 	validation.assertValidXrpcMessage = assertValidXrpcMessage;
@@ -12199,7 +12193,7 @@ if (cid) {
 	lexicons$1.Lexicons = void 0;
 	const types_1$3 = requireTypes();
 	const validation_1 = validation;
-	const util_1$O = requireUtil();
+	const util_1$P = requireUtil();
 	const ComplexValidators = __importStar$1(requireComplex());
 	/**
 	 * A collection of compiled lexicons.
@@ -12228,7 +12222,7 @@ if (cid) {
 	   * Add a lexicon doc.
 	   */
 	  add(doc) {
-	    const uri = (0, util_1$O.toLexUri)(doc.id);
+	    const uri = (0, util_1$P.toLexUri)(doc.id);
 	    if (this.docs.has(uri)) {
 	      throw new Error(`${uri} has already been registered`);
 	    }
@@ -12245,7 +12239,7 @@ if (cid) {
 	   * Remove a lexicon doc.
 	   */
 	  remove(uri) {
-	    uri = (0, util_1$O.toLexUri)(uri);
+	    uri = (0, util_1$P.toLexUri)(uri);
 	    const doc = this.docs.get(uri);
 	    if (!doc) {
 	      throw new Error(`Unable to remove "${uri}": does not exist`);
@@ -12259,14 +12253,14 @@ if (cid) {
 	   * Get a lexicon doc.
 	   */
 	  get(uri) {
-	    uri = (0, util_1$O.toLexUri)(uri);
+	    uri = (0, util_1$P.toLexUri)(uri);
 	    return this.docs.get(uri);
 	  }
 	  /**
 	   * Get a definition.
 	   */
 	  getDef(uri) {
-	    uri = (0, util_1$O.toLexUri)(uri);
+	    uri = (0, util_1$P.toLexUri)(uri);
 	    return this.defs.get(uri);
 	  }
 	  getDefOrThrow(uri, types) {
@@ -12283,7 +12277,7 @@ if (cid) {
 	   * Validate a record or object.
 	   */
 	  validate(lexUri, value) {
-	    lexUri = (0, util_1$O.toLexUri)(lexUri);
+	    lexUri = (0, util_1$P.toLexUri)(lexUri);
 	    const def = this.getDefOrThrow(lexUri, ['record', 'object']);
 	    if (!(0, types_1$3.isObj)(value)) {
 	      throw new types_1$3.ValidationError(`Value must be an object`);
@@ -12301,7 +12295,7 @@ if (cid) {
 	   * Validate a record and throw on any error.
 	   */
 	  assertValidRecord(lexUri, value) {
-	    lexUri = (0, util_1$O.toLexUri)(lexUri);
+	    lexUri = (0, util_1$P.toLexUri)(lexUri);
 	    const def = this.getDefOrThrow(lexUri, ['record']);
 	    if (!(0, types_1$3.isObj)(value)) {
 	      throw new types_1$3.ValidationError(`Record must be an object`);
@@ -12310,7 +12304,7 @@ if (cid) {
 	      throw new types_1$3.ValidationError(`Record/$type must be a string`);
 	    }
 	    const $type = value.$type || '';
-	    if ((0, util_1$O.toLexUri)($type) !== lexUri) {
+	    if ((0, util_1$P.toLexUri)($type) !== lexUri) {
 	      throw new types_1$3.ValidationError(`Invalid $type: must be ${lexUri}, got ${$type}`);
 	    }
 	    return (0, validation_1.assertValidRecord)(this, def, value);
@@ -12319,7 +12313,7 @@ if (cid) {
 	   * Validate xrpc query params and throw on any error.
 	   */
 	  assertValidXrpcParams(lexUri, value) {
-	    lexUri = (0, util_1$O.toLexUri)(lexUri);
+	    lexUri = (0, util_1$P.toLexUri)(lexUri);
 	    const def = this.getDefOrThrow(lexUri, ['query', 'procedure', 'subscription']);
 	    return (0, validation_1.assertValidXrpcParams)(this, def, value);
 	  }
@@ -12327,7 +12321,7 @@ if (cid) {
 	   * Validate xrpc input body and throw on any error.
 	   */
 	  assertValidXrpcInput(lexUri, value) {
-	    lexUri = (0, util_1$O.toLexUri)(lexUri);
+	    lexUri = (0, util_1$P.toLexUri)(lexUri);
 	    const def = this.getDefOrThrow(lexUri, ['procedure']);
 	    return (0, validation_1.assertValidXrpcInput)(this, def, value);
 	  }
@@ -12335,7 +12329,7 @@ if (cid) {
 	   * Validate xrpc output body and throw on any error.
 	   */
 	  assertValidXrpcOutput(lexUri, value) {
-	    lexUri = (0, util_1$O.toLexUri)(lexUri);
+	    lexUri = (0, util_1$P.toLexUri)(lexUri);
 	    const def = this.getDefOrThrow(lexUri, ['query', 'procedure']);
 	    return (0, validation_1.assertValidXrpcOutput)(this, def, value);
 	  }
@@ -12343,7 +12337,7 @@ if (cid) {
 	   * Validate xrpc subscription message and throw on any error.
 	   */
 	  assertValidXrpcMessage(lexUri, value) {
-	    lexUri = (0, util_1$O.toLexUri)(lexUri);
+	    lexUri = (0, util_1$P.toLexUri)(lexUri);
 	    const def = this.getDefOrThrow(lexUri, ['subscription']);
 	    return (0, validation_1.assertValidXrpcMessage)(this, def, value);
 	  }
@@ -12351,8 +12345,8 @@ if (cid) {
 	   * Resolve a lex uri given a ref
 	   */
 	  resolveLexUri(lexUri, ref) {
-	    lexUri = (0, util_1$O.toLexUri)(lexUri);
-	    return (0, util_1$O.toLexUri)(ref, lexUri);
+	    lexUri = (0, util_1$P.toLexUri)(lexUri);
+	    return (0, util_1$P.toLexUri)(ref, lexUri);
 	  }
 	}
 	lexicons$1.Lexicons = Lexicons;
@@ -12370,13 +12364,13 @@ if (cid) {
 	function resolveRefUris(obj, baseUri) {
 	  for (const k in obj) {
 	    if (obj.type === 'ref') {
-	      obj.ref = (0, util_1$O.toLexUri)(obj.ref, baseUri);
+	      obj.ref = (0, util_1$P.toLexUri)(obj.ref, baseUri);
 	    } else if (obj.type === 'union') {
-	      obj.refs = obj.refs.map(ref => (0, util_1$O.toLexUri)(ref, baseUri));
+	      obj.refs = obj.refs.map(ref => (0, util_1$P.toLexUri)(ref, baseUri));
 	    } else if (Array.isArray(obj[k])) {
 	      obj[k] = obj[k].map(item => {
 	        if (typeof item === 'string') {
-	          return item.startsWith('#') ? (0, util_1$O.toLexUri)(item, baseUri) : item;
+	          return item.startsWith('#') ? (0, util_1$P.toLexUri)(item, baseUri) : item;
 	        } else if (item && typeof item === 'object') {
 	          return resolveRefUris(item, baseUri);
 	        }
@@ -12525,7 +12519,9 @@ if (cid) {
 	const syntax_1$2 = dist$4;
 	const common_web_1$3 = dist$2;
 	function sanitizeMutedWordValue(value) {
-	  return value.trim().replace(/^#(?!\ufe0f)/, '').replace(/[\r\n\u00AD\u2060\u200D\u200C\u200B]+/, '');
+	  return value.trim().replace(/^#(?!\ufe0f)/, '')
+	  // eslint-disable-next-line no-misleading-character-class
+	  .replace(/[\r\n\u00AD\u2060\u200D\u200C\u200B]+/, '');
 	}
 	util$4.sanitizeMutedWordValue = sanitizeMutedWordValue;
 	function savedFeedsToUriArrays(savedFeeds) {
@@ -12875,7 +12871,7 @@ if (cid) {
 	});
 	client.defaultFetchHandler = client.ServiceClient = client.Client = void 0;
 	const lexicon_1 = dist$3;
-	const util_1$N = util$3;
+	const util_1$O = util$3;
 	const types_1$1 = types$1;
 	class Client {
 	  constructor() {
@@ -12949,9 +12945,9 @@ if (cid) {
 	    if (!def || def.type !== 'query' && def.type !== 'procedure') {
 	      throw new Error(`Invalid lexicon: ${methodNsid}. Must be a query or procedure.`);
 	    }
-	    const httpMethod = (0, util_1$N.getMethodSchemaHTTPMethod)(def);
-	    const httpUri = (0, util_1$N.constructMethodCallUri)(methodNsid, def, this.uri, params);
-	    const httpHeaders = (0, util_1$N.constructMethodCallHeaders)(def, data, {
+	    const httpMethod = (0, util_1$O.getMethodSchemaHTTPMethod)(def);
+	    const httpUri = (0, util_1$O.constructMethodCallUri)(methodNsid, def, this.uri, params);
+	    const httpHeaders = (0, util_1$O.constructMethodCallHeaders)(def, data, {
 	      headers: {
 	        ...this.headers,
 	        ...opts?.headers
@@ -12959,7 +12955,7 @@ if (cid) {
 	      encoding: opts?.encoding
 	    });
 	    const res = await this.baseClient.fetch(httpUri, httpMethod, httpHeaders, data);
-	    const resCode = (0, util_1$N.httpResponseCodeToEnum)(res.status);
+	    const resCode = (0, util_1$O.httpResponseCodeToEnum)(res.status);
 	    if (resCode === types_1$1.ResponseType.Success) {
 	      try {
 	        this.baseClient.lex.assertValidXrpcOutput(methodNsid, res.body);
@@ -12985,11 +12981,11 @@ if (cid) {
 	  try {
 	    // The duplex field is now required for streaming bodies, but not yet reflected
 	    // anywhere in docs or types. See whatwg/fetch#1438, nodejs/node#46221.
-	    const headers = (0, util_1$N.normalizeHeaders)(httpHeaders);
+	    const headers = (0, util_1$O.normalizeHeaders)(httpHeaders);
 	    const reqInit = {
 	      method: httpMethod,
 	      headers,
-	      body: (0, util_1$N.encodeMethodCallBody)(headers, httpReqBody),
+	      body: (0, util_1$O.encodeMethodCallBody)(headers, httpReqBody),
 	      duplex: 'half'
 	    };
 	    const res = await fetch(httpUri, reqInit);
@@ -12997,7 +12993,7 @@ if (cid) {
 	    return {
 	      status: res.status,
 	      headers: Object.fromEntries(res.headers.entries()),
-	      body: (0, util_1$N.httpResponseBodyParse)(res.headers.get('content-type'), resBody)
+	      body: (0, util_1$O.httpResponseBodyParse)(res.headers.get('content-type'), resBody)
 	    };
 	  } catch (e) {
 	    throw new types_1$1.XRPCError(types_1$1.ResponseType.Unknown, String(e));
@@ -13419,6 +13415,52 @@ if (cid) {
 	        }
 	      }
 	    },
+	    ComAtprotoAdminSearchAccounts: {
+	      lexicon: 1,
+	      id: 'com.atproto.admin.searchAccounts',
+	      defs: {
+	        main: {
+	          type: 'query',
+	          description: 'Get list of accounts that matches your search query.',
+	          parameters: {
+	            type: 'params',
+	            properties: {
+	              email: {
+	                type: 'string'
+	              },
+	              cursor: {
+	                type: 'string'
+	              },
+	              limit: {
+	                type: 'integer',
+	                minimum: 1,
+	                maximum: 100,
+	                default: 50
+	              }
+	            }
+	          },
+	          output: {
+	            encoding: 'application/json',
+	            schema: {
+	              type: 'object',
+	              required: ['accounts'],
+	              properties: {
+	                cursor: {
+	                  type: 'string'
+	                },
+	                accounts: {
+	                  type: 'array',
+	                  items: {
+	                    type: 'ref',
+	                    ref: 'lex:com.atproto.admin.defs#accountView'
+	                  }
+	                }
+	              }
+	            }
+	          }
+	        }
+	      }
+	    },
 	    ComAtprotoAdminSendEmail: {
 	      lexicon: 1,
 	      id: 'com.atproto.admin.sendEmail',
@@ -13566,6 +13608,10 @@ if (cid) {
 	                  refs: ['lex:com.atproto.admin.defs#repoRef', 'lex:com.atproto.repo.strongRef', 'lex:com.atproto.admin.defs#repoBlobRef']
 	                },
 	                takedown: {
+	                  type: 'ref',
+	                  ref: 'lex:com.atproto.admin.defs#statusAttr'
+	                },
+	                deactivated: {
 	                  type: 'ref',
 	                  ref: 'lex:com.atproto.admin.defs#statusAttr'
 	                }
@@ -16788,6 +16834,29 @@ if (cid) {
 	            followedBy: {
 	              type: 'string',
 	              format: 'at-uri'
+	            },
+	            knownFollowers: {
+	              type: 'ref',
+	              ref: 'lex:app.bsky.actor.defs#knownFollowers'
+	            }
+	          }
+	        },
+	        knownFollowers: {
+	          type: 'object',
+	          description: "The subject's followers whom you also follow",
+	          required: ['count', 'followers'],
+	          properties: {
+	            count: {
+	              type: 'integer'
+	            },
+	            followers: {
+	              type: 'array',
+	              minLength: 0,
+	              maxLength: 5,
+	              items: {
+	                type: 'ref',
+	                ref: 'lex:app.bsky.actor.defs#profileViewBasic'
+	              }
 	            }
 	          }
 	        },
@@ -17705,6 +17774,9 @@ if (cid) {
 	            like: {
 	              type: 'string',
 	              format: 'at-uri'
+	            },
+	            threadMuted: {
+	              type: 'boolean'
 	            },
 	            replyDisabled: {
 	              type: 'boolean'
@@ -19599,6 +19671,58 @@ if (cid) {
 	        }
 	      }
 	    },
+	    AppBskyGraphGetKnownFollowers: {
+	      lexicon: 1,
+	      id: 'app.bsky.graph.getKnownFollowers',
+	      defs: {
+	        main: {
+	          type: 'query',
+	          description: 'Enumerates accounts which follow a specified account (actor) and are followed by the viewer.',
+	          parameters: {
+	            type: 'params',
+	            required: ['actor'],
+	            properties: {
+	              actor: {
+	                type: 'string',
+	                format: 'at-identifier'
+	              },
+	              limit: {
+	                type: 'integer',
+	                minimum: 1,
+	                maximum: 100,
+	                default: 50
+	              },
+	              cursor: {
+	                type: 'string'
+	              }
+	            }
+	          },
+	          output: {
+	            encoding: 'application/json',
+	            schema: {
+	              type: 'object',
+	              required: ['subject', 'followers'],
+	              properties: {
+	                subject: {
+	                  type: 'ref',
+	                  ref: 'lex:app.bsky.actor.defs#profileView'
+	                },
+	                cursor: {
+	                  type: 'string'
+	                },
+	                followers: {
+	                  type: 'array',
+	                  items: {
+	                    type: 'ref',
+	                    ref: 'lex:app.bsky.actor.defs#profileView'
+	                  }
+	                }
+	              }
+	            }
+	          }
+	        }
+	      }
+	    },
 	    AppBskyGraphGetList: {
 	      lexicon: 1,
 	      id: 'app.bsky.graph.getList',
@@ -20076,6 +20200,29 @@ if (cid) {
 	        }
 	      }
 	    },
+	    AppBskyGraphMuteThread: {
+	      lexicon: 1,
+	      id: 'app.bsky.graph.muteThread',
+	      defs: {
+	        main: {
+	          type: 'procedure',
+	          description: 'Mutes a thread preventing notifications from the thread and any of its children. Mutes are private in Bluesky. Requires auth.',
+	          input: {
+	            encoding: 'application/json',
+	            schema: {
+	              type: 'object',
+	              required: ['root'],
+	              properties: {
+	                root: {
+	                  type: 'string',
+	                  format: 'at-uri'
+	                }
+	              }
+	            }
+	          }
+	        }
+	      }
+	    },
 	    AppBskyGraphUnmuteActor: {
 	      lexicon: 1,
 	      id: 'app.bsky.graph.unmuteActor',
@@ -20113,6 +20260,29 @@ if (cid) {
 	              required: ['list'],
 	              properties: {
 	                list: {
+	                  type: 'string',
+	                  format: 'at-uri'
+	                }
+	              }
+	            }
+	          }
+	        }
+	      }
+	    },
+	    AppBskyGraphUnmuteThread: {
+	      lexicon: 1,
+	      id: 'app.bsky.graph.unmuteThread',
+	      defs: {
+	        main: {
+	          type: 'procedure',
+	          description: 'Unmutes the specified thread. Requires auth.',
+	          input: {
+	            encoding: 'application/json',
+	            schema: {
+	              type: 'object',
+	              required: ['root'],
+	              properties: {
+	                root: {
 	                  type: 'string',
 	                  format: 'at-uri'
 	                }
@@ -23061,6 +23231,62 @@ if (cid) {
 	          }
 	        }
 	      }
+	    },
+	    ToolsOzoneServerGetConfig: {
+	      lexicon: 1,
+	      id: 'tools.ozone.server.getConfig',
+	      defs: {
+	        main: {
+	          type: 'query',
+	          description: "Get details about ozone's server configuration.",
+	          output: {
+	            encoding: 'application/json',
+	            schema: {
+	              type: 'object',
+	              properties: {
+	                appview: {
+	                  type: 'ref',
+	                  ref: 'lex:tools.ozone.server.getConfig#serviceConfig'
+	                },
+	                pds: {
+	                  type: 'ref',
+	                  ref: 'lex:tools.ozone.server.getConfig#serviceConfig'
+	                },
+	                blobDivert: {
+	                  type: 'ref',
+	                  ref: 'lex:tools.ozone.server.getConfig#serviceConfig'
+	                },
+	                chat: {
+	                  type: 'ref',
+	                  ref: 'lex:tools.ozone.server.getConfig#serviceConfig'
+	                },
+	                viewer: {
+	                  type: 'ref',
+	                  ref: 'lex:tools.ozone.server.getConfig#viewerConfig'
+	                }
+	              }
+	            }
+	          }
+	        },
+	        serviceConfig: {
+	          type: 'object',
+	          properties: {
+	            url: {
+	              type: 'string',
+	              format: 'uri'
+	            }
+	          }
+	        },
+	        viewerConfig: {
+	          type: 'object',
+	          properties: {
+	            role: {
+	              type: 'string',
+	              knownValues: ['tools.ozone.team.defs#roleAdmin', 'tools.ozone.team.defs#roleModerator', 'tools.ozone.team.defs#roleTriage']
+	            }
+	          }
+	        }
+	      }
 	    }
 	  };
 	  exports.schemas = Object.values(exports.schemaDict);
@@ -23075,6 +23301,7 @@ if (cid) {
 	    ComAtprotoAdminGetAccountInfos: 'com.atproto.admin.getAccountInfos',
 	    ComAtprotoAdminGetInviteCodes: 'com.atproto.admin.getInviteCodes',
 	    ComAtprotoAdminGetSubjectStatus: 'com.atproto.admin.getSubjectStatus',
+	    ComAtprotoAdminSearchAccounts: 'com.atproto.admin.searchAccounts',
 	    ComAtprotoAdminSendEmail: 'com.atproto.admin.sendEmail',
 	    ComAtprotoAdminUpdateAccountEmail: 'com.atproto.admin.updateAccountEmail',
 	    ComAtprotoAdminUpdateAccountHandle: 'com.atproto.admin.updateAccountHandle',
@@ -23186,6 +23413,7 @@ if (cid) {
 	    AppBskyGraphGetBlocks: 'app.bsky.graph.getBlocks',
 	    AppBskyGraphGetFollowers: 'app.bsky.graph.getFollowers',
 	    AppBskyGraphGetFollows: 'app.bsky.graph.getFollows',
+	    AppBskyGraphGetKnownFollowers: 'app.bsky.graph.getKnownFollowers',
 	    AppBskyGraphGetList: 'app.bsky.graph.getList',
 	    AppBskyGraphGetListBlocks: 'app.bsky.graph.getListBlocks',
 	    AppBskyGraphGetListMutes: 'app.bsky.graph.getListMutes',
@@ -23198,8 +23426,10 @@ if (cid) {
 	    AppBskyGraphListitem: 'app.bsky.graph.listitem',
 	    AppBskyGraphMuteActor: 'app.bsky.graph.muteActor',
 	    AppBskyGraphMuteActorList: 'app.bsky.graph.muteActorList',
+	    AppBskyGraphMuteThread: 'app.bsky.graph.muteThread',
 	    AppBskyGraphUnmuteActor: 'app.bsky.graph.unmuteActor',
 	    AppBskyGraphUnmuteActorList: 'app.bsky.graph.unmuteActorList',
+	    AppBskyGraphUnmuteThread: 'app.bsky.graph.unmuteThread',
 	    AppBskyLabelerDefs: 'app.bsky.labeler.defs',
 	    AppBskyLabelerGetServices: 'app.bsky.labeler.getServices',
 	    AppBskyLabelerService: 'app.bsky.labeler.service',
@@ -23246,7 +23476,8 @@ if (cid) {
 	    ToolsOzoneModerationGetRepo: 'tools.ozone.moderation.getRepo',
 	    ToolsOzoneModerationQueryEvents: 'tools.ozone.moderation.queryEvents',
 	    ToolsOzoneModerationQueryStatuses: 'tools.ozone.moderation.queryStatuses',
-	    ToolsOzoneModerationSearchRepos: 'tools.ozone.moderation.searchRepos'
+	    ToolsOzoneModerationSearchRepos: 'tools.ozone.moderation.searchRepos',
+	    ToolsOzoneServerGetConfig: 'tools.ozone.server.getConfig'
 	  };
 	})(lexicons);
 
@@ -23259,12 +23490,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2k = dist;
-	function toKnownErr$2i(e) {
-	  if (e instanceof xrpc_1$2k.XRPCError) ;
+	const xrpc_1$2p = dist;
+	function toKnownErr$2n(e) {
+	  if (e instanceof xrpc_1$2p.XRPCError) ;
 	  return e;
 	}
-	deleteAccount$2.toKnownErr = toKnownErr$2i;
+	deleteAccount$2.toKnownErr = toKnownErr$2n;
 
 	var disableAccountInvites = {};
 
@@ -23275,12 +23506,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2j = dist;
-	function toKnownErr$2h(e) {
-	  if (e instanceof xrpc_1$2j.XRPCError) ;
+	const xrpc_1$2o = dist;
+	function toKnownErr$2m(e) {
+	  if (e instanceof xrpc_1$2o.XRPCError) ;
 	  return e;
 	}
-	disableAccountInvites.toKnownErr = toKnownErr$2h;
+	disableAccountInvites.toKnownErr = toKnownErr$2m;
 
 	var disableInviteCodes = {};
 
@@ -23291,12 +23522,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2i = dist;
-	function toKnownErr$2g(e) {
-	  if (e instanceof xrpc_1$2i.XRPCError) ;
+	const xrpc_1$2n = dist;
+	function toKnownErr$2l(e) {
+	  if (e instanceof xrpc_1$2n.XRPCError) ;
 	  return e;
 	}
-	disableInviteCodes.toKnownErr = toKnownErr$2g;
+	disableInviteCodes.toKnownErr = toKnownErr$2l;
 
 	var enableAccountInvites = {};
 
@@ -23307,12 +23538,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2h = dist;
-	function toKnownErr$2f(e) {
-	  if (e instanceof xrpc_1$2h.XRPCError) ;
+	const xrpc_1$2m = dist;
+	function toKnownErr$2k(e) {
+	  if (e instanceof xrpc_1$2m.XRPCError) ;
 	  return e;
 	}
-	enableAccountInvites.toKnownErr = toKnownErr$2f;
+	enableAccountInvites.toKnownErr = toKnownErr$2k;
 
 	var getAccountInfo = {};
 
@@ -23323,12 +23554,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2g = dist;
-	function toKnownErr$2e(e) {
-	  if (e instanceof xrpc_1$2g.XRPCError) ;
+	const xrpc_1$2l = dist;
+	function toKnownErr$2j(e) {
+	  if (e instanceof xrpc_1$2l.XRPCError) ;
 	  return e;
 	}
-	getAccountInfo.toKnownErr = toKnownErr$2e;
+	getAccountInfo.toKnownErr = toKnownErr$2j;
 
 	var getAccountInfos = {};
 
@@ -23339,12 +23570,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2f = dist;
-	function toKnownErr$2d(e) {
-	  if (e instanceof xrpc_1$2f.XRPCError) ;
+	const xrpc_1$2k = dist;
+	function toKnownErr$2i(e) {
+	  if (e instanceof xrpc_1$2k.XRPCError) ;
 	  return e;
 	}
-	getAccountInfos.toKnownErr = toKnownErr$2d;
+	getAccountInfos.toKnownErr = toKnownErr$2i;
 
 	var getInviteCodes = {};
 
@@ -23355,12 +23586,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2e = dist;
-	function toKnownErr$2c(e) {
-	  if (e instanceof xrpc_1$2e.XRPCError) ;
+	const xrpc_1$2j = dist;
+	function toKnownErr$2h(e) {
+	  if (e instanceof xrpc_1$2j.XRPCError) ;
 	  return e;
 	}
-	getInviteCodes.toKnownErr = toKnownErr$2c;
+	getInviteCodes.toKnownErr = toKnownErr$2h;
 
 	var getSubjectStatus = {};
 
@@ -23371,12 +23602,28 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2d = dist;
-	function toKnownErr$2b(e) {
-	  if (e instanceof xrpc_1$2d.XRPCError) ;
+	const xrpc_1$2i = dist;
+	function toKnownErr$2g(e) {
+	  if (e instanceof xrpc_1$2i.XRPCError) ;
 	  return e;
 	}
-	getSubjectStatus.toKnownErr = toKnownErr$2b;
+	getSubjectStatus.toKnownErr = toKnownErr$2g;
+
+	var searchAccounts = {};
+
+	Object.defineProperty(searchAccounts, "__esModule", {
+	  value: true
+	});
+	searchAccounts.toKnownErr = void 0;
+	/**
+	 * GENERATED CODE - DO NOT MODIFY
+	 */
+	const xrpc_1$2h = dist;
+	function toKnownErr$2f(e) {
+	  if (e instanceof xrpc_1$2h.XRPCError) ;
+	  return e;
+	}
+	searchAccounts.toKnownErr = toKnownErr$2f;
 
 	var sendEmail = {};
 
@@ -23387,12 +23634,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2c = dist;
-	function toKnownErr$2a(e) {
-	  if (e instanceof xrpc_1$2c.XRPCError) ;
+	const xrpc_1$2g = dist;
+	function toKnownErr$2e(e) {
+	  if (e instanceof xrpc_1$2g.XRPCError) ;
 	  return e;
 	}
-	sendEmail.toKnownErr = toKnownErr$2a;
+	sendEmail.toKnownErr = toKnownErr$2e;
 
 	var updateAccountEmail = {};
 
@@ -23403,12 +23650,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2b = dist;
-	function toKnownErr$29(e) {
-	  if (e instanceof xrpc_1$2b.XRPCError) ;
+	const xrpc_1$2f = dist;
+	function toKnownErr$2d(e) {
+	  if (e instanceof xrpc_1$2f.XRPCError) ;
 	  return e;
 	}
-	updateAccountEmail.toKnownErr = toKnownErr$29;
+	updateAccountEmail.toKnownErr = toKnownErr$2d;
 
 	var updateAccountHandle = {};
 
@@ -23419,12 +23666,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2a = dist;
-	function toKnownErr$28(e) {
-	  if (e instanceof xrpc_1$2a.XRPCError) ;
+	const xrpc_1$2e = dist;
+	function toKnownErr$2c(e) {
+	  if (e instanceof xrpc_1$2e.XRPCError) ;
 	  return e;
 	}
-	updateAccountHandle.toKnownErr = toKnownErr$28;
+	updateAccountHandle.toKnownErr = toKnownErr$2c;
 
 	var updateAccountPassword = {};
 
@@ -23435,12 +23682,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$29 = dist;
-	function toKnownErr$27(e) {
-	  if (e instanceof xrpc_1$29.XRPCError) ;
+	const xrpc_1$2d = dist;
+	function toKnownErr$2b(e) {
+	  if (e instanceof xrpc_1$2d.XRPCError) ;
 	  return e;
 	}
-	updateAccountPassword.toKnownErr = toKnownErr$27;
+	updateAccountPassword.toKnownErr = toKnownErr$2b;
 
 	var updateSubjectStatus = {};
 
@@ -23451,12 +23698,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$28 = dist;
-	function toKnownErr$26(e) {
-	  if (e instanceof xrpc_1$28.XRPCError) ;
+	const xrpc_1$2c = dist;
+	function toKnownErr$2a(e) {
+	  if (e instanceof xrpc_1$2c.XRPCError) ;
 	  return e;
 	}
-	updateSubjectStatus.toKnownErr = toKnownErr$26;
+	updateSubjectStatus.toKnownErr = toKnownErr$2a;
 
 	var getRecommendedDidCredentials = {};
 
@@ -23467,12 +23714,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$27 = dist;
-	function toKnownErr$25(e) {
-	  if (e instanceof xrpc_1$27.XRPCError) ;
+	const xrpc_1$2b = dist;
+	function toKnownErr$29(e) {
+	  if (e instanceof xrpc_1$2b.XRPCError) ;
 	  return e;
 	}
-	getRecommendedDidCredentials.toKnownErr = toKnownErr$25;
+	getRecommendedDidCredentials.toKnownErr = toKnownErr$29;
 
 	var requestPlcOperationSignature = {};
 
@@ -23483,12 +23730,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$26 = dist;
-	function toKnownErr$24(e) {
-	  if (e instanceof xrpc_1$26.XRPCError) ;
+	const xrpc_1$2a = dist;
+	function toKnownErr$28(e) {
+	  if (e instanceof xrpc_1$2a.XRPCError) ;
 	  return e;
 	}
-	requestPlcOperationSignature.toKnownErr = toKnownErr$24;
+	requestPlcOperationSignature.toKnownErr = toKnownErr$28;
 
 	var resolveHandle = {};
 
@@ -23499,12 +23746,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$25 = dist;
-	function toKnownErr$23(e) {
-	  if (e instanceof xrpc_1$25.XRPCError) ;
+	const xrpc_1$29 = dist;
+	function toKnownErr$27(e) {
+	  if (e instanceof xrpc_1$29.XRPCError) ;
 	  return e;
 	}
-	resolveHandle.toKnownErr = toKnownErr$23;
+	resolveHandle.toKnownErr = toKnownErr$27;
 
 	var signPlcOperation = {};
 
@@ -23515,12 +23762,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$24 = dist;
-	function toKnownErr$22(e) {
-	  if (e instanceof xrpc_1$24.XRPCError) ;
+	const xrpc_1$28 = dist;
+	function toKnownErr$26(e) {
+	  if (e instanceof xrpc_1$28.XRPCError) ;
 	  return e;
 	}
-	signPlcOperation.toKnownErr = toKnownErr$22;
+	signPlcOperation.toKnownErr = toKnownErr$26;
 
 	var submitPlcOperation = {};
 
@@ -23531,12 +23778,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$23 = dist;
-	function toKnownErr$21(e) {
-	  if (e instanceof xrpc_1$23.XRPCError) ;
+	const xrpc_1$27 = dist;
+	function toKnownErr$25(e) {
+	  if (e instanceof xrpc_1$27.XRPCError) ;
 	  return e;
 	}
-	submitPlcOperation.toKnownErr = toKnownErr$21;
+	submitPlcOperation.toKnownErr = toKnownErr$25;
 
 	var updateHandle = {};
 
@@ -23547,12 +23794,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$22 = dist;
-	function toKnownErr$20(e) {
-	  if (e instanceof xrpc_1$22.XRPCError) ;
+	const xrpc_1$26 = dist;
+	function toKnownErr$24(e) {
+	  if (e instanceof xrpc_1$26.XRPCError) ;
 	  return e;
 	}
-	updateHandle.toKnownErr = toKnownErr$20;
+	updateHandle.toKnownErr = toKnownErr$24;
 
 	var queryLabels = {};
 
@@ -23563,12 +23810,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$21 = dist;
-	function toKnownErr$1$(e) {
-	  if (e instanceof xrpc_1$21.XRPCError) ;
+	const xrpc_1$25 = dist;
+	function toKnownErr$23(e) {
+	  if (e instanceof xrpc_1$25.XRPCError) ;
 	  return e;
 	}
-	queryLabels.toKnownErr = toKnownErr$1$;
+	queryLabels.toKnownErr = toKnownErr$23;
 
 	var createReport = {};
 
@@ -23579,12 +23826,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$20 = dist;
-	function toKnownErr$1_(e) {
-	  if (e instanceof xrpc_1$20.XRPCError) ;
+	const xrpc_1$24 = dist;
+	function toKnownErr$22(e) {
+	  if (e instanceof xrpc_1$24.XRPCError) ;
 	  return e;
 	}
-	createReport.toKnownErr = toKnownErr$1_;
+	createReport.toKnownErr = toKnownErr$22;
 
 	var applyWrites = {};
 
@@ -23613,44 +23860,44 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1$ = dist;
-	const util_1$M = util$2;
-	const lexicons_1$L = lexicons;
-	let InvalidSwapError$3 = class InvalidSwapError extends xrpc_1$1$.XRPCError {
+	const xrpc_1$23 = dist;
+	const util_1$N = util$2;
+	const lexicons_1$M = lexicons;
+	let InvalidSwapError$3 = class InvalidSwapError extends xrpc_1$23.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	applyWrites.InvalidSwapError = InvalidSwapError$3;
-	function toKnownErr$1Z(e) {
-	  if (e instanceof xrpc_1$1$.XRPCError) {
+	function toKnownErr$21(e) {
+	  if (e instanceof xrpc_1$23.XRPCError) {
 	    if (e.error === 'InvalidSwap') return new InvalidSwapError$3(e);
 	  }
 	  return e;
 	}
-	applyWrites.toKnownErr = toKnownErr$1Z;
+	applyWrites.toKnownErr = toKnownErr$21;
 	function isCreate(v) {
-	  return (0, util_1$M.isObj)(v) && (0, util_1$M.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#create';
+	  return (0, util_1$N.isObj)(v) && (0, util_1$N.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#create';
 	}
 	applyWrites.isCreate = isCreate;
 	function validateCreate(v) {
-	  return lexicons_1$L.lexicons.validate('com.atproto.repo.applyWrites#create', v);
+	  return lexicons_1$M.lexicons.validate('com.atproto.repo.applyWrites#create', v);
 	}
 	applyWrites.validateCreate = validateCreate;
 	function isUpdate(v) {
-	  return (0, util_1$M.isObj)(v) && (0, util_1$M.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#update';
+	  return (0, util_1$N.isObj)(v) && (0, util_1$N.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#update';
 	}
 	applyWrites.isUpdate = isUpdate;
 	function validateUpdate(v) {
-	  return lexicons_1$L.lexicons.validate('com.atproto.repo.applyWrites#update', v);
+	  return lexicons_1$M.lexicons.validate('com.atproto.repo.applyWrites#update', v);
 	}
 	applyWrites.validateUpdate = validateUpdate;
 	function isDelete(v) {
-	  return (0, util_1$M.isObj)(v) && (0, util_1$M.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#delete';
+	  return (0, util_1$N.isObj)(v) && (0, util_1$N.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#delete';
 	}
 	applyWrites.isDelete = isDelete;
 	function validateDelete(v) {
-	  return lexicons_1$L.lexicons.validate('com.atproto.repo.applyWrites#delete', v);
+	  return lexicons_1$M.lexicons.validate('com.atproto.repo.applyWrites#delete', v);
 	}
 	applyWrites.validateDelete = validateDelete;
 
@@ -23663,20 +23910,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1_ = dist;
-	let InvalidSwapError$2 = class InvalidSwapError extends xrpc_1$1_.XRPCError {
+	const xrpc_1$22 = dist;
+	let InvalidSwapError$2 = class InvalidSwapError extends xrpc_1$22.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	createRecord.InvalidSwapError = InvalidSwapError$2;
-	function toKnownErr$1Y(e) {
-	  if (e instanceof xrpc_1$1_.XRPCError) {
+	function toKnownErr$20(e) {
+	  if (e instanceof xrpc_1$22.XRPCError) {
 	    if (e.error === 'InvalidSwap') return new InvalidSwapError$2(e);
 	  }
 	  return e;
 	}
-	createRecord.toKnownErr = toKnownErr$1Y;
+	createRecord.toKnownErr = toKnownErr$20;
 
 	var deleteRecord = {};
 
@@ -23687,20 +23934,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1Z = dist;
-	let InvalidSwapError$1 = class InvalidSwapError extends xrpc_1$1Z.XRPCError {
+	const xrpc_1$21 = dist;
+	let InvalidSwapError$1 = class InvalidSwapError extends xrpc_1$21.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	deleteRecord.InvalidSwapError = InvalidSwapError$1;
-	function toKnownErr$1X(e) {
-	  if (e instanceof xrpc_1$1Z.XRPCError) {
+	function toKnownErr$1$(e) {
+	  if (e instanceof xrpc_1$21.XRPCError) {
 	    if (e.error === 'InvalidSwap') return new InvalidSwapError$1(e);
 	  }
 	  return e;
 	}
-	deleteRecord.toKnownErr = toKnownErr$1X;
+	deleteRecord.toKnownErr = toKnownErr$1$;
 
 	var describeRepo = {};
 
@@ -23711,12 +23958,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1Y = dist;
-	function toKnownErr$1W(e) {
-	  if (e instanceof xrpc_1$1Y.XRPCError) ;
+	const xrpc_1$20 = dist;
+	function toKnownErr$1_(e) {
+	  if (e instanceof xrpc_1$20.XRPCError) ;
 	  return e;
 	}
-	describeRepo.toKnownErr = toKnownErr$1W;
+	describeRepo.toKnownErr = toKnownErr$1_;
 
 	var getRecord$2 = {};
 
@@ -23727,12 +23974,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1X = dist;
-	function toKnownErr$1V(e) {
-	  if (e instanceof xrpc_1$1X.XRPCError) ;
+	const xrpc_1$1$ = dist;
+	function toKnownErr$1Z(e) {
+	  if (e instanceof xrpc_1$1$.XRPCError) ;
 	  return e;
 	}
-	getRecord$2.toKnownErr = toKnownErr$1V;
+	getRecord$2.toKnownErr = toKnownErr$1Z;
 
 	var importRepo = {};
 
@@ -23743,12 +23990,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1W = dist;
-	function toKnownErr$1U(e) {
-	  if (e instanceof xrpc_1$1W.XRPCError) ;
+	const xrpc_1$1_ = dist;
+	function toKnownErr$1Y(e) {
+	  if (e instanceof xrpc_1$1_.XRPCError) ;
 	  return e;
 	}
-	importRepo.toKnownErr = toKnownErr$1U;
+	importRepo.toKnownErr = toKnownErr$1Y;
 
 	var listMissingBlobs = {};
 
@@ -23759,20 +24006,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1V = dist;
-	const util_1$L = util$2;
-	const lexicons_1$K = lexicons;
-	function toKnownErr$1T(e) {
-	  if (e instanceof xrpc_1$1V.XRPCError) ;
+	const xrpc_1$1Z = dist;
+	const util_1$M = util$2;
+	const lexicons_1$L = lexicons;
+	function toKnownErr$1X(e) {
+	  if (e instanceof xrpc_1$1Z.XRPCError) ;
 	  return e;
 	}
-	listMissingBlobs.toKnownErr = toKnownErr$1T;
+	listMissingBlobs.toKnownErr = toKnownErr$1X;
 	function isRecordBlob(v) {
-	  return (0, util_1$L.isObj)(v) && (0, util_1$L.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.listMissingBlobs#recordBlob';
+	  return (0, util_1$M.isObj)(v) && (0, util_1$M.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.listMissingBlobs#recordBlob';
 	}
 	listMissingBlobs.isRecordBlob = isRecordBlob;
 	function validateRecordBlob(v) {
-	  return lexicons_1$K.lexicons.validate('com.atproto.repo.listMissingBlobs#recordBlob', v);
+	  return lexicons_1$L.lexicons.validate('com.atproto.repo.listMissingBlobs#recordBlob', v);
 	}
 	listMissingBlobs.validateRecordBlob = validateRecordBlob;
 
@@ -23785,20 +24032,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1U = dist;
-	const util_1$K = util$2;
-	const lexicons_1$J = lexicons;
-	function toKnownErr$1S(e) {
-	  if (e instanceof xrpc_1$1U.XRPCError) ;
+	const xrpc_1$1Y = dist;
+	const util_1$L = util$2;
+	const lexicons_1$K = lexicons;
+	function toKnownErr$1W(e) {
+	  if (e instanceof xrpc_1$1Y.XRPCError) ;
 	  return e;
 	}
-	listRecords.toKnownErr = toKnownErr$1S;
+	listRecords.toKnownErr = toKnownErr$1W;
 	function isRecord$d(v) {
-	  return (0, util_1$K.isObj)(v) && (0, util_1$K.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.listRecords#record';
+	  return (0, util_1$L.isObj)(v) && (0, util_1$L.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.listRecords#record';
 	}
 	listRecords.isRecord = isRecord$d;
 	function validateRecord$d(v) {
-	  return lexicons_1$J.lexicons.validate('com.atproto.repo.listRecords#record', v);
+	  return lexicons_1$K.lexicons.validate('com.atproto.repo.listRecords#record', v);
 	}
 	listRecords.validateRecord = validateRecord$d;
 
@@ -23811,20 +24058,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1T = dist;
-	class InvalidSwapError extends xrpc_1$1T.XRPCError {
+	const xrpc_1$1X = dist;
+	class InvalidSwapError extends xrpc_1$1X.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	putRecord.InvalidSwapError = InvalidSwapError;
-	function toKnownErr$1R(e) {
-	  if (e instanceof xrpc_1$1T.XRPCError) {
+	function toKnownErr$1V(e) {
+	  if (e instanceof xrpc_1$1X.XRPCError) {
 	    if (e.error === 'InvalidSwap') return new InvalidSwapError(e);
 	  }
 	  return e;
 	}
-	putRecord.toKnownErr = toKnownErr$1R;
+	putRecord.toKnownErr = toKnownErr$1V;
 
 	var uploadBlob = {};
 
@@ -23835,12 +24082,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1S = dist;
-	function toKnownErr$1Q(e) {
-	  if (e instanceof xrpc_1$1S.XRPCError) ;
+	const xrpc_1$1W = dist;
+	function toKnownErr$1U(e) {
+	  if (e instanceof xrpc_1$1W.XRPCError) ;
 	  return e;
 	}
-	uploadBlob.toKnownErr = toKnownErr$1Q;
+	uploadBlob.toKnownErr = toKnownErr$1U;
 
 	var activateAccount = {};
 
@@ -23851,12 +24098,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1R = dist;
-	function toKnownErr$1P(e) {
-	  if (e instanceof xrpc_1$1R.XRPCError) ;
+	const xrpc_1$1V = dist;
+	function toKnownErr$1T(e) {
+	  if (e instanceof xrpc_1$1V.XRPCError) ;
 	  return e;
 	}
-	activateAccount.toKnownErr = toKnownErr$1P;
+	activateAccount.toKnownErr = toKnownErr$1T;
 
 	var checkAccountStatus = {};
 
@@ -23867,12 +24114,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1Q = dist;
-	function toKnownErr$1O(e) {
-	  if (e instanceof xrpc_1$1Q.XRPCError) ;
+	const xrpc_1$1U = dist;
+	function toKnownErr$1S(e) {
+	  if (e instanceof xrpc_1$1U.XRPCError) ;
 	  return e;
 	}
-	checkAccountStatus.toKnownErr = toKnownErr$1O;
+	checkAccountStatus.toKnownErr = toKnownErr$1S;
 
 	var confirmEmail = {};
 
@@ -23883,33 +24130,33 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1P = dist;
-	class AccountNotFoundError extends xrpc_1$1P.XRPCError {
+	const xrpc_1$1T = dist;
+	class AccountNotFoundError extends xrpc_1$1T.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	confirmEmail.AccountNotFoundError = AccountNotFoundError;
-	let ExpiredTokenError$3 = class ExpiredTokenError extends xrpc_1$1P.XRPCError {
+	let ExpiredTokenError$3 = class ExpiredTokenError extends xrpc_1$1T.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	confirmEmail.ExpiredTokenError = ExpiredTokenError$3;
-	let InvalidTokenError$3 = class InvalidTokenError extends xrpc_1$1P.XRPCError {
+	let InvalidTokenError$3 = class InvalidTokenError extends xrpc_1$1T.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	confirmEmail.InvalidTokenError = InvalidTokenError$3;
-	class InvalidEmailError extends xrpc_1$1P.XRPCError {
+	class InvalidEmailError extends xrpc_1$1T.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	confirmEmail.InvalidEmailError = InvalidEmailError;
-	function toKnownErr$1N(e) {
-	  if (e instanceof xrpc_1$1P.XRPCError) {
+	function toKnownErr$1R(e) {
+	  if (e instanceof xrpc_1$1T.XRPCError) {
 	    if (e.error === 'AccountNotFound') return new AccountNotFoundError(e);
 	    if (e.error === 'ExpiredToken') return new ExpiredTokenError$3(e);
 	    if (e.error === 'InvalidToken') return new InvalidTokenError$3(e);
@@ -23917,7 +24164,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	confirmEmail.toKnownErr = toKnownErr$1N;
+	confirmEmail.toKnownErr = toKnownErr$1R;
 
 	var createAccount = {};
 
@@ -23928,51 +24175,51 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1O = dist;
-	class InvalidHandleError extends xrpc_1$1O.XRPCError {
+	const xrpc_1$1S = dist;
+	class InvalidHandleError extends xrpc_1$1S.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.InvalidHandleError = InvalidHandleError;
-	class InvalidPasswordError extends xrpc_1$1O.XRPCError {
+	class InvalidPasswordError extends xrpc_1$1S.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.InvalidPasswordError = InvalidPasswordError;
-	class InvalidInviteCodeError extends xrpc_1$1O.XRPCError {
+	class InvalidInviteCodeError extends xrpc_1$1S.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.InvalidInviteCodeError = InvalidInviteCodeError;
-	class HandleNotAvailableError extends xrpc_1$1O.XRPCError {
+	class HandleNotAvailableError extends xrpc_1$1S.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.HandleNotAvailableError = HandleNotAvailableError;
-	class UnsupportedDomainError extends xrpc_1$1O.XRPCError {
+	class UnsupportedDomainError extends xrpc_1$1S.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.UnsupportedDomainError = UnsupportedDomainError;
-	class UnresolvableDidError extends xrpc_1$1O.XRPCError {
+	class UnresolvableDidError extends xrpc_1$1S.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.UnresolvableDidError = UnresolvableDidError;
-	class IncompatibleDidDocError extends xrpc_1$1O.XRPCError {
+	class IncompatibleDidDocError extends xrpc_1$1S.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.IncompatibleDidDocError = IncompatibleDidDocError;
-	function toKnownErr$1M(e) {
-	  if (e instanceof xrpc_1$1O.XRPCError) {
+	function toKnownErr$1Q(e) {
+	  if (e instanceof xrpc_1$1S.XRPCError) {
 	    if (e.error === 'InvalidHandle') return new InvalidHandleError(e);
 	    if (e.error === 'InvalidPassword') return new InvalidPasswordError(e);
 	    if (e.error === 'InvalidInviteCode') return new InvalidInviteCodeError(e);
@@ -23983,7 +24230,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	createAccount.toKnownErr = toKnownErr$1M;
+	createAccount.toKnownErr = toKnownErr$1Q;
 
 	var createAppPassword = {};
 
@@ -23994,28 +24241,28 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1N = dist;
-	const util_1$J = util$2;
-	const lexicons_1$I = lexicons;
-	let AccountTakedownError$3 = class AccountTakedownError extends xrpc_1$1N.XRPCError {
+	const xrpc_1$1R = dist;
+	const util_1$K = util$2;
+	const lexicons_1$J = lexicons;
+	let AccountTakedownError$3 = class AccountTakedownError extends xrpc_1$1R.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	createAppPassword.AccountTakedownError = AccountTakedownError$3;
-	function toKnownErr$1L(e) {
-	  if (e instanceof xrpc_1$1N.XRPCError) {
+	function toKnownErr$1P(e) {
+	  if (e instanceof xrpc_1$1R.XRPCError) {
 	    if (e.error === 'AccountTakedown') return new AccountTakedownError$3(e);
 	  }
 	  return e;
 	}
-	createAppPassword.toKnownErr = toKnownErr$1L;
+	createAppPassword.toKnownErr = toKnownErr$1P;
 	function isAppPassword$1(v) {
-	  return (0, util_1$J.isObj)(v) && (0, util_1$J.hasProp)(v, '$type') && v.$type === 'com.atproto.server.createAppPassword#appPassword';
+	  return (0, util_1$K.isObj)(v) && (0, util_1$K.hasProp)(v, '$type') && v.$type === 'com.atproto.server.createAppPassword#appPassword';
 	}
 	createAppPassword.isAppPassword = isAppPassword$1;
 	function validateAppPassword$1(v) {
-	  return lexicons_1$I.lexicons.validate('com.atproto.server.createAppPassword#appPassword', v);
+	  return lexicons_1$J.lexicons.validate('com.atproto.server.createAppPassword#appPassword', v);
 	}
 	createAppPassword.validateAppPassword = validateAppPassword$1;
 
@@ -24028,12 +24275,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1M = dist;
-	function toKnownErr$1K(e) {
-	  if (e instanceof xrpc_1$1M.XRPCError) ;
+	const xrpc_1$1Q = dist;
+	function toKnownErr$1O(e) {
+	  if (e instanceof xrpc_1$1Q.XRPCError) ;
 	  return e;
 	}
-	createInviteCode.toKnownErr = toKnownErr$1K;
+	createInviteCode.toKnownErr = toKnownErr$1O;
 
 	var createInviteCodes = {};
 
@@ -24044,20 +24291,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1L = dist;
-	const util_1$I = util$2;
-	const lexicons_1$H = lexicons;
-	function toKnownErr$1J(e) {
-	  if (e instanceof xrpc_1$1L.XRPCError) ;
+	const xrpc_1$1P = dist;
+	const util_1$J = util$2;
+	const lexicons_1$I = lexicons;
+	function toKnownErr$1N(e) {
+	  if (e instanceof xrpc_1$1P.XRPCError) ;
 	  return e;
 	}
-	createInviteCodes.toKnownErr = toKnownErr$1J;
+	createInviteCodes.toKnownErr = toKnownErr$1N;
 	function isAccountCodes(v) {
-	  return (0, util_1$I.isObj)(v) && (0, util_1$I.hasProp)(v, '$type') && v.$type === 'com.atproto.server.createInviteCodes#accountCodes';
+	  return (0, util_1$J.isObj)(v) && (0, util_1$J.hasProp)(v, '$type') && v.$type === 'com.atproto.server.createInviteCodes#accountCodes';
 	}
 	createInviteCodes.isAccountCodes = isAccountCodes;
 	function validateAccountCodes(v) {
-	  return lexicons_1$H.lexicons.validate('com.atproto.server.createInviteCodes#accountCodes', v);
+	  return lexicons_1$I.lexicons.validate('com.atproto.server.createInviteCodes#accountCodes', v);
 	}
 	createInviteCodes.validateAccountCodes = validateAccountCodes;
 
@@ -24070,27 +24317,27 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1K = dist;
-	let AccountTakedownError$2 = class AccountTakedownError extends xrpc_1$1K.XRPCError {
+	const xrpc_1$1O = dist;
+	let AccountTakedownError$2 = class AccountTakedownError extends xrpc_1$1O.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	createSession.AccountTakedownError = AccountTakedownError$2;
-	class AuthFactorTokenRequiredError extends xrpc_1$1K.XRPCError {
+	class AuthFactorTokenRequiredError extends xrpc_1$1O.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createSession.AuthFactorTokenRequiredError = AuthFactorTokenRequiredError;
-	function toKnownErr$1I(e) {
-	  if (e instanceof xrpc_1$1K.XRPCError) {
+	function toKnownErr$1M(e) {
+	  if (e instanceof xrpc_1$1O.XRPCError) {
 	    if (e.error === 'AccountTakedown') return new AccountTakedownError$2(e);
 	    if (e.error === 'AuthFactorTokenRequired') return new AuthFactorTokenRequiredError(e);
 	  }
 	  return e;
 	}
-	createSession.toKnownErr = toKnownErr$1I;
+	createSession.toKnownErr = toKnownErr$1M;
 
 	var deactivateAccount = {};
 
@@ -24101,12 +24348,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1J = dist;
-	function toKnownErr$1H(e) {
-	  if (e instanceof xrpc_1$1J.XRPCError) ;
+	const xrpc_1$1N = dist;
+	function toKnownErr$1L(e) {
+	  if (e instanceof xrpc_1$1N.XRPCError) ;
 	  return e;
 	}
-	deactivateAccount.toKnownErr = toKnownErr$1H;
+	deactivateAccount.toKnownErr = toKnownErr$1L;
 
 	var deleteAccount$1 = {};
 
@@ -24117,27 +24364,27 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1I = dist;
-	let ExpiredTokenError$2 = class ExpiredTokenError extends xrpc_1$1I.XRPCError {
+	const xrpc_1$1M = dist;
+	let ExpiredTokenError$2 = class ExpiredTokenError extends xrpc_1$1M.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	deleteAccount$1.ExpiredTokenError = ExpiredTokenError$2;
-	let InvalidTokenError$2 = class InvalidTokenError extends xrpc_1$1I.XRPCError {
+	let InvalidTokenError$2 = class InvalidTokenError extends xrpc_1$1M.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	deleteAccount$1.InvalidTokenError = InvalidTokenError$2;
-	function toKnownErr$1G(e) {
-	  if (e instanceof xrpc_1$1I.XRPCError) {
+	function toKnownErr$1K(e) {
+	  if (e instanceof xrpc_1$1M.XRPCError) {
 	    if (e.error === 'ExpiredToken') return new ExpiredTokenError$2(e);
 	    if (e.error === 'InvalidToken') return new InvalidTokenError$2(e);
 	  }
 	  return e;
 	}
-	deleteAccount$1.toKnownErr = toKnownErr$1G;
+	deleteAccount$1.toKnownErr = toKnownErr$1K;
 
 	var deleteSession = {};
 
@@ -24148,12 +24395,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1H = dist;
-	function toKnownErr$1F(e) {
-	  if (e instanceof xrpc_1$1H.XRPCError) ;
+	const xrpc_1$1L = dist;
+	function toKnownErr$1J(e) {
+	  if (e instanceof xrpc_1$1L.XRPCError) ;
 	  return e;
 	}
-	deleteSession.toKnownErr = toKnownErr$1F;
+	deleteSession.toKnownErr = toKnownErr$1J;
 
 	var describeServer = {};
 
@@ -24164,28 +24411,28 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1G = dist;
-	const util_1$H = util$2;
-	const lexicons_1$G = lexicons;
-	function toKnownErr$1E(e) {
-	  if (e instanceof xrpc_1$1G.XRPCError) ;
+	const xrpc_1$1K = dist;
+	const util_1$I = util$2;
+	const lexicons_1$H = lexicons;
+	function toKnownErr$1I(e) {
+	  if (e instanceof xrpc_1$1K.XRPCError) ;
 	  return e;
 	}
-	describeServer.toKnownErr = toKnownErr$1E;
+	describeServer.toKnownErr = toKnownErr$1I;
 	function isLinks$1(v) {
-	  return (0, util_1$H.isObj)(v) && (0, util_1$H.hasProp)(v, '$type') && v.$type === 'com.atproto.server.describeServer#links';
+	  return (0, util_1$I.isObj)(v) && (0, util_1$I.hasProp)(v, '$type') && v.$type === 'com.atproto.server.describeServer#links';
 	}
 	describeServer.isLinks = isLinks$1;
 	function validateLinks$1(v) {
-	  return lexicons_1$G.lexicons.validate('com.atproto.server.describeServer#links', v);
+	  return lexicons_1$H.lexicons.validate('com.atproto.server.describeServer#links', v);
 	}
 	describeServer.validateLinks = validateLinks$1;
 	function isContact(v) {
-	  return (0, util_1$H.isObj)(v) && (0, util_1$H.hasProp)(v, '$type') && v.$type === 'com.atproto.server.describeServer#contact';
+	  return (0, util_1$I.isObj)(v) && (0, util_1$I.hasProp)(v, '$type') && v.$type === 'com.atproto.server.describeServer#contact';
 	}
 	describeServer.isContact = isContact;
 	function validateContact(v) {
-	  return lexicons_1$G.lexicons.validate('com.atproto.server.describeServer#contact', v);
+	  return lexicons_1$H.lexicons.validate('com.atproto.server.describeServer#contact', v);
 	}
 	describeServer.validateContact = validateContact;
 
@@ -24198,20 +24445,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1F = dist;
-	class DuplicateCreateError extends xrpc_1$1F.XRPCError {
+	const xrpc_1$1J = dist;
+	class DuplicateCreateError extends xrpc_1$1J.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getAccountInviteCodes.DuplicateCreateError = DuplicateCreateError;
-	function toKnownErr$1D(e) {
-	  if (e instanceof xrpc_1$1F.XRPCError) {
+	function toKnownErr$1H(e) {
+	  if (e instanceof xrpc_1$1J.XRPCError) {
 	    if (e.error === 'DuplicateCreate') return new DuplicateCreateError(e);
 	  }
 	  return e;
 	}
-	getAccountInviteCodes.toKnownErr = toKnownErr$1D;
+	getAccountInviteCodes.toKnownErr = toKnownErr$1H;
 
 	var getServiceAuth = {};
 
@@ -24222,12 +24469,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1E = dist;
-	function toKnownErr$1C(e) {
-	  if (e instanceof xrpc_1$1E.XRPCError) ;
+	const xrpc_1$1I = dist;
+	function toKnownErr$1G(e) {
+	  if (e instanceof xrpc_1$1I.XRPCError) ;
 	  return e;
 	}
-	getServiceAuth.toKnownErr = toKnownErr$1C;
+	getServiceAuth.toKnownErr = toKnownErr$1G;
 
 	var getSession = {};
 
@@ -24238,12 +24485,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1D = dist;
-	function toKnownErr$1B(e) {
-	  if (e instanceof xrpc_1$1D.XRPCError) ;
+	const xrpc_1$1H = dist;
+	function toKnownErr$1F(e) {
+	  if (e instanceof xrpc_1$1H.XRPCError) ;
 	  return e;
 	}
-	getSession.toKnownErr = toKnownErr$1B;
+	getSession.toKnownErr = toKnownErr$1F;
 
 	var listAppPasswords = {};
 
@@ -24254,28 +24501,28 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1C = dist;
-	const util_1$G = util$2;
-	const lexicons_1$F = lexicons;
-	let AccountTakedownError$1 = class AccountTakedownError extends xrpc_1$1C.XRPCError {
+	const xrpc_1$1G = dist;
+	const util_1$H = util$2;
+	const lexicons_1$G = lexicons;
+	let AccountTakedownError$1 = class AccountTakedownError extends xrpc_1$1G.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	listAppPasswords.AccountTakedownError = AccountTakedownError$1;
-	function toKnownErr$1A(e) {
-	  if (e instanceof xrpc_1$1C.XRPCError) {
+	function toKnownErr$1E(e) {
+	  if (e instanceof xrpc_1$1G.XRPCError) {
 	    if (e.error === 'AccountTakedown') return new AccountTakedownError$1(e);
 	  }
 	  return e;
 	}
-	listAppPasswords.toKnownErr = toKnownErr$1A;
+	listAppPasswords.toKnownErr = toKnownErr$1E;
 	function isAppPassword(v) {
-	  return (0, util_1$G.isObj)(v) && (0, util_1$G.hasProp)(v, '$type') && v.$type === 'com.atproto.server.listAppPasswords#appPassword';
+	  return (0, util_1$H.isObj)(v) && (0, util_1$H.hasProp)(v, '$type') && v.$type === 'com.atproto.server.listAppPasswords#appPassword';
 	}
 	listAppPasswords.isAppPassword = isAppPassword;
 	function validateAppPassword(v) {
-	  return lexicons_1$F.lexicons.validate('com.atproto.server.listAppPasswords#appPassword', v);
+	  return lexicons_1$G.lexicons.validate('com.atproto.server.listAppPasswords#appPassword', v);
 	}
 	listAppPasswords.validateAppPassword = validateAppPassword;
 
@@ -24288,20 +24535,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1B = dist;
-	class AccountTakedownError extends xrpc_1$1B.XRPCError {
+	const xrpc_1$1F = dist;
+	class AccountTakedownError extends xrpc_1$1F.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	refreshSession.AccountTakedownError = AccountTakedownError;
-	function toKnownErr$1z(e) {
-	  if (e instanceof xrpc_1$1B.XRPCError) {
+	function toKnownErr$1D(e) {
+	  if (e instanceof xrpc_1$1F.XRPCError) {
 	    if (e.error === 'AccountTakedown') return new AccountTakedownError(e);
 	  }
 	  return e;
 	}
-	refreshSession.toKnownErr = toKnownErr$1z;
+	refreshSession.toKnownErr = toKnownErr$1D;
 
 	var requestAccountDelete = {};
 
@@ -24312,12 +24559,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1A = dist;
-	function toKnownErr$1y(e) {
-	  if (e instanceof xrpc_1$1A.XRPCError) ;
+	const xrpc_1$1E = dist;
+	function toKnownErr$1C(e) {
+	  if (e instanceof xrpc_1$1E.XRPCError) ;
 	  return e;
 	}
-	requestAccountDelete.toKnownErr = toKnownErr$1y;
+	requestAccountDelete.toKnownErr = toKnownErr$1C;
 
 	var requestEmailConfirmation = {};
 
@@ -24328,12 +24575,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1z = dist;
-	function toKnownErr$1x(e) {
-	  if (e instanceof xrpc_1$1z.XRPCError) ;
+	const xrpc_1$1D = dist;
+	function toKnownErr$1B(e) {
+	  if (e instanceof xrpc_1$1D.XRPCError) ;
 	  return e;
 	}
-	requestEmailConfirmation.toKnownErr = toKnownErr$1x;
+	requestEmailConfirmation.toKnownErr = toKnownErr$1B;
 
 	var requestEmailUpdate = {};
 
@@ -24344,12 +24591,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1y = dist;
-	function toKnownErr$1w(e) {
-	  if (e instanceof xrpc_1$1y.XRPCError) ;
+	const xrpc_1$1C = dist;
+	function toKnownErr$1A(e) {
+	  if (e instanceof xrpc_1$1C.XRPCError) ;
 	  return e;
 	}
-	requestEmailUpdate.toKnownErr = toKnownErr$1w;
+	requestEmailUpdate.toKnownErr = toKnownErr$1A;
 
 	var requestPasswordReset = {};
 
@@ -24360,12 +24607,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1x = dist;
-	function toKnownErr$1v(e) {
-	  if (e instanceof xrpc_1$1x.XRPCError) ;
+	const xrpc_1$1B = dist;
+	function toKnownErr$1z(e) {
+	  if (e instanceof xrpc_1$1B.XRPCError) ;
 	  return e;
 	}
-	requestPasswordReset.toKnownErr = toKnownErr$1v;
+	requestPasswordReset.toKnownErr = toKnownErr$1z;
 
 	var reserveSigningKey = {};
 
@@ -24376,12 +24623,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1w = dist;
-	function toKnownErr$1u(e) {
-	  if (e instanceof xrpc_1$1w.XRPCError) ;
+	const xrpc_1$1A = dist;
+	function toKnownErr$1y(e) {
+	  if (e instanceof xrpc_1$1A.XRPCError) ;
 	  return e;
 	}
-	reserveSigningKey.toKnownErr = toKnownErr$1u;
+	reserveSigningKey.toKnownErr = toKnownErr$1y;
 
 	var resetPassword = {};
 
@@ -24392,27 +24639,27 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1v = dist;
-	let ExpiredTokenError$1 = class ExpiredTokenError extends xrpc_1$1v.XRPCError {
+	const xrpc_1$1z = dist;
+	let ExpiredTokenError$1 = class ExpiredTokenError extends xrpc_1$1z.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	resetPassword.ExpiredTokenError = ExpiredTokenError$1;
-	let InvalidTokenError$1 = class InvalidTokenError extends xrpc_1$1v.XRPCError {
+	let InvalidTokenError$1 = class InvalidTokenError extends xrpc_1$1z.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	resetPassword.InvalidTokenError = InvalidTokenError$1;
-	function toKnownErr$1t(e) {
-	  if (e instanceof xrpc_1$1v.XRPCError) {
+	function toKnownErr$1x(e) {
+	  if (e instanceof xrpc_1$1z.XRPCError) {
 	    if (e.error === 'ExpiredToken') return new ExpiredTokenError$1(e);
 	    if (e.error === 'InvalidToken') return new InvalidTokenError$1(e);
 	  }
 	  return e;
 	}
-	resetPassword.toKnownErr = toKnownErr$1t;
+	resetPassword.toKnownErr = toKnownErr$1x;
 
 	var revokeAppPassword = {};
 
@@ -24423,12 +24670,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1u = dist;
-	function toKnownErr$1s(e) {
-	  if (e instanceof xrpc_1$1u.XRPCError) ;
+	const xrpc_1$1y = dist;
+	function toKnownErr$1w(e) {
+	  if (e instanceof xrpc_1$1y.XRPCError) ;
 	  return e;
 	}
-	revokeAppPassword.toKnownErr = toKnownErr$1s;
+	revokeAppPassword.toKnownErr = toKnownErr$1w;
 
 	var updateEmail = {};
 
@@ -24439,34 +24686,34 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1t = dist;
-	class ExpiredTokenError extends xrpc_1$1t.XRPCError {
+	const xrpc_1$1x = dist;
+	class ExpiredTokenError extends xrpc_1$1x.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	updateEmail.ExpiredTokenError = ExpiredTokenError;
-	class InvalidTokenError extends xrpc_1$1t.XRPCError {
+	class InvalidTokenError extends xrpc_1$1x.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	updateEmail.InvalidTokenError = InvalidTokenError;
-	class TokenRequiredError extends xrpc_1$1t.XRPCError {
+	class TokenRequiredError extends xrpc_1$1x.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	updateEmail.TokenRequiredError = TokenRequiredError;
-	function toKnownErr$1r(e) {
-	  if (e instanceof xrpc_1$1t.XRPCError) {
+	function toKnownErr$1v(e) {
+	  if (e instanceof xrpc_1$1x.XRPCError) {
 	    if (e.error === 'ExpiredToken') return new ExpiredTokenError(e);
 	    if (e.error === 'InvalidToken') return new InvalidTokenError(e);
 	    if (e.error === 'TokenRequired') return new TokenRequiredError(e);
 	  }
 	  return e;
 	}
-	updateEmail.toKnownErr = toKnownErr$1r;
+	updateEmail.toKnownErr = toKnownErr$1v;
 
 	var getBlob = {};
 
@@ -24477,39 +24724,39 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1s = dist;
-	class BlobNotFoundError extends xrpc_1$1s.XRPCError {
+	const xrpc_1$1w = dist;
+	class BlobNotFoundError extends xrpc_1$1w.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getBlob.BlobNotFoundError = BlobNotFoundError;
-	let RepoNotFoundError$7 = class RepoNotFoundError extends xrpc_1$1s.XRPCError {
+	let RepoNotFoundError$7 = class RepoNotFoundError extends xrpc_1$1w.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getBlob.RepoNotFoundError = RepoNotFoundError$7;
-	let RepoTakendownError$5 = class RepoTakendownError extends xrpc_1$1s.XRPCError {
+	let RepoTakendownError$5 = class RepoTakendownError extends xrpc_1$1w.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getBlob.RepoTakendownError = RepoTakendownError$5;
-	let RepoSuspendedError$5 = class RepoSuspendedError extends xrpc_1$1s.XRPCError {
+	let RepoSuspendedError$5 = class RepoSuspendedError extends xrpc_1$1w.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getBlob.RepoSuspendedError = RepoSuspendedError$5;
-	let RepoDeactivatedError$5 = class RepoDeactivatedError extends xrpc_1$1s.XRPCError {
+	let RepoDeactivatedError$5 = class RepoDeactivatedError extends xrpc_1$1w.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getBlob.RepoDeactivatedError = RepoDeactivatedError$5;
-	function toKnownErr$1q(e) {
-	  if (e instanceof xrpc_1$1s.XRPCError) {
+	function toKnownErr$1u(e) {
+	  if (e instanceof xrpc_1$1w.XRPCError) {
 	    if (e.error === 'BlobNotFound') return new BlobNotFoundError(e);
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$7(e);
 	    if (e.error === 'RepoTakendown') return new RepoTakendownError$5(e);
@@ -24518,7 +24765,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	getBlob.toKnownErr = toKnownErr$1q;
+	getBlob.toKnownErr = toKnownErr$1u;
 
 	var getBlocks$1 = {};
 
@@ -24529,39 +24776,39 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1r = dist;
-	class BlockNotFoundError extends xrpc_1$1r.XRPCError {
+	const xrpc_1$1v = dist;
+	class BlockNotFoundError extends xrpc_1$1v.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getBlocks$1.BlockNotFoundError = BlockNotFoundError;
-	let RepoNotFoundError$6 = class RepoNotFoundError extends xrpc_1$1r.XRPCError {
+	let RepoNotFoundError$6 = class RepoNotFoundError extends xrpc_1$1v.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getBlocks$1.RepoNotFoundError = RepoNotFoundError$6;
-	let RepoTakendownError$4 = class RepoTakendownError extends xrpc_1$1r.XRPCError {
+	let RepoTakendownError$4 = class RepoTakendownError extends xrpc_1$1v.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getBlocks$1.RepoTakendownError = RepoTakendownError$4;
-	let RepoSuspendedError$4 = class RepoSuspendedError extends xrpc_1$1r.XRPCError {
+	let RepoSuspendedError$4 = class RepoSuspendedError extends xrpc_1$1v.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getBlocks$1.RepoSuspendedError = RepoSuspendedError$4;
-	let RepoDeactivatedError$4 = class RepoDeactivatedError extends xrpc_1$1r.XRPCError {
+	let RepoDeactivatedError$4 = class RepoDeactivatedError extends xrpc_1$1v.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getBlocks$1.RepoDeactivatedError = RepoDeactivatedError$4;
-	function toKnownErr$1p(e) {
-	  if (e instanceof xrpc_1$1r.XRPCError) {
+	function toKnownErr$1t(e) {
+	  if (e instanceof xrpc_1$1v.XRPCError) {
 	    if (e.error === 'BlockNotFound') return new BlockNotFoundError(e);
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$6(e);
 	    if (e.error === 'RepoTakendown') return new RepoTakendownError$4(e);
@@ -24570,7 +24817,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	getBlocks$1.toKnownErr = toKnownErr$1p;
+	getBlocks$1.toKnownErr = toKnownErr$1t;
 
 	var getCheckout = {};
 
@@ -24581,12 +24828,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1q = dist;
-	function toKnownErr$1o(e) {
-	  if (e instanceof xrpc_1$1q.XRPCError) ;
+	const xrpc_1$1u = dist;
+	function toKnownErr$1s(e) {
+	  if (e instanceof xrpc_1$1u.XRPCError) ;
 	  return e;
 	}
-	getCheckout.toKnownErr = toKnownErr$1o;
+	getCheckout.toKnownErr = toKnownErr$1s;
 
 	var getHead = {};
 
@@ -24597,20 +24844,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1p = dist;
-	class HeadNotFoundError extends xrpc_1$1p.XRPCError {
+	const xrpc_1$1t = dist;
+	class HeadNotFoundError extends xrpc_1$1t.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getHead.HeadNotFoundError = HeadNotFoundError;
-	function toKnownErr$1n(e) {
-	  if (e instanceof xrpc_1$1p.XRPCError) {
+	function toKnownErr$1r(e) {
+	  if (e instanceof xrpc_1$1t.XRPCError) {
 	    if (e.error === 'HeadNotFound') return new HeadNotFoundError(e);
 	  }
 	  return e;
 	}
-	getHead.toKnownErr = toKnownErr$1n;
+	getHead.toKnownErr = toKnownErr$1r;
 
 	var getLatestCommit = {};
 
@@ -24621,33 +24868,33 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1o = dist;
-	let RepoNotFoundError$5 = class RepoNotFoundError extends xrpc_1$1o.XRPCError {
+	const xrpc_1$1s = dist;
+	let RepoNotFoundError$5 = class RepoNotFoundError extends xrpc_1$1s.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getLatestCommit.RepoNotFoundError = RepoNotFoundError$5;
-	let RepoTakendownError$3 = class RepoTakendownError extends xrpc_1$1o.XRPCError {
+	let RepoTakendownError$3 = class RepoTakendownError extends xrpc_1$1s.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getLatestCommit.RepoTakendownError = RepoTakendownError$3;
-	let RepoSuspendedError$3 = class RepoSuspendedError extends xrpc_1$1o.XRPCError {
+	let RepoSuspendedError$3 = class RepoSuspendedError extends xrpc_1$1s.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getLatestCommit.RepoSuspendedError = RepoSuspendedError$3;
-	let RepoDeactivatedError$3 = class RepoDeactivatedError extends xrpc_1$1o.XRPCError {
+	let RepoDeactivatedError$3 = class RepoDeactivatedError extends xrpc_1$1s.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getLatestCommit.RepoDeactivatedError = RepoDeactivatedError$3;
-	function toKnownErr$1m(e) {
-	  if (e instanceof xrpc_1$1o.XRPCError) {
+	function toKnownErr$1q(e) {
+	  if (e instanceof xrpc_1$1s.XRPCError) {
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$5(e);
 	    if (e.error === 'RepoTakendown') return new RepoTakendownError$3(e);
 	    if (e.error === 'RepoSuspended') return new RepoSuspendedError$3(e);
@@ -24655,7 +24902,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	getLatestCommit.toKnownErr = toKnownErr$1m;
+	getLatestCommit.toKnownErr = toKnownErr$1q;
 
 	var getRecord$1 = {};
 
@@ -24666,39 +24913,39 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1n = dist;
-	let RecordNotFoundError$1 = class RecordNotFoundError extends xrpc_1$1n.XRPCError {
+	const xrpc_1$1r = dist;
+	let RecordNotFoundError$1 = class RecordNotFoundError extends xrpc_1$1r.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRecord$1.RecordNotFoundError = RecordNotFoundError$1;
-	let RepoNotFoundError$4 = class RepoNotFoundError extends xrpc_1$1n.XRPCError {
+	let RepoNotFoundError$4 = class RepoNotFoundError extends xrpc_1$1r.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRecord$1.RepoNotFoundError = RepoNotFoundError$4;
-	let RepoTakendownError$2 = class RepoTakendownError extends xrpc_1$1n.XRPCError {
+	let RepoTakendownError$2 = class RepoTakendownError extends xrpc_1$1r.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRecord$1.RepoTakendownError = RepoTakendownError$2;
-	let RepoSuspendedError$2 = class RepoSuspendedError extends xrpc_1$1n.XRPCError {
+	let RepoSuspendedError$2 = class RepoSuspendedError extends xrpc_1$1r.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRecord$1.RepoSuspendedError = RepoSuspendedError$2;
-	let RepoDeactivatedError$2 = class RepoDeactivatedError extends xrpc_1$1n.XRPCError {
+	let RepoDeactivatedError$2 = class RepoDeactivatedError extends xrpc_1$1r.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRecord$1.RepoDeactivatedError = RepoDeactivatedError$2;
-	function toKnownErr$1l(e) {
-	  if (e instanceof xrpc_1$1n.XRPCError) {
+	function toKnownErr$1p(e) {
+	  if (e instanceof xrpc_1$1r.XRPCError) {
 	    if (e.error === 'RecordNotFound') return new RecordNotFoundError$1(e);
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$4(e);
 	    if (e.error === 'RepoTakendown') return new RepoTakendownError$2(e);
@@ -24707,7 +24954,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	getRecord$1.toKnownErr = toKnownErr$1l;
+	getRecord$1.toKnownErr = toKnownErr$1p;
 
 	var getRepo$1 = {};
 
@@ -24718,33 +24965,33 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1m = dist;
-	let RepoNotFoundError$3 = class RepoNotFoundError extends xrpc_1$1m.XRPCError {
+	const xrpc_1$1q = dist;
+	let RepoNotFoundError$3 = class RepoNotFoundError extends xrpc_1$1q.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRepo$1.RepoNotFoundError = RepoNotFoundError$3;
-	let RepoTakendownError$1 = class RepoTakendownError extends xrpc_1$1m.XRPCError {
+	let RepoTakendownError$1 = class RepoTakendownError extends xrpc_1$1q.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRepo$1.RepoTakendownError = RepoTakendownError$1;
-	let RepoSuspendedError$1 = class RepoSuspendedError extends xrpc_1$1m.XRPCError {
+	let RepoSuspendedError$1 = class RepoSuspendedError extends xrpc_1$1q.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRepo$1.RepoSuspendedError = RepoSuspendedError$1;
-	let RepoDeactivatedError$1 = class RepoDeactivatedError extends xrpc_1$1m.XRPCError {
+	let RepoDeactivatedError$1 = class RepoDeactivatedError extends xrpc_1$1q.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRepo$1.RepoDeactivatedError = RepoDeactivatedError$1;
-	function toKnownErr$1k(e) {
-	  if (e instanceof xrpc_1$1m.XRPCError) {
+	function toKnownErr$1o(e) {
+	  if (e instanceof xrpc_1$1q.XRPCError) {
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$3(e);
 	    if (e.error === 'RepoTakendown') return new RepoTakendownError$1(e);
 	    if (e.error === 'RepoSuspended') return new RepoSuspendedError$1(e);
@@ -24752,7 +24999,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	getRepo$1.toKnownErr = toKnownErr$1k;
+	getRepo$1.toKnownErr = toKnownErr$1o;
 
 	var getRepoStatus = {};
 
@@ -24763,20 +25010,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1l = dist;
-	let RepoNotFoundError$2 = class RepoNotFoundError extends xrpc_1$1l.XRPCError {
+	const xrpc_1$1p = dist;
+	let RepoNotFoundError$2 = class RepoNotFoundError extends xrpc_1$1p.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRepoStatus.RepoNotFoundError = RepoNotFoundError$2;
-	function toKnownErr$1j(e) {
-	  if (e instanceof xrpc_1$1l.XRPCError) {
+	function toKnownErr$1n(e) {
+	  if (e instanceof xrpc_1$1p.XRPCError) {
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$2(e);
 	  }
 	  return e;
 	}
-	getRepoStatus.toKnownErr = toKnownErr$1j;
+	getRepoStatus.toKnownErr = toKnownErr$1n;
 
 	var listBlobs = {};
 
@@ -24787,33 +25034,33 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1k = dist;
-	let RepoNotFoundError$1 = class RepoNotFoundError extends xrpc_1$1k.XRPCError {
+	const xrpc_1$1o = dist;
+	let RepoNotFoundError$1 = class RepoNotFoundError extends xrpc_1$1o.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	listBlobs.RepoNotFoundError = RepoNotFoundError$1;
-	class RepoTakendownError extends xrpc_1$1k.XRPCError {
+	class RepoTakendownError extends xrpc_1$1o.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	listBlobs.RepoTakendownError = RepoTakendownError;
-	class RepoSuspendedError extends xrpc_1$1k.XRPCError {
+	class RepoSuspendedError extends xrpc_1$1o.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	listBlobs.RepoSuspendedError = RepoSuspendedError;
-	class RepoDeactivatedError extends xrpc_1$1k.XRPCError {
+	class RepoDeactivatedError extends xrpc_1$1o.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	listBlobs.RepoDeactivatedError = RepoDeactivatedError;
-	function toKnownErr$1i(e) {
-	  if (e instanceof xrpc_1$1k.XRPCError) {
+	function toKnownErr$1m(e) {
+	  if (e instanceof xrpc_1$1o.XRPCError) {
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$1(e);
 	    if (e.error === 'RepoTakendown') return new RepoTakendownError(e);
 	    if (e.error === 'RepoSuspended') return new RepoSuspendedError(e);
@@ -24821,7 +25068,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	listBlobs.toKnownErr = toKnownErr$1i;
+	listBlobs.toKnownErr = toKnownErr$1m;
 
 	var listRepos = {};
 
@@ -24832,20 +25079,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1j = dist;
-	const util_1$F = util$2;
-	const lexicons_1$E = lexicons;
-	function toKnownErr$1h(e) {
-	  if (e instanceof xrpc_1$1j.XRPCError) ;
+	const xrpc_1$1n = dist;
+	const util_1$G = util$2;
+	const lexicons_1$F = lexicons;
+	function toKnownErr$1l(e) {
+	  if (e instanceof xrpc_1$1n.XRPCError) ;
 	  return e;
 	}
-	listRepos.toKnownErr = toKnownErr$1h;
+	listRepos.toKnownErr = toKnownErr$1l;
 	function isRepo(v) {
-	  return (0, util_1$F.isObj)(v) && (0, util_1$F.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.listRepos#repo';
+	  return (0, util_1$G.isObj)(v) && (0, util_1$G.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.listRepos#repo';
 	}
 	listRepos.isRepo = isRepo;
 	function validateRepo(v) {
-	  return lexicons_1$E.lexicons.validate('com.atproto.sync.listRepos#repo', v);
+	  return lexicons_1$F.lexicons.validate('com.atproto.sync.listRepos#repo', v);
 	}
 	listRepos.validateRepo = validateRepo;
 
@@ -24858,12 +25105,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1i = dist;
-	function toKnownErr$1g(e) {
-	  if (e instanceof xrpc_1$1i.XRPCError) ;
+	const xrpc_1$1m = dist;
+	function toKnownErr$1k(e) {
+	  if (e instanceof xrpc_1$1m.XRPCError) ;
 	  return e;
 	}
-	notifyOfUpdate.toKnownErr = toKnownErr$1g;
+	notifyOfUpdate.toKnownErr = toKnownErr$1k;
 
 	var requestCrawl = {};
 
@@ -24874,12 +25121,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1h = dist;
-	function toKnownErr$1f(e) {
-	  if (e instanceof xrpc_1$1h.XRPCError) ;
+	const xrpc_1$1l = dist;
+	function toKnownErr$1j(e) {
+	  if (e instanceof xrpc_1$1l.XRPCError) ;
 	  return e;
 	}
-	requestCrawl.toKnownErr = toKnownErr$1f;
+	requestCrawl.toKnownErr = toKnownErr$1j;
 
 	var checkSignupQueue = {};
 
@@ -24890,12 +25137,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1g = dist;
-	function toKnownErr$1e(e) {
-	  if (e instanceof xrpc_1$1g.XRPCError) ;
+	const xrpc_1$1k = dist;
+	function toKnownErr$1i(e) {
+	  if (e instanceof xrpc_1$1k.XRPCError) ;
 	  return e;
 	}
-	checkSignupQueue.toKnownErr = toKnownErr$1e;
+	checkSignupQueue.toKnownErr = toKnownErr$1i;
 
 	var fetchLabels = {};
 
@@ -24906,12 +25153,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1f = dist;
-	function toKnownErr$1d(e) {
-	  if (e instanceof xrpc_1$1f.XRPCError) ;
+	const xrpc_1$1j = dist;
+	function toKnownErr$1h(e) {
+	  if (e instanceof xrpc_1$1j.XRPCError) ;
 	  return e;
 	}
-	fetchLabels.toKnownErr = toKnownErr$1d;
+	fetchLabels.toKnownErr = toKnownErr$1h;
 
 	var requestPhoneVerification = {};
 
@@ -24922,12 +25169,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1e = dist;
-	function toKnownErr$1c(e) {
-	  if (e instanceof xrpc_1$1e.XRPCError) ;
+	const xrpc_1$1i = dist;
+	function toKnownErr$1g(e) {
+	  if (e instanceof xrpc_1$1i.XRPCError) ;
 	  return e;
 	}
-	requestPhoneVerification.toKnownErr = toKnownErr$1c;
+	requestPhoneVerification.toKnownErr = toKnownErr$1g;
 
 	var getPreferences = {};
 
@@ -24938,12 +25185,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1d = dist;
-	function toKnownErr$1b(e) {
-	  if (e instanceof xrpc_1$1d.XRPCError) ;
+	const xrpc_1$1h = dist;
+	function toKnownErr$1f(e) {
+	  if (e instanceof xrpc_1$1h.XRPCError) ;
 	  return e;
 	}
-	getPreferences.toKnownErr = toKnownErr$1b;
+	getPreferences.toKnownErr = toKnownErr$1f;
 
 	var getProfile = {};
 
@@ -24954,12 +25201,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1c = dist;
-	function toKnownErr$1a(e) {
-	  if (e instanceof xrpc_1$1c.XRPCError) ;
+	const xrpc_1$1g = dist;
+	function toKnownErr$1e(e) {
+	  if (e instanceof xrpc_1$1g.XRPCError) ;
 	  return e;
 	}
-	getProfile.toKnownErr = toKnownErr$1a;
+	getProfile.toKnownErr = toKnownErr$1e;
 
 	var getProfiles = {};
 
@@ -24970,12 +25217,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1b = dist;
-	function toKnownErr$19(e) {
-	  if (e instanceof xrpc_1$1b.XRPCError) ;
+	const xrpc_1$1f = dist;
+	function toKnownErr$1d(e) {
+	  if (e instanceof xrpc_1$1f.XRPCError) ;
 	  return e;
 	}
-	getProfiles.toKnownErr = toKnownErr$19;
+	getProfiles.toKnownErr = toKnownErr$1d;
 
 	var getSuggestions = {};
 
@@ -24986,12 +25233,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1a = dist;
-	function toKnownErr$18(e) {
-	  if (e instanceof xrpc_1$1a.XRPCError) ;
+	const xrpc_1$1e = dist;
+	function toKnownErr$1c(e) {
+	  if (e instanceof xrpc_1$1e.XRPCError) ;
 	  return e;
 	}
-	getSuggestions.toKnownErr = toKnownErr$18;
+	getSuggestions.toKnownErr = toKnownErr$1c;
 
 	var putPreferences = {};
 
@@ -25002,12 +25249,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$19 = dist;
-	function toKnownErr$17(e) {
-	  if (e instanceof xrpc_1$19.XRPCError) ;
+	const xrpc_1$1d = dist;
+	function toKnownErr$1b(e) {
+	  if (e instanceof xrpc_1$1d.XRPCError) ;
 	  return e;
 	}
-	putPreferences.toKnownErr = toKnownErr$17;
+	putPreferences.toKnownErr = toKnownErr$1b;
 
 	var searchActors = {};
 
@@ -25018,12 +25265,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$18 = dist;
-	function toKnownErr$16(e) {
-	  if (e instanceof xrpc_1$18.XRPCError) ;
+	const xrpc_1$1c = dist;
+	function toKnownErr$1a(e) {
+	  if (e instanceof xrpc_1$1c.XRPCError) ;
 	  return e;
 	}
-	searchActors.toKnownErr = toKnownErr$16;
+	searchActors.toKnownErr = toKnownErr$1a;
 
 	var searchActorsTypeahead = {};
 
@@ -25034,12 +25281,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$17 = dist;
-	function toKnownErr$15(e) {
-	  if (e instanceof xrpc_1$17.XRPCError) ;
+	const xrpc_1$1b = dist;
+	function toKnownErr$19(e) {
+	  if (e instanceof xrpc_1$1b.XRPCError) ;
 	  return e;
 	}
-	searchActorsTypeahead.toKnownErr = toKnownErr$15;
+	searchActorsTypeahead.toKnownErr = toKnownErr$19;
 
 	var describeFeedGenerator = {};
 
@@ -25050,28 +25297,28 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$16 = dist;
-	const util_1$E = util$2;
-	const lexicons_1$D = lexicons;
-	function toKnownErr$14(e) {
-	  if (e instanceof xrpc_1$16.XRPCError) ;
+	const xrpc_1$1a = dist;
+	const util_1$F = util$2;
+	const lexicons_1$E = lexicons;
+	function toKnownErr$18(e) {
+	  if (e instanceof xrpc_1$1a.XRPCError) ;
 	  return e;
 	}
-	describeFeedGenerator.toKnownErr = toKnownErr$14;
+	describeFeedGenerator.toKnownErr = toKnownErr$18;
 	function isFeed(v) {
-	  return (0, util_1$E.isObj)(v) && (0, util_1$E.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.describeFeedGenerator#feed';
+	  return (0, util_1$F.isObj)(v) && (0, util_1$F.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.describeFeedGenerator#feed';
 	}
 	describeFeedGenerator.isFeed = isFeed;
 	function validateFeed(v) {
-	  return lexicons_1$D.lexicons.validate('app.bsky.feed.describeFeedGenerator#feed', v);
+	  return lexicons_1$E.lexicons.validate('app.bsky.feed.describeFeedGenerator#feed', v);
 	}
 	describeFeedGenerator.validateFeed = validateFeed;
 	function isLinks(v) {
-	  return (0, util_1$E.isObj)(v) && (0, util_1$E.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.describeFeedGenerator#links';
+	  return (0, util_1$F.isObj)(v) && (0, util_1$F.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.describeFeedGenerator#links';
 	}
 	describeFeedGenerator.isLinks = isLinks;
 	function validateLinks(v) {
-	  return lexicons_1$D.lexicons.validate('app.bsky.feed.describeFeedGenerator#links', v);
+	  return lexicons_1$E.lexicons.validate('app.bsky.feed.describeFeedGenerator#links', v);
 	}
 	describeFeedGenerator.validateLinks = validateLinks;
 
@@ -25084,12 +25331,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$15 = dist;
-	function toKnownErr$13(e) {
-	  if (e instanceof xrpc_1$15.XRPCError) ;
+	const xrpc_1$19 = dist;
+	function toKnownErr$17(e) {
+	  if (e instanceof xrpc_1$19.XRPCError) ;
 	  return e;
 	}
-	getActorFeeds.toKnownErr = toKnownErr$13;
+	getActorFeeds.toKnownErr = toKnownErr$17;
 
 	var getActorLikes = {};
 
@@ -25100,27 +25347,27 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$14 = dist;
-	let BlockedActorError$1 = class BlockedActorError extends xrpc_1$14.XRPCError {
+	const xrpc_1$18 = dist;
+	let BlockedActorError$1 = class BlockedActorError extends xrpc_1$18.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getActorLikes.BlockedActorError = BlockedActorError$1;
-	let BlockedByActorError$1 = class BlockedByActorError extends xrpc_1$14.XRPCError {
+	let BlockedByActorError$1 = class BlockedByActorError extends xrpc_1$18.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getActorLikes.BlockedByActorError = BlockedByActorError$1;
-	function toKnownErr$12(e) {
-	  if (e instanceof xrpc_1$14.XRPCError) {
+	function toKnownErr$16(e) {
+	  if (e instanceof xrpc_1$18.XRPCError) {
 	    if (e.error === 'BlockedActor') return new BlockedActorError$1(e);
 	    if (e.error === 'BlockedByActor') return new BlockedByActorError$1(e);
 	  }
 	  return e;
 	}
-	getActorLikes.toKnownErr = toKnownErr$12;
+	getActorLikes.toKnownErr = toKnownErr$16;
 
 	var getAuthorFeed = {};
 
@@ -25131,27 +25378,27 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$13 = dist;
-	class BlockedActorError extends xrpc_1$13.XRPCError {
+	const xrpc_1$17 = dist;
+	class BlockedActorError extends xrpc_1$17.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getAuthorFeed.BlockedActorError = BlockedActorError;
-	class BlockedByActorError extends xrpc_1$13.XRPCError {
+	class BlockedByActorError extends xrpc_1$17.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getAuthorFeed.BlockedByActorError = BlockedByActorError;
-	function toKnownErr$11(e) {
-	  if (e instanceof xrpc_1$13.XRPCError) {
+	function toKnownErr$15(e) {
+	  if (e instanceof xrpc_1$17.XRPCError) {
 	    if (e.error === 'BlockedActor') return new BlockedActorError(e);
 	    if (e.error === 'BlockedByActor') return new BlockedByActorError(e);
 	  }
 	  return e;
 	}
-	getAuthorFeed.toKnownErr = toKnownErr$11;
+	getAuthorFeed.toKnownErr = toKnownErr$15;
 
 	var getFeed = {};
 
@@ -25162,20 +25409,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$12 = dist;
-	let UnknownFeedError$1 = class UnknownFeedError extends xrpc_1$12.XRPCError {
+	const xrpc_1$16 = dist;
+	let UnknownFeedError$1 = class UnknownFeedError extends xrpc_1$16.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getFeed.UnknownFeedError = UnknownFeedError$1;
-	function toKnownErr$10(e) {
-	  if (e instanceof xrpc_1$12.XRPCError) {
+	function toKnownErr$14(e) {
+	  if (e instanceof xrpc_1$16.XRPCError) {
 	    if (e.error === 'UnknownFeed') return new UnknownFeedError$1(e);
 	  }
 	  return e;
 	}
-	getFeed.toKnownErr = toKnownErr$10;
+	getFeed.toKnownErr = toKnownErr$14;
 
 	var getFeedGenerator = {};
 
@@ -25186,12 +25433,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$11 = dist;
-	function toKnownErr$$(e) {
-	  if (e instanceof xrpc_1$11.XRPCError) ;
+	const xrpc_1$15 = dist;
+	function toKnownErr$13(e) {
+	  if (e instanceof xrpc_1$15.XRPCError) ;
 	  return e;
 	}
-	getFeedGenerator.toKnownErr = toKnownErr$$;
+	getFeedGenerator.toKnownErr = toKnownErr$13;
 
 	var getFeedGenerators = {};
 
@@ -25202,12 +25449,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$10 = dist;
-	function toKnownErr$_(e) {
-	  if (e instanceof xrpc_1$10.XRPCError) ;
+	const xrpc_1$14 = dist;
+	function toKnownErr$12(e) {
+	  if (e instanceof xrpc_1$14.XRPCError) ;
 	  return e;
 	}
-	getFeedGenerators.toKnownErr = toKnownErr$_;
+	getFeedGenerators.toKnownErr = toKnownErr$12;
 
 	var getFeedSkeleton = {};
 
@@ -25218,20 +25465,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$$ = dist;
-	class UnknownFeedError extends xrpc_1$$.XRPCError {
+	const xrpc_1$13 = dist;
+	class UnknownFeedError extends xrpc_1$13.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getFeedSkeleton.UnknownFeedError = UnknownFeedError;
-	function toKnownErr$Z(e) {
-	  if (e instanceof xrpc_1$$.XRPCError) {
+	function toKnownErr$11(e) {
+	  if (e instanceof xrpc_1$13.XRPCError) {
 	    if (e.error === 'UnknownFeed') return new UnknownFeedError(e);
 	  }
 	  return e;
 	}
-	getFeedSkeleton.toKnownErr = toKnownErr$Z;
+	getFeedSkeleton.toKnownErr = toKnownErr$11;
 
 	var getLikes = {};
 
@@ -25242,20 +25489,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$_ = dist;
-	const util_1$D = util$2;
-	const lexicons_1$C = lexicons;
-	function toKnownErr$Y(e) {
-	  if (e instanceof xrpc_1$_.XRPCError) ;
+	const xrpc_1$12 = dist;
+	const util_1$E = util$2;
+	const lexicons_1$D = lexicons;
+	function toKnownErr$10(e) {
+	  if (e instanceof xrpc_1$12.XRPCError) ;
 	  return e;
 	}
-	getLikes.toKnownErr = toKnownErr$Y;
+	getLikes.toKnownErr = toKnownErr$10;
 	function isLike(v) {
-	  return (0, util_1$D.isObj)(v) && (0, util_1$D.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.getLikes#like';
+	  return (0, util_1$E.isObj)(v) && (0, util_1$E.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.getLikes#like';
 	}
 	getLikes.isLike = isLike;
 	function validateLike(v) {
-	  return lexicons_1$C.lexicons.validate('app.bsky.feed.getLikes#like', v);
+	  return lexicons_1$D.lexicons.validate('app.bsky.feed.getLikes#like', v);
 	}
 	getLikes.validateLike = validateLike;
 
@@ -25268,20 +25515,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$Z = dist;
-	class UnknownListError extends xrpc_1$Z.XRPCError {
+	const xrpc_1$11 = dist;
+	class UnknownListError extends xrpc_1$11.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getListFeed.UnknownListError = UnknownListError;
-	function toKnownErr$X(e) {
-	  if (e instanceof xrpc_1$Z.XRPCError) {
+	function toKnownErr$$(e) {
+	  if (e instanceof xrpc_1$11.XRPCError) {
 	    if (e.error === 'UnknownList') return new UnknownListError(e);
 	  }
 	  return e;
 	}
-	getListFeed.toKnownErr = toKnownErr$X;
+	getListFeed.toKnownErr = toKnownErr$$;
 
 	var getPostThread = {};
 
@@ -25292,20 +25539,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$Y = dist;
-	class NotFoundError extends xrpc_1$Y.XRPCError {
+	const xrpc_1$10 = dist;
+	class NotFoundError extends xrpc_1$10.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getPostThread.NotFoundError = NotFoundError;
-	function toKnownErr$W(e) {
-	  if (e instanceof xrpc_1$Y.XRPCError) {
+	function toKnownErr$_(e) {
+	  if (e instanceof xrpc_1$10.XRPCError) {
 	    if (e.error === 'NotFound') return new NotFoundError(e);
 	  }
 	  return e;
 	}
-	getPostThread.toKnownErr = toKnownErr$W;
+	getPostThread.toKnownErr = toKnownErr$_;
 
 	var getPosts = {};
 
@@ -25316,12 +25563,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$X = dist;
-	function toKnownErr$V(e) {
-	  if (e instanceof xrpc_1$X.XRPCError) ;
+	const xrpc_1$$ = dist;
+	function toKnownErr$Z(e) {
+	  if (e instanceof xrpc_1$$.XRPCError) ;
 	  return e;
 	}
-	getPosts.toKnownErr = toKnownErr$V;
+	getPosts.toKnownErr = toKnownErr$Z;
 
 	var getRepostedBy = {};
 
@@ -25332,12 +25579,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$W = dist;
-	function toKnownErr$U(e) {
-	  if (e instanceof xrpc_1$W.XRPCError) ;
+	const xrpc_1$_ = dist;
+	function toKnownErr$Y(e) {
+	  if (e instanceof xrpc_1$_.XRPCError) ;
 	  return e;
 	}
-	getRepostedBy.toKnownErr = toKnownErr$U;
+	getRepostedBy.toKnownErr = toKnownErr$Y;
 
 	var getSuggestedFeeds = {};
 
@@ -25348,12 +25595,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$V = dist;
-	function toKnownErr$T(e) {
-	  if (e instanceof xrpc_1$V.XRPCError) ;
+	const xrpc_1$Z = dist;
+	function toKnownErr$X(e) {
+	  if (e instanceof xrpc_1$Z.XRPCError) ;
 	  return e;
 	}
-	getSuggestedFeeds.toKnownErr = toKnownErr$T;
+	getSuggestedFeeds.toKnownErr = toKnownErr$X;
 
 	var getTimeline = {};
 
@@ -25364,12 +25611,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$U = dist;
-	function toKnownErr$S(e) {
-	  if (e instanceof xrpc_1$U.XRPCError) ;
+	const xrpc_1$Y = dist;
+	function toKnownErr$W(e) {
+	  if (e instanceof xrpc_1$Y.XRPCError) ;
 	  return e;
 	}
-	getTimeline.toKnownErr = toKnownErr$S;
+	getTimeline.toKnownErr = toKnownErr$W;
 
 	var searchPosts = {};
 
@@ -25380,20 +25627,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$T = dist;
-	let BadQueryStringError$2 = class BadQueryStringError extends xrpc_1$T.XRPCError {
+	const xrpc_1$X = dist;
+	let BadQueryStringError$2 = class BadQueryStringError extends xrpc_1$X.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	searchPosts.BadQueryStringError = BadQueryStringError$2;
-	function toKnownErr$R(e) {
-	  if (e instanceof xrpc_1$T.XRPCError) {
+	function toKnownErr$V(e) {
+	  if (e instanceof xrpc_1$X.XRPCError) {
 	    if (e.error === 'BadQueryString') return new BadQueryStringError$2(e);
 	  }
 	  return e;
 	}
-	searchPosts.toKnownErr = toKnownErr$R;
+	searchPosts.toKnownErr = toKnownErr$V;
 
 	var sendInteractions = {};
 
@@ -25404,12 +25651,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$S = dist;
-	function toKnownErr$Q(e) {
-	  if (e instanceof xrpc_1$S.XRPCError) ;
+	const xrpc_1$W = dist;
+	function toKnownErr$U(e) {
+	  if (e instanceof xrpc_1$W.XRPCError) ;
 	  return e;
 	}
-	sendInteractions.toKnownErr = toKnownErr$Q;
+	sendInteractions.toKnownErr = toKnownErr$U;
 
 	var getBlocks = {};
 
@@ -25420,12 +25667,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$R = dist;
-	function toKnownErr$P(e) {
-	  if (e instanceof xrpc_1$R.XRPCError) ;
+	const xrpc_1$V = dist;
+	function toKnownErr$T(e) {
+	  if (e instanceof xrpc_1$V.XRPCError) ;
 	  return e;
 	}
-	getBlocks.toKnownErr = toKnownErr$P;
+	getBlocks.toKnownErr = toKnownErr$T;
 
 	var getFollowers = {};
 
@@ -25436,12 +25683,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$Q = dist;
-	function toKnownErr$O(e) {
-	  if (e instanceof xrpc_1$Q.XRPCError) ;
+	const xrpc_1$U = dist;
+	function toKnownErr$S(e) {
+	  if (e instanceof xrpc_1$U.XRPCError) ;
 	  return e;
 	}
-	getFollowers.toKnownErr = toKnownErr$O;
+	getFollowers.toKnownErr = toKnownErr$S;
 
 	var getFollows = {};
 
@@ -25452,12 +25699,28 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$P = dist;
-	function toKnownErr$N(e) {
-	  if (e instanceof xrpc_1$P.XRPCError) ;
+	const xrpc_1$T = dist;
+	function toKnownErr$R(e) {
+	  if (e instanceof xrpc_1$T.XRPCError) ;
 	  return e;
 	}
-	getFollows.toKnownErr = toKnownErr$N;
+	getFollows.toKnownErr = toKnownErr$R;
+
+	var getKnownFollowers = {};
+
+	Object.defineProperty(getKnownFollowers, "__esModule", {
+	  value: true
+	});
+	getKnownFollowers.toKnownErr = void 0;
+	/**
+	 * GENERATED CODE - DO NOT MODIFY
+	 */
+	const xrpc_1$S = dist;
+	function toKnownErr$Q(e) {
+	  if (e instanceof xrpc_1$S.XRPCError) ;
+	  return e;
+	}
+	getKnownFollowers.toKnownErr = toKnownErr$Q;
 
 	var getList = {};
 
@@ -25468,12 +25731,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$O = dist;
-	function toKnownErr$M(e) {
-	  if (e instanceof xrpc_1$O.XRPCError) ;
+	const xrpc_1$R = dist;
+	function toKnownErr$P(e) {
+	  if (e instanceof xrpc_1$R.XRPCError) ;
 	  return e;
 	}
-	getList.toKnownErr = toKnownErr$M;
+	getList.toKnownErr = toKnownErr$P;
 
 	var getListBlocks = {};
 
@@ -25484,12 +25747,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$N = dist;
-	function toKnownErr$L(e) {
-	  if (e instanceof xrpc_1$N.XRPCError) ;
+	const xrpc_1$Q = dist;
+	function toKnownErr$O(e) {
+	  if (e instanceof xrpc_1$Q.XRPCError) ;
 	  return e;
 	}
-	getListBlocks.toKnownErr = toKnownErr$L;
+	getListBlocks.toKnownErr = toKnownErr$O;
 
 	var getListMutes = {};
 
@@ -25500,12 +25763,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$M = dist;
-	function toKnownErr$K(e) {
-	  if (e instanceof xrpc_1$M.XRPCError) ;
+	const xrpc_1$P = dist;
+	function toKnownErr$N(e) {
+	  if (e instanceof xrpc_1$P.XRPCError) ;
 	  return e;
 	}
-	getListMutes.toKnownErr = toKnownErr$K;
+	getListMutes.toKnownErr = toKnownErr$N;
 
 	var getLists = {};
 
@@ -25516,12 +25779,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$L = dist;
-	function toKnownErr$J(e) {
-	  if (e instanceof xrpc_1$L.XRPCError) ;
+	const xrpc_1$O = dist;
+	function toKnownErr$M(e) {
+	  if (e instanceof xrpc_1$O.XRPCError) ;
 	  return e;
 	}
-	getLists.toKnownErr = toKnownErr$J;
+	getLists.toKnownErr = toKnownErr$M;
 
 	var getMutes = {};
 
@@ -25532,12 +25795,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$K = dist;
-	function toKnownErr$I(e) {
-	  if (e instanceof xrpc_1$K.XRPCError) ;
+	const xrpc_1$N = dist;
+	function toKnownErr$L(e) {
+	  if (e instanceof xrpc_1$N.XRPCError) ;
 	  return e;
 	}
-	getMutes.toKnownErr = toKnownErr$I;
+	getMutes.toKnownErr = toKnownErr$L;
 
 	var getRelationships = {};
 
@@ -25548,20 +25811,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$J = dist;
-	class ActorNotFoundError extends xrpc_1$J.XRPCError {
+	const xrpc_1$M = dist;
+	class ActorNotFoundError extends xrpc_1$M.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getRelationships.ActorNotFoundError = ActorNotFoundError;
-	function toKnownErr$H(e) {
-	  if (e instanceof xrpc_1$J.XRPCError) {
+	function toKnownErr$K(e) {
+	  if (e instanceof xrpc_1$M.XRPCError) {
 	    if (e.error === 'ActorNotFound') return new ActorNotFoundError(e);
 	  }
 	  return e;
 	}
-	getRelationships.toKnownErr = toKnownErr$H;
+	getRelationships.toKnownErr = toKnownErr$K;
 
 	var getSuggestedFollowsByActor = {};
 
@@ -25572,12 +25835,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$I = dist;
-	function toKnownErr$G(e) {
-	  if (e instanceof xrpc_1$I.XRPCError) ;
+	const xrpc_1$L = dist;
+	function toKnownErr$J(e) {
+	  if (e instanceof xrpc_1$L.XRPCError) ;
 	  return e;
 	}
-	getSuggestedFollowsByActor.toKnownErr = toKnownErr$G;
+	getSuggestedFollowsByActor.toKnownErr = toKnownErr$J;
 
 	var muteActor = {};
 
@@ -25588,12 +25851,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$H = dist;
-	function toKnownErr$F(e) {
-	  if (e instanceof xrpc_1$H.XRPCError) ;
+	const xrpc_1$K = dist;
+	function toKnownErr$I(e) {
+	  if (e instanceof xrpc_1$K.XRPCError) ;
 	  return e;
 	}
-	muteActor.toKnownErr = toKnownErr$F;
+	muteActor.toKnownErr = toKnownErr$I;
 
 	var muteActorList = {};
 
@@ -25604,12 +25867,28 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$G = dist;
-	function toKnownErr$E(e) {
-	  if (e instanceof xrpc_1$G.XRPCError) ;
+	const xrpc_1$J = dist;
+	function toKnownErr$H(e) {
+	  if (e instanceof xrpc_1$J.XRPCError) ;
 	  return e;
 	}
-	muteActorList.toKnownErr = toKnownErr$E;
+	muteActorList.toKnownErr = toKnownErr$H;
+
+	var muteThread = {};
+
+	Object.defineProperty(muteThread, "__esModule", {
+	  value: true
+	});
+	muteThread.toKnownErr = void 0;
+	/**
+	 * GENERATED CODE - DO NOT MODIFY
+	 */
+	const xrpc_1$I = dist;
+	function toKnownErr$G(e) {
+	  if (e instanceof xrpc_1$I.XRPCError) ;
+	  return e;
+	}
+	muteThread.toKnownErr = toKnownErr$G;
 
 	var unmuteActor = {};
 
@@ -25620,12 +25899,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$F = dist;
-	function toKnownErr$D(e) {
-	  if (e instanceof xrpc_1$F.XRPCError) ;
+	const xrpc_1$H = dist;
+	function toKnownErr$F(e) {
+	  if (e instanceof xrpc_1$H.XRPCError) ;
 	  return e;
 	}
-	unmuteActor.toKnownErr = toKnownErr$D;
+	unmuteActor.toKnownErr = toKnownErr$F;
 
 	var unmuteActorList = {};
 
@@ -25636,12 +25915,28 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$E = dist;
-	function toKnownErr$C(e) {
-	  if (e instanceof xrpc_1$E.XRPCError) ;
+	const xrpc_1$G = dist;
+	function toKnownErr$E(e) {
+	  if (e instanceof xrpc_1$G.XRPCError) ;
 	  return e;
 	}
-	unmuteActorList.toKnownErr = toKnownErr$C;
+	unmuteActorList.toKnownErr = toKnownErr$E;
+
+	var unmuteThread = {};
+
+	Object.defineProperty(unmuteThread, "__esModule", {
+	  value: true
+	});
+	unmuteThread.toKnownErr = void 0;
+	/**
+	 * GENERATED CODE - DO NOT MODIFY
+	 */
+	const xrpc_1$F = dist;
+	function toKnownErr$D(e) {
+	  if (e instanceof xrpc_1$F.XRPCError) ;
+	  return e;
+	}
+	unmuteThread.toKnownErr = toKnownErr$D;
 
 	var getServices = {};
 
@@ -25652,12 +25947,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$D = dist;
-	function toKnownErr$B(e) {
-	  if (e instanceof xrpc_1$D.XRPCError) ;
+	const xrpc_1$E = dist;
+	function toKnownErr$C(e) {
+	  if (e instanceof xrpc_1$E.XRPCError) ;
 	  return e;
 	}
-	getServices.toKnownErr = toKnownErr$B;
+	getServices.toKnownErr = toKnownErr$C;
 
 	var getUnreadCount = {};
 
@@ -25668,12 +25963,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$C = dist;
-	function toKnownErr$A(e) {
-	  if (e instanceof xrpc_1$C.XRPCError) ;
+	const xrpc_1$D = dist;
+	function toKnownErr$B(e) {
+	  if (e instanceof xrpc_1$D.XRPCError) ;
 	  return e;
 	}
-	getUnreadCount.toKnownErr = toKnownErr$A;
+	getUnreadCount.toKnownErr = toKnownErr$B;
 
 	var listNotifications = {};
 
@@ -25684,20 +25979,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$B = dist;
-	const util_1$C = util$2;
-	const lexicons_1$B = lexicons;
-	function toKnownErr$z(e) {
-	  if (e instanceof xrpc_1$B.XRPCError) ;
+	const xrpc_1$C = dist;
+	const util_1$D = util$2;
+	const lexicons_1$C = lexicons;
+	function toKnownErr$A(e) {
+	  if (e instanceof xrpc_1$C.XRPCError) ;
 	  return e;
 	}
-	listNotifications.toKnownErr = toKnownErr$z;
+	listNotifications.toKnownErr = toKnownErr$A;
 	function isNotification(v) {
-	  return (0, util_1$C.isObj)(v) && (0, util_1$C.hasProp)(v, '$type') && v.$type === 'app.bsky.notification.listNotifications#notification';
+	  return (0, util_1$D.isObj)(v) && (0, util_1$D.hasProp)(v, '$type') && v.$type === 'app.bsky.notification.listNotifications#notification';
 	}
 	listNotifications.isNotification = isNotification;
 	function validateNotification(v) {
-	  return lexicons_1$B.lexicons.validate('app.bsky.notification.listNotifications#notification', v);
+	  return lexicons_1$C.lexicons.validate('app.bsky.notification.listNotifications#notification', v);
 	}
 	listNotifications.validateNotification = validateNotification;
 
@@ -25710,12 +26005,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$A = dist;
-	function toKnownErr$y(e) {
-	  if (e instanceof xrpc_1$A.XRPCError) ;
+	const xrpc_1$B = dist;
+	function toKnownErr$z(e) {
+	  if (e instanceof xrpc_1$B.XRPCError) ;
 	  return e;
 	}
-	registerPush.toKnownErr = toKnownErr$y;
+	registerPush.toKnownErr = toKnownErr$z;
 
 	var updateSeen = {};
 
@@ -25726,12 +26021,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$z = dist;
-	function toKnownErr$x(e) {
-	  if (e instanceof xrpc_1$z.XRPCError) ;
+	const xrpc_1$A = dist;
+	function toKnownErr$y(e) {
+	  if (e instanceof xrpc_1$A.XRPCError) ;
 	  return e;
 	}
-	updateSeen.toKnownErr = toKnownErr$x;
+	updateSeen.toKnownErr = toKnownErr$y;
 
 	var getPopularFeedGenerators = {};
 
@@ -25742,12 +26037,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$y = dist;
-	function toKnownErr$w(e) {
-	  if (e instanceof xrpc_1$y.XRPCError) ;
+	const xrpc_1$z = dist;
+	function toKnownErr$x(e) {
+	  if (e instanceof xrpc_1$z.XRPCError) ;
 	  return e;
 	}
-	getPopularFeedGenerators.toKnownErr = toKnownErr$w;
+	getPopularFeedGenerators.toKnownErr = toKnownErr$x;
 
 	var getSuggestionsSkeleton = {};
 
@@ -25758,12 +26053,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$x = dist;
-	function toKnownErr$v(e) {
-	  if (e instanceof xrpc_1$x.XRPCError) ;
+	const xrpc_1$y = dist;
+	function toKnownErr$w(e) {
+	  if (e instanceof xrpc_1$y.XRPCError) ;
 	  return e;
 	}
-	getSuggestionsSkeleton.toKnownErr = toKnownErr$v;
+	getSuggestionsSkeleton.toKnownErr = toKnownErr$w;
 
 	var getTaggedSuggestions = {};
 
@@ -25774,20 +26069,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$w = dist;
-	const util_1$B = util$2;
-	const lexicons_1$A = lexicons;
-	function toKnownErr$u(e) {
-	  if (e instanceof xrpc_1$w.XRPCError) ;
+	const xrpc_1$x = dist;
+	const util_1$C = util$2;
+	const lexicons_1$B = lexicons;
+	function toKnownErr$v(e) {
+	  if (e instanceof xrpc_1$x.XRPCError) ;
 	  return e;
 	}
-	getTaggedSuggestions.toKnownErr = toKnownErr$u;
+	getTaggedSuggestions.toKnownErr = toKnownErr$v;
 	function isSuggestion(v) {
-	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.unspecced.getTaggedSuggestions#suggestion';
+	  return (0, util_1$C.isObj)(v) && (0, util_1$C.hasProp)(v, '$type') && v.$type === 'app.bsky.unspecced.getTaggedSuggestions#suggestion';
 	}
 	getTaggedSuggestions.isSuggestion = isSuggestion;
 	function validateSuggestion(v) {
-	  return lexicons_1$A.lexicons.validate('app.bsky.unspecced.getTaggedSuggestions#suggestion', v);
+	  return lexicons_1$B.lexicons.validate('app.bsky.unspecced.getTaggedSuggestions#suggestion', v);
 	}
 	getTaggedSuggestions.validateSuggestion = validateSuggestion;
 
@@ -25800,20 +26095,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$v = dist;
-	let BadQueryStringError$1 = class BadQueryStringError extends xrpc_1$v.XRPCError {
+	const xrpc_1$w = dist;
+	let BadQueryStringError$1 = class BadQueryStringError extends xrpc_1$w.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	searchActorsSkeleton.BadQueryStringError = BadQueryStringError$1;
-	function toKnownErr$t(e) {
-	  if (e instanceof xrpc_1$v.XRPCError) {
+	function toKnownErr$u(e) {
+	  if (e instanceof xrpc_1$w.XRPCError) {
 	    if (e.error === 'BadQueryString') return new BadQueryStringError$1(e);
 	  }
 	  return e;
 	}
-	searchActorsSkeleton.toKnownErr = toKnownErr$t;
+	searchActorsSkeleton.toKnownErr = toKnownErr$u;
 
 	var searchPostsSkeleton = {};
 
@@ -25824,20 +26119,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$u = dist;
-	class BadQueryStringError extends xrpc_1$u.XRPCError {
+	const xrpc_1$v = dist;
+	class BadQueryStringError extends xrpc_1$v.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	searchPostsSkeleton.BadQueryStringError = BadQueryStringError;
-	function toKnownErr$s(e) {
-	  if (e instanceof xrpc_1$u.XRPCError) {
+	function toKnownErr$t(e) {
+	  if (e instanceof xrpc_1$v.XRPCError) {
 	    if (e.error === 'BadQueryString') return new BadQueryStringError(e);
 	  }
 	  return e;
 	}
-	searchPostsSkeleton.toKnownErr = toKnownErr$s;
+	searchPostsSkeleton.toKnownErr = toKnownErr$t;
 
 	var deleteAccount = {};
 
@@ -25848,12 +26143,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$t = dist;
-	function toKnownErr$r(e) {
-	  if (e instanceof xrpc_1$t.XRPCError) ;
+	const xrpc_1$u = dist;
+	function toKnownErr$s(e) {
+	  if (e instanceof xrpc_1$u.XRPCError) ;
 	  return e;
 	}
-	deleteAccount.toKnownErr = toKnownErr$r;
+	deleteAccount.toKnownErr = toKnownErr$s;
 
 	var exportAccountData = {};
 
@@ -25864,12 +26159,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$s = dist;
-	function toKnownErr$q(e) {
-	  if (e instanceof xrpc_1$s.XRPCError) ;
+	const xrpc_1$t = dist;
+	function toKnownErr$r(e) {
+	  if (e instanceof xrpc_1$t.XRPCError) ;
 	  return e;
 	}
-	exportAccountData.toKnownErr = toKnownErr$q;
+	exportAccountData.toKnownErr = toKnownErr$r;
 
 	var deleteMessageForSelf = {};
 
@@ -25880,12 +26175,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$r = dist;
-	function toKnownErr$p(e) {
-	  if (e instanceof xrpc_1$r.XRPCError) ;
+	const xrpc_1$s = dist;
+	function toKnownErr$q(e) {
+	  if (e instanceof xrpc_1$s.XRPCError) ;
 	  return e;
 	}
-	deleteMessageForSelf.toKnownErr = toKnownErr$p;
+	deleteMessageForSelf.toKnownErr = toKnownErr$q;
 
 	var getConvo = {};
 
@@ -25896,12 +26191,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$q = dist;
-	function toKnownErr$o(e) {
-	  if (e instanceof xrpc_1$q.XRPCError) ;
+	const xrpc_1$r = dist;
+	function toKnownErr$p(e) {
+	  if (e instanceof xrpc_1$r.XRPCError) ;
 	  return e;
 	}
-	getConvo.toKnownErr = toKnownErr$o;
+	getConvo.toKnownErr = toKnownErr$p;
 
 	var getConvoForMembers = {};
 
@@ -25912,12 +26207,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$p = dist;
-	function toKnownErr$n(e) {
-	  if (e instanceof xrpc_1$p.XRPCError) ;
+	const xrpc_1$q = dist;
+	function toKnownErr$o(e) {
+	  if (e instanceof xrpc_1$q.XRPCError) ;
 	  return e;
 	}
-	getConvoForMembers.toKnownErr = toKnownErr$n;
+	getConvoForMembers.toKnownErr = toKnownErr$o;
 
 	var getLog = {};
 
@@ -25928,12 +26223,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$o = dist;
-	function toKnownErr$m(e) {
-	  if (e instanceof xrpc_1$o.XRPCError) ;
+	const xrpc_1$p = dist;
+	function toKnownErr$n(e) {
+	  if (e instanceof xrpc_1$p.XRPCError) ;
 	  return e;
 	}
-	getLog.toKnownErr = toKnownErr$m;
+	getLog.toKnownErr = toKnownErr$n;
 
 	var getMessages = {};
 
@@ -25944,12 +26239,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$n = dist;
-	function toKnownErr$l(e) {
-	  if (e instanceof xrpc_1$n.XRPCError) ;
+	const xrpc_1$o = dist;
+	function toKnownErr$m(e) {
+	  if (e instanceof xrpc_1$o.XRPCError) ;
 	  return e;
 	}
-	getMessages.toKnownErr = toKnownErr$l;
+	getMessages.toKnownErr = toKnownErr$m;
 
 	var leaveConvo = {};
 
@@ -25960,12 +26255,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$m = dist;
-	function toKnownErr$k(e) {
-	  if (e instanceof xrpc_1$m.XRPCError) ;
+	const xrpc_1$n = dist;
+	function toKnownErr$l(e) {
+	  if (e instanceof xrpc_1$n.XRPCError) ;
 	  return e;
 	}
-	leaveConvo.toKnownErr = toKnownErr$k;
+	leaveConvo.toKnownErr = toKnownErr$l;
 
 	var listConvos = {};
 
@@ -25976,12 +26271,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$l = dist;
-	function toKnownErr$j(e) {
-	  if (e instanceof xrpc_1$l.XRPCError) ;
+	const xrpc_1$m = dist;
+	function toKnownErr$k(e) {
+	  if (e instanceof xrpc_1$m.XRPCError) ;
 	  return e;
 	}
-	listConvos.toKnownErr = toKnownErr$j;
+	listConvos.toKnownErr = toKnownErr$k;
 
 	var muteConvo = {};
 
@@ -25992,12 +26287,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$k = dist;
-	function toKnownErr$i(e) {
-	  if (e instanceof xrpc_1$k.XRPCError) ;
+	const xrpc_1$l = dist;
+	function toKnownErr$j(e) {
+	  if (e instanceof xrpc_1$l.XRPCError) ;
 	  return e;
 	}
-	muteConvo.toKnownErr = toKnownErr$i;
+	muteConvo.toKnownErr = toKnownErr$j;
 
 	var sendMessage = {};
 
@@ -26008,12 +26303,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$j = dist;
-	function toKnownErr$h(e) {
-	  if (e instanceof xrpc_1$j.XRPCError) ;
+	const xrpc_1$k = dist;
+	function toKnownErr$i(e) {
+	  if (e instanceof xrpc_1$k.XRPCError) ;
 	  return e;
 	}
-	sendMessage.toKnownErr = toKnownErr$h;
+	sendMessage.toKnownErr = toKnownErr$i;
 
 	var sendMessageBatch = {};
 
@@ -26024,20 +26319,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$i = dist;
-	const util_1$A = util$2;
-	const lexicons_1$z = lexicons;
-	function toKnownErr$g(e) {
-	  if (e instanceof xrpc_1$i.XRPCError) ;
+	const xrpc_1$j = dist;
+	const util_1$B = util$2;
+	const lexicons_1$A = lexicons;
+	function toKnownErr$h(e) {
+	  if (e instanceof xrpc_1$j.XRPCError) ;
 	  return e;
 	}
-	sendMessageBatch.toKnownErr = toKnownErr$g;
+	sendMessageBatch.toKnownErr = toKnownErr$h;
 	function isBatchItem(v) {
-	  return (0, util_1$A.isObj)(v) && (0, util_1$A.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.sendMessageBatch#batchItem';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.sendMessageBatch#batchItem';
 	}
 	sendMessageBatch.isBatchItem = isBatchItem;
 	function validateBatchItem(v) {
-	  return lexicons_1$z.lexicons.validate('chat.bsky.convo.sendMessageBatch#batchItem', v);
+	  return lexicons_1$A.lexicons.validate('chat.bsky.convo.sendMessageBatch#batchItem', v);
 	}
 	sendMessageBatch.validateBatchItem = validateBatchItem;
 
@@ -26050,12 +26345,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$h = dist;
-	function toKnownErr$f(e) {
-	  if (e instanceof xrpc_1$h.XRPCError) ;
+	const xrpc_1$i = dist;
+	function toKnownErr$g(e) {
+	  if (e instanceof xrpc_1$i.XRPCError) ;
 	  return e;
 	}
-	unmuteConvo.toKnownErr = toKnownErr$f;
+	unmuteConvo.toKnownErr = toKnownErr$g;
 
 	var updateRead = {};
 
@@ -26066,12 +26361,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$g = dist;
-	function toKnownErr$e(e) {
-	  if (e instanceof xrpc_1$g.XRPCError) ;
+	const xrpc_1$h = dist;
+	function toKnownErr$f(e) {
+	  if (e instanceof xrpc_1$h.XRPCError) ;
 	  return e;
 	}
-	updateRead.toKnownErr = toKnownErr$e;
+	updateRead.toKnownErr = toKnownErr$f;
 
 	var getActorMetadata = {};
 
@@ -26082,20 +26377,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$f = dist;
-	const util_1$z = util$2;
-	const lexicons_1$y = lexicons;
-	function toKnownErr$d(e) {
-	  if (e instanceof xrpc_1$f.XRPCError) ;
+	const xrpc_1$g = dist;
+	const util_1$A = util$2;
+	const lexicons_1$z = lexicons;
+	function toKnownErr$e(e) {
+	  if (e instanceof xrpc_1$g.XRPCError) ;
 	  return e;
 	}
-	getActorMetadata.toKnownErr = toKnownErr$d;
+	getActorMetadata.toKnownErr = toKnownErr$e;
 	function isMetadata(v) {
-	  return (0, util_1$z.isObj)(v) && (0, util_1$z.hasProp)(v, '$type') && v.$type === 'chat.bsky.moderation.getActorMetadata#metadata';
+	  return (0, util_1$A.isObj)(v) && (0, util_1$A.hasProp)(v, '$type') && v.$type === 'chat.bsky.moderation.getActorMetadata#metadata';
 	}
 	getActorMetadata.isMetadata = isMetadata;
 	function validateMetadata(v) {
-	  return lexicons_1$y.lexicons.validate('chat.bsky.moderation.getActorMetadata#metadata', v);
+	  return lexicons_1$z.lexicons.validate('chat.bsky.moderation.getActorMetadata#metadata', v);
 	}
 	getActorMetadata.validateMetadata = validateMetadata;
 
@@ -26108,12 +26403,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$e = dist;
-	function toKnownErr$c(e) {
-	  if (e instanceof xrpc_1$e.XRPCError) ;
+	const xrpc_1$f = dist;
+	function toKnownErr$d(e) {
+	  if (e instanceof xrpc_1$f.XRPCError) ;
 	  return e;
 	}
-	getMessageContext.toKnownErr = toKnownErr$c;
+	getMessageContext.toKnownErr = toKnownErr$d;
 
 	var updateActorAccess = {};
 
@@ -26124,12 +26419,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$d = dist;
-	function toKnownErr$b(e) {
-	  if (e instanceof xrpc_1$d.XRPCError) ;
+	const xrpc_1$e = dist;
+	function toKnownErr$c(e) {
+	  if (e instanceof xrpc_1$e.XRPCError) ;
 	  return e;
 	}
-	updateActorAccess.toKnownErr = toKnownErr$b;
+	updateActorAccess.toKnownErr = toKnownErr$c;
 
 	var createTemplate = {};
 
@@ -26140,12 +26435,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$c = dist;
-	function toKnownErr$a(e) {
-	  if (e instanceof xrpc_1$c.XRPCError) ;
+	const xrpc_1$d = dist;
+	function toKnownErr$b(e) {
+	  if (e instanceof xrpc_1$d.XRPCError) ;
 	  return e;
 	}
-	createTemplate.toKnownErr = toKnownErr$a;
+	createTemplate.toKnownErr = toKnownErr$b;
 
 	var deleteTemplate = {};
 
@@ -26156,12 +26451,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$b = dist;
-	function toKnownErr$9(e) {
-	  if (e instanceof xrpc_1$b.XRPCError) ;
+	const xrpc_1$c = dist;
+	function toKnownErr$a(e) {
+	  if (e instanceof xrpc_1$c.XRPCError) ;
 	  return e;
 	}
-	deleteTemplate.toKnownErr = toKnownErr$9;
+	deleteTemplate.toKnownErr = toKnownErr$a;
 
 	var listTemplates = {};
 
@@ -26172,12 +26467,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$a = dist;
-	function toKnownErr$8(e) {
-	  if (e instanceof xrpc_1$a.XRPCError) ;
+	const xrpc_1$b = dist;
+	function toKnownErr$9(e) {
+	  if (e instanceof xrpc_1$b.XRPCError) ;
 	  return e;
 	}
-	listTemplates.toKnownErr = toKnownErr$8;
+	listTemplates.toKnownErr = toKnownErr$9;
 
 	var updateTemplate = {};
 
@@ -26188,12 +26483,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$9 = dist;
-	function toKnownErr$7(e) {
-	  if (e instanceof xrpc_1$9.XRPCError) ;
+	const xrpc_1$a = dist;
+	function toKnownErr$8(e) {
+	  if (e instanceof xrpc_1$a.XRPCError) ;
 	  return e;
 	}
-	updateTemplate.toKnownErr = toKnownErr$7;
+	updateTemplate.toKnownErr = toKnownErr$8;
 
 	var emitEvent = {};
 
@@ -26204,20 +26499,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$8 = dist;
-	class SubjectHasActionError extends xrpc_1$8.XRPCError {
+	const xrpc_1$9 = dist;
+	class SubjectHasActionError extends xrpc_1$9.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	emitEvent.SubjectHasActionError = SubjectHasActionError;
-	function toKnownErr$6(e) {
-	  if (e instanceof xrpc_1$8.XRPCError) {
+	function toKnownErr$7(e) {
+	  if (e instanceof xrpc_1$9.XRPCError) {
 	    if (e.error === 'SubjectHasAction') return new SubjectHasActionError(e);
 	  }
 	  return e;
 	}
-	emitEvent.toKnownErr = toKnownErr$6;
+	emitEvent.toKnownErr = toKnownErr$7;
 
 	var getEvent = {};
 
@@ -26228,12 +26523,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$7 = dist;
-	function toKnownErr$5(e) {
-	  if (e instanceof xrpc_1$7.XRPCError) ;
+	const xrpc_1$8 = dist;
+	function toKnownErr$6(e) {
+	  if (e instanceof xrpc_1$8.XRPCError) ;
 	  return e;
 	}
-	getEvent.toKnownErr = toKnownErr$5;
+	getEvent.toKnownErr = toKnownErr$6;
 
 	var getRecord = {};
 
@@ -26244,20 +26539,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$6 = dist;
-	class RecordNotFoundError extends xrpc_1$6.XRPCError {
+	const xrpc_1$7 = dist;
+	class RecordNotFoundError extends xrpc_1$7.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getRecord.RecordNotFoundError = RecordNotFoundError;
-	function toKnownErr$4(e) {
-	  if (e instanceof xrpc_1$6.XRPCError) {
+	function toKnownErr$5(e) {
+	  if (e instanceof xrpc_1$7.XRPCError) {
 	    if (e.error === 'RecordNotFound') return new RecordNotFoundError(e);
 	  }
 	  return e;
 	}
-	getRecord.toKnownErr = toKnownErr$4;
+	getRecord.toKnownErr = toKnownErr$5;
 
 	var getRepo = {};
 
@@ -26268,20 +26563,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$5 = dist;
-	class RepoNotFoundError extends xrpc_1$5.XRPCError {
+	const xrpc_1$6 = dist;
+	class RepoNotFoundError extends xrpc_1$6.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getRepo.RepoNotFoundError = RepoNotFoundError;
-	function toKnownErr$3(e) {
-	  if (e instanceof xrpc_1$5.XRPCError) {
+	function toKnownErr$4(e) {
+	  if (e instanceof xrpc_1$6.XRPCError) {
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError(e);
 	  }
 	  return e;
 	}
-	getRepo.toKnownErr = toKnownErr$3;
+	getRepo.toKnownErr = toKnownErr$4;
 
 	var queryEvents = {};
 
@@ -26292,12 +26587,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$4 = dist;
-	function toKnownErr$2(e) {
-	  if (e instanceof xrpc_1$4.XRPCError) ;
+	const xrpc_1$5 = dist;
+	function toKnownErr$3(e) {
+	  if (e instanceof xrpc_1$5.XRPCError) ;
 	  return e;
 	}
-	queryEvents.toKnownErr = toKnownErr$2;
+	queryEvents.toKnownErr = toKnownErr$3;
 
 	var queryStatuses = {};
 
@@ -26308,12 +26603,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$3 = dist;
-	function toKnownErr$1(e) {
-	  if (e instanceof xrpc_1$3.XRPCError) ;
+	const xrpc_1$4 = dist;
+	function toKnownErr$2(e) {
+	  if (e instanceof xrpc_1$4.XRPCError) ;
 	  return e;
 	}
-	queryStatuses.toKnownErr = toKnownErr$1;
+	queryStatuses.toKnownErr = toKnownErr$2;
 
 	var searchRepos = {};
 
@@ -26324,12 +26619,46 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
+	const xrpc_1$3 = dist;
+	function toKnownErr$1(e) {
+	  if (e instanceof xrpc_1$3.XRPCError) ;
+	  return e;
+	}
+	searchRepos.toKnownErr = toKnownErr$1;
+
+	var getConfig = {};
+
+	Object.defineProperty(getConfig, "__esModule", {
+	  value: true
+	});
+	getConfig.validateViewerConfig = getConfig.isViewerConfig = getConfig.validateServiceConfig = getConfig.isServiceConfig = getConfig.toKnownErr = void 0;
+	/**
+	 * GENERATED CODE - DO NOT MODIFY
+	 */
 	const xrpc_1$2 = dist;
+	const util_1$z = util$2;
+	const lexicons_1$y = lexicons;
 	function toKnownErr(e) {
 	  if (e instanceof xrpc_1$2.XRPCError) ;
 	  return e;
 	}
-	searchRepos.toKnownErr = toKnownErr;
+	getConfig.toKnownErr = toKnownErr;
+	function isServiceConfig(v) {
+	  return (0, util_1$z.isObj)(v) && (0, util_1$z.hasProp)(v, '$type') && v.$type === 'tools.ozone.server.getConfig#serviceConfig';
+	}
+	getConfig.isServiceConfig = isServiceConfig;
+	function validateServiceConfig(v) {
+	  return lexicons_1$y.lexicons.validate('tools.ozone.server.getConfig#serviceConfig', v);
+	}
+	getConfig.validateServiceConfig = validateServiceConfig;
+	function isViewerConfig(v) {
+	  return (0, util_1$z.isObj)(v) && (0, util_1$z.hasProp)(v, '$type') && v.$type === 'tools.ozone.server.getConfig#viewerConfig';
+	}
+	getConfig.isViewerConfig = isViewerConfig;
+	function validateViewerConfig(v) {
+	  return lexicons_1$y.lexicons.validate('tools.ozone.server.getConfig#viewerConfig', v);
+	}
+	getConfig.validateViewerConfig = validateViewerConfig;
 
 	var defs$c = {};
 
@@ -26587,7 +26916,7 @@ if (cid) {
 	Object.defineProperty(defs$8, "__esModule", {
 	  value: true
 	});
-	defs$8.validateLabelerPrefItem = defs$8.isLabelerPrefItem = defs$8.validateLabelersPref = defs$8.isLabelersPref = defs$8.validateHiddenPostsPref = defs$8.isHiddenPostsPref = defs$8.validateMutedWordsPref = defs$8.isMutedWordsPref = defs$8.validateMutedWord = defs$8.isMutedWord = defs$8.validateInterestsPref = defs$8.isInterestsPref = defs$8.validateThreadViewPref = defs$8.isThreadViewPref = defs$8.validateFeedViewPref = defs$8.isFeedViewPref = defs$8.validatePersonalDetailsPref = defs$8.isPersonalDetailsPref = defs$8.validateSavedFeedsPref = defs$8.isSavedFeedsPref = defs$8.validateSavedFeedsPrefV2 = defs$8.isSavedFeedsPrefV2 = defs$8.validateSavedFeed = defs$8.isSavedFeed = defs$8.validateContentLabelPref = defs$8.isContentLabelPref = defs$8.validateAdultContentPref = defs$8.isAdultContentPref = defs$8.validateViewerState = defs$8.isViewerState = defs$8.validateProfileAssociatedChat = defs$8.isProfileAssociatedChat = defs$8.validateProfileAssociated = defs$8.isProfileAssociated = defs$8.validateProfileViewDetailed = defs$8.isProfileViewDetailed = defs$8.validateProfileView = defs$8.isProfileView = defs$8.validateProfileViewBasic = defs$8.isProfileViewBasic = void 0;
+	defs$8.validateLabelerPrefItem = defs$8.isLabelerPrefItem = defs$8.validateLabelersPref = defs$8.isLabelersPref = defs$8.validateHiddenPostsPref = defs$8.isHiddenPostsPref = defs$8.validateMutedWordsPref = defs$8.isMutedWordsPref = defs$8.validateMutedWord = defs$8.isMutedWord = defs$8.validateInterestsPref = defs$8.isInterestsPref = defs$8.validateThreadViewPref = defs$8.isThreadViewPref = defs$8.validateFeedViewPref = defs$8.isFeedViewPref = defs$8.validatePersonalDetailsPref = defs$8.isPersonalDetailsPref = defs$8.validateSavedFeedsPref = defs$8.isSavedFeedsPref = defs$8.validateSavedFeedsPrefV2 = defs$8.isSavedFeedsPrefV2 = defs$8.validateSavedFeed = defs$8.isSavedFeed = defs$8.validateContentLabelPref = defs$8.isContentLabelPref = defs$8.validateAdultContentPref = defs$8.isAdultContentPref = defs$8.validateKnownFollowers = defs$8.isKnownFollowers = defs$8.validateViewerState = defs$8.isViewerState = defs$8.validateProfileAssociatedChat = defs$8.isProfileAssociatedChat = defs$8.validateProfileAssociated = defs$8.isProfileAssociated = defs$8.validateProfileViewDetailed = defs$8.isProfileViewDetailed = defs$8.validateProfileView = defs$8.isProfileView = defs$8.validateProfileViewBasic = defs$8.isProfileViewBasic = void 0;
 	const util_1$s = util$2;
 	const lexicons_1$r = lexicons;
 	function isProfileViewBasic$1(v) {
@@ -26638,6 +26967,14 @@ if (cid) {
 	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#viewerState', v);
 	}
 	defs$8.validateViewerState = validateViewerState$1;
+	function isKnownFollowers(v) {
+	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#knownFollowers';
+	}
+	defs$8.isKnownFollowers = isKnownFollowers;
+	function validateKnownFollowers(v) {
+	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#knownFollowers', v);
+	}
+	defs$8.validateKnownFollowers = validateKnownFollowers;
 	function isAdultContentPref(v) {
 	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#adultContentPref';
 	}
@@ -27920,11 +28257,11 @@ if (cid) {
 	Object.defineProperty(client$1, "__esModule", {
 	  value: true
 	});
-	client$1.ComAtprotoServerGetAccountInviteCodes = client$1.ComAtprotoServerDescribeServer = client$1.ComAtprotoServerDeleteSession = client$1.ComAtprotoServerDeleteAccount = client$1.ComAtprotoServerDefs = client$1.ComAtprotoServerDeactivateAccount = client$1.ComAtprotoServerCreateSession = client$1.ComAtprotoServerCreateInviteCodes = client$1.ComAtprotoServerCreateInviteCode = client$1.ComAtprotoServerCreateAppPassword = client$1.ComAtprotoServerCreateAccount = client$1.ComAtprotoServerConfirmEmail = client$1.ComAtprotoServerCheckAccountStatus = client$1.ComAtprotoServerActivateAccount = client$1.ComAtprotoRepoUploadBlob = client$1.ComAtprotoRepoStrongRef = client$1.ComAtprotoRepoPutRecord = client$1.ComAtprotoRepoListRecords = client$1.ComAtprotoRepoListMissingBlobs = client$1.ComAtprotoRepoImportRepo = client$1.ComAtprotoRepoGetRecord = client$1.ComAtprotoRepoDescribeRepo = client$1.ComAtprotoRepoDeleteRecord = client$1.ComAtprotoRepoCreateRecord = client$1.ComAtprotoRepoApplyWrites = client$1.ComAtprotoModerationDefs = client$1.ComAtprotoModerationCreateReport = client$1.ComAtprotoLabelSubscribeLabels = client$1.ComAtprotoLabelQueryLabels = client$1.ComAtprotoLabelDefs = client$1.ComAtprotoIdentityUpdateHandle = client$1.ComAtprotoIdentitySubmitPlcOperation = client$1.ComAtprotoIdentitySignPlcOperation = client$1.ComAtprotoIdentityResolveHandle = client$1.ComAtprotoIdentityRequestPlcOperationSignature = client$1.ComAtprotoIdentityGetRecommendedDidCredentials = client$1.ComAtprotoAdminUpdateSubjectStatus = client$1.ComAtprotoAdminUpdateAccountPassword = client$1.ComAtprotoAdminUpdateAccountHandle = client$1.ComAtprotoAdminUpdateAccountEmail = client$1.ComAtprotoAdminSendEmail = client$1.ComAtprotoAdminGetSubjectStatus = client$1.ComAtprotoAdminGetInviteCodes = client$1.ComAtprotoAdminGetAccountInfos = client$1.ComAtprotoAdminGetAccountInfo = client$1.ComAtprotoAdminEnableAccountInvites = client$1.ComAtprotoAdminDisableInviteCodes = client$1.ComAtprotoAdminDisableAccountInvites = client$1.ComAtprotoAdminDeleteAccount = client$1.ComAtprotoAdminDefs = void 0;
-	client$1.AppBskyFeedGetFeedGenerators = client$1.AppBskyFeedGetFeedGenerator = client$1.AppBskyFeedGetFeed = client$1.AppBskyFeedGetAuthorFeed = client$1.AppBskyFeedGetActorLikes = client$1.AppBskyFeedGetActorFeeds = client$1.AppBskyFeedGenerator = client$1.AppBskyFeedDescribeFeedGenerator = client$1.AppBskyFeedDefs = client$1.AppBskyEmbedRecordWithMedia = client$1.AppBskyEmbedRecord = client$1.AppBskyEmbedImages = client$1.AppBskyEmbedExternal = client$1.AppBskyActorSearchActorsTypeahead = client$1.AppBskyActorSearchActors = client$1.AppBskyActorPutPreferences = client$1.AppBskyActorProfile = client$1.AppBskyActorGetSuggestions = client$1.AppBskyActorGetProfiles = client$1.AppBskyActorGetProfile = client$1.AppBskyActorGetPreferences = client$1.AppBskyActorDefs = client$1.ComAtprotoTempRequestPhoneVerification = client$1.ComAtprotoTempFetchLabels = client$1.ComAtprotoTempCheckSignupQueue = client$1.ComAtprotoSyncSubscribeRepos = client$1.ComAtprotoSyncRequestCrawl = client$1.ComAtprotoSyncNotifyOfUpdate = client$1.ComAtprotoSyncListRepos = client$1.ComAtprotoSyncListBlobs = client$1.ComAtprotoSyncGetRepoStatus = client$1.ComAtprotoSyncGetRepo = client$1.ComAtprotoSyncGetRecord = client$1.ComAtprotoSyncGetLatestCommit = client$1.ComAtprotoSyncGetHead = client$1.ComAtprotoSyncGetCheckout = client$1.ComAtprotoSyncGetBlocks = client$1.ComAtprotoSyncGetBlob = client$1.ComAtprotoServerUpdateEmail = client$1.ComAtprotoServerRevokeAppPassword = client$1.ComAtprotoServerResetPassword = client$1.ComAtprotoServerReserveSigningKey = client$1.ComAtprotoServerRequestPasswordReset = client$1.ComAtprotoServerRequestEmailUpdate = client$1.ComAtprotoServerRequestEmailConfirmation = client$1.ComAtprotoServerRequestAccountDelete = client$1.ComAtprotoServerRefreshSession = client$1.ComAtprotoServerListAppPasswords = client$1.ComAtprotoServerGetSession = client$1.ComAtprotoServerGetServiceAuth = void 0;
-	client$1.ChatBskyActorDefs = client$1.ChatBskyActorDeclaration = client$1.AppBskyUnspeccedSearchPostsSkeleton = client$1.AppBskyUnspeccedSearchActorsSkeleton = client$1.AppBskyUnspeccedGetTaggedSuggestions = client$1.AppBskyUnspeccedGetSuggestionsSkeleton = client$1.AppBskyUnspeccedGetPopularFeedGenerators = client$1.AppBskyUnspeccedDefs = client$1.AppBskyRichtextFacet = client$1.AppBskyNotificationUpdateSeen = client$1.AppBskyNotificationRegisterPush = client$1.AppBskyNotificationListNotifications = client$1.AppBskyNotificationGetUnreadCount = client$1.AppBskyLabelerService = client$1.AppBskyLabelerGetServices = client$1.AppBskyLabelerDefs = client$1.AppBskyGraphUnmuteActorList = client$1.AppBskyGraphUnmuteActor = client$1.AppBskyGraphMuteActorList = client$1.AppBskyGraphMuteActor = client$1.AppBskyGraphListitem = client$1.AppBskyGraphListblock = client$1.AppBskyGraphList = client$1.AppBskyGraphGetSuggestedFollowsByActor = client$1.AppBskyGraphGetRelationships = client$1.AppBskyGraphGetMutes = client$1.AppBskyGraphGetLists = client$1.AppBskyGraphGetListMutes = client$1.AppBskyGraphGetListBlocks = client$1.AppBskyGraphGetList = client$1.AppBskyGraphGetFollows = client$1.AppBskyGraphGetFollowers = client$1.AppBskyGraphGetBlocks = client$1.AppBskyGraphFollow = client$1.AppBskyGraphDefs = client$1.AppBskyGraphBlock = client$1.AppBskyFeedThreadgate = client$1.AppBskyFeedSendInteractions = client$1.AppBskyFeedSearchPosts = client$1.AppBskyFeedRepost = client$1.AppBskyFeedPost = client$1.AppBskyFeedLike = client$1.AppBskyFeedGetTimeline = client$1.AppBskyFeedGetSuggestedFeeds = client$1.AppBskyFeedGetRepostedBy = client$1.AppBskyFeedGetPosts = client$1.AppBskyFeedGetPostThread = client$1.AppBskyFeedGetListFeed = client$1.AppBskyFeedGetLikes = client$1.AppBskyFeedGetFeedSkeleton = void 0;
-	client$1.AppBskyActorNS = client$1.AppBskyNS = client$1.AppNS = client$1.ComAtprotoTempNS = client$1.ComAtprotoSyncNS = client$1.ComAtprotoServerNS = client$1.ComAtprotoRepoNS = client$1.ComAtprotoModerationNS = client$1.ComAtprotoLabelNS = client$1.ComAtprotoIdentityNS = client$1.ComAtprotoAdminNS = client$1.ComAtprotoNS = client$1.ComNS = client$1.AtpServiceClient = client$1.AtpBaseClient = client$1.TOOLS_OZONE_MODERATION = client$1.APP_BSKY_GRAPH = client$1.APP_BSKY_FEED = client$1.COM_ATPROTO_MODERATION = client$1.ToolsOzoneModerationSearchRepos = client$1.ToolsOzoneModerationQueryStatuses = client$1.ToolsOzoneModerationQueryEvents = client$1.ToolsOzoneModerationGetRepo = client$1.ToolsOzoneModerationGetRecord = client$1.ToolsOzoneModerationGetEvent = client$1.ToolsOzoneModerationEmitEvent = client$1.ToolsOzoneModerationDefs = client$1.ToolsOzoneCommunicationUpdateTemplate = client$1.ToolsOzoneCommunicationListTemplates = client$1.ToolsOzoneCommunicationDeleteTemplate = client$1.ToolsOzoneCommunicationDefs = client$1.ToolsOzoneCommunicationCreateTemplate = client$1.ChatBskyModerationUpdateActorAccess = client$1.ChatBskyModerationGetMessageContext = client$1.ChatBskyModerationGetActorMetadata = client$1.ChatBskyConvoUpdateRead = client$1.ChatBskyConvoUnmuteConvo = client$1.ChatBskyConvoSendMessageBatch = client$1.ChatBskyConvoSendMessage = client$1.ChatBskyConvoMuteConvo = client$1.ChatBskyConvoListConvos = client$1.ChatBskyConvoLeaveConvo = client$1.ChatBskyConvoGetMessages = client$1.ChatBskyConvoGetLog = client$1.ChatBskyConvoGetConvoForMembers = client$1.ChatBskyConvoGetConvo = client$1.ChatBskyConvoDeleteMessageForSelf = client$1.ChatBskyConvoDefs = client$1.ChatBskyActorExportAccountData = client$1.ChatBskyActorDeleteAccount = void 0;
-	client$1.ToolsOzoneModerationNS = client$1.ToolsOzoneCommunicationNS = client$1.ToolsOzoneNS = client$1.ToolsNS = client$1.ChatBskyModerationNS = client$1.ChatBskyConvoNS = client$1.DeclarationRecord = client$1.ChatBskyActorNS = client$1.ChatBskyNS = client$1.ChatNS = client$1.AppBskyUnspeccedNS = client$1.AppBskyRichtextNS = client$1.AppBskyNotificationNS = client$1.ServiceRecord = client$1.AppBskyLabelerNS = client$1.ListitemRecord = client$1.ListblockRecord = client$1.ListRecord = client$1.FollowRecord = client$1.BlockRecord = client$1.AppBskyGraphNS = client$1.ThreadgateRecord = client$1.RepostRecord = client$1.PostRecord = client$1.LikeRecord = client$1.GeneratorRecord = client$1.AppBskyFeedNS = client$1.AppBskyEmbedNS = client$1.ProfileRecord = void 0;
+	client$1.ComAtprotoServerDescribeServer = client$1.ComAtprotoServerDeleteSession = client$1.ComAtprotoServerDeleteAccount = client$1.ComAtprotoServerDefs = client$1.ComAtprotoServerDeactivateAccount = client$1.ComAtprotoServerCreateSession = client$1.ComAtprotoServerCreateInviteCodes = client$1.ComAtprotoServerCreateInviteCode = client$1.ComAtprotoServerCreateAppPassword = client$1.ComAtprotoServerCreateAccount = client$1.ComAtprotoServerConfirmEmail = client$1.ComAtprotoServerCheckAccountStatus = client$1.ComAtprotoServerActivateAccount = client$1.ComAtprotoRepoUploadBlob = client$1.ComAtprotoRepoStrongRef = client$1.ComAtprotoRepoPutRecord = client$1.ComAtprotoRepoListRecords = client$1.ComAtprotoRepoListMissingBlobs = client$1.ComAtprotoRepoImportRepo = client$1.ComAtprotoRepoGetRecord = client$1.ComAtprotoRepoDescribeRepo = client$1.ComAtprotoRepoDeleteRecord = client$1.ComAtprotoRepoCreateRecord = client$1.ComAtprotoRepoApplyWrites = client$1.ComAtprotoModerationDefs = client$1.ComAtprotoModerationCreateReport = client$1.ComAtprotoLabelSubscribeLabels = client$1.ComAtprotoLabelQueryLabels = client$1.ComAtprotoLabelDefs = client$1.ComAtprotoIdentityUpdateHandle = client$1.ComAtprotoIdentitySubmitPlcOperation = client$1.ComAtprotoIdentitySignPlcOperation = client$1.ComAtprotoIdentityResolveHandle = client$1.ComAtprotoIdentityRequestPlcOperationSignature = client$1.ComAtprotoIdentityGetRecommendedDidCredentials = client$1.ComAtprotoAdminUpdateSubjectStatus = client$1.ComAtprotoAdminUpdateAccountPassword = client$1.ComAtprotoAdminUpdateAccountHandle = client$1.ComAtprotoAdminUpdateAccountEmail = client$1.ComAtprotoAdminSendEmail = client$1.ComAtprotoAdminSearchAccounts = client$1.ComAtprotoAdminGetSubjectStatus = client$1.ComAtprotoAdminGetInviteCodes = client$1.ComAtprotoAdminGetAccountInfos = client$1.ComAtprotoAdminGetAccountInfo = client$1.ComAtprotoAdminEnableAccountInvites = client$1.ComAtprotoAdminDisableInviteCodes = client$1.ComAtprotoAdminDisableAccountInvites = client$1.ComAtprotoAdminDeleteAccount = client$1.ComAtprotoAdminDefs = void 0;
+	client$1.AppBskyFeedGetFeedGenerator = client$1.AppBskyFeedGetFeed = client$1.AppBskyFeedGetAuthorFeed = client$1.AppBskyFeedGetActorLikes = client$1.AppBskyFeedGetActorFeeds = client$1.AppBskyFeedGenerator = client$1.AppBskyFeedDescribeFeedGenerator = client$1.AppBskyFeedDefs = client$1.AppBskyEmbedRecordWithMedia = client$1.AppBskyEmbedRecord = client$1.AppBskyEmbedImages = client$1.AppBskyEmbedExternal = client$1.AppBskyActorSearchActorsTypeahead = client$1.AppBskyActorSearchActors = client$1.AppBskyActorPutPreferences = client$1.AppBskyActorProfile = client$1.AppBskyActorGetSuggestions = client$1.AppBskyActorGetProfiles = client$1.AppBskyActorGetProfile = client$1.AppBskyActorGetPreferences = client$1.AppBskyActorDefs = client$1.ComAtprotoTempRequestPhoneVerification = client$1.ComAtprotoTempFetchLabels = client$1.ComAtprotoTempCheckSignupQueue = client$1.ComAtprotoSyncSubscribeRepos = client$1.ComAtprotoSyncRequestCrawl = client$1.ComAtprotoSyncNotifyOfUpdate = client$1.ComAtprotoSyncListRepos = client$1.ComAtprotoSyncListBlobs = client$1.ComAtprotoSyncGetRepoStatus = client$1.ComAtprotoSyncGetRepo = client$1.ComAtprotoSyncGetRecord = client$1.ComAtprotoSyncGetLatestCommit = client$1.ComAtprotoSyncGetHead = client$1.ComAtprotoSyncGetCheckout = client$1.ComAtprotoSyncGetBlocks = client$1.ComAtprotoSyncGetBlob = client$1.ComAtprotoServerUpdateEmail = client$1.ComAtprotoServerRevokeAppPassword = client$1.ComAtprotoServerResetPassword = client$1.ComAtprotoServerReserveSigningKey = client$1.ComAtprotoServerRequestPasswordReset = client$1.ComAtprotoServerRequestEmailUpdate = client$1.ComAtprotoServerRequestEmailConfirmation = client$1.ComAtprotoServerRequestAccountDelete = client$1.ComAtprotoServerRefreshSession = client$1.ComAtprotoServerListAppPasswords = client$1.ComAtprotoServerGetSession = client$1.ComAtprotoServerGetServiceAuth = client$1.ComAtprotoServerGetAccountInviteCodes = void 0;
+	client$1.AppBskyUnspeccedGetTaggedSuggestions = client$1.AppBskyUnspeccedGetSuggestionsSkeleton = client$1.AppBskyUnspeccedGetPopularFeedGenerators = client$1.AppBskyUnspeccedDefs = client$1.AppBskyRichtextFacet = client$1.AppBskyNotificationUpdateSeen = client$1.AppBskyNotificationRegisterPush = client$1.AppBskyNotificationListNotifications = client$1.AppBskyNotificationGetUnreadCount = client$1.AppBskyLabelerService = client$1.AppBskyLabelerGetServices = client$1.AppBskyLabelerDefs = client$1.AppBskyGraphUnmuteThread = client$1.AppBskyGraphUnmuteActorList = client$1.AppBskyGraphUnmuteActor = client$1.AppBskyGraphMuteThread = client$1.AppBskyGraphMuteActorList = client$1.AppBskyGraphMuteActor = client$1.AppBskyGraphListitem = client$1.AppBskyGraphListblock = client$1.AppBskyGraphList = client$1.AppBskyGraphGetSuggestedFollowsByActor = client$1.AppBskyGraphGetRelationships = client$1.AppBskyGraphGetMutes = client$1.AppBskyGraphGetLists = client$1.AppBskyGraphGetListMutes = client$1.AppBskyGraphGetListBlocks = client$1.AppBskyGraphGetList = client$1.AppBskyGraphGetKnownFollowers = client$1.AppBskyGraphGetFollows = client$1.AppBskyGraphGetFollowers = client$1.AppBskyGraphGetBlocks = client$1.AppBskyGraphFollow = client$1.AppBskyGraphDefs = client$1.AppBskyGraphBlock = client$1.AppBskyFeedThreadgate = client$1.AppBskyFeedSendInteractions = client$1.AppBskyFeedSearchPosts = client$1.AppBskyFeedRepost = client$1.AppBskyFeedPost = client$1.AppBskyFeedLike = client$1.AppBskyFeedGetTimeline = client$1.AppBskyFeedGetSuggestedFeeds = client$1.AppBskyFeedGetRepostedBy = client$1.AppBskyFeedGetPosts = client$1.AppBskyFeedGetPostThread = client$1.AppBskyFeedGetListFeed = client$1.AppBskyFeedGetLikes = client$1.AppBskyFeedGetFeedSkeleton = client$1.AppBskyFeedGetFeedGenerators = void 0;
+	client$1.ComAtprotoServerNS = client$1.ComAtprotoRepoNS = client$1.ComAtprotoModerationNS = client$1.ComAtprotoLabelNS = client$1.ComAtprotoIdentityNS = client$1.ComAtprotoAdminNS = client$1.ComAtprotoNS = client$1.ComNS = client$1.AtpServiceClient = client$1.AtpBaseClient = client$1.TOOLS_OZONE_MODERATION = client$1.APP_BSKY_GRAPH = client$1.APP_BSKY_FEED = client$1.COM_ATPROTO_MODERATION = client$1.ToolsOzoneServerGetConfig = client$1.ToolsOzoneModerationSearchRepos = client$1.ToolsOzoneModerationQueryStatuses = client$1.ToolsOzoneModerationQueryEvents = client$1.ToolsOzoneModerationGetRepo = client$1.ToolsOzoneModerationGetRecord = client$1.ToolsOzoneModerationGetEvent = client$1.ToolsOzoneModerationEmitEvent = client$1.ToolsOzoneModerationDefs = client$1.ToolsOzoneCommunicationUpdateTemplate = client$1.ToolsOzoneCommunicationListTemplates = client$1.ToolsOzoneCommunicationDeleteTemplate = client$1.ToolsOzoneCommunicationDefs = client$1.ToolsOzoneCommunicationCreateTemplate = client$1.ChatBskyModerationUpdateActorAccess = client$1.ChatBskyModerationGetMessageContext = client$1.ChatBskyModerationGetActorMetadata = client$1.ChatBskyConvoUpdateRead = client$1.ChatBskyConvoUnmuteConvo = client$1.ChatBskyConvoSendMessageBatch = client$1.ChatBskyConvoSendMessage = client$1.ChatBskyConvoMuteConvo = client$1.ChatBskyConvoListConvos = client$1.ChatBskyConvoLeaveConvo = client$1.ChatBskyConvoGetMessages = client$1.ChatBskyConvoGetLog = client$1.ChatBskyConvoGetConvoForMembers = client$1.ChatBskyConvoGetConvo = client$1.ChatBskyConvoDeleteMessageForSelf = client$1.ChatBskyConvoDefs = client$1.ChatBskyActorExportAccountData = client$1.ChatBskyActorDeleteAccount = client$1.ChatBskyActorDefs = client$1.ChatBskyActorDeclaration = client$1.AppBskyUnspeccedSearchPostsSkeleton = client$1.AppBskyUnspeccedSearchActorsSkeleton = void 0;
+	client$1.ToolsOzoneServerNS = client$1.ToolsOzoneModerationNS = client$1.ToolsOzoneCommunicationNS = client$1.ToolsOzoneNS = client$1.ToolsNS = client$1.ChatBskyModerationNS = client$1.ChatBskyConvoNS = client$1.DeclarationRecord = client$1.ChatBskyActorNS = client$1.ChatBskyNS = client$1.ChatNS = client$1.AppBskyUnspeccedNS = client$1.AppBskyRichtextNS = client$1.AppBskyNotificationNS = client$1.ServiceRecord = client$1.AppBskyLabelerNS = client$1.ListitemRecord = client$1.ListblockRecord = client$1.ListRecord = client$1.FollowRecord = client$1.BlockRecord = client$1.AppBskyGraphNS = client$1.ThreadgateRecord = client$1.RepostRecord = client$1.PostRecord = client$1.LikeRecord = client$1.GeneratorRecord = client$1.AppBskyFeedNS = client$1.AppBskyEmbedNS = client$1.ProfileRecord = client$1.AppBskyActorNS = client$1.AppBskyNS = client$1.AppNS = client$1.ComAtprotoTempNS = client$1.ComAtprotoSyncNS = void 0;
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
@@ -27938,6 +28275,7 @@ if (cid) {
 	const ComAtprotoAdminGetAccountInfos = __importStar(getAccountInfos);
 	const ComAtprotoAdminGetInviteCodes = __importStar(getInviteCodes);
 	const ComAtprotoAdminGetSubjectStatus = __importStar(getSubjectStatus);
+	const ComAtprotoAdminSearchAccounts = __importStar(searchAccounts);
 	const ComAtprotoAdminSendEmail = __importStar(sendEmail);
 	const ComAtprotoAdminUpdateAccountEmail = __importStar(updateAccountEmail);
 	const ComAtprotoAdminUpdateAccountHandle = __importStar(updateAccountHandle);
@@ -28028,6 +28366,7 @@ if (cid) {
 	const AppBskyGraphGetBlocks = __importStar(getBlocks);
 	const AppBskyGraphGetFollowers = __importStar(getFollowers);
 	const AppBskyGraphGetFollows = __importStar(getFollows);
+	const AppBskyGraphGetKnownFollowers = __importStar(getKnownFollowers);
 	const AppBskyGraphGetList = __importStar(getList);
 	const AppBskyGraphGetListBlocks = __importStar(getListBlocks);
 	const AppBskyGraphGetListMutes = __importStar(getListMutes);
@@ -28037,8 +28376,10 @@ if (cid) {
 	const AppBskyGraphGetSuggestedFollowsByActor = __importStar(getSuggestedFollowsByActor);
 	const AppBskyGraphMuteActor = __importStar(muteActor);
 	const AppBskyGraphMuteActorList = __importStar(muteActorList);
+	const AppBskyGraphMuteThread = __importStar(muteThread);
 	const AppBskyGraphUnmuteActor = __importStar(unmuteActor);
 	const AppBskyGraphUnmuteActorList = __importStar(unmuteActorList);
+	const AppBskyGraphUnmuteThread = __importStar(unmuteThread);
 	const AppBskyLabelerGetServices = __importStar(getServices);
 	const AppBskyNotificationGetUnreadCount = __importStar(getUnreadCount);
 	const AppBskyNotificationListNotifications = __importStar(listNotifications);
@@ -28077,6 +28418,7 @@ if (cid) {
 	const ToolsOzoneModerationQueryEvents = __importStar(queryEvents);
 	const ToolsOzoneModerationQueryStatuses = __importStar(queryStatuses);
 	const ToolsOzoneModerationSearchRepos = __importStar(searchRepos);
+	const ToolsOzoneServerGetConfig = __importStar(getConfig);
 	client$1.ComAtprotoAdminDefs = __importStar(defs$c);
 	client$1.ComAtprotoAdminDeleteAccount = __importStar(deleteAccount$2);
 	client$1.ComAtprotoAdminDisableAccountInvites = __importStar(disableAccountInvites);
@@ -28086,6 +28428,7 @@ if (cid) {
 	client$1.ComAtprotoAdminGetAccountInfos = __importStar(getAccountInfos);
 	client$1.ComAtprotoAdminGetInviteCodes = __importStar(getInviteCodes);
 	client$1.ComAtprotoAdminGetSubjectStatus = __importStar(getSubjectStatus);
+	client$1.ComAtprotoAdminSearchAccounts = __importStar(searchAccounts);
 	client$1.ComAtprotoAdminSendEmail = __importStar(sendEmail);
 	client$1.ComAtprotoAdminUpdateAccountEmail = __importStar(updateAccountEmail);
 	client$1.ComAtprotoAdminUpdateAccountHandle = __importStar(updateAccountHandle);
@@ -28197,6 +28540,7 @@ if (cid) {
 	client$1.AppBskyGraphGetBlocks = __importStar(getBlocks);
 	client$1.AppBskyGraphGetFollowers = __importStar(getFollowers);
 	client$1.AppBskyGraphGetFollows = __importStar(getFollows);
+	client$1.AppBskyGraphGetKnownFollowers = __importStar(getKnownFollowers);
 	client$1.AppBskyGraphGetList = __importStar(getList);
 	client$1.AppBskyGraphGetListBlocks = __importStar(getListBlocks);
 	client$1.AppBskyGraphGetListMutes = __importStar(getListMutes);
@@ -28209,8 +28553,10 @@ if (cid) {
 	client$1.AppBskyGraphListitem = __importStar(listitem);
 	client$1.AppBskyGraphMuteActor = __importStar(muteActor);
 	client$1.AppBskyGraphMuteActorList = __importStar(muteActorList);
+	client$1.AppBskyGraphMuteThread = __importStar(muteThread);
 	client$1.AppBskyGraphUnmuteActor = __importStar(unmuteActor);
 	client$1.AppBskyGraphUnmuteActorList = __importStar(unmuteActorList);
+	client$1.AppBskyGraphUnmuteThread = __importStar(unmuteThread);
 	client$1.AppBskyLabelerDefs = __importStar(defs$5);
 	client$1.AppBskyLabelerGetServices = __importStar(getServices);
 	client$1.AppBskyLabelerService = __importStar(service);
@@ -28258,6 +28604,7 @@ if (cid) {
 	client$1.ToolsOzoneModerationQueryEvents = __importStar(queryEvents);
 	client$1.ToolsOzoneModerationQueryStatuses = __importStar(queryStatuses);
 	client$1.ToolsOzoneModerationSearchRepos = __importStar(searchRepos);
+	client$1.ToolsOzoneServerGetConfig = __importStar(getConfig);
 	client$1.COM_ATPROTO_MODERATION = {
 	  DefsReasonSpam: 'com.atproto.moderation.defs#reasonSpam',
 	  DefsReasonViolation: 'com.atproto.moderation.defs#reasonViolation',
@@ -28491,6 +28838,11 @@ if (cid) {
 	  getSubjectStatus(params, opts) {
 	    return this._service.xrpc.call('com.atproto.admin.getSubjectStatus', params, undefined, opts).catch(e => {
 	      throw ComAtprotoAdminGetSubjectStatus.toKnownErr(e);
+	    });
+	  }
+	  searchAccounts(params, opts) {
+	    return this._service.xrpc.call('com.atproto.admin.searchAccounts', params, undefined, opts).catch(e => {
+	      throw ComAtprotoAdminSearchAccounts.toKnownErr(e);
 	    });
 	  }
 	  sendEmail(data, opts) {
@@ -29516,6 +29868,11 @@ if (cid) {
 	      throw AppBskyGraphGetFollows.toKnownErr(e);
 	    });
 	  }
+	  getKnownFollowers(params, opts) {
+	    return this._service.xrpc.call('app.bsky.graph.getKnownFollowers', params, undefined, opts).catch(e => {
+	      throw AppBskyGraphGetKnownFollowers.toKnownErr(e);
+	    });
+	  }
 	  getList(params, opts) {
 	    return this._service.xrpc.call('app.bsky.graph.getList', params, undefined, opts).catch(e => {
 	      throw AppBskyGraphGetList.toKnownErr(e);
@@ -29561,6 +29918,11 @@ if (cid) {
 	      throw AppBskyGraphMuteActorList.toKnownErr(e);
 	    });
 	  }
+	  muteThread(data, opts) {
+	    return this._service.xrpc.call('app.bsky.graph.muteThread', opts?.qp, data, opts).catch(e => {
+	      throw AppBskyGraphMuteThread.toKnownErr(e);
+	    });
+	  }
 	  unmuteActor(data, opts) {
 	    return this._service.xrpc.call('app.bsky.graph.unmuteActor', opts?.qp, data, opts).catch(e => {
 	      throw AppBskyGraphUnmuteActor.toKnownErr(e);
@@ -29569,6 +29931,11 @@ if (cid) {
 	  unmuteActorList(data, opts) {
 	    return this._service.xrpc.call('app.bsky.graph.unmuteActorList', opts?.qp, data, opts).catch(e => {
 	      throw AppBskyGraphUnmuteActorList.toKnownErr(e);
+	    });
+	  }
+	  unmuteThread(data, opts) {
+	    return this._service.xrpc.call('app.bsky.graph.unmuteThread', opts?.qp, data, opts).catch(e => {
+	      throw AppBskyGraphUnmuteThread.toKnownErr(e);
 	    });
 	  }
 	}
@@ -30221,9 +30588,16 @@ if (cid) {
 	      writable: true,
 	      value: void 0
 	    });
+	    Object.defineProperty(this, "server", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: void 0
+	    });
 	    this._service = service;
 	    this.communication = new ToolsOzoneCommunicationNS(service);
 	    this.moderation = new ToolsOzoneModerationNS(service);
+	    this.server = new ToolsOzoneServerNS(service);
 	  }
 	}
 	client$1.ToolsOzoneNS = ToolsOzoneNS;
@@ -30306,6 +30680,23 @@ if (cid) {
 	  }
 	}
 	client$1.ToolsOzoneModerationNS = ToolsOzoneModerationNS;
+	class ToolsOzoneServerNS {
+	  constructor(service) {
+	    Object.defineProperty(this, "_service", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: void 0
+	    });
+	    this._service = service;
+	  }
+	  getConfig(params, opts) {
+	    return this._service.xrpc.call('tools.ozone.server.getConfig', params, undefined, opts).catch(e => {
+	      throw ToolsOzoneServerGetConfig.toKnownErr(e);
+	    });
+	  }
+	}
+	client$1.ToolsOzoneServerNS = ToolsOzoneServerNS;
 
 	var agent = {};
 
@@ -31652,7 +32043,6 @@ if (cid) {
 		"nab",
 		"nagoya",
 		"name",
-		"natura",
 		"navy",
 		"nba",
 		"nc",
@@ -32312,7 +32702,9 @@ if (cid) {
 	 * `\ufe0f` emoji modifier
 	 * `\u00AD\u2060\u200A\u200B\u200C\u200D\u20e2` zero-width spaces (likely incomplete)
 	 */
-	util$1.TAG_REGEX = /(^|\s)[#＃]((?!\ufe0f)[^\s\u00AD\u2060\u200A\u200B\u200C\u200D\u20e2]*[^\d\s\p{P}\u00AD\u2060\u200A\u200B\u200C\u200D\u20e2]+[^\s\u00AD\u2060\u200A\u200B\u200C\u200D\u20e2]*)?/gu;
+	util$1.TAG_REGEX =
+	// eslint-disable-next-line no-misleading-character-class
+	/(^|\s)[#＃]((?!\ufe0f)[^\s\u00AD\u2060\u200A\u200B\u200C\u200D\u20e2]*[^\d\s\p{P}\u00AD\u2060\u200A\u200B\u200C\u200D\u20e2]+[^\s\u00AD\u2060\u200A\u200B\u200C\u200D\u20e2]*)?/gu;
 
 	var __importDefault = commonjsGlobal && commonjsGlobal.__importDefault || function (mod) {
 	  return mod && mod.__esModule ? mod : {
@@ -32390,7 +32782,8 @@ if (cid) {
 	  {
 	    const re = util_1$1.TAG_REGEX;
 	    while (match = re.exec(text.utf16)) {
-	      let [, leading, tag] = match;
+	      const leading = match[1];
+	      let tag = match[2];
 	      if (!tag) continue;
 	      // strip ending punctuation and any spaces
 	      tag = tag.trim().replace(util_1$1.TRAILING_PUNCTUATION_REGEX, '');
@@ -35402,7 +35795,7 @@ if (cid) {
 	    if (postURL && postURL.shortDID) return postURL.shortDID;
 	  }
 	  if (handle && handle.lastIndexOf('at:', 0) === 0) {
-	    const feedUri = breakFeedUri(handle);
+	    const feedUri = breakFeedURI(handle);
 	    if (feedUri && feedUri.shortDID) return feedUri.shortDID;
 	    if (handle && handle.lastIndexOf('at://', 0) === 0) handle = handle.slice(5);else handle = handle.slice(3);
 	  }
@@ -35505,9 +35898,15 @@ if (cid) {
 	    shortDID: shortenDID(matchGisting[2]),
 	    postID: matchGisting[3]?.toString().toLowerCase()
 	  };
+	  const matchBskyStyle = _breakBskyStylePostURL_Regex.exec(url);
+	  if (matchBskyStyle) return {
+	    shortDID: shortenDID(matchBskyStyle[2]),
+	    postID: matchBskyStyle[3]?.toString().toLowerCase()
+	  };
 	}
 	const _breakBskyPostURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:\-]+)\/post\/([a-z0-9]+)(\/|$)/i;
-	const _breakGistingPostURL_Regex = /^http[s]?\:\/\/(gist\.ing|gisti\.ng|gist\.ink)\/([a-z0-9\.\:\-]+)\/([a-z0-9]+)(\/|$)/i;
+	const _breakBskyStylePostURL_Regex = /^http[s]?\:\/\/(bsky\.app|6sky\.app|gist\.ing|gisti\.ng|gist\.ink)\/profile\/([a-z0-9\.\:\-]+)\/post\/([a-z0-9]+)(\/|$)/i;
+	const _breakGistingPostURL_Regex = /^http[s]?\:\/\/(6sky\.app|gist\.ing|gisti\.ng|gist\.ink)\/([a-z0-9\.\:\-]+)\/([a-z0-9]+)(\/|$)/i;
 
 	/**
 	* @param {string | null | undefined} url
@@ -35534,16 +35933,34 @@ if (cid) {
 	/**
 	* @param {string | null | undefined} uri
 	*/
-	function breakFeedUri(uri) {
+	function breakFeedURI(uri) {
 	  if (!uri) return;
 	  const match = _breakFeedUri_Regex.exec(uri);
-	  if (!match || !match[3]) return;
+	  if (!match || !match[4]) return;
+	  if (match[3] === 'app.bsky.feed.post') return {
+	    shortDID: shortenDID(match[2]),
+	    postID: match[4]
+	  };
 	  return {
 	    shortDID: match[2],
-	    postID: match[3]
+	    postID: match[4],
+	    feedType: match[3]
 	  };
 	}
-	const _breakFeedUri_Regex = /^at\:\/\/(did:plc:)?([a-z0-9]+)\/[a-z\.]+\/?(.*)?$/;
+	const _breakFeedUri_Regex = /^at\:\/\/(did:plc:)?([a-z0-9]+)\/([a-z\.]+)\/?(.*)?$/;
+
+	/**
+	* @param {string | null | undefined} uri
+	*/
+	function breakFeedURIPostOnly(uri) {
+	  if (!uri) return;
+	  const match = _breakFeedUri_Regex.exec(uri);
+	  if (!match || !match[4]) return;
+	  if (match[3] === 'app.bsky.feed.post') return {
+	    shortDID: shortenDID(match[2]),
+	    postID: match[4]
+	  };
+	}
 	function getProfileBlobUrl(did, cid) {
 	  if (!did || !cid) return undefined;
 	  return `https://cdn.bsky.app/img/avatar/plain/${unwrapShortDID(did)}/${cid}@jpeg`;
@@ -42306,7 +42723,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.43";
+	var version = "0.2.44";
 
 	// @ts-check
 
@@ -42369,15 +42786,15 @@ if (cid) {
 	    addShortDID(msg.repo);
 	    switch (msg.$type) {
 	      case 'app.bsky.feed.like':
-	        addShortDID(breakFeedUri(msg.subject?.uri)?.shortDID);
+	        addShortDID(breakFeedURIPostOnly(msg.subject?.uri)?.shortDID);
 	        return;
 	      case 'app.bsky.feed.post':
-	        addShortDID(breakFeedUri(msg.reply?.parent?.uri)?.shortDID);
-	        addShortDID(breakFeedUri(msg.reply?.root?.uri)?.shortDID);
-	        if (msg.embed?.$type === 'app.bsky.embed.record') addShortDID(breakFeedUri( /** @type {*} */msg.embed?.record?.uri)?.shortDID);
+	        addShortDID(breakFeedURIPostOnly(msg.reply?.parent?.uri)?.shortDID);
+	        addShortDID(breakFeedURIPostOnly(msg.reply?.root?.uri)?.shortDID);
+	        if (msg.embed?.$type === 'app.bsky.embed.record') addShortDID(breakFeedURIPostOnly( /** @type {*} */msg.embed?.record?.uri)?.shortDID);
 	        return;
 	      case 'app.bsky.feed.repost':
-	        addShortDID(breakFeedUri(msg.subject?.uri)?.shortDID);
+	        addShortDID(breakFeedURIPostOnly(msg.subject?.uri)?.shortDID);
 	        return;
 	      case 'app.bsky.feed.threadgate':
 	        // TODO extend
@@ -50611,7 +51028,7 @@ if (cid) {
 	   */
 	  function getPostOnly(uri) {
 	    if (!uri) return;
-	    const parsedURL = breakFeedUri(uri) || breakPostURL(uri);
+	    const parsedURL = breakFeedURIPostOnly(uri) || breakPostURL(uri);
 	    if (!parsedURL) return;
 	    let repo = memStore.repos.get(parsedURL.repo);
 	    if (repo) {
@@ -50645,7 +51062,7 @@ if (cid) {
 	   * @returns {Promise<import('.').CompactThreadPostSet | undefined>}
 	   */
 	  async function getPostThreadAsync(uri) {
-	    const shortDID = breakFeedUri(uri)?.shortDID;
+	    const shortDID = breakFeedURIPostOnly(uri)?.shortDID;
 	    if (!shortDID) return;
 	    let veryPost = outstandingPostUpdatesByURI.get(uri) || outstandingPostUpdatesInProgressByURI.get(uri);
 	    let threadStart = veryPost?.threadStart || uri;
@@ -50659,7 +51076,7 @@ if (cid) {
 	    const current = postsByUri.get(uri) || createSpeculativePost(shortDID, uri);
 	    let root = current?.threadStart ? postsByUri.get(current.threadStart) : undefined;
 	    if (!root) {
-	      const rootShortDID = breakFeedUri(current.threadStart)?.shortDID;
+	      const rootShortDID = breakFeedURIPostOnly(current.threadStart)?.shortDID;
 	      if (rootShortDID && current.threadStart) {
 	        const dbRoot = await db.posts.get(current.threadStart);
 	        if (dbRoot) root = createSpeculativePost(rootShortDID, current.threadStart);
@@ -50832,7 +51249,7 @@ if (cid) {
 	  async function syncRepoWithData(records, now) {
 	    let lastSync = '';
 	    for (const record of records) {
-	      const parsedURI = breakFeedUri(record.uri);
+	      const parsedURI = breakFeedURIPostOnly(record.uri);
 	      if (parsedURI?.postID && parsedURI.postID > lastSync) {
 	        // only consider POSTs, not other feed URIs
 	        if (record.uri.indexOf('app.bsky.feed.like') >= 0) {
@@ -50943,7 +51360,7 @@ if (cid) {
 	  agent_getRepoRecord_throttled
 	}) {
 	  if (!uri) return;
-	  const parsedURL = breakFeedUri(uri);
+	  const parsedURL = breakFeedURIPostOnly(uri);
 	  if (!parsedURL) throw new Error('Invalid post URI ' + JSON.stringify(uri));
 	  const postRecord =
 	  /**
@@ -50978,7 +51395,7 @@ if (cid) {
 	  agent_getPostThread_throttled
 	}) {
 	  if (!uri) return;
-	  const parsedURL = breakFeedUri(uri);
+	  const parsedURL = breakFeedURIPostOnly(uri);
 	  if (!parsedURL) return;
 	  const remotePromise = agent_getPostThread_throttled(uri);
 	  const local = await dbStore.getPostThread(uri);
@@ -52118,7 +52535,7 @@ if (cid) {
 	 * @param {string[] | undefined} quotes
 	 */
 	function detectQuoting(url, quotes) {
-	  const feedUri = breakFeedUri(url);
+	  const feedUri = breakFeedURIPostOnly(url);
 	  if (feedUri?.shortDID && feedUri.postID) return addToArrayUnique(quotes, makeFeedUri(feedUri.shortDID, feedUri.postID));
 	  const postUri = breakPostURL(url);
 	  if (postUri?.shortDID && postUri.postID) return addToArrayUnique(quotes, makeFeedUri(postUri.shortDID, postUri.postID));
@@ -52400,8 +52817,8 @@ if (cid) {
 	  if (!postView || visitedRevs.has(postView.cid)) return; // TODO: if visitedRevs is expected, use REV not CID, and update it after
 
 	  captureProfile(postView.author, store, now, intercepts);
-	  breakFeedUri(postView.uri);
 	  const compactPost = capturePostRecord(postView.author.did, postView.uri, /** @type {*} */postView.record, store, now, intercepts);
+	  if (!compactPost) return;
 	  compactPost.likeCount = postView.likeCount;
 	  compactPost.repostCount = postView.repostCount;
 	  compactPost.labels = capturePostLabels(postView.labels);
@@ -52428,7 +52845,7 @@ if (cid) {
 	 */
 	function getPostOrPlaceholder(postURI, store) {
 	  if (!postURI) return;
-	  const shortDID = breakFeedUri(postURI)?.shortDID;
+	  const shortDID = breakFeedURIPostOnly(postURI)?.shortDID;
 	  if (!shortDID) return;
 	  let repoData = store.get(shortDID);
 	  if (!repoData) store.set(shortDID, repoData = createRepoData(shortDID));
@@ -52592,6 +53009,7 @@ if (cid) {
 	 *  words: string[] | undefined,
 	 *  likeCount: number | undefined,
 	 *  repostCount: number | undefined,
+	 *  labels: Record<string, string> | undefined,
 	 *  asOf: number | undefined
 	 * }} CompactPost
 	 */
@@ -52632,7 +53050,8 @@ if (cid) {
 	exports.BSKY_SOCIAL_URL = BSKY_SOCIAL_URL;
 	exports.ColdskyAgent = ColdskyAgent;
 	exports.atproto = atproto;
-	exports.breakFeedUri = breakFeedUri;
+	exports.breakFeedURI = breakFeedURI;
+	exports.breakFeedURIPostOnly = breakFeedURIPostOnly;
 	exports.breakIntoWords = breakIntoWords;
 	exports.breakPostURL = breakPostURL;
 	exports.defineCacheIndexedDBStore = defineCacheIndexedDBStore;
