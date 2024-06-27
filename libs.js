@@ -39758,7 +39758,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.3";
+	var version = "0.2.4";
 
 	// @ts-check
 
@@ -40509,6 +40509,24 @@ if (cid) {
 
 	/**
 	 * @param {string} repo
+	 * @param {import('../..').RepoRecord$Typed['app.bsky.actor.profile']} profileRecord
+	 * @param {Map<string, import('../store-data').RepositoryData>} store
+	 * @param {number} asOf
+	 */
+	function captureProfileRecord(repo, profileRecord, store, asOf) {
+	  const shortDID = shortenDID(repo);
+	  let repoData = store.get(shortDID);
+	  if (!repoData) store.set(shortDID, repoData = createRepoData(shortDID));
+
+	  // TODO update with profileRecord
+	  repoData.profile;
+	}
+
+	// @ts-check
+
+
+	/**
+	 * @param {string} repo
 	 * @param {import('../..').RepoRecord$Typed['app.bsky.feed.repost']} repostRecord
 	 * @param {Map<string, import('../store-data').RepositoryData>} store
 	 */
@@ -40550,6 +40568,26 @@ if (cid) {
 	      return captureRepostRecord(repo, /** @type {RepoRecord$Typed['app.bsky.feed.repost']} */rec, store);
 	    case 'app.bsky.feed.post':
 	      return capturePostRecord(repo, cid, /** @type {RepoRecord$Typed['app.bsky.feed.post']} */rec, store, asOf);
+	    case 'app.bsky.actor.profile':
+	      return captureProfileRecord(repo, /** @type {RepoRecord$Typed['app.bsky.actor.profile']} */rec, store);
+	  }
+	}
+
+	// @ts-check
+
+
+	/**
+	 * @param {import('@atproto/api').AppBskyActorDefs.ProfileViewDetailed} profileView
+	 * @param {Map<string, import('./store-data').RepositoryData>} store
+	 * @param {number} now
+	 */
+	function captureProfile(profileView, store, now) {
+	  const shortDID = shortenDID(profileView.did);
+	  let repoData = store.get(shortDID);
+	  if (!repoData) store.set(shortDID, repoData = createRepoData(shortDID));
+	  if (repoData.profile) {
+	    repoData.profile.avatar;
+	    // TODO: update existing profile
 	  }
 	}
 
@@ -40614,9 +40652,7 @@ if (cid) {
 	 */
 	function capturePostView(visitedCIDs, postView, store, now) {
 	  if (!postView || visitedCIDs.has(postView.cid)) return;
-
-	  // TODO: capture profile
-
+	  captureProfile(postView.author, store);
 	  const compactPost = capturePostRecord(postView.author.did, postView.cid, /** @type {*} */postView.record, store, now);
 	  compactPost.likeCount = postView.likeCount;
 	  compactPost.repostCount = postView.repostCount;
