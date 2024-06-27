@@ -24,63 +24,72 @@ const publicAgent = new ColdskyAgent({
  * @typedef {import ('@atproto/api/dist/client/types/app/bsky/actor/defs').ProfileViewBasic} ProfileViewBasic
  */
 
-export async function resolveHandleOrDID(handleOrDID) {
-  const wholeTextSearchFullPromise = directSearchAccountsFull(handleOrDID, 5).then(matches => {
-    for (const pro of matches) {
-      storeAccountToCache(pro);
-      const shortHandle = shortenHandle(pro.handle);
-      if (shortHandle === shortenHandle(handleOrDID)) {
-        return { shortDID: shortenDID(pro.did), shortHandle };
-      }
-    }
-  });
+/**
+ * @typedef {import ('@atproto/api/dist/client/types/app/bsky/actor/defs').ProfileViewDetailed} ProfileViewDetailed
+ */
 
-  const resolvePlcDirectPromise = !likelyDID(handleOrDID) ? undefined :
-    resolvePlcDirectly(handleOrDID).then(auditEntries => {
-      for (let i = 0; i < auditEntries.length; i++) {
-        const fromEnd = auditEntries[auditEntries.length - 1 - i];
-        if (fromEnd.operation?.alsoKnownAs?.length) {
-          return {
-            shortDID: shortenDID(fromEnd.did),
-            shortHandle: shortenHandle(fromEnd.operation.alsoKnownAs[0].replace(/^at\:\/\//i, ''))
-          };
-        }
-      }
-    });
+/**
+ * @returns {AsyncIterable<ProfileViewDetailed>}
+ */
+export async function* resolveHandleOrDIDToProfile(handleOrDID) {
+  let fullyResolved = false;
+  const resolvedViaRequestPromise = resolveProfileViaRequest(handleOrDID);
+  resolvedViaRequestPromise.then(() => fullyResolved = true);
   
-  const cacheByDIDPromise = resolveDIDFromCache(handleOrDID);
+  const cacheByDIDPromise = !likelyDID(handleOrDID) ? undefined : resolveDIDFromCache(handleOrDID);
   const cacheByHandlePromise = resolveHandleFromCache(handleOrDID);
 
-  return new Promise(
-    /** @returns {{ shortDID: string, shortHandle: string }} */
+  const raceCachePromise = !cacheByDIDPromise ? cacheByHandlePromise : new Promise(
+    /** @param {(value: ProfileView) => void} resolve */
     resolve => {
-      [
-        wholeTextSearchFullPromise,
-        resolvePlcDirectPromise,
-        cacheByDIDPromise,
-        cacheByHandlePromise
-      ].map(async promise => {
-        const value = await promise;
-        if (value)
-          resolve(value);
-      });
+      cacheByDIDPromise.then(resolve);
+      cacheByHandlePromise.then(resolve);
     });
+
+  const fastCacheResponse = await Promise.race([
+    raceCachePromise,
+    resolvedViaRequestPromise,
+    new Promise(resolve => setTimeout(resolve, 100))
+  ]);
+
+  if (fastCacheResponse) yield fastCacheResponse;
+
+  if (!fullyResolved) {
+    const fullResponse = await resolvedViaRequestPromise;
+    yield fullResponse;
+  }
+}
+
+async function resolveHandleToProfileViaSearch(handle) {
+  const matches = await directSearchAccountsFull(unwrapShortHandle(handle), 5);
+  const shortHandle = shortenHandle(handle);
+  for (const pro of matches) {
+    storeAccountToCache(pro);
+  }
+
+  for (const pro of matches) {
+      if (shortenHandle(pro.handle) === shortHandle) {
+        return pro;
+    }
+  }
+}
+
+export async function resolveProfileViaRequest(handleOrDID) {
+  const actorParam = likelyDID(handleOrDID) ? unwrapShortDID(handleOrDID) : unwrapShortHandle(handleOrDID);
+  /** @type {ProfileViewDetailed} */
+  const profile = await fetch(`https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${actorParam}`).then(x => x.json());
+  storeAccountToCache(profile);
+  return profile;
 }
 
 async function resolveHandleFromCache(handle) {
   const matchByHandle = await db.accounts.where('handle').equals(unwrapShortHandle(handle)).first();
-  if (matchByHandle) return {
-    shortDID: shortenDID(matchByHandle.did),
-    shortHandle: shortenHandle(matchByHandle.handle)
-  };
+  return matchByHandle;
 }
 
 async function resolveDIDFromCache(did) {
-  const matchByHandle = await db.accounts.where('did').equals(unwrapShortDID(did)).first();
-  if (matchByHandle) return {
-    shortDID: shortenDID(matchByHandle.did),
-    shortHandle: shortenHandle(matchByHandle.handle)
-  };
+  const matchByDID = await db.accounts.where('did').equals(unwrapShortDID(did)).first();
+  return matchByDID;
 }
 
 async function resolvePlcDirectly(did) {

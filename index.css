@@ -194,4 +194,43 @@
   color: #bdd4fc;
   text-shadow: 0 0 14px #0052ff, 0 0 2px black;
 }
+
+/* src/history/history.css */
+.history-view {
+  display: grid;
+  grid-template-rows: 20vh 13vh auto 1fr;
+  grid-template-columns: 1fr 20vh;
+  min-height: 100vh;
+}
+.history-view .history-account-banner-bg {
+  grid-row: 1/3;
+  grid-column: 1/ 3;
+  background: no-repeat center center;
+  background-size: cover;
+}
+.history-view .history-account-banner-stripe-below {
+  grid-row: 3;
+  grid-column: 1/ 3;
+  height: 0.5em;
+  background-color: royalblue;
+}
+.history-view .history-account-avatar {
+  grid-row: 1;
+  grid-column: 2;
+  background: no-repeat center center;
+  background-size: cover;
+  margin-top: 1vh;
+  margin-right: 1vh;
+  border-radius: 200%;
+  box-shadow:
+    0 0 2px black,
+    -0.4vh 0.5vh 3vh white,
+    inset -1vh -1vh 3vh #00000085,
+    inset 0.5vh 0.5vh 2vh #ffffff73;
+}
+.history-view .history-account-handle {
+  grid-row: 1;
+  grid-column: 1;
+  align-self: center;
+}
 /*# sourceMappingURL=index.css.map */

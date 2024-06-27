@@ -98470,73 +98470,51 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   var publicAgent = new ColdskyAgent({
     service: BSKY_PUBLIC_URL
   });
-  function resolveHandleOrDID(handleOrDID) {
-    return __async(this, null, function* () {
-      const wholeTextSearchFullPromise = directSearchAccountsFull(handleOrDID, 5).then((matches) => {
-        for (const pro of matches) {
-          storeAccountToCache(pro);
-          const shortHandle = shortenHandle(pro.handle);
-          if (shortHandle === shortenHandle(handleOrDID)) {
-            return { shortDID: shortenDID(pro.did), shortHandle };
-          }
-        }
-      });
-      const resolvePlcDirectPromise = !likelyDID(handleOrDID) ? void 0 : resolvePlcDirectly(handleOrDID).then((auditEntries) => {
-        var _a3, _b;
-        for (let i = 0; i < auditEntries.length; i++) {
-          const fromEnd = auditEntries[auditEntries.length - 1 - i];
-          if ((_b = (_a3 = fromEnd.operation) == null ? void 0 : _a3.alsoKnownAs) == null ? void 0 : _b.length) {
-            return {
-              shortDID: shortenDID(fromEnd.did),
-              shortHandle: shortenHandle(fromEnd.operation.alsoKnownAs[0].replace(/^at\:\/\//i, ""))
-            };
-          }
-        }
-      });
-      const cacheByDIDPromise = resolveDIDFromCache(handleOrDID);
+  function resolveHandleOrDIDToProfile(handleOrDID) {
+    return __asyncGenerator(this, null, function* () {
+      let fullyResolved = false;
+      const resolvedViaRequestPromise = resolveProfileViaRequest(handleOrDID);
+      resolvedViaRequestPromise.then(() => fullyResolved = true);
+      const cacheByDIDPromise = !likelyDID(handleOrDID) ? void 0 : resolveDIDFromCache(handleOrDID);
       const cacheByHandlePromise = resolveHandleFromCache(handleOrDID);
-      return new Promise(
-        /** @returns {{ shortDID: string, shortHandle: string }} */
+      const raceCachePromise = !cacheByDIDPromise ? cacheByHandlePromise : new Promise(
+        /** @param {(value: ProfileView) => void} resolve */
         (resolve) => {
-          [
-            wholeTextSearchFullPromise,
-            resolvePlcDirectPromise,
-            cacheByDIDPromise,
-            cacheByHandlePromise
-          ].map((promise) => __async(this, null, function* () {
-            const value = yield promise;
-            if (value)
-              resolve(value);
-          }));
+          cacheByDIDPromise.then(resolve);
+          cacheByHandlePromise.then(resolve);
         }
       );
+      const fastCacheResponse = yield new __await(Promise.race([
+        raceCachePromise,
+        resolvedViaRequestPromise,
+        new Promise((resolve) => setTimeout(resolve, 100))
+      ]));
+      if (fastCacheResponse)
+        yield fastCacheResponse;
+      if (!fullyResolved) {
+        const fullResponse = yield new __await(resolvedViaRequestPromise);
+        yield fullResponse;
+      }
+    });
+  }
+  function resolveProfileViaRequest(handleOrDID) {
+    return __async(this, null, function* () {
+      const actorParam = likelyDID(handleOrDID) ? unwrapShortDID(handleOrDID) : unwrapShortHandle(handleOrDID);
+      const profile = yield fetch(`https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${actorParam}`).then((x) => x.json());
+      storeAccountToCache(profile);
+      return profile;
     });
   }
   function resolveHandleFromCache(handle) {
     return __async(this, null, function* () {
       const matchByHandle = yield db.accounts.where("handle").equals(unwrapShortHandle(handle)).first();
-      if (matchByHandle)
-        return {
-          shortDID: shortenDID(matchByHandle.did),
-          shortHandle: shortenHandle(matchByHandle.handle)
-        };
+      return matchByHandle;
     });
   }
   function resolveDIDFromCache(did) {
     return __async(this, null, function* () {
-      const matchByHandle = yield db.accounts.where("did").equals(unwrapShortDID(did)).first();
-      if (matchByHandle)
-        return {
-          shortDID: shortenDID(matchByHandle.did),
-          shortHandle: shortenHandle(matchByHandle.handle)
-        };
-    });
-  }
-  function resolvePlcDirectly(did) {
-    return __async(this, null, function* () {
-      const fullDID = unwrapShortDID(did);
-      const entries = yield fetch(`https://plc.directory/${fullDID}/log/audit`).then((x) => x.json());
-      return entries;
+      const matchByDID = yield db.accounts.where("did").equals(unwrapShortDID(did)).first();
+      return matchByDID;
     });
   }
   function searchAccounts(text) {
@@ -99465,7 +99443,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // package.json
-  var version4 = "0.1.20";
+  var version4 = "0.2.0";
 
   // src/localise.js
   function localise(english, languageMap) {
@@ -99585,14 +99563,33 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
   function HistoryCore() {
     let { handle } = useParams();
-    const resolved = forAwait(handle, () => resolveHandleOrDID(handle));
-    if (handle) {
-      console.log({
-        handle,
-        unwrap: unwrapShortHandle(handle)
-      });
-    }
-    return /* @__PURE__ */ import_react12.default.createElement("div", null, "History...", handle, resolved && /* @__PURE__ */ import_react12.default.createElement("pre", null, JSON.stringify(resolved, null, 2)));
+    const resolved = forAwait(
+      handle,
+      () => resolveHandleOrDIDToProfile(handle)
+    ) || {
+      did: "did:plc:1234567890",
+      handle: localise("loading....bsky.social", { uk: "\u0445\u0432\u0438\u043B\u0438\u043D\u043E\u0447\u043A\u0443....bsky.social" }),
+      displayName: localise("Just a moment", { uk: "\u0417\u0430\u0447\u0435\u043A\u0430\u0439\u0442\u0435, \u0437\u0430\u0440\u0430 \u0431\u0443\u0434\u0435" }),
+      description: localise("Important announcement", { uk: "\u0426\u044F \u0456\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0456\u044F \u0432\u0430\u0441 \u0437\u0434\u0438\u0432\u0443\u0454" }),
+      placeholder: true
+    };
+    console.log("profile ", resolved);
+    return /* @__PURE__ */ import_react12.default.createElement("div", { className: "history-view" }, /* @__PURE__ */ import_react12.default.createElement(
+      "div",
+      {
+        className: suffixClassWhenEmpty("history-account-banner-bg", resolved.banner),
+        style: !resolved.banner ? void 0 : { backgroundImage: `url(${resolved.banner})` }
+      }
+    ), /* @__PURE__ */ import_react12.default.createElement("div", { className: "history-account-banner-stripe-below" }), /* @__PURE__ */ import_react12.default.createElement(
+      "div",
+      {
+        className: suffixClassWhenEmpty("history-account-avatar", resolved.avatar),
+        style: !resolved.avatar ? void 0 : { backgroundImage: `url(${resolved.avatar})` }
+      }
+    ), /* @__PURE__ */ import_react12.default.createElement("div", { className: "history-account-handle" }, /* @__PURE__ */ import_react12.default.createElement(FullHandle, { shortHandle: resolved.handle })), /* @__PURE__ */ import_react12.default.createElement("div", { className: suffixClassWhenEmpty("history-account-displayName", resolved.displayName) }, resolved.displayName), /* @__PURE__ */ import_react12.default.createElement("div", { className: suffixClassWhenEmpty("history-account-description", resolved.description) }, resolved.description));
+  }
+  function suffixClassWhenEmpty(className, value) {
+    return value ? className : className + " " + className + "-empty";
   }
 
   // src/index.js
