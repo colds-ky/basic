@@ -1,12 +1,12 @@
 // @ts-check
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useMatch } from 'react-router-dom';
 
 import { FormatTime } from '../format-time';
 import { useDB } from '../..';
 import { forAwait } from '../../../coldsky/src/api/forAwait';
-import { breakFeedURIPostOnly } from '../../../coldsky/lib';
+import { breakFeedURIPostOnly, breakPostURL } from '../../../coldsky/lib';
 
 /**
  * @param {{
@@ -38,4 +38,30 @@ export function PostTimestamp({ className, post, since, linkTimestamp }) {
      <FormatTime since={since} time={post.asOf} />
    </Link>
  );
+}
+
+/**
+ * @param {{
+ *  postURI: string | { postID: string, shortDID: string } | null | undefined
+ * }} _
+ */
+export function PostLink({ postURI }) {
+  const navigate = useNavigate();
+
+  const parsedURI =
+    typeof postURI === 'string' ?
+      breakFeedURIPostOnly(postURI) || breakPostURL(postURI) :
+      postURI;
+
+  let localURL;
+  let bskyURL;
+
+  if (parsedURI) {
+
+    localURL = '/' + parsedURI.shortDID + '/' + parsedURI.postID;
+    bskyURL = '/' + parsedURI.shortDID + '/' + parsedURI.postID;
+  }
+
+
+
 }

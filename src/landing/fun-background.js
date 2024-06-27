@@ -5,7 +5,6 @@ import React from "react";
 import "./fun-background.css";
 import { calcHash, firehoseThreads, nextRandom } from "../api";
 import { forAwait } from "../../coldsky/src/api/forAwait";
-import { useNavigate } from "react-router-dom";
 import { useDB } from "..";
 import { Post } from "../widgets/post/post";
 
