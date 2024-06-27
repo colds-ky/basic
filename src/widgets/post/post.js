@@ -163,7 +163,6 @@ function PostEmbeddedIntoAnother({ uri }) {
     for await (const profile of db.getProfileIncrementally(parsedURI?.shortDID)) {
       if (profile.handle) {
         yield profile.handle;
-        await new Promise(resolve => setTimeout(resolve, 10));
         break;
       }
     }

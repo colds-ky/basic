@@ -98335,7 +98335,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // coldsky/package.json
-  var version4 = "0.2.13";
+  var version4 = "0.2.14";
 
   // coldsky/lib/firehose-short-dids.js
   function firehoseShortDIDs(filterShortDIDs) {
@@ -100512,19 +100512,20 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     }
     function getPostOnlyAsync(uri) {
       return __async(this, null, function* () {
+        var _a3, _b;
         const parsedURL = breakFeedUri(uri);
         if (!parsedURL)
           throw new Error("Invalid post URI " + JSON.stringify(uri));
-        const postRecord = yield agent_getRepoRecord_throttled(
+        const postRecord = (_b = (_a3 = yield agent_getRepoRecord_throttled(
           unwrapShortDID(parsedURL.shortDID),
           parsedURL.postID,
           "app.bsky.feed.post"
-        );
-        const post = dbStore.captureRecord(
-          /** @type {*} */
-          postRecord.data,
-          Date.now()
-        );
+        )) == null ? void 0 : _a3.data) == null ? void 0 : _b.value;
+        postRecord.$type = "app.bsky.feed.post";
+        postRecord.repo = parsedURL.shortDID;
+        postRecord.uri = uri;
+        postRecord.action = "create";
+        const post = dbStore.captureRecord(postRecord, Date.now());
         if (post && "uri" in post)
           return post;
       });
@@ -101546,9 +101547,9 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           return this.continueWithFunction(from7, run, derive, completedNaturally);
         if (isPromise(derive))
           return this.continueWithPromise(from7, run, derive, completedNaturally);
-        if (Array.isArray(derive))
+        if (Array.isArray(derive) || typeof derive.length === "number")
           return this.continueWithArray(from7, run, derive, completedNaturally);
-        if (isIterable(derive))
+        if (isIterable(derive) && typeof derive !== "string")
           return this.continueWithIterable(from7, run, derive, completedNaturally);
         if (isAsyncIterable(derive))
           return this.continueWithAsyncIterable(from7, run, derive, completedNaturally);
@@ -101623,7 +101624,13 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     * @param {() => void} completedNaturally
     */
     continueWithArray(from7, run, array, completedNaturally) {
-      this.continueWithIterable(from7, run, array, completedNaturally);
+      this.continueWithScalar(
+        from7,
+        run,
+        /** @type {*} */
+        array
+      );
+      completedNaturally();
     }
     /**
      * @param {TFrom} from
@@ -101770,19 +101777,19 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       account,
       () => db2.getProfileIncrementally(account)
     ) || {
-      shortDID: account,
-      handle: account
+      shortDID: likelyDID(account) ? account : void 0,
+      handle: likelyDID(account) ? void 0 : account
     } : account;
     return /* @__PURE__ */ import_react9.default.createElement(Component2, __spreadValues({ className: "account-label " + (className || "") }, rest), /* @__PURE__ */ import_react9.default.createElement("span", { className: "account-handle" }, /* @__PURE__ */ import_react9.default.createElement(
       "span",
       {
-        className: "account-avatar",
-        style: !profile.avatar ? void 0 : {
-          backgroundImage: `url(${profile.avatar})`
+        className: (profile == null ? void 0 : profile.avatar) ? "account-avatar" : "account-avatar account-avatar-at-sign",
+        style: !(profile == null ? void 0 : profile.avatar) ? void 0 : {
+          backgroundImage: `url(${profile == null ? void 0 : profile.avatar})`
         }
       },
       "@"
-    ), /* @__PURE__ */ import_react9.default.createElement(FullHandle, { shortHandle: profile.handle }), !withDisplayName || !profile.displayName ? void 0 : /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, " ", /* @__PURE__ */ import_react9.default.createElement("span", { className: "account-label-display-name" }, profile.displayName))));
+    ), /* @__PURE__ */ import_react9.default.createElement(FullHandle, { shortHandle: profile == null ? void 0 : profile.handle }), !withDisplayName || !(profile == null ? void 0 : profile.displayName) ? void 0 : /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, " ", /* @__PURE__ */ import_react9.default.createElement("span", { className: "account-label-display-name" }, profile == null ? void 0 : profile.displayName))));
   }
 
   // src/landing/fun-background.js
@@ -102123,7 +102130,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // package.json
-  var version5 = "0.2.13";
+  var version5 = "0.2.14";
 
   // src/landing/landing.js
   var uppercase_GIST = localise("\u{1D4D6}\u{1D4D8}\u{1D4E2}\u{1D4E3}", { uk: "\u{1D4F7}\u{1D4EE}\u{1D4F9}\u{1D4EE}\u{1D4EC}\u{1D502}\u{1D4F0}" });
@@ -102352,7 +102359,6 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
             const profile = temp.value;
             if (profile.handle) {
               yield profile.handle;
-              yield new __await(new Promise((resolve) => setTimeout(resolve, 10)));
               break;
             }
           }

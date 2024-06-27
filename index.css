@@ -24,6 +24,12 @@
   position: relative;
   top: -0.15em;
 }
+.account-label .account-avatar.account-avatar-at-sign {
+  color: cornflowerblue;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+}
 .account-label .handle-main-text {
   color: #365ca1;
 }

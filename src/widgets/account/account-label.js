@@ -7,6 +7,7 @@ import { useDB } from '../..';
 import { forAwait } from '../../../coldsky/src/api/forAwait';
 
 import './account-label.css';
+import { likelyDID } from '../../../coldsky/lib';
 
 /**
  * @param {{
@@ -29,10 +30,9 @@ export function AccountLabel({ account, withDisplayName, className, Component, .
   const profile = typeof account === 'string' ? forAwait(
     account,
     () =>
-      db.getProfileIncrementally(account)) ||
-  {
-    shortDID: account,
-    handle: account
+      db.getProfileIncrementally(account)) || {
+    shortDID: likelyDID(account) ? account : undefined,
+    handle: likelyDID(account) ? undefined : account
   } :
     account;
 
@@ -40,17 +40,17 @@ export function AccountLabel({ account, withDisplayName, className, Component, .
     <Component className={'account-label ' + (className || '')} {...rest}>
       <span className='account-handle'>
         <span
-          className='account-avatar'
-          style={!profile.avatar ? undefined :
+          className={profile?.avatar ?'account-avatar' : 'account-avatar account-avatar-at-sign'}
+          style={!profile?.avatar ? undefined :
             {
-              backgroundImage: `url(${profile.avatar})`
+              backgroundImage: `url(${profile?.avatar})`
             }}>@</span>
-        <FullHandle shortHandle={profile.handle} />
+        <FullHandle shortHandle={profile?.handle} />
         {
-          !withDisplayName || !profile.displayName ? undefined :
+          !withDisplayName || !profile?.displayName ? undefined :
             <>
               {' '}<span className='account-label-display-name'>
-                {profile.displayName}
+                {profile?.displayName}
               </span>
             </>
         }
