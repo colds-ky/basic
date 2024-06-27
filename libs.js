@@ -41834,7 +41834,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.18";
+	var version = "0.2.19";
 
 	// @ts-check
 
@@ -50375,6 +50375,7 @@ if (cid) {
 	  /**
 	   * @param {string | null | undefined} shortDID
 	   * @param {string | null | undefined} text
+	   * @returns {[] | AsyncGenerator<CompactPost[] & { cachedOnly?: boolean } | undefined>}
 	   */
 	  function searchPostsIncrementally(shortDID, text) {
 	    if (shortDID) {
@@ -50398,9 +50399,10 @@ if (cid) {
 	    let lastSearchReport = 0;
 	    let anyUpdates = false;
 
-	    /** @type {CompactPost[] | undefined} */
+	    /** @type {CompactPost[] & { cachedOnly?: boolean } | undefined} */
 	    let lastMatches = await cachedMatchesPromise;
 	    if (lastMatches?.length) {
+	      lastMatches.cachedOnly = true;
 	      lastSearchReport = Date.now();
 	      yield lastMatches;
 	    }
@@ -50437,6 +50439,7 @@ if (cid) {
 	        }
 	      }
 	      if (anyUpdates && Date.now() - lastSearchReport > REPORT_UPDATES_FREQUENCY_MSEC) {
+	        /** @type {typeof lastMatches} */
 	        const newMatches = await dbStore.searchPosts(shortDID, text);
 	        if (newMatches?.length) {
 	          lastMatches = newMatches;
