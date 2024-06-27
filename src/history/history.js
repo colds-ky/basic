@@ -13,6 +13,8 @@ import { HistoryLayout } from './history-layout';
 import { HistoryPageDecorations } from './history-page-decorations';
 import { Timeline } from './timeline';
 
+import { version } from '../../package.json';
+
 import './history.css';
 
 export function History() {
@@ -79,6 +81,9 @@ function HistoryCore() {
               linkTimestamp
             />
       }
+      <div className='history-footer'>
+        v{version}
+      </div>
     </HistoryLayout>
   );
 }
