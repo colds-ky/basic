@@ -79,7 +79,6 @@ export function FunBackground() {
 function ThreadBubble({ thread }) {
   const hash = calcHash(thread?.post?.uri);
   let rnd = nextRandom(Math.abs(hash / 1000 + hash));
-  console.log('hash ', hash, ' rnd 1 ', rnd, ' rnd2 ', nextRandom(rnd));
   const animationDuration = 14 + rnd * 20; 
   rnd = nextRandom(rnd);
 

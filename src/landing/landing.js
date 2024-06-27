@@ -8,10 +8,14 @@ import { FunBackground } from './fun-background';
 import { version } from '../../package.json';
 
 import './landing.css';
+import { searchAccounts } from '../api';
 
 export function Landing() {
+  const [timeout] = React.useState({ timeout: 0, searchText: '' });
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchText, setSearchText] = React.useState(searchParams.get('q') || '');
+  const [searchResults, setSearchResults] = React.useState(
+    /** @type {import('@atproto/api/dist/client/types/app/bsky/actor/defs').ProfileViewBasic[]} */([]));
 
   return (
     <div className='landing'>
@@ -27,12 +31,29 @@ export function Landing() {
           variant='standard'
           value={searchText}
           onChange={(e) => {
-            setSearchText(e.target.value);
-            setSearchParams({ q: e.target.value });
+            const searchText = e.target.value;
+            setSearchText(searchText);
+            clearTimeout(timeout.timeout);
+            timeout.searchText = searchText;
+            timeout.timeout = setTimeout(async () => {
+              setSearchParams({ q: searchText });
+              const searchResults = await searchAccounts(searchText);
+              if (timeout.searchText !== searchText) return;
+              setSearchResults(searchResults);
+            }, 500);
           }}
         />
       </div>
       <div className='landing-auto-completion-area'>
+        {
+          !searchResults.length ? undefined :
+            searchResults.map(profile => (
+              <div key={profile.did} className='landing-auto-completion-item'>
+                <a href={`/${profile.handle}`}>{profile.displayName}</a>
+              </div>
+            
+            ))
+        }
       </div>
       <div className='landing-bottom-bar'>
         v{version}
