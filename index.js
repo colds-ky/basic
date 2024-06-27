@@ -1083,7 +1083,11 @@
       try {
         for (var iter = __forAwait(run), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
           const progress = temp.value;
-          const reportProgress = {};
+          const reportProgress = { registrations: 0 };
+          if (progress.stores) {
+            for (const sto of progress.stores)
+              reportProgress.registrations += sto.size;
+          }
           if (progress.affectedStores)
             reportProgress.affectedStores = progress.affectedStores.map((store) => store.file);
           if (progress.earliestRegistration)
@@ -1108,9 +1112,16 @@
             const storesInWritingOrder = progress.affectedStores.slice().sort((a, b) => a.latestRegistration - b.latestRegistration);
             for (const sto of storesInWritingOrder) {
               const filePath = path.resolve(directoryPath, sto.file + ".json");
-              process.stdout.write("  " + filePath);
+              process.stdout.write("    " + filePath);
               const json = stringifyRegistrationStore(sto);
-              fs.writeFileSync(filePath, json);
+              yield new Promise((resolve, reject) => {
+                fs.writeFile(filePath, json, (error2) => {
+                  if (error2)
+                    reject(error2);
+                  else
+                    resolve(void 0);
+                });
+              });
               console.log();
             }
             const inceptionPath = path.resolve(rootPath, "inception.json");
@@ -1122,7 +1133,7 @@
             if (currentInception !== inceptionStr) {
               process.stdout.write("  " + path.resolve(rootPath, "inception.json"));
               fs.writeFileSync(inceptionPath, inceptionStr);
-              console.log(" CHANGED.");
+              console.log(" ++++ CHANGED.");
             }
           }
           console.log(" OK");

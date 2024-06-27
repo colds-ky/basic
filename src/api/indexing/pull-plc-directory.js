@@ -31,7 +31,12 @@ export async function pullPLCDirectoryCompact() {
 
   let firstLoaded = true;
   for await (const progress of run) {
-    const reportProgress = {};
+    const reportProgress = { registrations: 0 };
+    if (progress.stores) {
+      for (const sto of progress.stores)
+        reportProgress.registrations += sto.size;
+    }
+
     if (progress.affectedStores) reportProgress.affectedStores = progress.affectedStores.map(store => store.file);
     if (progress.earliestRegistration) reportProgress.earliestRegistration = new Date(progress.earliestRegistration);
     if (progress.latestRegistration) reportProgress.latestRegistration = new Date(progress.latestRegistration);
@@ -56,9 +61,14 @@ export async function pullPLCDirectoryCompact() {
 
       for (const sto of storesInWritingOrder) {
         const filePath = path.resolve(directoryPath, sto.file + '.json');
-        process.stdout.write('  ' + filePath);
+        process.stdout.write('    ' + filePath);
         const json = stringifyRegistrationStore(sto);
-        fs.writeFileSync(filePath, json);
+        await new Promise((resolve, reject) => {
+          fs.writeFile(filePath, json, error => {
+            if (error) reject(error);
+            else resolve(undefined);
+          });
+        });
         console.log();
       }
 
@@ -72,7 +82,7 @@ export async function pullPLCDirectoryCompact() {
       if (currentInception !== inceptionStr) {
         process.stdout.write('  ' + path.resolve(rootPath, 'inception.json'));
         fs.writeFileSync(inceptionPath, inceptionStr);
-        console.log(' CHANGED.');
+        console.log(' ++++ CHANGED.');
       }
     }
 
