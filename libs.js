@@ -42300,7 +42300,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.42";
+	var version = "0.2.43";
 
 	// @ts-check
 
@@ -50445,7 +50445,7 @@ if (cid) {
 	   * @type {Dexie & {
 	   *  posts: import('dexie').Table<import('.').CompactPost, string>,
 	   *  profiles: import('dexie').Table<import('.').CompactProfile, string>,
-	   *  repoSync: import('dexie').Table<{shortDID: string, lastSync: number }>
+	   *  repoSync: import('dexie').Table<{shortDID: string, lastSyncRev: string }>
 	   * }}
 	   */
 	  new Dexie(dbName || DEFAULT_DB_NAME);
@@ -50455,6 +50455,8 @@ if (cid) {
 	    posts: 'uri, shortDID, replyTo, threadStart, *quoting, *words',
 	    profiles: 'shortDID, *handle, *words'
 	  });
+
+	  // incorrect URIs: at:// prefix missing
 	  db.version(4).stores({
 	    posts: null,
 	    profiles: 'shortDID, *handle, *words'
@@ -50463,7 +50465,20 @@ if (cid) {
 	    posts: 'uri, shortDID, replyTo, threadStart, *quoting, *words',
 	    profiles: 'shortDID, *handle, *words'
 	  });
+
+	  // repoSync introduced
 	  db.version(6).stores({
+	    posts: 'uri, shortDID, replyTo, threadStart, *quoting, *words',
+	    profiles: 'shortDID, *handle, *words',
+	    repoSync: 'shortDID' // 
+	  });
+
+	  // incorrect URI: missing a slash in the middle
+	  db.version(7).stores({
+	    posts: null,
+	    profiles: 'shortDID, *handle, *words'
+	  });
+	  db.version(8).stores({
 	    posts: 'uri, shortDID, replyTo, threadStart, *quoting, *words',
 	    profiles: 'shortDID, *handle, *words',
 	    repoSync: 'shortDID'
@@ -50500,7 +50515,7 @@ if (cid) {
 	    getProfile,
 	    searchPosts,
 	    searchProfiles,
-	    getLastRepoSync,
+	    getLastRepoSyncRev,
 	    syncRepoWithData
 	  };
 	  function deleteRecord(rec) {
@@ -50528,35 +50543,61 @@ if (cid) {
 	    clearTimeout(queueTimeoutDebounce);
 	    queueTimeoutDebounce = setTimeout(performUpdate, DEFAULT_DB_DEBOUNCE_TIME);
 	  }
+	  var currentBulkUpdate;
 	  async function performUpdate() {
 	    if (outstandingPostUpdatesInProgressByURI.size || outstandingProfileUpdatesInProgressByShortDID.size) return;
 	    clearTimeout(queueTimeoutMax);
 	    clearTimeout(queueTimeoutDebounce);
 	    queueTimeoutMax = queueTimeoutDebounce = undefined;
-	    const updateReport = {};
-	    let postUpdatePromise;
-	    if (outstandingPostUpdatesByURI.size) {
-	      postUpdatePromise = db.posts.bulkPut(updateReport.posts = [...outstandingPostUpdatesByURI.values()]);
-
-	      // push updates to in-progress map
-	      const tmp = outstandingPostUpdatesByURI;
-	      outstandingPostUpdatesByURI = outstandingPostUpdatesInProgressByURI;
-	      outstandingPostUpdatesInProgressByURI = tmp;
-	    }
-	    let profileUpdatePromise;
-	    if (outstandingProfileUpdatesByShortDID.size) {
-	      profileUpdatePromise = db.profiles.bulkPut(updateReport.profiles = [...outstandingProfileUpdatesByShortDID.values()]);
-
-	      // push updates to in-progress map
-	      const tmp = outstandingProfileUpdatesByShortDID;
-	      outstandingProfileUpdatesByShortDID = outstandingProfileUpdatesInProgressByShortDID;
-	      outstandingProfileUpdatesInProgressByShortDID = tmp;
-	    }
-	    console.log('dumping to indexedDB: ', updateReport);
-	    await postUpdatePromise;
-	    await profileUpdatePromise;
-	    outstandingPostUpdatesInProgressByURI.clear();
-	    outstandingProfileUpdatesInProgressByShortDID.clear();
+	    let BULK_UPDATE_BATCH_COUNT = 1023;
+	    currentBulkUpdate = (async () => {
+	      while (outstandingPostUpdatesByURI.size || outstandingProfileUpdatesByShortDID.size) {
+	        const postUpdates = [...outstandingPostUpdatesByURI.values()];
+	        const profileUpdates = [...outstandingProfileUpdatesByShortDID.values()];
+	        {
+	          // push post updates to in-progress map
+	          const tmp = outstandingPostUpdatesByURI;
+	          outstandingPostUpdatesByURI = outstandingPostUpdatesInProgressByURI;
+	          outstandingPostUpdatesInProgressByURI = tmp;
+	        }
+	        {
+	          // push profile updates to in-progress map
+	          const tmp = outstandingProfileUpdatesByShortDID;
+	          outstandingProfileUpdatesByShortDID = outstandingProfileUpdatesInProgressByShortDID;
+	          outstandingProfileUpdatesInProgressByShortDID = tmp;
+	        }
+	        for (let i = 0; i < Math.max(postUpdates.length, profileUpdates.length); i += BULK_UPDATE_BATCH_COUNT) {
+	          if (i) {
+	            await new Promise(resolve => setTimeout(resolve, 10));
+	          }
+	          const postBatch = postUpdates.slice(i, i + BULK_UPDATE_BATCH_COUNT);
+	          const profileBatch = profileUpdates.slice(i, i + BULK_UPDATE_BATCH_COUNT);
+	          const updateReport = {};
+	          updateReport.postsTotal = postUpdates.length;
+	          updateReport.profilesTotal = profileUpdates.length;
+	          let postUpdatePromise;
+	          if (postBatch.length) {
+	            postUpdatePromise = db.posts.bulkPut(updateReport.posts = postBatch);
+	          }
+	          let profileUpdatePromise;
+	          if (profileBatch.length) {
+	            profileUpdatePromise = db.profiles.bulkPut(updateReport.profiles = profileBatch);
+	          }
+	          const startBulkUpdate = Date.now();
+	          await postUpdatePromise;
+	          await profileUpdatePromise;
+	          console.log('dumping to indexedDB: ', updateReport, ' in ' + (Date.now() - startBulkUpdate).toLocaleString() + 'ms');
+	          for (const post of postBatch) {
+	            outstandingPostUpdatesInProgressByURI.delete(post.uri);
+	          }
+	          for (const profile of profileBatch) {
+	            outstandingProfileUpdatesInProgressByShortDID.delete(profile.shortDID);
+	          }
+	        }
+	      }
+	      currentBulkUpdate = undefined;
+	    })();
+	    await currentBulkUpdate;
 	  }
 
 	  /**
@@ -50774,20 +50815,24 @@ if (cid) {
 	  /**
 	   * @param {string} shortDID
 	   */
-	  async function getLastRepoSync(shortDID) {
-	    return db.repoSync.get(shortDID).then(sync => sync?.lastSync);
+	  async function getLastRepoSyncRev(shortDID) {
+	    return db.repoSync.get(shortDID).then(sync => sync?.lastSyncRev);
 	  }
 
 	  /**
-	   * @param {string} shortDID
 	   * @param {import('../firehose').FirehoseRecord[]} records
 	   * @param {number} now
 	   */
-	  async function syncRepoWithData(shortDID, records, now) {
+	  async function syncRepoWithData(records, now) {
 	    let lastSync = '';
 	    for (const record of records) {
 	      const parsedURI = breakFeedUri(record.uri);
-	      if (parsedURI?.postID && parsedURI.postID > lastSync) lastSync = parsedURI.postID;
+	      if (parsedURI?.postID && parsedURI.postID > lastSync) {
+	        // only consider POSTs, not other feed URIs
+	        if (record.uri.indexOf('app.bsky.feed.like') >= 0) {
+	          lastSync = parsedURI.postID;
+	        }
+	      }
 	    }
 	    const compact = [];
 	    for (const record of records) {
@@ -50796,6 +50841,12 @@ if (cid) {
 	        compact.push(co);
 	      }
 	    }
+	    await currentBulkUpdate;
+	    await performUpdate();
+	    db.repoSync.put({
+	      shortDID: shortenDID(records[0].repo),
+	      lastSyncRev: lastSync
+	    });
 	    return compact;
 	  }
 	}
@@ -51012,9 +51063,11 @@ if (cid) {
 	async function readCAR(shortDID, messageBuf) {
 	  const bytes = messageBuf instanceof ArrayBuffer ? new Uint8Array(messageBuf) : messageBuf;
 	  const car = await CarReader.fromBytes(bytes);
+	  ensureCborXExtended();
 	  const recordsByCID = new Map();
 	  const keyByCID = new Map();
 	  let lastRest = Date.now();
+	  const errors = [];
 	  for await (const block of car.blocks()) {
 	    await restRegularly();
 	    const record = decode$7(block.bytes);
@@ -51022,13 +51075,23 @@ if (cid) {
 	      let key = '';
 	      const decoder = new TextDecoder();
 	      for (const sub of record.e) {
-	        const keySuffix = decoder.decode(sub.k);
-	        key = key.slice(0, sub.p || 0) + keySuffix;
-	        const expandWithoutZero = sub.v.value[0] ? sub.v.value : /** @type {Uint8Array} */sub.v.value.subarray(1);
+	        if (!sub.k || !sub.v) continue;
 	        try {
-	          const cid = CID.decode(expandWithoutZero);
+	          const keySuffix = decoder.decode(sub.k);
+	          key = key.slice(0, sub.p || 0) + keySuffix;
+	          let cid;
+	          if (sub.v.multihash) {
+	            cid = sub.v;
+	          } else if (sub.v.value) {
+	            const expandWithoutZero = sub.v.value[0] ? sub.v.value : /** @type {Uint8Array} */sub.v.value.subarray(1);
+	            cid = CID.decode(expandWithoutZero);
+	          }
+	          if (!cid) continue;
 	          keyByCID.set(String(cid), key);
-	        } catch (error) {}
+	        } catch (error) {
+	          if (!errors.length) console.error(error);
+	          errors.push(error);
+	        }
 	      }
 	    }
 	  }
@@ -51044,7 +51107,7 @@ if (cid) {
 	    const key = keyByCID.get(cid);
 	    if (key) {
 	      record.path = key;
-	      record.uri = 'at://' + fullDID + key;
+	      record.uri = 'at://' + fullDID + '/' + key;
 	    }
 	    records.push(record);
 	    await restRegularly();
@@ -51077,7 +51140,70 @@ if (cid) {
 	/**
 	 * @typedef {{
 	 *  shortDID: string | null | undefined,
+	 *  agent_getProfile_throttled: (did) => ReturnType<import('@atproto/api').BskyAgent['getProfile']>,
+	 *  agent_resolveHandle_throttled: (handle) => ReturnType<import('@atproto/api').BskyAgent['resolveHandle']>,
+	 *  dbStore: ReturnType<typeof import('../define-cache-indexedDB-store').defineCacheIndexedDBStore>
+	 * }} Args
+	 */
+
+	/**
+	 * @param {Args} args
+	 */
+	async function syncRepo(args) {
+	  const {
+	    shortDID,
+	    dbStore
+	  } = args;
+	  if (!shortDID) return;
+	  const lastRepoSyncRev = await dbStore.getLastRepoSyncRev(shortDID);
+	  let profile = await dbStore.getProfile(shortDID);
+	  if (!profile) {
+	    const profileIterator = getProfileIncrementally({
+	      ...args,
+	      didOrHandle: shortDID
+	    });
+	    for await (const profileData of profileIterator) {
+	      if (!profileData) continue;
+	      const pds = profileData.history?.map(h => h.pds)?.find(Boolean);
+	      if (pds) {
+	        profile = profileData;
+	        break;
+	      }
+	    }
+	  }
+	  if (!profile) {
+	    console.error('Could not resolve profile ', shortDID);
+	    return;
+	  }
+	  const pds = profile.history?.map(h => h.pds)?.find(Boolean);
+	  const fullDID = unwrapShortDID(shortDID);
+	  const pdsAgent = new ColdskyAgent({
+	    service: pds
+	  });
+	  const startDownloadCAR = Date.now();
+	  const repoData = await pdsAgent.com.atproto.sync.getRepo({
+	    did: fullDID,
+	    since: lastRepoSyncRev
+	  });
+	  console.log('@' + profile.handle + ' CAR ' + Math.round(repoData.data.byteLength / 1024).toLocaleString() + 'Kb downloaded in ', (Date.now() - startDownloadCAR) / 1000, 's');
+	  const startParse = Date.now();
+	  const parsed = await readCAR(shortDID, repoData.data);
+	  console.log('@' + profile.handle + ' parsed repo in ', (Date.now() - startParse) / 1000, 's');
+	  const startUploadingToDB = Date.now();
+	  const uptick = await dbStore.syncRepoWithData(parsed, Date.now());
+	  console.log('@' + profile.handle + ' uploaded to DB in ', (Date.now() - startUploadingToDB) / 1000, 's');
+	  return uptick;
+	}
+
+	// @ts-check
+
+
+	/**
+	 * @typedef {{
+	 *  shortDID: string | null | undefined,
 	 *  searchQuery: string | null | undefined,
+	 *  agent_getProfile_throttled: (did) => ReturnType<import('@atproto/api').BskyAgent['getProfile']>,
+	 *  agent_resolveHandle_throttled: (handle) => ReturnType<import('@atproto/api').BskyAgent['resolveHandle']>,
 	 *  agent_searchPosts_throttled: (q: string, limit: number | undefined, sort: string | undefined, cursor?: string) => ReturnType<import('@atproto/api').BskyAgent['app']['bsky']['feed']['searchPosts']>,
 	 *  dbStore: ReturnType<typeof import('../define-cache-indexedDB-store').defineCacheIndexedDBStore>
 	 * }} Args
@@ -51171,24 +51297,13 @@ if (cid) {
 	      streaming.yield(batch);
 	    }
 	    async function downloadFullRepoAndIndex() {
-	      const fullDID = unwrapShortDID( /** @type {string} */shortDID);
-	      const pdsAgent = new ColdskyAgent({
-	        service: profile?.history?.[0].pds
+	      const postsAndProfiles = await syncRepo({
+	        ...args,
+	        shortDID
 	      });
-	      const repoData = await pdsAgent.com.atproto.sync.getRepo({
-	        did: fullDID
-	      });
-	      console.log('download data from repo', repoData);
-	      const block = await readCAR(shortDID || '', repoData.data);
-	      console.log('parsed downloaded data from repo ', block);
-	      const posts = [];
-	      for (const rec of block) {
-	        const post = dbStore.captureRecord(rec, Date.now());
-	        if (isCompactPost(post)) {
-	          posts.push(post);
-	        }
-	      }
-	      streaming.yield(posts);
+	      const ownPostsOnly = !postsAndProfiles ? [] : ( /** @type {import('..').CompactPost[]} */
+	      postsAndProfiles.filter(post => isCompactPost(post) && post.shortDID === shortDID));
+	      streaming.yield(ownPostsOnly);
 	      fullRepoIndexed = true;
 	    }
 	  });
@@ -51308,6 +51423,8 @@ if (cid) {
 	 * @typedef {{
 	 *  shortDID: string | null | undefined,
 	 *  searchQuery: string | null | undefined,
+	 *  agent_getProfile_throttled: (did) => ReturnType<import('@atproto/api').BskyAgent['getProfile']>,
+	 *  agent_resolveHandle_throttled: (handle) => ReturnType<import('@atproto/api').BskyAgent['resolveHandle']>,
 	 *  agent_searchPosts_throttled: import('./search-posts-incrementally').Args['agent_searchPosts_throttled'],
 	 *  agent_getPostThread_throttled: (uri) => ReturnType<import('@atproto/api').BskyAgent['getPostThread']>,
 	 *  dbStore: ReturnType<typeof import('../define-cache-indexedDB-store').defineCacheIndexedDBStore>
@@ -51363,9 +51480,10 @@ if (cid) {
 	      entriesBatch.cachedOnly = entries.cachedOnly;
 	      entriesBatch.processedAllCount = entries.processedAllCount;
 	      entriesBatch.processedBatch = entries.processedBatch;
-	      for await (const report of processEntriesAndProduceBatchIfRequired(entriesBatch)) {
-	        if (report) {
+	      for await (const nextReport of processEntriesAndProduceBatchIfRequired(entriesBatch)) {
+	        if (nextReport) {
 	          anyReported = true;
+	          report = nextReport;
 	          yield report;
 	        }
 	      }
@@ -51640,6 +51758,8 @@ if (cid) {
 	      shortDID,
 	      searchQuery,
 	      dbStore,
+	      agent_getProfile_throttled,
+	      agent_resolveHandle_throttled,
 	      agent_searchPosts_throttled
 	    }),
 	    searchProfilesIncrementally: (searchQuery, max) => searchProfilesIncrementally({
@@ -51657,8 +51777,16 @@ if (cid) {
 	      shortDID,
 	      searchQuery,
 	      dbStore,
+	      agent_getProfile_throttled,
+	      agent_resolveHandle_throttled,
 	      agent_getPostThread_throttled,
 	      agent_searchPosts_throttled
+	    }),
+	    syncRepo: shortDID => syncRepo({
+	      shortDID,
+	      dbStore,
+	      agent_getProfile_throttled,
+	      agent_resolveHandle_throttled
 	    })
 	  };
 	}
