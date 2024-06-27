@@ -278,6 +278,9 @@
   right: 0;
   bottom: 0;
 }
+.complete-post-content .post-notes-area .post-notes .reply-avatars .reply-avatar-marker {
+  display: block;
+}
 .complete-post-content .post-after-notes {
   clear: both;
 }
