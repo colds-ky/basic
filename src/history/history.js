@@ -5,15 +5,47 @@ import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { unwrapShortHandle } from '../../coldsky/lib';
 import { forAwait } from '../../coldsky/src/api/forAwait';
-import { resolveProfileViaRequest, resolveHandleOrDIDToProfile } from '../api/record-cache';
+import { resolveHandleOrDIDToProfile, resolveProfileViaRequest } from '../api/record-cache';
+import { uppercase_GIST } from '../landing/landing';
 import { localise } from '../localise';
-import { FullHandle } from '../widgets/account/full-handle';
+import { FullHandle, breakHandleParts } from '../widgets/account/full-handle';
 
 import './history.css';
+import { applyModifier } from '../api/unicode-styles/apply-modifier';
+
+const middledot = '\u00B7';
 
 export function History() {
+  let { handle } = useParams();
+
   useEffect(() => {
     document.documentElement.classList.add('account');
+
+    if (!handle) {
+      document.title = uppercase_GIST;
+    } else {
+      const { mainText, tldSuffix, bskySocialSuffix, didPrefix, didBody } = breakHandleParts(handle);
+
+      let title;
+      if (didBody) {
+        title = applyModifier(didPrefix || '', 'typewriter') + applyModifier(didBody, 'bold');
+      } else {
+        title =
+          applyModifier(mainText.replace(/\./g, middledot), 'boldcursive') +
+          (
+          tldSuffix ? applyModifier(
+            tldSuffix.replace(/^\./, ' ' + middledot + ' ').replace(/\./g, middledot),
+            'cursive') : ''
+          ) +
+          (
+          bskySocialSuffix ? applyModifier(
+            bskySocialSuffix.replace(/^\./, ' ' + middledot + ' ').replace(/\./g, middledot),
+            'super') : ''
+          );
+      }
+
+      document.title = title;
+    }
   });
 
   return (

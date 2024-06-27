@@ -1,6 +1,6 @@
 {
   "name": "gist.ing",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Gisting on the Ski",
   "main": "index.js",
   "private": true,

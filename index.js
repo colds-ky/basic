@@ -30570,10 +30570,10 @@ The following color spaces are supported: srgb, display-p3, a98-rgb, prophoto-rg
         }
         if (!!resolvedStylesArg && typeof resolvedStylesArg === "object" && Array.isArray(resolvedStylesArg.variants)) {
           const {
-            variants = []
+            variants: variants2 = []
           } = resolvedStylesArg, otherStyles = (0, _objectWithoutPropertiesLoose22.default)(resolvedStylesArg, _excluded213);
           let result = otherStyles;
-          variants.forEach((variant) => {
+          variants2.forEach((variant) => {
             let isMatch = true;
             if (typeof variant.props === "function") {
               isMatch = variant.props((0, _extends22.default)({
@@ -82651,7 +82651,7 @@ const theme2 = createTheme({ palette: {
     }, fontFamily === defaultFontFamily ? {
       letterSpacing: `${round(letterSpacing / size)}em`
     } : {}, casing, allVariants);
-    const variants = {
+    const variants2 = {
       h1: buildVariant(fontWeightLight, 96, 1.167, -1.5),
       h2: buildVariant(fontWeightLight, 60, 1.2, -0.5),
       h3: buildVariant(fontWeightRegular, 48, 1.167, 0),
@@ -82683,7 +82683,7 @@ const theme2 = createTheme({ palette: {
       fontWeightRegular,
       fontWeightMedium,
       fontWeightBold
-    }, variants), other, {
+    }, variants2), other, {
       clone: false
       // No need to clone deep
     });
@@ -99293,10 +99293,11 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     if (!Component2)
       Component2 = "span";
     const fullDID = unwrapShortDID(shortDID);
-    if (shortDID === fullDID)
+    const shortDIDNormalized = shortenDID(fullDID);
+    if (shortDIDNormalized === fullDID)
       return /* @__PURE__ */ import_react7.default.createElement(Component2, __spreadValues({}, rest), fullDID);
     else
-      return /* @__PURE__ */ import_react7.default.createElement(Component2, __spreadValues({}, rest), /* @__PURE__ */ import_react7.default.createElement("span", { className: "did-plc-prefix" }, fullDID.slice(0, -shortDID.length)), shortDID);
+      return /* @__PURE__ */ import_react7.default.createElement(Component2, __spreadValues({}, rest), /* @__PURE__ */ import_react7.default.createElement("span", { className: "did-plc-prefix" }, fullDID.slice(0, -shortDIDNormalized.length)), shortDID);
   }
 
   // src/widgets/account/full-handle.js
@@ -99306,8 +99307,22 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       return void 0;
     if (!Component2)
       Component2 = "span";
-    if (likelyDID(shortHandle))
+    const { mainText, tldSuffix, bskySocialSuffix, didPrefix, didBody } = breakHandleParts(shortHandle);
+    if (didBody)
       return /* @__PURE__ */ import_react8.default.createElement(FullDID, __spreadValues({ shortDID: shortHandle, Component: Component2 }, rest));
+    return /* @__PURE__ */ import_react8.default.createElement(Component2, __spreadValues({}, rest), /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-main-text" }, mainText), tldSuffix && /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-tld-suffix" }, tldSuffix), bskySocialSuffix && /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-bsky-social-suffix-dot" }, bskySocialSuffix.charAt(0)), /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-bsky-social-suffix" }, bskySocialSuffix.slice(1))));
+  }
+  function breakHandleParts(shortHandle) {
+    if (!shortHandle)
+      return { mainText: shortHandle };
+    if (likelyDID(shortHandle)) {
+      const fullDID = unwrapShortDID(shortHandle);
+      const shortDID = shortenDID(shortHandle);
+      let didBody = shortDID;
+      let didPrefix = fullDID.slice(0, -shortDID.length);
+      return { mainText: shortHandle, didPrefix, didBody };
+    }
+    ;
     const fullHandle = unwrapShortHandle(shortHandle);
     shortHandle = shortenHandle(shortHandle);
     const bskySocialSuffix = shortHandle === fullHandle ? void 0 : fullHandle.slice(shortHandle.length);
@@ -99320,7 +99335,11 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         tldSuffix = shortHandle.slice(lastDot);
       }
     }
-    return /* @__PURE__ */ import_react8.default.createElement(Component2, __spreadValues({}, rest), /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-main-text" }, mainText), tldSuffix && /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-tld-suffix" }, tldSuffix), bskySocialSuffix && /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-bsky-social-suffix-dot" }, bskySocialSuffix.charAt(0)), /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-bsky-social-suffix" }, bskySocialSuffix.slice(1))));
+    return {
+      mainText,
+      tldSuffix,
+      bskySocialSuffix
+    };
   }
 
   // src/widgets/account/account-label.js
@@ -99443,7 +99462,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // package.json
-  var version4 = "0.2.0";
+  var version4 = "0.2.1";
 
   // src/localise.js
   function localise(english, languageMap) {
@@ -99483,9 +99502,11 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // src/landing/landing.js
+  var uppercase_GIST = localise("\u{1D4D6}\u{1D4D8}\u{1D4E2}\u{1D4E3}", { uk: "\u{1D4F7}\u{1D4EE}\u{1D4F9}\u{1D4EE}\u{1D4EC}\u{1D502}\u{1D4F0}" });
   function Landing() {
     (0, import_react11.useEffect)(() => {
       document.documentElement.classList.remove("account");
+      document.title = uppercase_GIST;
     });
     return /* @__PURE__ */ import_react11.default.createElement(LandingCore, null);
   }
@@ -99555,9 +99576,326 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
 
   // src/history/history.js
   var import_react12 = __toESM(require_react());
+
+  // src/api/unicode-styles/sanitize-for-regex.js
+  var regex_escapeableRegexChars = /[#-.]|[[-^]|[?|{}]/g;
+  function sanitizeForRegex(str) {
+    const sanitized = str.replace(regex_escapeableRegexChars, "\\$&");
+    return sanitized;
+  }
+
+  // src/api/unicode-styles/variants.js
+  var variants = {
+    bold: { AZ: "\u{1D5D4}\u{1D5D5}\u{1D5D6}\u{1D5D7}\u{1D5D8}\u{1D5D9}\u{1D5DA}\u{1D5DB}\u{1D5DC}\u{1D5DD}\u{1D5DE}\u{1D5DF}\u{1D5E0}\u{1D5E1}\u{1D5E2}\u{1D5E3}\u{1D5E4}\u{1D5E5}\u{1D5E6}\u{1D5E7}\u{1D5E8}\u{1D5E9}\u{1D5EA}\u{1D5EB}\u{1D5EC}\u{1D5ED}", az: "\u{1D5EE}\u{1D5EF}\u{1D5F0}\u{1D5F1}\u{1D5F2}\u{1D5F3}\u{1D5F4}\u{1D5F5}\u{1D5F6}\u{1D5F7}\u{1D5F8}\u{1D5F9}\u{1D5FA}\u{1D5FB}\u{1D5FC}\u{1D5FD}\u{1D5FE}\u{1D5FF}\u{1D600}\u{1D601}\u{1D602}\u{1D603}\u{1D604}\u{1D605}\u{1D606}\u{1D607}", "09": "\u{1D7EC}\u{1D7ED}\u{1D7EE}\u{1D7EF}\u{1D7F0}\u{1D7F1}\u{1D7F2}\u{1D7F3}\u{1D7F4}\u{1D7F5}" },
+    italic: { AZ: "\u{1D608}\u{1D609}\u{1D60A}\u{1D60B}\u{1D60C}\u{1D60D}\u{1D60E}\u{1D60F}\u{1D610}\u{1D611}\u{1D612}\u{1D613}\u{1D614}\u{1D615}\u{1D616}\u{1D617}\u{1D618}\u{1D619}\u{1D61A}\u{1D61B}\u{1D61C}\u{1D61D}\u{1D61E}\u{1D61F}\u{1D620}\u{1D621}", az: "\u{1D622}\u{1D623}\u{1D624}\u{1D625}\u{1D626}\u{1D627}\u{1D628}\u{1D629}\u{1D62A}\u{1D62B}\u{1D62C}\u{1D62D}\u{1D62E}\u{1D62F}\u{1D630}\u{1D631}\u{1D632}\u{1D633}\u{1D634}\u{1D635}\u{1D636}\u{1D637}\u{1D638}\u{1D639}\u{1D63A}\u{1D63B}" },
+    bolditalic: { AZ: "\u{1D63C}\u{1D63D}\u{1D63E}\u{1D63F}\u{1D640}\u{1D641}\u{1D642}\u{1D643}\u{1D644}\u{1D645}\u{1D646}\u{1D647}\u{1D648}\u{1D649}\u{1D64A}\u{1D64B}\u{1D64C}\u{1D64D}\u{1D64E}\u{1D64F}\u{1D650}\u{1D651}\u{1D652}\u{1D653}\u{1D654}\u{1D655}", az: "\u{1D656}\u{1D657}\u{1D658}\u{1D659}\u{1D65A}\u{1D65B}\u{1D65C}\u{1D65D}\u{1D65E}\u{1D65F}\u{1D660}\u{1D661}\u{1D662}\u{1D663}\u{1D664}\u{1D665}\u{1D666}\u{1D667}\u{1D668}\u{1D669}\u{1D66A}\u{1D66B}\u{1D66C}\u{1D66D}\u{1D66E}\u{1D66F}" },
+    fractur: { AB: "\u{1D504}\u{1D505}", C: "\u212D", DG: "\u{1D507}\u{1D508}\u{1D509}\u{1D50A}", HI: "\u210C\u2111", JQ: "\u{1D50D}\u{1D50E}\u{1D50F}\u{1D510}\u{1D511}\u{1D512}\u{1D513}\u{1D514}", R: "\u211C", SY: "\u{1D516}\u{1D517}\u{1D518}\u{1D519}\u{1D51A}\u{1D51B}\u{1D51C}", Z: "\u2128", az: "\u{1D51E}\u{1D51F}\u{1D520}\u{1D521}\u{1D522}\u{1D523}\u{1D524}\u{1D525}\u{1D526}\u{1D527}\u{1D528}\u{1D529}\u{1D52A}\u{1D52B}\u{1D52C}\u{1D52D}\u{1D52E}\u{1D52F}\u{1D530}\u{1D531}\u{1D532}\u{1D533}\u{1D534}\u{1D535}\u{1D536}\u{1D537}" },
+    boldfractur: { AZ: "\u{1D56C}\u{1D56D}\u{1D56E}\u{1D56F}\u{1D570}\u{1D571}\u{1D572}\u{1D573}\u{1D574}\u{1D575}\u{1D576}\u{1D577}\u{1D578}\u{1D579}\u{1D57A}\u{1D57B}\u{1D57C}\u{1D57D}\u{1D57E}\u{1D57F}\u{1D580}\u{1D581}\u{1D582}\u{1D583}\u{1D584}\u{1D585}", az: "\u{1D586}\u{1D587}\u{1D588}\u{1D589}\u{1D58A}\u{1D58B}\u{1D58C}\u{1D58D}\u{1D58E}\u{1D58F}\u{1D590}\u{1D591}\u{1D592}\u{1D593}\u{1D594}\u{1D595}\u{1D596}\u{1D597}\u{1D598}\u{1D599}\u{1D59A}\u{1D59B}\u{1D59C}\u{1D59D}\u{1D59E}\u{1D59F}" },
+    cursive: { AZ: "\u{1D49C}\u{1D435}\u{1D49E}\u{1D49F}\u{1D438}\u{1D439}\u{1D4A2}\u{1D43B}\u{1D43C}\u{1D4A5}\u{1D4A6}\u{1D43F}\u{1D440}\u{1D4A9}\u{1D4AA}\u{1D4AB}\u{1D4AC}\u{1D445}\u{1D4AE}\u{1D4AF}\u{1D4B0}\u{1D4B1}\u{1D4B2}\u{1D4B3}\u{1D4B4}\u{1D4B5}", az: "\u{1D4B6}\u{1D4B7}\u{1D4B8}\u{1D4B9}\u{1D452}\u{1D4BB}\u{1D454}\u{1D4BD}\u{1D4BE}\u{1D4BF}\u{1D4C0}\u{1D4C1}\u{1D4C2}\u{1D4C3}\u{1D45C}\u{1D4C5}\u{1D4C6}\u{1D4C7}\u{1D4C8}\u{1D4C9}\u{1D4CA}\u{1D4CB}\u{1D4CC}\u{1D4CD}\u{1D4CE}\u{1D4CF}" },
+    // TODO: handle cursive B, E, F, H, I, L, M, R
+    boldcursive: { AZ: "\u{1D4D0}\u{1D4D1}\u{1D4D2}\u{1D4D3}\u{1D4D4}\u{1D4D5}\u{1D4D6}\u{1D4D7}\u{1D4D8}\u{1D4D9}\u{1D4DA}\u{1D4DB}\u{1D4DC}\u{1D4DD}\u{1D4DE}\u{1D4DF}\u{1D4E0}\u{1D4E1}\u{1D4E2}\u{1D4E3}\u{1D4E4}\u{1D4E5}\u{1D4E6}\u{1D4E7}\u{1D4E8}\u{1D4E9}", az: "\u{1D4EA}\u{1D4EB}\u{1D4EC}\u{1D4ED}\u{1D4EE}\u{1D4EF}\u{1D4F0}\u{1D4F1}\u{1D4F2}\u{1D4F3}\u{1D4F4}\u{1D4F5}\u{1D4F6}\u{1D4F7}\u{1D4F8}\u{1D4F9}\u{1D4FA}\u{1D4FB}\u{1D4FC}\u{1D4FD}\u{1D4FE}\u{1D4FF}\u{1D500}\u{1D501}\u{1D502}\u{1D503}" },
+    "super": { AP: "\u1D2C\u1D2E\u1D9C\u1D30\u1D31\u1DA0\u1D33\u1D34\u1D35\u1D36\u1D37\u1D38\u1D39\u1D3A\u1D3C\u1D3E", Q: "\u1D3C\u0334", RW: "\u1D3F\u02E2\u1D40\u1D41\u2C7D\u1D42", ap: "\u1D43\u1D47\u1D9C\u1D48\u1D49\u1DA0\u1D4D\u02B0\u2071\u02B2\u1D4F\u02E1\u1D50\u207F\u1D52\u1D56", q: "\u0669", rz: "\u02B3\u02E2\u1D57\u1D58\u1D5B\u02B7\u02E3\u02B8\u1DBB", "09": "\u2070\xB9\xB2\xB3\u2074\u2075\u2076\u2077\u2078\u2079" },
+    box: { AZ: "\u{1F130}\u{1F131}\u{1F132}\u{1F133}\u{1F134}\u{1F135}\u{1F136}\u{1F137}\u{1F138}\u{1F139}\u{1F13A}\u{1F13B}\u{1F13C}\u{1F13D}\u{1F13E}\u{1F13F}\u{1F140}\u{1F141}\u{1F142}\u{1F143}\u{1F144}\u{1F145}\u{1F146}\u{1F147}\u{1F148}\u{1F149}" },
+    plate: { AZ: "\u{1F170}\u{1F171}\u{1F172}\u{1F173}\u{1F174}\u{1F175}\u{1F176}\u{1F177}\u{1F178}\u{1F179}\u{1F17A}\u{1F17B}\u{1F17C}\u{1F17D}\u{1F17E}\u{1F17F}\u{1F180}\u{1F181}\u{1F182}\u{1F183}\u{1F184}\u{1F185}\u{1F186}\u{1F187}\u{1F188}\u{1F189}" },
+    round: { AZ: "\u24B6\u24B7\u24B8\u24B9\u24BA\u24BB\u24BC\u24BD\u24BE\u24BF\u24C0\u24C1\u24C2\u24C3\u24C4\u24C5\u24C6\u24C7\u24C8\u24C9\u24CA\u24CB\u24CC\u24CD\u24CE\u24CF", az: "\u24D0\u24D1\u24D2\u24D3\u24D4\u24D5\u24D6\u24D7\u24D8\u24D9\u24DA\u24DB\u24DC\u24DD\u24DE\u24DF\u24E0\u24E1\u24E2\u24E3\u24E4\u24E5\u24E6\u24E7\u24E8\u24E9", "09": "\u24EA\u2460\u2461\u2462\u2463\u2464\u2465\u2466\u2467\u2468" },
+    typewriter: { AZ: "\u{1D670}\u{1D671}\u{1D672}\u{1D673}\u{1D674}\u{1D675}\u{1D676}\u{1D677}\u{1D678}\u{1D679}\u{1D67A}\u{1D67B}\u{1D67C}\u{1D67D}\u{1D67E}\u{1D67F}\u{1D680}\u{1D681}\u{1D682}\u{1D683}\u{1D684}\u{1D685}\u{1D686}\u{1D687}\u{1D688}\u{1D689}", az: "\u{1D68A}\u{1D68B}\u{1D68C}\u{1D68D}\u{1D68E}\u{1D68F}\u{1D690}\u{1D691}\u{1D692}\u{1D693}\u{1D694}\u{1D695}\u{1D696}\u{1D697}\u{1D698}\u{1D699}\u{1D69A}\u{1D69B}\u{1D69C}\u{1D69D}\u{1D69E}\u{1D69F}\u{1D6A0}\u{1D6A1}\u{1D6A2}\u{1D6A3}", "09": "\u{1D7F6}\u{1D7F7}\u{1D7F8}\u{1D7F9}\u{1D7FA}\u{1D7FB}\u{1D7FC}\u{1D7FD}\u{1D7FE}\u{1D7FF}" },
+    wide: {
+      AB: "\u{1D538}\u{1D539}",
+      C: "\u2102",
+      DG: "\u{1D53B}\u{1D53C}\u{1D53D}\u{1D53E}",
+      H: "\u210D",
+      IM: "\u{1D540}\u{1D541}\u{1D542}\u{1D543}\u{1D544}",
+      N: "\u2115",
+      O: "\u{1D546}",
+      PR: "\u2119\u211A\u211D",
+      SY: "\u{1D54A}\u{1D54B}\u{1D54C}\u{1D54D}\u{1D54E}\u{1D54F}\u{1D550}",
+      Z: "\u2124",
+      az: "\u{1D552}\u{1D553}\u{1D554}\u{1D555}\u{1D556}\u{1D557}\u{1D558}\u{1D559}\u{1D55A}\u{1D55B}\u{1D55C}\u{1D55D}\u{1D55E}\u{1D55F}\u{1D560}\u{1D561}\u{1D562}\u{1D563}\u{1D564}\u{1D565}\u{1D566}\u{1D567}\u{1D568}\u{1D569}\u{1D56A}\u{1D56B}",
+      "09": "\u{1D7D8}\u{1D7D9}\u{1D7DA}\u{1D7DB}\u{1D7DC}\u{1D7DD}\u{1D7DE}\u{1D7DF}\u{1D7E0}\u{1D7E1}"
+    }
+  };
+
+  // src/api/unicode-styles/create-unicode-formatter-parser.js
+  function createUnicodeFormattedParser() {
+    var lookup = {};
+    var formattedRegex;
+    var regex_underlinedChar = /[^\r\n]\u0332/g;
+    function buildLookups() {
+      var lookupList = [];
+      for (var modKind in variants) {
+        var rangeMap = variants[modKind];
+        if (!rangeMap || typeof rangeMap !== "object")
+          continue;
+        var modifiers = modKind === "bold" || modKind.indexOf("bold") ? [modKind] : ["bold", modKind.slice(4)];
+        var underlinedModifiers = modifiers.concat(["underlined"]);
+        var underlinedFullModifiers = modKind + "underlined";
+        for (var rangeDesc in rangeMap) {
+          var rangeChars = rangeMap[rangeDesc];
+          if (!rangeChars || typeof rangeChars !== "string")
+            continue;
+          var rangeCount = rangeDesc.length === 1 ? 1 : rangeDesc.charCodeAt(1) - rangeDesc.charCodeAt(0) + 1;
+          var formattedWidth = rangeChars.length / rangeCount;
+          for (var i = 0; i < rangeCount; i++) {
+            var ascii2 = String.fromCharCode(rangeDesc.charCodeAt(0) + i);
+            var rangeCh = rangeChars.slice(i * formattedWidth, (i + 1) * formattedWidth);
+            var entry = {
+              formatted: rangeCh,
+              plain: ascii2,
+              modifiers,
+              underlinedModifiers,
+              fullModifiers: modKind,
+              underlinedFullModifiers
+            };
+            lookupList.push(entry);
+            lookup[entry.formatted] = entry;
+          }
+        }
+      }
+      lookupList.sort(function(entry1, entry2) {
+        return -(entry1.formatted.length - entry2.formatted.length);
+      });
+      formattedRegex = new RegExp(lookupList.map(function(entry2) {
+        var sanitizedEntry = sanitizeForRegex(entry2.formatted);
+        var underlineEntry = sanitizedEntry + "\u0332";
+        return underlineEntry + "|" + sanitizedEntry;
+      }).join("|"), "g");
+    }
+    function parser(text, options) {
+      function addUnderlinedsAndPlainTextBetween(start, end) {
+        while (start < end) {
+          regex_underlinedChar.lastIndex = start;
+          var matchUnderlined = regex_underlinedChar.exec(text);
+          if (!matchUnderlined || matchUnderlined.index >= end) {
+            addFormattedToResult(text.slice(start, end));
+            break;
+          }
+          if (matchUnderlined.index > start)
+            addFormattedToResult(text.slice(start, matchUnderlined.index));
+          var underlinedText = matchUnderlined[0];
+          var plain = underlinedText.slice(0, underlinedText.length - 1);
+          var added = false;
+          if (!disableCoalescing) {
+            var prevEntry = result.length && result[result.length - 1];
+            if (prevEntry && typeof prevEntry !== "string" && prevEntry.fullModifiers === "underlined") {
+              added = true;
+              prevEntry.formatted += underlinedText;
+              prevEntry.plain += plain;
+              prevEntry.length += underlinedText.length;
+            }
+          }
+          if (!added) {
+            addFormattedToResult({
+              formatted: underlinedText,
+              plain,
+              modifiers: ["underlined"],
+              fullModifiers: "underlined",
+              length: underlinedText.length
+            });
+          }
+          if (result.modifiers.indexOf("underlined") < 0)
+            result.modifiers.push("underlined");
+          start = matchUnderlined.index + underlinedText.length;
+        }
+      }
+      var regex_formattableCharacters = /[a-z0-9]/;
+      function addFormattedToResult(entry2) {
+        var prev3 = result.length && result[result.length - 1];
+        if (!disableCoalescing) {
+          if (typeof entry2 === "string") {
+            if (typeof prev3 === "string") {
+              result[result.length - 1] = prev3 + entry2;
+              return;
+            }
+          } else if (prev3) {
+            if (typeof prev3 === "string") {
+              var nextPrev = result.length > 1 && result[result.length - 2];
+              if (nextPrev && typeof nextPrev !== "string" && nextPrev.fullModifiers === entry2.fullModifiers && !regex_formattableCharacters.test(prev3) && prev3.indexOf("\n") < 0) {
+                nextPrev.formatted += prev3 + entry2.formatted;
+                nextPrev.plain += prev3 + entry2.plain;
+                nextPrev.length += prev3.length + entry2.length;
+                result.pop();
+                return;
+              }
+            } else if (prev3.fullModifiers === entry2.fullModifiers) {
+              prev3.formatted += entry2.formatted;
+              prev3.plain += entry2.plain;
+              prev3.length += entry2.length;
+              return;
+            }
+          }
+        }
+        if (typeof entry2 !== "string" && (!prev3 || typeof prev3 === "string" || prev3.fullModifiers !== entry2.fullModifiers))
+          for (var i = 0; i < entry2.modifiers.length; i++) {
+            var mod = entry2.modifiers[i];
+            if (!modifierDict[mod]) {
+              modifierDict[mod] = true;
+              result.modifiers.push(mod);
+            }
+          }
+        result.push(entry2);
+      }
+      var result = (
+        /** @type{*} */
+        []
+      );
+      result.modifiers = [];
+      result.fullModifiers = "";
+      if (!text)
+        return result;
+      var disableCoalescing = options && options.disableCoalescing;
+      var modifierDict = {};
+      formattedRegex.lastIndex = 0;
+      var index = 0;
+      while (true) {
+        formattedRegex.lastIndex = index;
+        var match2 = formattedRegex.exec(text);
+        if (!match2)
+          break;
+        if (match2.index > index) {
+          addUnderlinedsAndPlainTextBetween(index, match2.index);
+        }
+        var underlined = false;
+        var entryKey = match2[0];
+        if (entryKey.charCodeAt(entryKey.length - 1) === "\u0332".charCodeAt(0)) {
+          entryKey = entryKey.slice(0, entryKey.length - 1);
+          underlined = true;
+        }
+        var entry = lookup[entryKey];
+        var prev2 = result.length && result[result.length - 1];
+        var modifiers = !underlined ? entry.modifiers : entry.underlinedModifiers;
+        var fullModifiers = !underlined ? entry.fullModifiers : entry.underlinedFullModifiers;
+        addFormattedToResult({
+          formatted: match2[0],
+          plain: entry.plain,
+          modifiers,
+          fullModifiers,
+          length: match2[0].length
+        });
+        index = match2.index + match2[0].length;
+      }
+      if (index < text.length) {
+        addUnderlinedsAndPlainTextBetween(index, text.length);
+      }
+      result.modifiers.sort();
+      result.fullModifiers = result.modifiers.join("");
+      return result;
+    }
+    buildLookups();
+    return parser;
+  }
+
+  // src/api/unicode-styles/run-parse-ranges.js
+  var _parseRanges;
+  function runParseRanges(text, options) {
+    if (!_parseRanges) {
+      if (!_parseRanges)
+        _parseRanges = createUnicodeFormattedParser();
+    }
+    const parsed = _parseRanges(text, options);
+    return parsed;
+  }
+
+  // src/api/unicode-styles/apply-modifier.js
+  function applyModifier(input, modifier, remove) {
+    const parsed = runParseRanges(input, { disableCoalescing: true });
+    let text = "";
+    for (const range of parsed) {
+      if (typeof range === "string") {
+        if (remove) {
+          text += range;
+        } else {
+          const rangeMap = variants[modifier];
+          if (!rangeMap && modifier !== "underlined") {
+            text += range;
+          } else {
+            for (const ch of range) {
+              const formattedCh = applyModifierToPlainCh(ch, [modifier]);
+              text += formattedCh;
+            }
+          }
+        }
+      } else {
+        let applyFullModifiers;
+        if (remove) {
+          if (range.modifiers.indexOf(modifier) < 0) {
+            text += range.formatted;
+            continue;
+          } else if (range.modifiers.length === 1) {
+            text += range.plain;
+            continue;
+          } else {
+            applyFullModifiers = range.modifiers.filter(function(mod) {
+              return mod !== modifier;
+            }).join("");
+          }
+        } else {
+          applyFullModifiers = range.modifiers.indexOf(modifier) < 0 ? range.modifiers.concat([modifier]).sort().join("") : range.fullModifiers;
+        }
+        const formattedCh = applyModifierToPlainCh(
+          range.plain,
+          applyFullModifiers === modifier ? [modifier] : [applyFullModifiers, modifier]
+        );
+        text += formattedCh;
+      }
+    }
+    return text;
+  }
+  var regex_underlined = /underlined/g;
+  function applyModifierToPlainCh(plainCh, modifierAndFallbacks) {
+    if (modifierAndFallbacks.length === 1 && modifierAndFallbacks[0] === "underlined")
+      return plainCh + "\u0332";
+    for (let mod of modifierAndFallbacks) {
+      const underlined = regex_underlined.test(mod);
+      if (underlined)
+        mod = mod.replace(regex_underlined, "");
+      if (!mod && underlined) {
+        return plainCh + "\u0332";
+      }
+      const rangeMap = variants[mod];
+      if (!rangeMap)
+        continue;
+      const formattedRange = rangeMap[plainCh];
+      if (formattedRange)
+        return formattedRange;
+      for (const asciiRange in rangeMap) {
+        const formattedRange2 = rangeMap[asciiRange];
+        if (typeof formattedRange2 === "string" && plainCh.charCodeAt(0) >= asciiRange.charCodeAt(0) && plainCh.charCodeAt(0) <= asciiRange.charCodeAt(1)) {
+          const formattedIndex = plainCh.charCodeAt(0) - asciiRange.charCodeAt(0);
+          const formattedUnit = formattedRange2.length / (asciiRange.charCodeAt(1) - asciiRange.charCodeAt(0) + 1);
+          let formattedChar = formattedRange2.slice(formattedIndex * formattedUnit, (formattedIndex + 1) * formattedUnit);
+          if (underlined)
+            formattedChar += "\u0332";
+          return formattedChar;
+        }
+      }
+    }
+    return plainCh;
+  }
+
+  // src/history/history.js
+  var middledot = "\xB7";
   function History() {
+    let { handle } = useParams();
     (0, import_react12.useEffect)(() => {
       document.documentElement.classList.add("account");
+      if (!handle) {
+        document.title = uppercase_GIST;
+      } else {
+        const { mainText, tldSuffix, bskySocialSuffix, didPrefix, didBody } = breakHandleParts(handle);
+        let title;
+        if (didBody) {
+          title = applyModifier(didPrefix || "", "typewriter") + applyModifier(didBody, "bold");
+        } else {
+          title = applyModifier(mainText.replace(/\./g, middledot), "boldcursive") + (tldSuffix ? applyModifier(
+            tldSuffix.replace(/^\./, " " + middledot + " ").replace(/\./g, middledot),
+            "cursive"
+          ) : "") + (bskySocialSuffix ? applyModifier(
+            bskySocialSuffix.replace(/^\./, " " + middledot + " ").replace(/\./g, middledot),
+            "super"
+          ) : "");
+        }
+        document.title = title;
+      }
     });
     return /* @__PURE__ */ import_react12.default.createElement(HistoryCore, null);
   }

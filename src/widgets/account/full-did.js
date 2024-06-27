@@ -1,7 +1,7 @@
 // @ts-check
 
 import React from 'react';
-import { unwrapShortDID } from '../../../coldsky/lib';
+import { shortenDID, unwrapShortDID } from '../../../coldsky/lib';
 
 /**
  * @param {{
@@ -14,10 +14,11 @@ export function FullDID({ shortDID, Component, ...rest }) {
   if (!shortDID) return undefined;
   if (!Component) Component = 'span';
   const fullDID = unwrapShortDID(shortDID);
-  if (shortDID === fullDID) return <Component {...rest}>{fullDID}</Component>;
+  const shortDIDNormalized = shortenDID(fullDID);
+  if (shortDIDNormalized === fullDID) return <Component {...rest}>{fullDID}</Component>;
   else return (
     <Component {...rest}>
-      <span className='did-plc-prefix'>{fullDID.slice(0, -shortDID.length)}</span>
+      <span className='did-plc-prefix'>{fullDID.slice(0, -shortDIDNormalized.length)}</span>
       {shortDID}
     </Component>
   );

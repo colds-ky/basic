@@ -210,9 +210,15 @@
 }
 .history-view .history-account-banner-stripe-below {
   grid-row: 3;
-  grid-column: 1/ 3;
-  height: 0.5em;
-  background-color: royalblue;
+  grid-column: 1 / 3;
+  min-height: 0.5em;
+  background:
+    linear-gradient(
+      to right,
+      #001659,
+      #002289);
+  border-top: solid 1px #003595;
+  box-shadow: 0 4px 6px #00000036;
 }
 .history-view .history-account-avatar {
   grid-row: 1;
@@ -227,10 +233,64 @@
     -0.4vh 0.5vh 3vh white,
     inset -1vh -1vh 3vh #00000085,
     inset 0.5vh 0.5vh 2vh #ffffff73;
+  z-index: 3;
 }
 .history-view .history-account-handle {
+  align-self: center;
+  grid-row: 3;
+  grid-column: 1 / 3;
+  padding: 0.25em 0.9vh;
+  color: white;
+}
+.history-view .history-account-displayName {
   grid-row: 1;
   grid-column: 1;
   align-self: center;
+  justify-self: start;
+  font-size: 6vh;
+  color: #002182;
+  font-weight: bold;
+  padding-left: 1vh;
+  padding-right: 1vh;
+  text-shadow: 0 0 2px white;
+  position: relative;
+  z-index: 1;
+}
+.history-view .history-account-displayName::before {
+  content: " ";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgb(255 255 255);
+  border-radius: 2em;
+  filter: blur(20px);
+  transform: scaleX(1.2);
+  z-index: -1;
+}
+.history-view .history-account-description {
+  grid-row: 2;
+  grid-column: 2;
+  align-self: start;
+  justify-self: start;
+  text-shadow: 0 0 2px white;
+  z-index: 4;
+  position: relative;
+  margin-top: 1vh;
+}
+.history-view .history-account-description::before {
+  content: " ";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgb(255 255 255 / 71%);
+  border-radius: 2em;
+  filter: blur(10px);
+  transform: scaleX(1.2);
+  z-index: -2;
+  border: solid 4px cornflowerblue;
 }
 /*# sourceMappingURL=index.css.map */

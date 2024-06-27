@@ -12,9 +12,12 @@ import { localise } from '../localise';
 import { AccountLabel } from '../widgets/account';
 import { searchAccounts } from '../api';
 
+export const uppercase_GIST = localise('𝓖𝓘𝓢𝓣', { uk: '𝓷𝓮𝓹𝓮𝓬𝔂𝓰' });
+
 export function Landing() {
   useEffect(() => {
     document.documentElement.classList.remove('account');
+    document.title = uppercase_GIST;
   });
 
   return (
