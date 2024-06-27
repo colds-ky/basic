@@ -26,6 +26,7 @@
     "@rollup/plugin-json": "*",
     "@rollup/plugin-node-resolve": "*",
     "cbor-x": "*",
+    "dexie": "*",
     "esbuild": "*",
     "multiformats": "*",
     "rollup": "*",
