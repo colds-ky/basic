@@ -13107,6 +13107,10 @@ if (cid) {
 	            },
 	            inviteNote: {
 	              type: 'string'
+	            },
+	            deactivatedAt: {
+	              type: 'string',
+	              format: 'datetime'
 	            }
 	          }
 	        },
@@ -13396,6 +13400,10 @@ if (cid) {
 	                  refs: ['lex:com.atproto.admin.defs#repoRef', 'lex:com.atproto.repo.strongRef', 'lex:com.atproto.admin.defs#repoBlobRef']
 	                },
 	                takedown: {
+	                  type: 'ref',
+	                  ref: 'lex:com.atproto.admin.defs#statusAttr'
+	                },
+	                deactivated: {
 	                  type: 'ref',
 	                  ref: 'lex:com.atproto.admin.defs#statusAttr'
 	                }
@@ -15125,6 +15133,14 @@ if (cid) {
 	                },
 	                emailAuthFactor: {
 	                  type: 'boolean'
+	                },
+	                active: {
+	                  type: 'boolean'
+	                },
+	                status: {
+	                  type: 'string',
+	                  description: 'If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.',
+	                  knownValues: ['takendown', 'suspended', 'deactivated']
 	                }
 	              }
 	            }
@@ -15433,6 +15449,14 @@ if (cid) {
 	                },
 	                didDoc: {
 	                  type: 'unknown'
+	                },
+	                active: {
+	                  type: 'boolean'
+	                },
+	                status: {
+	                  type: 'string',
+	                  description: 'If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.',
+	                  knownValues: ['takendown', 'suspended', 'deactivated']
 	                }
 	              }
 	            }
@@ -15514,6 +15538,14 @@ if (cid) {
 	                },
 	                didDoc: {
 	                  type: 'unknown'
+	                },
+	                active: {
+	                  type: 'boolean'
+	                },
+	                status: {
+	                  type: 'string',
+	                  description: "Hosting status of the account. If not specified, then assume 'active'.",
+	                  knownValues: ['takendown', 'suspended', 'deactivated']
 	                }
 	              }
 	            }
@@ -15737,7 +15769,18 @@ if (cid) {
 	          },
 	          output: {
 	            encoding: '*/*'
-	          }
+	          },
+	          errors: [{
+	            name: 'BlobNotFound'
+	          }, {
+	            name: 'RepoNotFound'
+	          }, {
+	            name: 'RepoTakendown'
+	          }, {
+	            name: 'RepoSuspended'
+	          }, {
+	            name: 'RepoDeactivated'
+	          }]
 	        }
 	      }
 	    },
@@ -15768,7 +15811,18 @@ if (cid) {
 	          },
 	          output: {
 	            encoding: 'application/vnd.ipld.car'
-	          }
+	          },
+	          errors: [{
+	            name: 'BlockNotFound'
+	          }, {
+	            name: 'RepoNotFound'
+	          }, {
+	            name: 'RepoTakendown'
+	          }, {
+	            name: 'RepoSuspended'
+	          }, {
+	            name: 'RepoDeactivated'
+	          }]
 	        }
 	      }
 	    },
@@ -15869,6 +15923,12 @@ if (cid) {
 	          },
 	          errors: [{
 	            name: 'RepoNotFound'
+	          }, {
+	            name: 'RepoTakendown'
+	          }, {
+	            name: 'RepoSuspended'
+	          }, {
+	            name: 'RepoDeactivated'
 	          }]
 	        }
 	      }
@@ -15906,7 +15966,18 @@ if (cid) {
 	          },
 	          output: {
 	            encoding: 'application/vnd.ipld.car'
-	          }
+	          },
+	          errors: [{
+	            name: 'RecordNotFound'
+	          }, {
+	            name: 'RepoNotFound'
+	          }, {
+	            name: 'RepoTakendown'
+	          }, {
+	            name: 'RepoSuspended'
+	          }, {
+	            name: 'RepoDeactivated'
+	          }]
 	        }
 	      }
 	    },
@@ -15934,7 +16005,65 @@ if (cid) {
 	          },
 	          output: {
 	            encoding: 'application/vnd.ipld.car'
-	          }
+	          },
+	          errors: [{
+	            name: 'RepoNotFound'
+	          }, {
+	            name: 'RepoTakendown'
+	          }, {
+	            name: 'RepoSuspended'
+	          }, {
+	            name: 'RepoDeactivated'
+	          }]
+	        }
+	      }
+	    },
+	    ComAtprotoSyncGetRepoStatus: {
+	      lexicon: 1,
+	      id: 'com.atproto.sync.getRepoStatus',
+	      defs: {
+	        main: {
+	          type: 'query',
+	          description: 'Get the hosting status for a repository, on this server. Expected to be implemented by PDS and Relay.',
+	          parameters: {
+	            type: 'params',
+	            required: ['did'],
+	            properties: {
+	              did: {
+	                type: 'string',
+	                format: 'did',
+	                description: 'The DID of the repo.'
+	              }
+	            }
+	          },
+	          output: {
+	            encoding: 'application/json',
+	            schema: {
+	              type: 'object',
+	              required: ['did', 'active'],
+	              properties: {
+	                did: {
+	                  type: 'string',
+	                  format: 'did'
+	                },
+	                active: {
+	                  type: 'boolean'
+	                },
+	                status: {
+	                  type: 'string',
+	                  description: 'If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.',
+	                  knownValues: ['takendown', 'suspended', 'deactivated']
+	                },
+	                rev: {
+	                  type: 'string',
+	                  description: 'Optional field, the current rev of the repo, if active=true'
+	                }
+	              }
+	            }
+	          },
+	          errors: [{
+	            name: 'RepoNotFound'
+	          }]
 	        }
 	      }
 	    },
@@ -15987,7 +16116,16 @@ if (cid) {
 	                }
 	              }
 	            }
-	          }
+	          },
+	          errors: [{
+	            name: 'RepoNotFound'
+	          }, {
+	            name: 'RepoTakendown'
+	          }, {
+	            name: 'RepoSuspended'
+	          }, {
+	            name: 'RepoDeactivated'
+	          }]
 	        }
 	      }
 	    },
@@ -16047,6 +16185,14 @@ if (cid) {
 	            },
 	            rev: {
 	              type: 'string'
+	            },
+	            active: {
+	              type: 'boolean'
+	            },
+	            status: {
+	              type: 'string',
+	              description: 'If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.',
+	              knownValues: ['takendown', 'suspended', 'deactivated']
 	            }
 	          }
 	        }
@@ -16117,7 +16263,7 @@ if (cid) {
 	          message: {
 	            schema: {
 	              type: 'union',
-	              refs: ['lex:com.atproto.sync.subscribeRepos#commit', 'lex:com.atproto.sync.subscribeRepos#identity', 'lex:com.atproto.sync.subscribeRepos#handle', 'lex:com.atproto.sync.subscribeRepos#migrate', 'lex:com.atproto.sync.subscribeRepos#tombstone', 'lex:com.atproto.sync.subscribeRepos#info']
+	              refs: ['lex:com.atproto.sync.subscribeRepos#commit', 'lex:com.atproto.sync.subscribeRepos#identity', 'lex:com.atproto.sync.subscribeRepos#account', 'lex:com.atproto.sync.subscribeRepos#handle', 'lex:com.atproto.sync.subscribeRepos#migrate', 'lex:com.atproto.sync.subscribeRepos#tombstone', 'lex:com.atproto.sync.subscribeRepos#info']
 	            }
 	          },
 	          errors: [{
@@ -16209,12 +16355,44 @@ if (cid) {
 	            time: {
 	              type: 'string',
 	              format: 'datetime'
+	            },
+	            handle: {
+	              type: 'string',
+	              format: 'handle',
+	              description: "The current handle for the account, or 'handle.invalid' if validation fails. This field is optional, might have been validated or passed-through from an upstream source. Semantics and behaviors for PDS vs Relay may evolve in the future; see atproto specs for more details."
+	            }
+	          }
+	        },
+	        account: {
+	          type: 'object',
+	          description: "Represents a change to an account's status on a host (eg, PDS or Relay). The semantics of this event are that the status is at the host which emitted the event, not necessarily that at the currently active PDS. Eg, a Relay takedown would emit a takedown with active=false, even if the PDS is still active.",
+	          required: ['seq', 'did', 'time', 'active'],
+	          properties: {
+	            seq: {
+	              type: 'integer'
+	            },
+	            did: {
+	              type: 'string',
+	              format: 'did'
+	            },
+	            time: {
+	              type: 'string',
+	              format: 'datetime'
+	            },
+	            active: {
+	              type: 'boolean',
+	              description: 'Indicates that the account has a repository which can be fetched from the host that emitted this event.'
+	            },
+	            status: {
+	              type: 'string',
+	              description: 'If active=false, this optional field indicates a reason for why the account is not active.',
+	              knownValues: ['takendown', 'suspended', 'deleted', 'deactivated']
 	            }
 	          }
 	        },
 	        handle: {
 	          type: 'object',
-	          description: "Represents an update of the account's handle, or transition to/from invalid state. NOTE: Will be deprecated in favor of #identity.",
+	          description: 'DEPRECATED -- Use #identity event instead',
 	          required: ['seq', 'did', 'handle', 'time'],
 	          properties: {
 	            seq: {
@@ -16236,7 +16414,7 @@ if (cid) {
 	        },
 	        migrate: {
 	          type: 'object',
-	          description: 'Represents an account moving from one PDS instance to another. NOTE: not implemented; account migration uses #identity instead',
+	          description: 'DEPRECATED -- Use #account event instead',
 	          required: ['seq', 'did', 'migrateTo', 'time'],
 	          nullable: ['migrateTo'],
 	          properties: {
@@ -16258,7 +16436,7 @@ if (cid) {
 	        },
 	        tombstone: {
 	          type: 'object',
-	          description: 'Indicates that an account has been deleted. NOTE: may be deprecated in favor of #identity or a future #account event',
+	          description: 'DEPRECATED -- Use #account event instead',
 	          required: ['seq', 'did', 'time'],
 	          properties: {
 	            seq: {
@@ -20885,7 +21063,7 @@ if (cid) {
 	            },
 	            embed: {
 	              type: 'union',
-	              refs: ['lex:app.bsky.embed.record']
+	              refs: ['lex:app.bsky.embed.record#view']
 	            },
 	            sender: {
 	              type: 'ref',
@@ -22200,6 +22378,10 @@ if (cid) {
 	            },
 	            inviteNote: {
 	              type: 'string'
+	            },
+	            deactivatedAt: {
+	              type: 'string',
+	              format: 'datetime'
 	            }
 	          }
 	        },
@@ -22257,6 +22439,10 @@ if (cid) {
 	              type: 'string'
 	            },
 	            emailConfirmedAt: {
+	              type: 'string',
+	              format: 'datetime'
+	            },
+	            deactivatedAt: {
 	              type: 'string',
 	              format: 'datetime'
 	            }
@@ -22943,6 +23129,7 @@ if (cid) {
 	    ComAtprotoSyncGetLatestCommit: 'com.atproto.sync.getLatestCommit',
 	    ComAtprotoSyncGetRecord: 'com.atproto.sync.getRecord',
 	    ComAtprotoSyncGetRepo: 'com.atproto.sync.getRepo',
+	    ComAtprotoSyncGetRepoStatus: 'com.atproto.sync.getRepoStatus',
 	    ComAtprotoSyncListBlobs: 'com.atproto.sync.listBlobs',
 	    ComAtprotoSyncListRepos: 'com.atproto.sync.listRepos',
 	    ComAtprotoSyncNotifyOfUpdate: 'com.atproto.sync.notifyOfUpdate',
@@ -23066,12 +23253,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2j = dist;
-	function toKnownErr$2h(e) {
-	  if (e instanceof xrpc_1$2j.XRPCError) ;
+	const xrpc_1$2k = dist;
+	function toKnownErr$2i(e) {
+	  if (e instanceof xrpc_1$2k.XRPCError) ;
 	  return e;
 	}
-	deleteAccount$2.toKnownErr = toKnownErr$2h;
+	deleteAccount$2.toKnownErr = toKnownErr$2i;
 
 	var disableAccountInvites = {};
 
@@ -23082,12 +23269,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2i = dist;
-	function toKnownErr$2g(e) {
-	  if (e instanceof xrpc_1$2i.XRPCError) ;
+	const xrpc_1$2j = dist;
+	function toKnownErr$2h(e) {
+	  if (e instanceof xrpc_1$2j.XRPCError) ;
 	  return e;
 	}
-	disableAccountInvites.toKnownErr = toKnownErr$2g;
+	disableAccountInvites.toKnownErr = toKnownErr$2h;
 
 	var disableInviteCodes = {};
 
@@ -23098,12 +23285,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2h = dist;
-	function toKnownErr$2f(e) {
-	  if (e instanceof xrpc_1$2h.XRPCError) ;
+	const xrpc_1$2i = dist;
+	function toKnownErr$2g(e) {
+	  if (e instanceof xrpc_1$2i.XRPCError) ;
 	  return e;
 	}
-	disableInviteCodes.toKnownErr = toKnownErr$2f;
+	disableInviteCodes.toKnownErr = toKnownErr$2g;
 
 	var enableAccountInvites = {};
 
@@ -23114,12 +23301,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2g = dist;
-	function toKnownErr$2e(e) {
-	  if (e instanceof xrpc_1$2g.XRPCError) ;
+	const xrpc_1$2h = dist;
+	function toKnownErr$2f(e) {
+	  if (e instanceof xrpc_1$2h.XRPCError) ;
 	  return e;
 	}
-	enableAccountInvites.toKnownErr = toKnownErr$2e;
+	enableAccountInvites.toKnownErr = toKnownErr$2f;
 
 	var getAccountInfo = {};
 
@@ -23130,12 +23317,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2f = dist;
-	function toKnownErr$2d(e) {
-	  if (e instanceof xrpc_1$2f.XRPCError) ;
+	const xrpc_1$2g = dist;
+	function toKnownErr$2e(e) {
+	  if (e instanceof xrpc_1$2g.XRPCError) ;
 	  return e;
 	}
-	getAccountInfo.toKnownErr = toKnownErr$2d;
+	getAccountInfo.toKnownErr = toKnownErr$2e;
 
 	var getAccountInfos = {};
 
@@ -23146,12 +23333,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2e = dist;
-	function toKnownErr$2c(e) {
-	  if (e instanceof xrpc_1$2e.XRPCError) ;
+	const xrpc_1$2f = dist;
+	function toKnownErr$2d(e) {
+	  if (e instanceof xrpc_1$2f.XRPCError) ;
 	  return e;
 	}
-	getAccountInfos.toKnownErr = toKnownErr$2c;
+	getAccountInfos.toKnownErr = toKnownErr$2d;
 
 	var getInviteCodes = {};
 
@@ -23162,12 +23349,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2d = dist;
-	function toKnownErr$2b(e) {
-	  if (e instanceof xrpc_1$2d.XRPCError) ;
+	const xrpc_1$2e = dist;
+	function toKnownErr$2c(e) {
+	  if (e instanceof xrpc_1$2e.XRPCError) ;
 	  return e;
 	}
-	getInviteCodes.toKnownErr = toKnownErr$2b;
+	getInviteCodes.toKnownErr = toKnownErr$2c;
 
 	var getSubjectStatus = {};
 
@@ -23178,12 +23365,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2c = dist;
-	function toKnownErr$2a(e) {
-	  if (e instanceof xrpc_1$2c.XRPCError) ;
+	const xrpc_1$2d = dist;
+	function toKnownErr$2b(e) {
+	  if (e instanceof xrpc_1$2d.XRPCError) ;
 	  return e;
 	}
-	getSubjectStatus.toKnownErr = toKnownErr$2a;
+	getSubjectStatus.toKnownErr = toKnownErr$2b;
 
 	var sendEmail = {};
 
@@ -23194,12 +23381,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2b = dist;
-	function toKnownErr$29(e) {
-	  if (e instanceof xrpc_1$2b.XRPCError) ;
+	const xrpc_1$2c = dist;
+	function toKnownErr$2a(e) {
+	  if (e instanceof xrpc_1$2c.XRPCError) ;
 	  return e;
 	}
-	sendEmail.toKnownErr = toKnownErr$29;
+	sendEmail.toKnownErr = toKnownErr$2a;
 
 	var updateAccountEmail = {};
 
@@ -23210,12 +23397,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2a = dist;
-	function toKnownErr$28(e) {
-	  if (e instanceof xrpc_1$2a.XRPCError) ;
+	const xrpc_1$2b = dist;
+	function toKnownErr$29(e) {
+	  if (e instanceof xrpc_1$2b.XRPCError) ;
 	  return e;
 	}
-	updateAccountEmail.toKnownErr = toKnownErr$28;
+	updateAccountEmail.toKnownErr = toKnownErr$29;
 
 	var updateAccountHandle = {};
 
@@ -23226,12 +23413,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$29 = dist;
-	function toKnownErr$27(e) {
-	  if (e instanceof xrpc_1$29.XRPCError) ;
+	const xrpc_1$2a = dist;
+	function toKnownErr$28(e) {
+	  if (e instanceof xrpc_1$2a.XRPCError) ;
 	  return e;
 	}
-	updateAccountHandle.toKnownErr = toKnownErr$27;
+	updateAccountHandle.toKnownErr = toKnownErr$28;
 
 	var updateAccountPassword = {};
 
@@ -23242,12 +23429,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$28 = dist;
-	function toKnownErr$26(e) {
-	  if (e instanceof xrpc_1$28.XRPCError) ;
+	const xrpc_1$29 = dist;
+	function toKnownErr$27(e) {
+	  if (e instanceof xrpc_1$29.XRPCError) ;
 	  return e;
 	}
-	updateAccountPassword.toKnownErr = toKnownErr$26;
+	updateAccountPassword.toKnownErr = toKnownErr$27;
 
 	var updateSubjectStatus = {};
 
@@ -23258,12 +23445,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$27 = dist;
-	function toKnownErr$25(e) {
-	  if (e instanceof xrpc_1$27.XRPCError) ;
+	const xrpc_1$28 = dist;
+	function toKnownErr$26(e) {
+	  if (e instanceof xrpc_1$28.XRPCError) ;
 	  return e;
 	}
-	updateSubjectStatus.toKnownErr = toKnownErr$25;
+	updateSubjectStatus.toKnownErr = toKnownErr$26;
 
 	var getRecommendedDidCredentials = {};
 
@@ -23274,12 +23461,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$26 = dist;
-	function toKnownErr$24(e) {
-	  if (e instanceof xrpc_1$26.XRPCError) ;
+	const xrpc_1$27 = dist;
+	function toKnownErr$25(e) {
+	  if (e instanceof xrpc_1$27.XRPCError) ;
 	  return e;
 	}
-	getRecommendedDidCredentials.toKnownErr = toKnownErr$24;
+	getRecommendedDidCredentials.toKnownErr = toKnownErr$25;
 
 	var requestPlcOperationSignature = {};
 
@@ -23290,12 +23477,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$25 = dist;
-	function toKnownErr$23(e) {
-	  if (e instanceof xrpc_1$25.XRPCError) ;
+	const xrpc_1$26 = dist;
+	function toKnownErr$24(e) {
+	  if (e instanceof xrpc_1$26.XRPCError) ;
 	  return e;
 	}
-	requestPlcOperationSignature.toKnownErr = toKnownErr$23;
+	requestPlcOperationSignature.toKnownErr = toKnownErr$24;
 
 	var resolveHandle = {};
 
@@ -23306,12 +23493,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$24 = dist;
-	function toKnownErr$22(e) {
-	  if (e instanceof xrpc_1$24.XRPCError) ;
+	const xrpc_1$25 = dist;
+	function toKnownErr$23(e) {
+	  if (e instanceof xrpc_1$25.XRPCError) ;
 	  return e;
 	}
-	resolveHandle.toKnownErr = toKnownErr$22;
+	resolveHandle.toKnownErr = toKnownErr$23;
 
 	var signPlcOperation = {};
 
@@ -23322,12 +23509,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$23 = dist;
-	function toKnownErr$21(e) {
-	  if (e instanceof xrpc_1$23.XRPCError) ;
+	const xrpc_1$24 = dist;
+	function toKnownErr$22(e) {
+	  if (e instanceof xrpc_1$24.XRPCError) ;
 	  return e;
 	}
-	signPlcOperation.toKnownErr = toKnownErr$21;
+	signPlcOperation.toKnownErr = toKnownErr$22;
 
 	var submitPlcOperation = {};
 
@@ -23338,12 +23525,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$22 = dist;
-	function toKnownErr$20(e) {
-	  if (e instanceof xrpc_1$22.XRPCError) ;
+	const xrpc_1$23 = dist;
+	function toKnownErr$21(e) {
+	  if (e instanceof xrpc_1$23.XRPCError) ;
 	  return e;
 	}
-	submitPlcOperation.toKnownErr = toKnownErr$20;
+	submitPlcOperation.toKnownErr = toKnownErr$21;
 
 	var updateHandle = {};
 
@@ -23354,12 +23541,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$21 = dist;
-	function toKnownErr$1$(e) {
-	  if (e instanceof xrpc_1$21.XRPCError) ;
+	const xrpc_1$22 = dist;
+	function toKnownErr$20(e) {
+	  if (e instanceof xrpc_1$22.XRPCError) ;
 	  return e;
 	}
-	updateHandle.toKnownErr = toKnownErr$1$;
+	updateHandle.toKnownErr = toKnownErr$20;
 
 	var queryLabels = {};
 
@@ -23370,12 +23557,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$20 = dist;
-	function toKnownErr$1_(e) {
-	  if (e instanceof xrpc_1$20.XRPCError) ;
+	const xrpc_1$21 = dist;
+	function toKnownErr$1$(e) {
+	  if (e instanceof xrpc_1$21.XRPCError) ;
 	  return e;
 	}
-	queryLabels.toKnownErr = toKnownErr$1_;
+	queryLabels.toKnownErr = toKnownErr$1$;
 
 	var createReport = {};
 
@@ -23386,12 +23573,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1$ = dist;
-	function toKnownErr$1Z(e) {
-	  if (e instanceof xrpc_1$1$.XRPCError) ;
+	const xrpc_1$20 = dist;
+	function toKnownErr$1_(e) {
+	  if (e instanceof xrpc_1$20.XRPCError) ;
 	  return e;
 	}
-	createReport.toKnownErr = toKnownErr$1Z;
+	createReport.toKnownErr = toKnownErr$1_;
 
 	var applyWrites = {};
 
@@ -23420,22 +23607,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1_ = dist;
+	const xrpc_1$1$ = dist;
 	const util_1$M = util$2;
 	const lexicons_1$L = lexicons;
-	let InvalidSwapError$3 = class InvalidSwapError extends xrpc_1$1_.XRPCError {
+	let InvalidSwapError$3 = class InvalidSwapError extends xrpc_1$1$.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	applyWrites.InvalidSwapError = InvalidSwapError$3;
-	function toKnownErr$1Y(e) {
-	  if (e instanceof xrpc_1$1_.XRPCError) {
+	function toKnownErr$1Z(e) {
+	  if (e instanceof xrpc_1$1$.XRPCError) {
 	    if (e.error === 'InvalidSwap') return new InvalidSwapError$3(e);
 	  }
 	  return e;
 	}
-	applyWrites.toKnownErr = toKnownErr$1Y;
+	applyWrites.toKnownErr = toKnownErr$1Z;
 	function isCreate(v) {
 	  return (0, util_1$M.isObj)(v) && (0, util_1$M.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#create';
 	}
@@ -23470,20 +23657,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1Z = dist;
-	let InvalidSwapError$2 = class InvalidSwapError extends xrpc_1$1Z.XRPCError {
+	const xrpc_1$1_ = dist;
+	let InvalidSwapError$2 = class InvalidSwapError extends xrpc_1$1_.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	createRecord.InvalidSwapError = InvalidSwapError$2;
-	function toKnownErr$1X(e) {
-	  if (e instanceof xrpc_1$1Z.XRPCError) {
+	function toKnownErr$1Y(e) {
+	  if (e instanceof xrpc_1$1_.XRPCError) {
 	    if (e.error === 'InvalidSwap') return new InvalidSwapError$2(e);
 	  }
 	  return e;
 	}
-	createRecord.toKnownErr = toKnownErr$1X;
+	createRecord.toKnownErr = toKnownErr$1Y;
 
 	var deleteRecord = {};
 
@@ -23494,20 +23681,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1Y = dist;
-	let InvalidSwapError$1 = class InvalidSwapError extends xrpc_1$1Y.XRPCError {
+	const xrpc_1$1Z = dist;
+	let InvalidSwapError$1 = class InvalidSwapError extends xrpc_1$1Z.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	deleteRecord.InvalidSwapError = InvalidSwapError$1;
-	function toKnownErr$1W(e) {
-	  if (e instanceof xrpc_1$1Y.XRPCError) {
+	function toKnownErr$1X(e) {
+	  if (e instanceof xrpc_1$1Z.XRPCError) {
 	    if (e.error === 'InvalidSwap') return new InvalidSwapError$1(e);
 	  }
 	  return e;
 	}
-	deleteRecord.toKnownErr = toKnownErr$1W;
+	deleteRecord.toKnownErr = toKnownErr$1X;
 
 	var describeRepo = {};
 
@@ -23518,12 +23705,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1X = dist;
-	function toKnownErr$1V(e) {
-	  if (e instanceof xrpc_1$1X.XRPCError) ;
+	const xrpc_1$1Y = dist;
+	function toKnownErr$1W(e) {
+	  if (e instanceof xrpc_1$1Y.XRPCError) ;
 	  return e;
 	}
-	describeRepo.toKnownErr = toKnownErr$1V;
+	describeRepo.toKnownErr = toKnownErr$1W;
 
 	var getRecord$2 = {};
 
@@ -23534,12 +23721,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1W = dist;
-	function toKnownErr$1U(e) {
-	  if (e instanceof xrpc_1$1W.XRPCError) ;
+	const xrpc_1$1X = dist;
+	function toKnownErr$1V(e) {
+	  if (e instanceof xrpc_1$1X.XRPCError) ;
 	  return e;
 	}
-	getRecord$2.toKnownErr = toKnownErr$1U;
+	getRecord$2.toKnownErr = toKnownErr$1V;
 
 	var importRepo = {};
 
@@ -23550,12 +23737,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1V = dist;
-	function toKnownErr$1T(e) {
-	  if (e instanceof xrpc_1$1V.XRPCError) ;
+	const xrpc_1$1W = dist;
+	function toKnownErr$1U(e) {
+	  if (e instanceof xrpc_1$1W.XRPCError) ;
 	  return e;
 	}
-	importRepo.toKnownErr = toKnownErr$1T;
+	importRepo.toKnownErr = toKnownErr$1U;
 
 	var listMissingBlobs = {};
 
@@ -23566,14 +23753,14 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1U = dist;
+	const xrpc_1$1V = dist;
 	const util_1$L = util$2;
 	const lexicons_1$K = lexicons;
-	function toKnownErr$1S(e) {
-	  if (e instanceof xrpc_1$1U.XRPCError) ;
+	function toKnownErr$1T(e) {
+	  if (e instanceof xrpc_1$1V.XRPCError) ;
 	  return e;
 	}
-	listMissingBlobs.toKnownErr = toKnownErr$1S;
+	listMissingBlobs.toKnownErr = toKnownErr$1T;
 	function isRecordBlob(v) {
 	  return (0, util_1$L.isObj)(v) && (0, util_1$L.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.listMissingBlobs#recordBlob';
 	}
@@ -23592,14 +23779,14 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1T = dist;
+	const xrpc_1$1U = dist;
 	const util_1$K = util$2;
 	const lexicons_1$J = lexicons;
-	function toKnownErr$1R(e) {
-	  if (e instanceof xrpc_1$1T.XRPCError) ;
+	function toKnownErr$1S(e) {
+	  if (e instanceof xrpc_1$1U.XRPCError) ;
 	  return e;
 	}
-	listRecords.toKnownErr = toKnownErr$1R;
+	listRecords.toKnownErr = toKnownErr$1S;
 	function isRecord$d(v) {
 	  return (0, util_1$K.isObj)(v) && (0, util_1$K.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.listRecords#record';
 	}
@@ -23618,20 +23805,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1S = dist;
-	class InvalidSwapError extends xrpc_1$1S.XRPCError {
+	const xrpc_1$1T = dist;
+	class InvalidSwapError extends xrpc_1$1T.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	putRecord.InvalidSwapError = InvalidSwapError;
-	function toKnownErr$1Q(e) {
-	  if (e instanceof xrpc_1$1S.XRPCError) {
+	function toKnownErr$1R(e) {
+	  if (e instanceof xrpc_1$1T.XRPCError) {
 	    if (e.error === 'InvalidSwap') return new InvalidSwapError(e);
 	  }
 	  return e;
 	}
-	putRecord.toKnownErr = toKnownErr$1Q;
+	putRecord.toKnownErr = toKnownErr$1R;
 
 	var uploadBlob = {};
 
@@ -23642,12 +23829,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1R = dist;
-	function toKnownErr$1P(e) {
-	  if (e instanceof xrpc_1$1R.XRPCError) ;
+	const xrpc_1$1S = dist;
+	function toKnownErr$1Q(e) {
+	  if (e instanceof xrpc_1$1S.XRPCError) ;
 	  return e;
 	}
-	uploadBlob.toKnownErr = toKnownErr$1P;
+	uploadBlob.toKnownErr = toKnownErr$1Q;
 
 	var activateAccount = {};
 
@@ -23658,12 +23845,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1Q = dist;
-	function toKnownErr$1O(e) {
-	  if (e instanceof xrpc_1$1Q.XRPCError) ;
+	const xrpc_1$1R = dist;
+	function toKnownErr$1P(e) {
+	  if (e instanceof xrpc_1$1R.XRPCError) ;
 	  return e;
 	}
-	activateAccount.toKnownErr = toKnownErr$1O;
+	activateAccount.toKnownErr = toKnownErr$1P;
 
 	var checkAccountStatus = {};
 
@@ -23674,12 +23861,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1P = dist;
-	function toKnownErr$1N(e) {
-	  if (e instanceof xrpc_1$1P.XRPCError) ;
+	const xrpc_1$1Q = dist;
+	function toKnownErr$1O(e) {
+	  if (e instanceof xrpc_1$1Q.XRPCError) ;
 	  return e;
 	}
-	checkAccountStatus.toKnownErr = toKnownErr$1N;
+	checkAccountStatus.toKnownErr = toKnownErr$1O;
 
 	var confirmEmail = {};
 
@@ -23690,33 +23877,33 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1O = dist;
-	class AccountNotFoundError extends xrpc_1$1O.XRPCError {
+	const xrpc_1$1P = dist;
+	class AccountNotFoundError extends xrpc_1$1P.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	confirmEmail.AccountNotFoundError = AccountNotFoundError;
-	let ExpiredTokenError$3 = class ExpiredTokenError extends xrpc_1$1O.XRPCError {
+	let ExpiredTokenError$3 = class ExpiredTokenError extends xrpc_1$1P.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	confirmEmail.ExpiredTokenError = ExpiredTokenError$3;
-	let InvalidTokenError$3 = class InvalidTokenError extends xrpc_1$1O.XRPCError {
+	let InvalidTokenError$3 = class InvalidTokenError extends xrpc_1$1P.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	confirmEmail.InvalidTokenError = InvalidTokenError$3;
-	class InvalidEmailError extends xrpc_1$1O.XRPCError {
+	class InvalidEmailError extends xrpc_1$1P.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	confirmEmail.InvalidEmailError = InvalidEmailError;
-	function toKnownErr$1M(e) {
-	  if (e instanceof xrpc_1$1O.XRPCError) {
+	function toKnownErr$1N(e) {
+	  if (e instanceof xrpc_1$1P.XRPCError) {
 	    if (e.error === 'AccountNotFound') return new AccountNotFoundError(e);
 	    if (e.error === 'ExpiredToken') return new ExpiredTokenError$3(e);
 	    if (e.error === 'InvalidToken') return new InvalidTokenError$3(e);
@@ -23724,7 +23911,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	confirmEmail.toKnownErr = toKnownErr$1M;
+	confirmEmail.toKnownErr = toKnownErr$1N;
 
 	var createAccount = {};
 
@@ -23735,51 +23922,51 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1N = dist;
-	class InvalidHandleError extends xrpc_1$1N.XRPCError {
+	const xrpc_1$1O = dist;
+	class InvalidHandleError extends xrpc_1$1O.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.InvalidHandleError = InvalidHandleError;
-	class InvalidPasswordError extends xrpc_1$1N.XRPCError {
+	class InvalidPasswordError extends xrpc_1$1O.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.InvalidPasswordError = InvalidPasswordError;
-	class InvalidInviteCodeError extends xrpc_1$1N.XRPCError {
+	class InvalidInviteCodeError extends xrpc_1$1O.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.InvalidInviteCodeError = InvalidInviteCodeError;
-	class HandleNotAvailableError extends xrpc_1$1N.XRPCError {
+	class HandleNotAvailableError extends xrpc_1$1O.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.HandleNotAvailableError = HandleNotAvailableError;
-	class UnsupportedDomainError extends xrpc_1$1N.XRPCError {
+	class UnsupportedDomainError extends xrpc_1$1O.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.UnsupportedDomainError = UnsupportedDomainError;
-	class UnresolvableDidError extends xrpc_1$1N.XRPCError {
+	class UnresolvableDidError extends xrpc_1$1O.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.UnresolvableDidError = UnresolvableDidError;
-	class IncompatibleDidDocError extends xrpc_1$1N.XRPCError {
+	class IncompatibleDidDocError extends xrpc_1$1O.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.IncompatibleDidDocError = IncompatibleDidDocError;
-	function toKnownErr$1L(e) {
-	  if (e instanceof xrpc_1$1N.XRPCError) {
+	function toKnownErr$1M(e) {
+	  if (e instanceof xrpc_1$1O.XRPCError) {
 	    if (e.error === 'InvalidHandle') return new InvalidHandleError(e);
 	    if (e.error === 'InvalidPassword') return new InvalidPasswordError(e);
 	    if (e.error === 'InvalidInviteCode') return new InvalidInviteCodeError(e);
@@ -23790,7 +23977,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	createAccount.toKnownErr = toKnownErr$1L;
+	createAccount.toKnownErr = toKnownErr$1M;
 
 	var createAppPassword = {};
 
@@ -23801,22 +23988,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1M = dist;
+	const xrpc_1$1N = dist;
 	const util_1$J = util$2;
 	const lexicons_1$I = lexicons;
-	let AccountTakedownError$3 = class AccountTakedownError extends xrpc_1$1M.XRPCError {
+	let AccountTakedownError$3 = class AccountTakedownError extends xrpc_1$1N.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	createAppPassword.AccountTakedownError = AccountTakedownError$3;
-	function toKnownErr$1K(e) {
-	  if (e instanceof xrpc_1$1M.XRPCError) {
+	function toKnownErr$1L(e) {
+	  if (e instanceof xrpc_1$1N.XRPCError) {
 	    if (e.error === 'AccountTakedown') return new AccountTakedownError$3(e);
 	  }
 	  return e;
 	}
-	createAppPassword.toKnownErr = toKnownErr$1K;
+	createAppPassword.toKnownErr = toKnownErr$1L;
 	function isAppPassword$1(v) {
 	  return (0, util_1$J.isObj)(v) && (0, util_1$J.hasProp)(v, '$type') && v.$type === 'com.atproto.server.createAppPassword#appPassword';
 	}
@@ -23835,12 +24022,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1L = dist;
-	function toKnownErr$1J(e) {
-	  if (e instanceof xrpc_1$1L.XRPCError) ;
+	const xrpc_1$1M = dist;
+	function toKnownErr$1K(e) {
+	  if (e instanceof xrpc_1$1M.XRPCError) ;
 	  return e;
 	}
-	createInviteCode.toKnownErr = toKnownErr$1J;
+	createInviteCode.toKnownErr = toKnownErr$1K;
 
 	var createInviteCodes = {};
 
@@ -23851,14 +24038,14 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1K = dist;
+	const xrpc_1$1L = dist;
 	const util_1$I = util$2;
 	const lexicons_1$H = lexicons;
-	function toKnownErr$1I(e) {
-	  if (e instanceof xrpc_1$1K.XRPCError) ;
+	function toKnownErr$1J(e) {
+	  if (e instanceof xrpc_1$1L.XRPCError) ;
 	  return e;
 	}
-	createInviteCodes.toKnownErr = toKnownErr$1I;
+	createInviteCodes.toKnownErr = toKnownErr$1J;
 	function isAccountCodes(v) {
 	  return (0, util_1$I.isObj)(v) && (0, util_1$I.hasProp)(v, '$type') && v.$type === 'com.atproto.server.createInviteCodes#accountCodes';
 	}
@@ -23877,27 +24064,27 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1J = dist;
-	let AccountTakedownError$2 = class AccountTakedownError extends xrpc_1$1J.XRPCError {
+	const xrpc_1$1K = dist;
+	let AccountTakedownError$2 = class AccountTakedownError extends xrpc_1$1K.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	createSession.AccountTakedownError = AccountTakedownError$2;
-	class AuthFactorTokenRequiredError extends xrpc_1$1J.XRPCError {
+	class AuthFactorTokenRequiredError extends xrpc_1$1K.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createSession.AuthFactorTokenRequiredError = AuthFactorTokenRequiredError;
-	function toKnownErr$1H(e) {
-	  if (e instanceof xrpc_1$1J.XRPCError) {
+	function toKnownErr$1I(e) {
+	  if (e instanceof xrpc_1$1K.XRPCError) {
 	    if (e.error === 'AccountTakedown') return new AccountTakedownError$2(e);
 	    if (e.error === 'AuthFactorTokenRequired') return new AuthFactorTokenRequiredError(e);
 	  }
 	  return e;
 	}
-	createSession.toKnownErr = toKnownErr$1H;
+	createSession.toKnownErr = toKnownErr$1I;
 
 	var deactivateAccount = {};
 
@@ -23908,12 +24095,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1I = dist;
-	function toKnownErr$1G(e) {
-	  if (e instanceof xrpc_1$1I.XRPCError) ;
+	const xrpc_1$1J = dist;
+	function toKnownErr$1H(e) {
+	  if (e instanceof xrpc_1$1J.XRPCError) ;
 	  return e;
 	}
-	deactivateAccount.toKnownErr = toKnownErr$1G;
+	deactivateAccount.toKnownErr = toKnownErr$1H;
 
 	var deleteAccount$1 = {};
 
@@ -23924,27 +24111,27 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1H = dist;
-	let ExpiredTokenError$2 = class ExpiredTokenError extends xrpc_1$1H.XRPCError {
+	const xrpc_1$1I = dist;
+	let ExpiredTokenError$2 = class ExpiredTokenError extends xrpc_1$1I.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	deleteAccount$1.ExpiredTokenError = ExpiredTokenError$2;
-	let InvalidTokenError$2 = class InvalidTokenError extends xrpc_1$1H.XRPCError {
+	let InvalidTokenError$2 = class InvalidTokenError extends xrpc_1$1I.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	deleteAccount$1.InvalidTokenError = InvalidTokenError$2;
-	function toKnownErr$1F(e) {
-	  if (e instanceof xrpc_1$1H.XRPCError) {
+	function toKnownErr$1G(e) {
+	  if (e instanceof xrpc_1$1I.XRPCError) {
 	    if (e.error === 'ExpiredToken') return new ExpiredTokenError$2(e);
 	    if (e.error === 'InvalidToken') return new InvalidTokenError$2(e);
 	  }
 	  return e;
 	}
-	deleteAccount$1.toKnownErr = toKnownErr$1F;
+	deleteAccount$1.toKnownErr = toKnownErr$1G;
 
 	var deleteSession = {};
 
@@ -23955,12 +24142,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1G = dist;
-	function toKnownErr$1E(e) {
-	  if (e instanceof xrpc_1$1G.XRPCError) ;
+	const xrpc_1$1H = dist;
+	function toKnownErr$1F(e) {
+	  if (e instanceof xrpc_1$1H.XRPCError) ;
 	  return e;
 	}
-	deleteSession.toKnownErr = toKnownErr$1E;
+	deleteSession.toKnownErr = toKnownErr$1F;
 
 	var describeServer = {};
 
@@ -23971,14 +24158,14 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1F = dist;
+	const xrpc_1$1G = dist;
 	const util_1$H = util$2;
 	const lexicons_1$G = lexicons;
-	function toKnownErr$1D(e) {
-	  if (e instanceof xrpc_1$1F.XRPCError) ;
+	function toKnownErr$1E(e) {
+	  if (e instanceof xrpc_1$1G.XRPCError) ;
 	  return e;
 	}
-	describeServer.toKnownErr = toKnownErr$1D;
+	describeServer.toKnownErr = toKnownErr$1E;
 	function isLinks$1(v) {
 	  return (0, util_1$H.isObj)(v) && (0, util_1$H.hasProp)(v, '$type') && v.$type === 'com.atproto.server.describeServer#links';
 	}
@@ -24005,20 +24192,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1E = dist;
-	class DuplicateCreateError extends xrpc_1$1E.XRPCError {
+	const xrpc_1$1F = dist;
+	class DuplicateCreateError extends xrpc_1$1F.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getAccountInviteCodes.DuplicateCreateError = DuplicateCreateError;
-	function toKnownErr$1C(e) {
-	  if (e instanceof xrpc_1$1E.XRPCError) {
+	function toKnownErr$1D(e) {
+	  if (e instanceof xrpc_1$1F.XRPCError) {
 	    if (e.error === 'DuplicateCreate') return new DuplicateCreateError(e);
 	  }
 	  return e;
 	}
-	getAccountInviteCodes.toKnownErr = toKnownErr$1C;
+	getAccountInviteCodes.toKnownErr = toKnownErr$1D;
 
 	var getServiceAuth = {};
 
@@ -24029,12 +24216,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1D = dist;
-	function toKnownErr$1B(e) {
-	  if (e instanceof xrpc_1$1D.XRPCError) ;
+	const xrpc_1$1E = dist;
+	function toKnownErr$1C(e) {
+	  if (e instanceof xrpc_1$1E.XRPCError) ;
 	  return e;
 	}
-	getServiceAuth.toKnownErr = toKnownErr$1B;
+	getServiceAuth.toKnownErr = toKnownErr$1C;
 
 	var getSession = {};
 
@@ -24045,12 +24232,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1C = dist;
-	function toKnownErr$1A(e) {
-	  if (e instanceof xrpc_1$1C.XRPCError) ;
+	const xrpc_1$1D = dist;
+	function toKnownErr$1B(e) {
+	  if (e instanceof xrpc_1$1D.XRPCError) ;
 	  return e;
 	}
-	getSession.toKnownErr = toKnownErr$1A;
+	getSession.toKnownErr = toKnownErr$1B;
 
 	var listAppPasswords = {};
 
@@ -24061,22 +24248,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1B = dist;
+	const xrpc_1$1C = dist;
 	const util_1$G = util$2;
 	const lexicons_1$F = lexicons;
-	let AccountTakedownError$1 = class AccountTakedownError extends xrpc_1$1B.XRPCError {
+	let AccountTakedownError$1 = class AccountTakedownError extends xrpc_1$1C.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	listAppPasswords.AccountTakedownError = AccountTakedownError$1;
-	function toKnownErr$1z(e) {
-	  if (e instanceof xrpc_1$1B.XRPCError) {
+	function toKnownErr$1A(e) {
+	  if (e instanceof xrpc_1$1C.XRPCError) {
 	    if (e.error === 'AccountTakedown') return new AccountTakedownError$1(e);
 	  }
 	  return e;
 	}
-	listAppPasswords.toKnownErr = toKnownErr$1z;
+	listAppPasswords.toKnownErr = toKnownErr$1A;
 	function isAppPassword(v) {
 	  return (0, util_1$G.isObj)(v) && (0, util_1$G.hasProp)(v, '$type') && v.$type === 'com.atproto.server.listAppPasswords#appPassword';
 	}
@@ -24095,20 +24282,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1A = dist;
-	class AccountTakedownError extends xrpc_1$1A.XRPCError {
+	const xrpc_1$1B = dist;
+	class AccountTakedownError extends xrpc_1$1B.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	refreshSession.AccountTakedownError = AccountTakedownError;
-	function toKnownErr$1y(e) {
-	  if (e instanceof xrpc_1$1A.XRPCError) {
+	function toKnownErr$1z(e) {
+	  if (e instanceof xrpc_1$1B.XRPCError) {
 	    if (e.error === 'AccountTakedown') return new AccountTakedownError(e);
 	  }
 	  return e;
 	}
-	refreshSession.toKnownErr = toKnownErr$1y;
+	refreshSession.toKnownErr = toKnownErr$1z;
 
 	var requestAccountDelete = {};
 
@@ -24119,12 +24306,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1z = dist;
-	function toKnownErr$1x(e) {
-	  if (e instanceof xrpc_1$1z.XRPCError) ;
+	const xrpc_1$1A = dist;
+	function toKnownErr$1y(e) {
+	  if (e instanceof xrpc_1$1A.XRPCError) ;
 	  return e;
 	}
-	requestAccountDelete.toKnownErr = toKnownErr$1x;
+	requestAccountDelete.toKnownErr = toKnownErr$1y;
 
 	var requestEmailConfirmation = {};
 
@@ -24135,12 +24322,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1y = dist;
-	function toKnownErr$1w(e) {
-	  if (e instanceof xrpc_1$1y.XRPCError) ;
+	const xrpc_1$1z = dist;
+	function toKnownErr$1x(e) {
+	  if (e instanceof xrpc_1$1z.XRPCError) ;
 	  return e;
 	}
-	requestEmailConfirmation.toKnownErr = toKnownErr$1w;
+	requestEmailConfirmation.toKnownErr = toKnownErr$1x;
 
 	var requestEmailUpdate = {};
 
@@ -24151,12 +24338,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1x = dist;
-	function toKnownErr$1v(e) {
-	  if (e instanceof xrpc_1$1x.XRPCError) ;
+	const xrpc_1$1y = dist;
+	function toKnownErr$1w(e) {
+	  if (e instanceof xrpc_1$1y.XRPCError) ;
 	  return e;
 	}
-	requestEmailUpdate.toKnownErr = toKnownErr$1v;
+	requestEmailUpdate.toKnownErr = toKnownErr$1w;
 
 	var requestPasswordReset = {};
 
@@ -24167,12 +24354,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1w = dist;
-	function toKnownErr$1u(e) {
-	  if (e instanceof xrpc_1$1w.XRPCError) ;
+	const xrpc_1$1x = dist;
+	function toKnownErr$1v(e) {
+	  if (e instanceof xrpc_1$1x.XRPCError) ;
 	  return e;
 	}
-	requestPasswordReset.toKnownErr = toKnownErr$1u;
+	requestPasswordReset.toKnownErr = toKnownErr$1v;
 
 	var reserveSigningKey = {};
 
@@ -24183,12 +24370,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1v = dist;
-	function toKnownErr$1t(e) {
-	  if (e instanceof xrpc_1$1v.XRPCError) ;
+	const xrpc_1$1w = dist;
+	function toKnownErr$1u(e) {
+	  if (e instanceof xrpc_1$1w.XRPCError) ;
 	  return e;
 	}
-	reserveSigningKey.toKnownErr = toKnownErr$1t;
+	reserveSigningKey.toKnownErr = toKnownErr$1u;
 
 	var resetPassword = {};
 
@@ -24199,27 +24386,27 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1u = dist;
-	let ExpiredTokenError$1 = class ExpiredTokenError extends xrpc_1$1u.XRPCError {
+	const xrpc_1$1v = dist;
+	let ExpiredTokenError$1 = class ExpiredTokenError extends xrpc_1$1v.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	resetPassword.ExpiredTokenError = ExpiredTokenError$1;
-	let InvalidTokenError$1 = class InvalidTokenError extends xrpc_1$1u.XRPCError {
+	let InvalidTokenError$1 = class InvalidTokenError extends xrpc_1$1v.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	resetPassword.InvalidTokenError = InvalidTokenError$1;
-	function toKnownErr$1s(e) {
-	  if (e instanceof xrpc_1$1u.XRPCError) {
+	function toKnownErr$1t(e) {
+	  if (e instanceof xrpc_1$1v.XRPCError) {
 	    if (e.error === 'ExpiredToken') return new ExpiredTokenError$1(e);
 	    if (e.error === 'InvalidToken') return new InvalidTokenError$1(e);
 	  }
 	  return e;
 	}
-	resetPassword.toKnownErr = toKnownErr$1s;
+	resetPassword.toKnownErr = toKnownErr$1t;
 
 	var revokeAppPassword = {};
 
@@ -24230,12 +24417,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1t = dist;
-	function toKnownErr$1r(e) {
-	  if (e instanceof xrpc_1$1t.XRPCError) ;
+	const xrpc_1$1u = dist;
+	function toKnownErr$1s(e) {
+	  if (e instanceof xrpc_1$1u.XRPCError) ;
 	  return e;
 	}
-	revokeAppPassword.toKnownErr = toKnownErr$1r;
+	revokeAppPassword.toKnownErr = toKnownErr$1s;
 
 	var updateEmail = {};
 
@@ -24246,66 +24433,138 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1s = dist;
-	class ExpiredTokenError extends xrpc_1$1s.XRPCError {
+	const xrpc_1$1t = dist;
+	class ExpiredTokenError extends xrpc_1$1t.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	updateEmail.ExpiredTokenError = ExpiredTokenError;
-	class InvalidTokenError extends xrpc_1$1s.XRPCError {
+	class InvalidTokenError extends xrpc_1$1t.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	updateEmail.InvalidTokenError = InvalidTokenError;
-	class TokenRequiredError extends xrpc_1$1s.XRPCError {
+	class TokenRequiredError extends xrpc_1$1t.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	updateEmail.TokenRequiredError = TokenRequiredError;
-	function toKnownErr$1q(e) {
-	  if (e instanceof xrpc_1$1s.XRPCError) {
+	function toKnownErr$1r(e) {
+	  if (e instanceof xrpc_1$1t.XRPCError) {
 	    if (e.error === 'ExpiredToken') return new ExpiredTokenError(e);
 	    if (e.error === 'InvalidToken') return new InvalidTokenError(e);
 	    if (e.error === 'TokenRequired') return new TokenRequiredError(e);
 	  }
 	  return e;
 	}
-	updateEmail.toKnownErr = toKnownErr$1q;
+	updateEmail.toKnownErr = toKnownErr$1r;
 
 	var getBlob = {};
 
 	Object.defineProperty(getBlob, "__esModule", {
 	  value: true
 	});
-	getBlob.toKnownErr = void 0;
+	getBlob.toKnownErr = getBlob.RepoDeactivatedError = getBlob.RepoSuspendedError = getBlob.RepoTakendownError = getBlob.RepoNotFoundError = getBlob.BlobNotFoundError = void 0;
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1r = dist;
-	function toKnownErr$1p(e) {
-	  if (e instanceof xrpc_1$1r.XRPCError) ;
+	const xrpc_1$1s = dist;
+	class BlobNotFoundError extends xrpc_1$1s.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	}
+	getBlob.BlobNotFoundError = BlobNotFoundError;
+	let RepoNotFoundError$7 = class RepoNotFoundError extends xrpc_1$1s.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getBlob.RepoNotFoundError = RepoNotFoundError$7;
+	let RepoTakendownError$5 = class RepoTakendownError extends xrpc_1$1s.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getBlob.RepoTakendownError = RepoTakendownError$5;
+	let RepoSuspendedError$5 = class RepoSuspendedError extends xrpc_1$1s.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getBlob.RepoSuspendedError = RepoSuspendedError$5;
+	let RepoDeactivatedError$5 = class RepoDeactivatedError extends xrpc_1$1s.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getBlob.RepoDeactivatedError = RepoDeactivatedError$5;
+	function toKnownErr$1q(e) {
+	  if (e instanceof xrpc_1$1s.XRPCError) {
+	    if (e.error === 'BlobNotFound') return new BlobNotFoundError(e);
+	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$7(e);
+	    if (e.error === 'RepoTakendown') return new RepoTakendownError$5(e);
+	    if (e.error === 'RepoSuspended') return new RepoSuspendedError$5(e);
+	    if (e.error === 'RepoDeactivated') return new RepoDeactivatedError$5(e);
+	  }
 	  return e;
 	}
-	getBlob.toKnownErr = toKnownErr$1p;
+	getBlob.toKnownErr = toKnownErr$1q;
 
 	var getBlocks$1 = {};
 
 	Object.defineProperty(getBlocks$1, "__esModule", {
 	  value: true
 	});
-	getBlocks$1.toKnownErr = void 0;
+	getBlocks$1.toKnownErr = getBlocks$1.RepoDeactivatedError = getBlocks$1.RepoSuspendedError = getBlocks$1.RepoTakendownError = getBlocks$1.RepoNotFoundError = getBlocks$1.BlockNotFoundError = void 0;
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1q = dist;
-	function toKnownErr$1o(e) {
-	  if (e instanceof xrpc_1$1q.XRPCError) ;
+	const xrpc_1$1r = dist;
+	class BlockNotFoundError extends xrpc_1$1r.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	}
+	getBlocks$1.BlockNotFoundError = BlockNotFoundError;
+	let RepoNotFoundError$6 = class RepoNotFoundError extends xrpc_1$1r.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getBlocks$1.RepoNotFoundError = RepoNotFoundError$6;
+	let RepoTakendownError$4 = class RepoTakendownError extends xrpc_1$1r.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getBlocks$1.RepoTakendownError = RepoTakendownError$4;
+	let RepoSuspendedError$4 = class RepoSuspendedError extends xrpc_1$1r.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getBlocks$1.RepoSuspendedError = RepoSuspendedError$4;
+	let RepoDeactivatedError$4 = class RepoDeactivatedError extends xrpc_1$1r.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getBlocks$1.RepoDeactivatedError = RepoDeactivatedError$4;
+	function toKnownErr$1p(e) {
+	  if (e instanceof xrpc_1$1r.XRPCError) {
+	    if (e.error === 'BlockNotFound') return new BlockNotFoundError(e);
+	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$6(e);
+	    if (e.error === 'RepoTakendown') return new RepoTakendownError$4(e);
+	    if (e.error === 'RepoSuspended') return new RepoSuspendedError$4(e);
+	    if (e.error === 'RepoDeactivated') return new RepoDeactivatedError$4(e);
+	  }
 	  return e;
 	}
-	getBlocks$1.toKnownErr = toKnownErr$1o;
+	getBlocks$1.toKnownErr = toKnownErr$1p;
 
 	var getCheckout = {};
 
@@ -24316,12 +24575,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1p = dist;
-	function toKnownErr$1n(e) {
-	  if (e instanceof xrpc_1$1p.XRPCError) ;
+	const xrpc_1$1q = dist;
+	function toKnownErr$1o(e) {
+	  if (e instanceof xrpc_1$1q.XRPCError) ;
 	  return e;
 	}
-	getCheckout.toKnownErr = toKnownErr$1n;
+	getCheckout.toKnownErr = toKnownErr$1o;
 
 	var getHead = {};
 
@@ -24332,89 +24591,228 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1o = dist;
-	class HeadNotFoundError extends xrpc_1$1o.XRPCError {
+	const xrpc_1$1p = dist;
+	class HeadNotFoundError extends xrpc_1$1p.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getHead.HeadNotFoundError = HeadNotFoundError;
-	function toKnownErr$1m(e) {
-	  if (e instanceof xrpc_1$1o.XRPCError) {
+	function toKnownErr$1n(e) {
+	  if (e instanceof xrpc_1$1p.XRPCError) {
 	    if (e.error === 'HeadNotFound') return new HeadNotFoundError(e);
 	  }
 	  return e;
 	}
-	getHead.toKnownErr = toKnownErr$1m;
+	getHead.toKnownErr = toKnownErr$1n;
 
 	var getLatestCommit = {};
 
 	Object.defineProperty(getLatestCommit, "__esModule", {
 	  value: true
 	});
-	getLatestCommit.toKnownErr = getLatestCommit.RepoNotFoundError = void 0;
+	getLatestCommit.toKnownErr = getLatestCommit.RepoDeactivatedError = getLatestCommit.RepoSuspendedError = getLatestCommit.RepoTakendownError = getLatestCommit.RepoNotFoundError = void 0;
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1n = dist;
-	let RepoNotFoundError$1 = class RepoNotFoundError extends xrpc_1$1n.XRPCError {
+	const xrpc_1$1o = dist;
+	let RepoNotFoundError$5 = class RepoNotFoundError extends xrpc_1$1o.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
-	getLatestCommit.RepoNotFoundError = RepoNotFoundError$1;
-	function toKnownErr$1l(e) {
-	  if (e instanceof xrpc_1$1n.XRPCError) {
-	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$1(e);
+	getLatestCommit.RepoNotFoundError = RepoNotFoundError$5;
+	let RepoTakendownError$3 = class RepoTakendownError extends xrpc_1$1o.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getLatestCommit.RepoTakendownError = RepoTakendownError$3;
+	let RepoSuspendedError$3 = class RepoSuspendedError extends xrpc_1$1o.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getLatestCommit.RepoSuspendedError = RepoSuspendedError$3;
+	let RepoDeactivatedError$3 = class RepoDeactivatedError extends xrpc_1$1o.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getLatestCommit.RepoDeactivatedError = RepoDeactivatedError$3;
+	function toKnownErr$1m(e) {
+	  if (e instanceof xrpc_1$1o.XRPCError) {
+	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$5(e);
+	    if (e.error === 'RepoTakendown') return new RepoTakendownError$3(e);
+	    if (e.error === 'RepoSuspended') return new RepoSuspendedError$3(e);
+	    if (e.error === 'RepoDeactivated') return new RepoDeactivatedError$3(e);
 	  }
 	  return e;
 	}
-	getLatestCommit.toKnownErr = toKnownErr$1l;
+	getLatestCommit.toKnownErr = toKnownErr$1m;
 
 	var getRecord$1 = {};
 
 	Object.defineProperty(getRecord$1, "__esModule", {
 	  value: true
 	});
-	getRecord$1.toKnownErr = void 0;
+	getRecord$1.toKnownErr = getRecord$1.RepoDeactivatedError = getRecord$1.RepoSuspendedError = getRecord$1.RepoTakendownError = getRecord$1.RepoNotFoundError = getRecord$1.RecordNotFoundError = void 0;
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1m = dist;
-	function toKnownErr$1k(e) {
-	  if (e instanceof xrpc_1$1m.XRPCError) ;
+	const xrpc_1$1n = dist;
+	let RecordNotFoundError$1 = class RecordNotFoundError extends xrpc_1$1n.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getRecord$1.RecordNotFoundError = RecordNotFoundError$1;
+	let RepoNotFoundError$4 = class RepoNotFoundError extends xrpc_1$1n.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getRecord$1.RepoNotFoundError = RepoNotFoundError$4;
+	let RepoTakendownError$2 = class RepoTakendownError extends xrpc_1$1n.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getRecord$1.RepoTakendownError = RepoTakendownError$2;
+	let RepoSuspendedError$2 = class RepoSuspendedError extends xrpc_1$1n.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getRecord$1.RepoSuspendedError = RepoSuspendedError$2;
+	let RepoDeactivatedError$2 = class RepoDeactivatedError extends xrpc_1$1n.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getRecord$1.RepoDeactivatedError = RepoDeactivatedError$2;
+	function toKnownErr$1l(e) {
+	  if (e instanceof xrpc_1$1n.XRPCError) {
+	    if (e.error === 'RecordNotFound') return new RecordNotFoundError$1(e);
+	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$4(e);
+	    if (e.error === 'RepoTakendown') return new RepoTakendownError$2(e);
+	    if (e.error === 'RepoSuspended') return new RepoSuspendedError$2(e);
+	    if (e.error === 'RepoDeactivated') return new RepoDeactivatedError$2(e);
+	  }
 	  return e;
 	}
-	getRecord$1.toKnownErr = toKnownErr$1k;
+	getRecord$1.toKnownErr = toKnownErr$1l;
 
 	var getRepo$1 = {};
 
 	Object.defineProperty(getRepo$1, "__esModule", {
 	  value: true
 	});
-	getRepo$1.toKnownErr = void 0;
+	getRepo$1.toKnownErr = getRepo$1.RepoDeactivatedError = getRepo$1.RepoSuspendedError = getRepo$1.RepoTakendownError = getRepo$1.RepoNotFoundError = void 0;
+	/**
+	 * GENERATED CODE - DO NOT MODIFY
+	 */
+	const xrpc_1$1m = dist;
+	let RepoNotFoundError$3 = class RepoNotFoundError extends xrpc_1$1m.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getRepo$1.RepoNotFoundError = RepoNotFoundError$3;
+	let RepoTakendownError$1 = class RepoTakendownError extends xrpc_1$1m.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getRepo$1.RepoTakendownError = RepoTakendownError$1;
+	let RepoSuspendedError$1 = class RepoSuspendedError extends xrpc_1$1m.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getRepo$1.RepoSuspendedError = RepoSuspendedError$1;
+	let RepoDeactivatedError$1 = class RepoDeactivatedError extends xrpc_1$1m.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getRepo$1.RepoDeactivatedError = RepoDeactivatedError$1;
+	function toKnownErr$1k(e) {
+	  if (e instanceof xrpc_1$1m.XRPCError) {
+	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$3(e);
+	    if (e.error === 'RepoTakendown') return new RepoTakendownError$1(e);
+	    if (e.error === 'RepoSuspended') return new RepoSuspendedError$1(e);
+	    if (e.error === 'RepoDeactivated') return new RepoDeactivatedError$1(e);
+	  }
+	  return e;
+	}
+	getRepo$1.toKnownErr = toKnownErr$1k;
+
+	var getRepoStatus = {};
+
+	Object.defineProperty(getRepoStatus, "__esModule", {
+	  value: true
+	});
+	getRepoStatus.toKnownErr = getRepoStatus.RepoNotFoundError = void 0;
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
 	const xrpc_1$1l = dist;
+	let RepoNotFoundError$2 = class RepoNotFoundError extends xrpc_1$1l.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	getRepoStatus.RepoNotFoundError = RepoNotFoundError$2;
 	function toKnownErr$1j(e) {
-	  if (e instanceof xrpc_1$1l.XRPCError) ;
+	  if (e instanceof xrpc_1$1l.XRPCError) {
+	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$2(e);
+	  }
 	  return e;
 	}
-	getRepo$1.toKnownErr = toKnownErr$1j;
+	getRepoStatus.toKnownErr = toKnownErr$1j;
 
 	var listBlobs = {};
 
 	Object.defineProperty(listBlobs, "__esModule", {
 	  value: true
 	});
-	listBlobs.toKnownErr = void 0;
+	listBlobs.toKnownErr = listBlobs.RepoDeactivatedError = listBlobs.RepoSuspendedError = listBlobs.RepoTakendownError = listBlobs.RepoNotFoundError = void 0;
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
 	const xrpc_1$1k = dist;
+	let RepoNotFoundError$1 = class RepoNotFoundError extends xrpc_1$1k.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	listBlobs.RepoNotFoundError = RepoNotFoundError$1;
+	class RepoTakendownError extends xrpc_1$1k.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	}
+	listBlobs.RepoTakendownError = RepoTakendownError;
+	class RepoSuspendedError extends xrpc_1$1k.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	}
+	listBlobs.RepoSuspendedError = RepoSuspendedError;
+	class RepoDeactivatedError extends xrpc_1$1k.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	}
+	listBlobs.RepoDeactivatedError = RepoDeactivatedError;
 	function toKnownErr$1i(e) {
-	  if (e instanceof xrpc_1$1k.XRPCError) ;
+	  if (e instanceof xrpc_1$1k.XRPCError) {
+	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$1(e);
+	    if (e.error === 'RepoTakendown') return new RepoTakendownError(e);
+	    if (e.error === 'RepoSuspended') return new RepoSuspendedError(e);
+	    if (e.error === 'RepoDeactivated') return new RepoDeactivatedError(e);
+	  }
 	  return e;
 	}
 	listBlobs.toKnownErr = toKnownErr$1i;
@@ -26110,7 +26508,7 @@ if (cid) {
 	Object.defineProperty(subscribeRepos, "__esModule", {
 	  value: true
 	});
-	subscribeRepos.validateRepoOp = subscribeRepos.isRepoOp = subscribeRepos.validateInfo = subscribeRepos.isInfo = subscribeRepos.validateTombstone = subscribeRepos.isTombstone = subscribeRepos.validateMigrate = subscribeRepos.isMigrate = subscribeRepos.validateHandle = subscribeRepos.isHandle = subscribeRepos.validateIdentity = subscribeRepos.isIdentity = subscribeRepos.validateCommit = subscribeRepos.isCommit = void 0;
+	subscribeRepos.validateRepoOp = subscribeRepos.isRepoOp = subscribeRepos.validateInfo = subscribeRepos.isInfo = subscribeRepos.validateTombstone = subscribeRepos.isTombstone = subscribeRepos.validateMigrate = subscribeRepos.isMigrate = subscribeRepos.validateHandle = subscribeRepos.isHandle = subscribeRepos.validateAccount = subscribeRepos.isAccount = subscribeRepos.validateIdentity = subscribeRepos.isIdentity = subscribeRepos.validateCommit = subscribeRepos.isCommit = void 0;
 	const util_1$t = util$2;
 	const lexicons_1$s = lexicons;
 	function isCommit(v) {
@@ -26129,6 +26527,14 @@ if (cid) {
 	  return lexicons_1$s.lexicons.validate('com.atproto.sync.subscribeRepos#identity', v);
 	}
 	subscribeRepos.validateIdentity = validateIdentity;
+	function isAccount(v) {
+	  return (0, util_1$t.isObj)(v) && (0, util_1$t.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#account';
+	}
+	subscribeRepos.isAccount = isAccount;
+	function validateAccount(v) {
+	  return lexicons_1$s.lexicons.validate('com.atproto.sync.subscribeRepos#account', v);
+	}
+	subscribeRepos.validateAccount = validateAccount;
 	function isHandle(v) {
 	  return (0, util_1$t.isObj)(v) && (0, util_1$t.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#handle';
 	}
@@ -27509,10 +27915,10 @@ if (cid) {
 	  value: true
 	});
 	client$1.ComAtprotoServerGetAccountInviteCodes = client$1.ComAtprotoServerDescribeServer = client$1.ComAtprotoServerDeleteSession = client$1.ComAtprotoServerDeleteAccount = client$1.ComAtprotoServerDefs = client$1.ComAtprotoServerDeactivateAccount = client$1.ComAtprotoServerCreateSession = client$1.ComAtprotoServerCreateInviteCodes = client$1.ComAtprotoServerCreateInviteCode = client$1.ComAtprotoServerCreateAppPassword = client$1.ComAtprotoServerCreateAccount = client$1.ComAtprotoServerConfirmEmail = client$1.ComAtprotoServerCheckAccountStatus = client$1.ComAtprotoServerActivateAccount = client$1.ComAtprotoRepoUploadBlob = client$1.ComAtprotoRepoStrongRef = client$1.ComAtprotoRepoPutRecord = client$1.ComAtprotoRepoListRecords = client$1.ComAtprotoRepoListMissingBlobs = client$1.ComAtprotoRepoImportRepo = client$1.ComAtprotoRepoGetRecord = client$1.ComAtprotoRepoDescribeRepo = client$1.ComAtprotoRepoDeleteRecord = client$1.ComAtprotoRepoCreateRecord = client$1.ComAtprotoRepoApplyWrites = client$1.ComAtprotoModerationDefs = client$1.ComAtprotoModerationCreateReport = client$1.ComAtprotoLabelSubscribeLabels = client$1.ComAtprotoLabelQueryLabels = client$1.ComAtprotoLabelDefs = client$1.ComAtprotoIdentityUpdateHandle = client$1.ComAtprotoIdentitySubmitPlcOperation = client$1.ComAtprotoIdentitySignPlcOperation = client$1.ComAtprotoIdentityResolveHandle = client$1.ComAtprotoIdentityRequestPlcOperationSignature = client$1.ComAtprotoIdentityGetRecommendedDidCredentials = client$1.ComAtprotoAdminUpdateSubjectStatus = client$1.ComAtprotoAdminUpdateAccountPassword = client$1.ComAtprotoAdminUpdateAccountHandle = client$1.ComAtprotoAdminUpdateAccountEmail = client$1.ComAtprotoAdminSendEmail = client$1.ComAtprotoAdminGetSubjectStatus = client$1.ComAtprotoAdminGetInviteCodes = client$1.ComAtprotoAdminGetAccountInfos = client$1.ComAtprotoAdminGetAccountInfo = client$1.ComAtprotoAdminEnableAccountInvites = client$1.ComAtprotoAdminDisableInviteCodes = client$1.ComAtprotoAdminDisableAccountInvites = client$1.ComAtprotoAdminDeleteAccount = client$1.ComAtprotoAdminDefs = void 0;
-	client$1.AppBskyFeedGetFeedSkeleton = client$1.AppBskyFeedGetFeedGenerators = client$1.AppBskyFeedGetFeedGenerator = client$1.AppBskyFeedGetFeed = client$1.AppBskyFeedGetAuthorFeed = client$1.AppBskyFeedGetActorLikes = client$1.AppBskyFeedGetActorFeeds = client$1.AppBskyFeedGenerator = client$1.AppBskyFeedDescribeFeedGenerator = client$1.AppBskyFeedDefs = client$1.AppBskyEmbedRecordWithMedia = client$1.AppBskyEmbedRecord = client$1.AppBskyEmbedImages = client$1.AppBskyEmbedExternal = client$1.AppBskyActorSearchActorsTypeahead = client$1.AppBskyActorSearchActors = client$1.AppBskyActorPutPreferences = client$1.AppBskyActorProfile = client$1.AppBskyActorGetSuggestions = client$1.AppBskyActorGetProfiles = client$1.AppBskyActorGetProfile = client$1.AppBskyActorGetPreferences = client$1.AppBskyActorDefs = client$1.ComAtprotoTempRequestPhoneVerification = client$1.ComAtprotoTempFetchLabels = client$1.ComAtprotoTempCheckSignupQueue = client$1.ComAtprotoSyncSubscribeRepos = client$1.ComAtprotoSyncRequestCrawl = client$1.ComAtprotoSyncNotifyOfUpdate = client$1.ComAtprotoSyncListRepos = client$1.ComAtprotoSyncListBlobs = client$1.ComAtprotoSyncGetRepo = client$1.ComAtprotoSyncGetRecord = client$1.ComAtprotoSyncGetLatestCommit = client$1.ComAtprotoSyncGetHead = client$1.ComAtprotoSyncGetCheckout = client$1.ComAtprotoSyncGetBlocks = client$1.ComAtprotoSyncGetBlob = client$1.ComAtprotoServerUpdateEmail = client$1.ComAtprotoServerRevokeAppPassword = client$1.ComAtprotoServerResetPassword = client$1.ComAtprotoServerReserveSigningKey = client$1.ComAtprotoServerRequestPasswordReset = client$1.ComAtprotoServerRequestEmailUpdate = client$1.ComAtprotoServerRequestEmailConfirmation = client$1.ComAtprotoServerRequestAccountDelete = client$1.ComAtprotoServerRefreshSession = client$1.ComAtprotoServerListAppPasswords = client$1.ComAtprotoServerGetSession = client$1.ComAtprotoServerGetServiceAuth = void 0;
-	client$1.ChatBskyActorDeleteAccount = client$1.ChatBskyActorDefs = client$1.ChatBskyActorDeclaration = client$1.AppBskyUnspeccedSearchPostsSkeleton = client$1.AppBskyUnspeccedSearchActorsSkeleton = client$1.AppBskyUnspeccedGetTaggedSuggestions = client$1.AppBskyUnspeccedGetSuggestionsSkeleton = client$1.AppBskyUnspeccedGetPopularFeedGenerators = client$1.AppBskyUnspeccedDefs = client$1.AppBskyRichtextFacet = client$1.AppBskyNotificationUpdateSeen = client$1.AppBskyNotificationRegisterPush = client$1.AppBskyNotificationListNotifications = client$1.AppBskyNotificationGetUnreadCount = client$1.AppBskyLabelerService = client$1.AppBskyLabelerGetServices = client$1.AppBskyLabelerDefs = client$1.AppBskyGraphUnmuteActorList = client$1.AppBskyGraphUnmuteActor = client$1.AppBskyGraphMuteActorList = client$1.AppBskyGraphMuteActor = client$1.AppBskyGraphListitem = client$1.AppBskyGraphListblock = client$1.AppBskyGraphList = client$1.AppBskyGraphGetSuggestedFollowsByActor = client$1.AppBskyGraphGetRelationships = client$1.AppBskyGraphGetMutes = client$1.AppBskyGraphGetLists = client$1.AppBskyGraphGetListMutes = client$1.AppBskyGraphGetListBlocks = client$1.AppBskyGraphGetList = client$1.AppBskyGraphGetFollows = client$1.AppBskyGraphGetFollowers = client$1.AppBskyGraphGetBlocks = client$1.AppBskyGraphFollow = client$1.AppBskyGraphDefs = client$1.AppBskyGraphBlock = client$1.AppBskyFeedThreadgate = client$1.AppBskyFeedSendInteractions = client$1.AppBskyFeedSearchPosts = client$1.AppBskyFeedRepost = client$1.AppBskyFeedPost = client$1.AppBskyFeedLike = client$1.AppBskyFeedGetTimeline = client$1.AppBskyFeedGetSuggestedFeeds = client$1.AppBskyFeedGetRepostedBy = client$1.AppBskyFeedGetPosts = client$1.AppBskyFeedGetPostThread = client$1.AppBskyFeedGetListFeed = client$1.AppBskyFeedGetLikes = void 0;
-	client$1.ProfileRecord = client$1.AppBskyActorNS = client$1.AppBskyNS = client$1.AppNS = client$1.ComAtprotoTempNS = client$1.ComAtprotoSyncNS = client$1.ComAtprotoServerNS = client$1.ComAtprotoRepoNS = client$1.ComAtprotoModerationNS = client$1.ComAtprotoLabelNS = client$1.ComAtprotoIdentityNS = client$1.ComAtprotoAdminNS = client$1.ComAtprotoNS = client$1.ComNS = client$1.AtpServiceClient = client$1.AtpBaseClient = client$1.TOOLS_OZONE_MODERATION = client$1.APP_BSKY_GRAPH = client$1.APP_BSKY_FEED = client$1.COM_ATPROTO_MODERATION = client$1.ToolsOzoneModerationSearchRepos = client$1.ToolsOzoneModerationQueryStatuses = client$1.ToolsOzoneModerationQueryEvents = client$1.ToolsOzoneModerationGetRepo = client$1.ToolsOzoneModerationGetRecord = client$1.ToolsOzoneModerationGetEvent = client$1.ToolsOzoneModerationEmitEvent = client$1.ToolsOzoneModerationDefs = client$1.ToolsOzoneCommunicationUpdateTemplate = client$1.ToolsOzoneCommunicationListTemplates = client$1.ToolsOzoneCommunicationDeleteTemplate = client$1.ToolsOzoneCommunicationDefs = client$1.ToolsOzoneCommunicationCreateTemplate = client$1.ChatBskyModerationUpdateActorAccess = client$1.ChatBskyModerationGetMessageContext = client$1.ChatBskyModerationGetActorMetadata = client$1.ChatBskyConvoUpdateRead = client$1.ChatBskyConvoUnmuteConvo = client$1.ChatBskyConvoSendMessageBatch = client$1.ChatBskyConvoSendMessage = client$1.ChatBskyConvoMuteConvo = client$1.ChatBskyConvoListConvos = client$1.ChatBskyConvoLeaveConvo = client$1.ChatBskyConvoGetMessages = client$1.ChatBskyConvoGetLog = client$1.ChatBskyConvoGetConvoForMembers = client$1.ChatBskyConvoGetConvo = client$1.ChatBskyConvoDeleteMessageForSelf = client$1.ChatBskyConvoDefs = client$1.ChatBskyActorExportAccountData = void 0;
-	client$1.ToolsOzoneModerationNS = client$1.ToolsOzoneCommunicationNS = client$1.ToolsOzoneNS = client$1.ToolsNS = client$1.ChatBskyModerationNS = client$1.ChatBskyConvoNS = client$1.DeclarationRecord = client$1.ChatBskyActorNS = client$1.ChatBskyNS = client$1.ChatNS = client$1.AppBskyUnspeccedNS = client$1.AppBskyRichtextNS = client$1.AppBskyNotificationNS = client$1.ServiceRecord = client$1.AppBskyLabelerNS = client$1.ListitemRecord = client$1.ListblockRecord = client$1.ListRecord = client$1.FollowRecord = client$1.BlockRecord = client$1.AppBskyGraphNS = client$1.ThreadgateRecord = client$1.RepostRecord = client$1.PostRecord = client$1.LikeRecord = client$1.GeneratorRecord = client$1.AppBskyFeedNS = client$1.AppBskyEmbedNS = void 0;
+	client$1.AppBskyFeedGetFeedGenerators = client$1.AppBskyFeedGetFeedGenerator = client$1.AppBskyFeedGetFeed = client$1.AppBskyFeedGetAuthorFeed = client$1.AppBskyFeedGetActorLikes = client$1.AppBskyFeedGetActorFeeds = client$1.AppBskyFeedGenerator = client$1.AppBskyFeedDescribeFeedGenerator = client$1.AppBskyFeedDefs = client$1.AppBskyEmbedRecordWithMedia = client$1.AppBskyEmbedRecord = client$1.AppBskyEmbedImages = client$1.AppBskyEmbedExternal = client$1.AppBskyActorSearchActorsTypeahead = client$1.AppBskyActorSearchActors = client$1.AppBskyActorPutPreferences = client$1.AppBskyActorProfile = client$1.AppBskyActorGetSuggestions = client$1.AppBskyActorGetProfiles = client$1.AppBskyActorGetProfile = client$1.AppBskyActorGetPreferences = client$1.AppBskyActorDefs = client$1.ComAtprotoTempRequestPhoneVerification = client$1.ComAtprotoTempFetchLabels = client$1.ComAtprotoTempCheckSignupQueue = client$1.ComAtprotoSyncSubscribeRepos = client$1.ComAtprotoSyncRequestCrawl = client$1.ComAtprotoSyncNotifyOfUpdate = client$1.ComAtprotoSyncListRepos = client$1.ComAtprotoSyncListBlobs = client$1.ComAtprotoSyncGetRepoStatus = client$1.ComAtprotoSyncGetRepo = client$1.ComAtprotoSyncGetRecord = client$1.ComAtprotoSyncGetLatestCommit = client$1.ComAtprotoSyncGetHead = client$1.ComAtprotoSyncGetCheckout = client$1.ComAtprotoSyncGetBlocks = client$1.ComAtprotoSyncGetBlob = client$1.ComAtprotoServerUpdateEmail = client$1.ComAtprotoServerRevokeAppPassword = client$1.ComAtprotoServerResetPassword = client$1.ComAtprotoServerReserveSigningKey = client$1.ComAtprotoServerRequestPasswordReset = client$1.ComAtprotoServerRequestEmailUpdate = client$1.ComAtprotoServerRequestEmailConfirmation = client$1.ComAtprotoServerRequestAccountDelete = client$1.ComAtprotoServerRefreshSession = client$1.ComAtprotoServerListAppPasswords = client$1.ComAtprotoServerGetSession = client$1.ComAtprotoServerGetServiceAuth = void 0;
+	client$1.ChatBskyActorDefs = client$1.ChatBskyActorDeclaration = client$1.AppBskyUnspeccedSearchPostsSkeleton = client$1.AppBskyUnspeccedSearchActorsSkeleton = client$1.AppBskyUnspeccedGetTaggedSuggestions = client$1.AppBskyUnspeccedGetSuggestionsSkeleton = client$1.AppBskyUnspeccedGetPopularFeedGenerators = client$1.AppBskyUnspeccedDefs = client$1.AppBskyRichtextFacet = client$1.AppBskyNotificationUpdateSeen = client$1.AppBskyNotificationRegisterPush = client$1.AppBskyNotificationListNotifications = client$1.AppBskyNotificationGetUnreadCount = client$1.AppBskyLabelerService = client$1.AppBskyLabelerGetServices = client$1.AppBskyLabelerDefs = client$1.AppBskyGraphUnmuteActorList = client$1.AppBskyGraphUnmuteActor = client$1.AppBskyGraphMuteActorList = client$1.AppBskyGraphMuteActor = client$1.AppBskyGraphListitem = client$1.AppBskyGraphListblock = client$1.AppBskyGraphList = client$1.AppBskyGraphGetSuggestedFollowsByActor = client$1.AppBskyGraphGetRelationships = client$1.AppBskyGraphGetMutes = client$1.AppBskyGraphGetLists = client$1.AppBskyGraphGetListMutes = client$1.AppBskyGraphGetListBlocks = client$1.AppBskyGraphGetList = client$1.AppBskyGraphGetFollows = client$1.AppBskyGraphGetFollowers = client$1.AppBskyGraphGetBlocks = client$1.AppBskyGraphFollow = client$1.AppBskyGraphDefs = client$1.AppBskyGraphBlock = client$1.AppBskyFeedThreadgate = client$1.AppBskyFeedSendInteractions = client$1.AppBskyFeedSearchPosts = client$1.AppBskyFeedRepost = client$1.AppBskyFeedPost = client$1.AppBskyFeedLike = client$1.AppBskyFeedGetTimeline = client$1.AppBskyFeedGetSuggestedFeeds = client$1.AppBskyFeedGetRepostedBy = client$1.AppBskyFeedGetPosts = client$1.AppBskyFeedGetPostThread = client$1.AppBskyFeedGetListFeed = client$1.AppBskyFeedGetLikes = client$1.AppBskyFeedGetFeedSkeleton = void 0;
+	client$1.AppBskyActorNS = client$1.AppBskyNS = client$1.AppNS = client$1.ComAtprotoTempNS = client$1.ComAtprotoSyncNS = client$1.ComAtprotoServerNS = client$1.ComAtprotoRepoNS = client$1.ComAtprotoModerationNS = client$1.ComAtprotoLabelNS = client$1.ComAtprotoIdentityNS = client$1.ComAtprotoAdminNS = client$1.ComAtprotoNS = client$1.ComNS = client$1.AtpServiceClient = client$1.AtpBaseClient = client$1.TOOLS_OZONE_MODERATION = client$1.APP_BSKY_GRAPH = client$1.APP_BSKY_FEED = client$1.COM_ATPROTO_MODERATION = client$1.ToolsOzoneModerationSearchRepos = client$1.ToolsOzoneModerationQueryStatuses = client$1.ToolsOzoneModerationQueryEvents = client$1.ToolsOzoneModerationGetRepo = client$1.ToolsOzoneModerationGetRecord = client$1.ToolsOzoneModerationGetEvent = client$1.ToolsOzoneModerationEmitEvent = client$1.ToolsOzoneModerationDefs = client$1.ToolsOzoneCommunicationUpdateTemplate = client$1.ToolsOzoneCommunicationListTemplates = client$1.ToolsOzoneCommunicationDeleteTemplate = client$1.ToolsOzoneCommunicationDefs = client$1.ToolsOzoneCommunicationCreateTemplate = client$1.ChatBskyModerationUpdateActorAccess = client$1.ChatBskyModerationGetMessageContext = client$1.ChatBskyModerationGetActorMetadata = client$1.ChatBskyConvoUpdateRead = client$1.ChatBskyConvoUnmuteConvo = client$1.ChatBskyConvoSendMessageBatch = client$1.ChatBskyConvoSendMessage = client$1.ChatBskyConvoMuteConvo = client$1.ChatBskyConvoListConvos = client$1.ChatBskyConvoLeaveConvo = client$1.ChatBskyConvoGetMessages = client$1.ChatBskyConvoGetLog = client$1.ChatBskyConvoGetConvoForMembers = client$1.ChatBskyConvoGetConvo = client$1.ChatBskyConvoDeleteMessageForSelf = client$1.ChatBskyConvoDefs = client$1.ChatBskyActorExportAccountData = client$1.ChatBskyActorDeleteAccount = void 0;
+	client$1.ToolsOzoneModerationNS = client$1.ToolsOzoneCommunicationNS = client$1.ToolsOzoneNS = client$1.ToolsNS = client$1.ChatBskyModerationNS = client$1.ChatBskyConvoNS = client$1.DeclarationRecord = client$1.ChatBskyActorNS = client$1.ChatBskyNS = client$1.ChatNS = client$1.AppBskyUnspeccedNS = client$1.AppBskyRichtextNS = client$1.AppBskyNotificationNS = client$1.ServiceRecord = client$1.AppBskyLabelerNS = client$1.ListitemRecord = client$1.ListblockRecord = client$1.ListRecord = client$1.FollowRecord = client$1.BlockRecord = client$1.AppBskyGraphNS = client$1.ThreadgateRecord = client$1.RepostRecord = client$1.PostRecord = client$1.LikeRecord = client$1.GeneratorRecord = client$1.AppBskyFeedNS = client$1.AppBskyEmbedNS = client$1.ProfileRecord = void 0;
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
@@ -27581,6 +27987,7 @@ if (cid) {
 	const ComAtprotoSyncGetLatestCommit = __importStar(getLatestCommit);
 	const ComAtprotoSyncGetRecord = __importStar(getRecord$1);
 	const ComAtprotoSyncGetRepo = __importStar(getRepo$1);
+	const ComAtprotoSyncGetRepoStatus = __importStar(getRepoStatus);
 	const ComAtprotoSyncListBlobs = __importStar(listBlobs);
 	const ComAtprotoSyncListRepos = __importStar(listRepos);
 	const ComAtprotoSyncNotifyOfUpdate = __importStar(notifyOfUpdate);
@@ -27733,6 +28140,7 @@ if (cid) {
 	client$1.ComAtprotoSyncGetLatestCommit = __importStar(getLatestCommit);
 	client$1.ComAtprotoSyncGetRecord = __importStar(getRecord$1);
 	client$1.ComAtprotoSyncGetRepo = __importStar(getRepo$1);
+	client$1.ComAtprotoSyncGetRepoStatus = __importStar(getRepoStatus);
 	client$1.ComAtprotoSyncListBlobs = __importStar(listBlobs);
 	client$1.ComAtprotoSyncListRepos = __importStar(listRepos);
 	client$1.ComAtprotoSyncNotifyOfUpdate = __importStar(notifyOfUpdate);
@@ -28424,6 +28832,11 @@ if (cid) {
 	  getRepo(params, opts) {
 	    return this._service.xrpc.call('com.atproto.sync.getRepo', params, undefined, opts).catch(e => {
 	      throw ComAtprotoSyncGetRepo.toKnownErr(e);
+	    });
+	  }
+	  getRepoStatus(params, opts) {
+	    return this._service.xrpc.call('com.atproto.sync.getRepoStatus', params, undefined, opts).catch(e => {
+	      throw ComAtprotoSyncGetRepoStatus.toKnownErr(e);
 	    });
 	  }
 	  listBlobs(params, opts) {
@@ -30079,7 +30492,8 @@ if (cid) {
 	        did: res.data.did,
 	        email: opts.email,
 	        emailConfirmed: false,
-	        emailAuthFactor: false
+	        emailAuthFactor: false,
+	        active: true
 	      };
 	      this._updateApiEndpoint(res.data.didDoc);
 	      return res;
@@ -30111,7 +30525,9 @@ if (cid) {
 	        did: res.data.did,
 	        email: res.data.email,
 	        emailConfirmed: res.data.emailConfirmed,
-	        emailAuthFactor: res.data.emailAuthFactor
+	        emailAuthFactor: res.data.emailAuthFactor,
+	        active: res.data.active ?? true,
+	        status: res.data.status
 	      };
 	      this._updateApiEndpoint(res.data.didDoc);
 	      return res;
@@ -30140,6 +30556,8 @@ if (cid) {
 	      this.session.handle = res.data.handle;
 	      this.session.emailConfirmed = res.data.emailConfirmed;
 	      this.session.emailAuthFactor = res.data.emailAuthFactor;
+	      this.session.active = res.data.active ?? true;
+	      this.session.status = res.data.status;
 	      this._updateApiEndpoint(res.data.didDoc);
 	      this._persistSession?.('update', this.session);
 	      return res;
@@ -41882,7 +42300,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.36";
+	var version = "0.2.37";
 
 	// @ts-check
 
@@ -50703,6 +51121,9 @@ if (cid) {
 
 	  /** @type {Map<string, number>} */
 	  let latestRelevantPostForThreadRootUri = new Map();
+
+	  /** @type {import('.').IncrementalMatchThreadResult | undefined} */
+	  let report;
 	  const searchPostIterator = searchAccountHistoryPostsIncrementally({
 	    ...args,
 	    shortDID,
@@ -50731,9 +51152,18 @@ if (cid) {
 	      dummyBatch.cachedOnly = entries.cachedOnly;
 	      dummyBatch.processedAllCount = entries.processedAllCount;
 	      dummyBatch.processedBatch = entries.processedBatch;
+	      if (!report) report = dummyBatch;
 	      yield dummyBatch;
 	    }
 	  }
+
+	  /** @type {import('.').IncrementalMatchThreadResult} */
+	  const completeReport = report ? report.slice() : [];
+	  completeReport.cachedOnly = false;
+	  completeReport.processedAllCount = report ? report.processedAllCount : 0;
+	  completeReport.processedBatch = report?.processedBatch;
+	  completeReport.complete = true;
+	  yield completeReport;
 
 	  /**
 	   * @param {import('.').IncrementalMatchCompactPosts} entries
