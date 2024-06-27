@@ -25,7 +25,7 @@ export function Timeline({ shortDID, searchQuery }) {
     () => getTimeline(shortDID, searchQuery));
 
   if (retrieved?.cachedOnly) {
-    setTimeout(next, 300);
+    setTimeout(next, 800 + Math.random() * 400);
   }
 
   return (
@@ -37,7 +37,7 @@ export function Timeline({ shortDID, searchQuery }) {
             <ThreadView
               key={i}
               thread={thread}
-              shortDID={shortDID}
+              significantPost={post => !!post.matches?.length}
               linkTimestamp={true}
               linkAuthor={true}
             />
@@ -141,6 +141,7 @@ export function Timeline({ shortDID, searchQuery }) {
       let historicalPostThreads = [];
       /** @type {Set<string>} */
       const seenPosts = new Set();
+      let livePosts = false;
 
       for await (const entries of db.searchPostsIncrementally(shortDID, searchQuery)) {
         if (!entries?.length) continue;
@@ -171,8 +172,14 @@ export function Timeline({ shortDID, searchQuery }) {
           };
 
           historicalPostThreads.push(postThreadRetrieved);
+          if (!livePosts) {
+            historicalPostThreads.sort((t1, t2) => (t2.current.asOf || 0) - (t1.current.asOf || 0));
+          }
+
           yield { timeline: historicalPostThreads, cachedOnly: entries.cachedOnly, complete: false };
         }
+
+        livePosts = !entries.cachedOnly;
       }
       console.log('timeline to end...');
 

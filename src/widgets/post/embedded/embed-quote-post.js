@@ -15,7 +15,13 @@ import { Post } from '../post';
  */
 export function EmbedQuotePost({ className, parentPost, post, ...rest }) {
   return (
-    <Post className={className} post={post} {...rest} />
+    <Post
+      className={className}
+      post={post}
+      indicateLeadsFromThread
+      indicateTrailsFromThread
+      {...rest}
+    />
   );
 }
 
@@ -50,6 +56,8 @@ export function EmbedQuotePostMultiple({ className, parentPost, posts, compact, 
           post={post}
           compact={compact}
           allowEmbedDepth={allowEmbedDepth}
+          indicateLeadsFromThread
+          indicateTrailsFromThread
         />
       ))}
     </div>

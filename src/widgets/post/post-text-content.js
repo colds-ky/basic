@@ -56,12 +56,8 @@ export function PostTextContent({ post }) {
                         break;
                       } else if (matchLength > 3) {
                         const subMatch = w.indexOf(str) >= 0 || str.indexOf(w) >= 0;
-                        const lengthRatio = Math.min(w.length, matchLength) / Math.max(w.length, matchLength);
-                        if (lengthRatio > 0.9 && subMatch) {
+                        if (subMatch) {
                           matchHighlyRelevant = true;
-                          break;
-                        } else if (lengthRatio > 0.5 && subMatch) {
-                          matchRelevant = true;
                           break;
                         }
                       }

@@ -30,7 +30,9 @@ const DEFAULT_EMBED_DEPTH = 25;
  *  compact?: boolean,
  *  linkTimestamp?: boolean,
  *  linkAuthor?: boolean,
- *  allowEmbedDepth?: number
+ *  allowEmbedDepth?: number,
+ *  indicateLeadsFromThread?: boolean | import('../../../coldsky/lib').CompactThreadPostSet,
+ *  indicateTrailsFromThread?: boolean | import('../../../coldsky/lib').CompactThreadPostSet,
  * }} _
  */
 export function Post({ className, post, compact, linkTimestamp, linkAuthor, allowEmbedDepth, ...rest }) {

@@ -281,6 +281,16 @@
   position: relative;
   border-right: solid 1px #e5e5e5;
 }
+.post-embeds-section .post-embed-link .post-embed-link-description {
+  padding-top: 0.2em;
+  padding-left: 1em;
+  padding-bottom: 0.5em;
+  max-height: 6.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 90%;
+  color: #3d3d3d;
+}
 .post-embeds-section .post-embed-image-and-description .post-embed-image-description,
 .post-embeds-section .post-embed-link-image-and-description .post-embed-link-description {
   position: absolute;

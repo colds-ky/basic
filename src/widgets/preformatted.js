@@ -72,7 +72,7 @@ export function PreFormatted({
       lineBreakCount = 0;
 
       const currentClassName = typeof charClass === 'function' ? charClass(offset, text, cp) || '' : '';
-      if (String(currentClassName) !== String(spanClassName)) {
+      if (currentClassName?.toString() !== spanClassName?.toString()) {
         if (spanStart < offset) {
           let spanText = text.slice(spanStart, offset).replace('  ', '\u00A0 ');
           if (!paragraphs.length && !spans.length) spanText = spanText.trimStart();

@@ -28,7 +28,7 @@ export function EmbedImages({ className, post, images, ...rest }) {
                 <span className='post-embed-image-description-wrapper'>
                   <span className='post-embed-image-description'>
                     <PreFormatted text={image.description} />
-                    </span>
+                  </span>
                 </span>
                 <span className='post-embed-image-wrapper'>
                   <img className='post-embed-image' src={image.imgSrc} />

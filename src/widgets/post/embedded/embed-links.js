@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { EmbedFrame } from './embed-frame';
+import { PreFormatted } from '../../preformatted';
 
 /**
  * @param {{
@@ -41,15 +42,15 @@ export function EmbedLinks({ className, post, links, ...rest }) {
                       <img className='post-embed-link-image' src={link.imgSrc} />
                     </span> :
                     !link.imgSrc ?
-                      <span className='post-embed-link-description'>
-                        {link.description}
-                      </span> :
+                      <div className='post-embed-link-description'>
+                        <PreFormatted text={link.description} />
+                      </div> :
                       <div className={alternateSideNext ?
                         'post-embed-link-image-and-description post-embed-link-image-and-description-alternate' :
                         'post-embed-link-image-and-description'}>
                         <span className='post-embed-link-description-wrapper'>
                           <span className='post-embed-link-description'>
-                            {link.description}
+                            <PreFormatted text={link.description} />
                           </span>
                         </span>
                         <span className='post-embed-link-image-wrapper'>

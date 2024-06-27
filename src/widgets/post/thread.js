@@ -13,12 +13,13 @@ import './thread.css';
 /**
  * @param {{
  *  className?: string,
+ *  significantPost?: (post: import('./post-text-content').MatchCompactPost) => boolean | null | undefined,
  *  uri: string,
  *  linkTimestamp?: boolean,
  *  linkAuthor?: boolean
  * }} _
  */
-export function Thread({ className, uri, linkTimestamp, linkAuthor, ...rest }) {
+export function Thread({ className, uri, ...rest }) {
   const db = useDB();
 
   const thread = forAwait(uri, () => db.getPostThreadIncrementally(uri));
@@ -30,10 +31,7 @@ export function Thread({ className, uri, linkTimestamp, linkAuthor, ...rest }) {
       </div> :
     <ThreadView
       className={'thread ' + (className || '')}
-      shortDID={thread.current.shortDID}
       thread={thread}
-      linkAuthor={linkAuthor}
-      linkTimestamp={linkTimestamp}
       {...rest}
     />
   );
@@ -42,20 +40,20 @@ export function Thread({ className, uri, linkTimestamp, linkAuthor, ...rest }) {
 /**
  * @param {{
  *  className?: string,
- *  shortDID: string,
+ *  significantPost?: (post: import('./post-text-content').MatchCompactPost) => boolean | null | undefined,
  *  thread: import('../../../coldsky/lib').CompactThreadPostSet,
  *  underPrevious?: boolean,
  *  linkTimestamp?: boolean,
  *  linkAuthor?: boolean
  * }} _
  */
-export function ThreadView({ className, shortDID, thread, underPrevious, linkTimestamp, linkAuthor, ...rest }) {
-  const root = layoutThread(shortDID, thread);
+export function ThreadView({ className, significantPost, thread, underPrevious, linkTimestamp, linkAuthor, ...rest }) {
+  const root = layoutThread(thread, significantPost);
 
   return (
     <SubThread
       className={'thread-view ' + (className || '')}
-      shortDID={shortDID}
+      significantPost={significantPost || (post => post.shortDID === thread.current.shortDID)}
       node={root}
       underPrevious={underPrevious}
       linkTimestamp={linkTimestamp}
@@ -75,7 +73,7 @@ export function ThreadView({ className, shortDID, thread, underPrevious, linkTim
 /**
  * @param {{
  *  className?: string,
- *  shortDID: string,
+ *  significantPost?: (post: import('./post-text-content').MatchCompactPost) => boolean | null | undefined,
  *  node: PostNode,
  *  underPrevious?: boolean,
  *  linkTimestamp?: boolean,
@@ -84,7 +82,7 @@ export function ThreadView({ className, shortDID, thread, underPrevious, linkTim
  */
 function SubThread({
   className,
-  shortDID,
+  significantPost,
   node,
   underPrevious,
   linkTimestamp,
@@ -105,7 +103,7 @@ function SubThread({
         node.children.map((child, i) => (
           <CollapsedOrExpandedSubThread
             key={i}
-            shortDID={shortDID}
+            significantPost={significantPost}
             node={child}
             underPrevious={!i}
             linkTimestamp={linkTimestamp}
@@ -119,18 +117,18 @@ function SubThread({
 
 /**
  * @param {{
- *  shortDID: string,
+ *  significantPost?: (post: import('./post-text-content').MatchCompactPost) => boolean | null | undefined,
  *  node: PostNode,
  *  underPrevious?: boolean,
  *  linkTimestamp?: boolean,
  *  linkAuthor?: boolean
  * }} _
  */
-function CollapsedOrExpandedSubThread({ shortDID, node, underPrevious, linkTimestamp, linkAuthor }) {
+function CollapsedOrExpandedSubThread({ significantPost, node, underPrevious, linkTimestamp, linkAuthor }) {
   let collapsedChunk = [];
   let nextNode = node;
   while (true) {
-    if (nextNode.post.shortDID === shortDID || nextNode.children.length != 1) break;
+    if (significantPost?.(nextNode.post) || nextNode.children.length != 1) break;
     collapsedChunk.push(nextNode.post);
     nextNode = nextNode.children[0];
   }
@@ -138,7 +136,7 @@ function CollapsedOrExpandedSubThread({ shortDID, node, underPrevious, linkTimes
   if (collapsedChunk.length === 0) {
     return (
       <SubThread
-        shortDID={shortDID}
+        significantPost={significantPost}
         node={node}
         underPrevious={underPrevious}
         linkTimestamp={linkTimestamp}
@@ -152,7 +150,7 @@ function CollapsedOrExpandedSubThread({ shortDID, node, underPrevious, linkTimes
           children={collapsedChunk}
         />
         <SubThread
-          shortDID={shortDID}
+          significantPost={significantPost}
           node={nextNode}
           linkTimestamp={linkTimestamp}
           linkAuthor={linkAuthor}
@@ -257,33 +255,33 @@ function CollapsedManyPosts({ posts }) {
 }
 
 /**
- * @param {string} shortDID
  * @param {import('../../../coldsky/lib').CompactThreadPostSet} thread
+ * @param {(post: import('./post-text-content').MatchCompactPost) => boolean | null | undefined} [significantPost]
  */
-function layoutThread(shortDID, thread) {
+function layoutThread(thread, significantPost) {
   /** @type {Map<string, import('../../../coldsky/lib').CompactPost>} */
   const allPosts = new Map();
 
   /** @type {Map<string, import('../../../coldsky/lib').CompactPost>} */
-  const ownPosts = new Map();
+  const significantPosts = new Map();
   for (const post of thread.all) {
     allPosts.set(post.uri, post);
-    if (post.shortDID === shortDID) {
-      ownPosts.set(post.uri, post);
+    if (significantPost?.(post)) {
+      significantPosts.set(post.uri, post);
     }
   }
 
-  if (thread.root.shortDID === shortDID) {
-    ownPosts.set(thread.root.uri, thread.root);
+  if (significantPost?.(thread.root)) {
+    significantPosts.set(thread.root.uri, thread.root);
     allPosts.set(thread.root.uri, thread.root);
   }
 
-  if (thread.current.shortDID === shortDID) {
-    ownPosts.set(thread.current.uri, thread.current);
+  if (significantPost?.(thread.current)) {
+    significantPosts.set(thread.current.uri, thread.current);
     allPosts.set(thread.current.uri, thread.current);
   }
 
-  const ownEearlyFirst = [...ownPosts.values()].sort((p1, p2) => (p2.asOf || 0) - (p1.asOf || 0));
+  const ownEearlyFirst = [...significantPosts.values()].sort((p1, p2) => (p2.asOf || 0) - (p1.asOf || 0));
 
   /** @type {PostNode} */
   let root = {
@@ -293,7 +291,7 @@ function layoutThread(shortDID, thread) {
   /** @type {Map<string, PostNode>} */
   const nodeByUri = new Map();
 
-  ownPosts.delete(thread.root.uri);
+  significantPosts.delete(thread.root.uri);
   nodeByUri.set(thread.root.uri, root);
 
   while (true) {

@@ -14,7 +14,7 @@ import {
 import { createTheme, ThemeProvider } from '@mui/material';
 import { Landing } from './landing';
 import { History } from './history';
-import { breakFeedUri, breakPostURL, defineCachedStore } from '../coldsky/lib';
+import { breakFeedUri, breakPostURL, defineCachedStore, detectProfileURL } from '../coldsky/lib';
 
 /** @typedef {ReturnType<typeof defineCachedStore>} DBAccess */
 var db;
@@ -53,8 +53,18 @@ function runApp() {
     path = path.replace(/^\/+/g, '').replace(/\/+$/g, '');
     if (!path) return exit('/');
 
-    const postURL = breakFeedUri(path) || breakPostURL(path);
+    const pathWithQuery = location.search ? path + location.search : path;
+
+    const postURL =
+      breakFeedUri(path) || breakPostURL(path) ||
+      breakFeedUri(pathWithQuery) || breakPostURL(pathWithQuery);
     if (postURL) return exit(`/${postURL.shortDID}/${postURL.postID}`);
+
+    const profileURL =
+      detectProfileURL(path) ||
+      detectProfileURL(pathWithQuery);
+
+    if (profileURL) return exit(`/${profileURL}`);
     if (path.indexOf('/') < 0) return exit('/' + path);
     else return exit('/?q=' + path);
   };
