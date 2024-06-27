@@ -46,8 +46,18 @@ body {
 }
 </style>
 <script>
-if (/oyin\.bo|mihailik/i.test(location.hostname)) document.write('<base href="/receipts">');
-else if (location.pathname!=='/') document.write('<base href="/">');
+(function() {
+  const baseHref= 
+    /oyin\.bo|mihailik/i.test(location.hostname) ? '/receipts' :
+    location.pathname!=='/' ? '/' :
+    '';
+
+    if (baseHref) document.write('<base href="' + baseHref + '">');
+    const localPath = (location.pathname + '').slice(baseHref.length).replace(/^\/+/, '');
+    if (localPath) {
+      document.documentElement.classList.add('account');
+    }
+})()
 </script>
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto Sans Math">
