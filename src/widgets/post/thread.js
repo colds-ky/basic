@@ -23,7 +23,7 @@ import { useMatches } from 'react-router-dom';
  *  linkAuthor?: boolean
  * }} _
  */
-export function Thread({ className, uri, ...rest }) {
+export function Thread({ className, significantPost, uri, linkTimestamp, linkAuthor, ...rest }) {
   const db = useDB();
 
   const thread = forAwait(uri, () => db.getPostThreadIncrementally(uri));
@@ -33,12 +33,15 @@ export function Thread({ className, uri, ...rest }) {
       <div className='thread-loading-placeholder' {...rest}>
         {localise('Loading thread...', { uk: 'Завантаження дискусії...' })}
       </div> :
-    <ThreadView
-      className={'thread ' + (className || '')}
-      thread={thread}
-      unrollMainConversation
-      {...rest}
-    />
+      <ThreadView
+        className={'thread ' + (className || '')}
+        significantPost={significantPost}
+        thread={thread}
+        unrollMainConversation
+        linkTimestamp={linkTimestamp}
+
+        {...rest}
+      />
   );
 }
 

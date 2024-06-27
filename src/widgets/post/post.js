@@ -42,7 +42,10 @@ export function Post({
   linkTimestamp,
   linkAuthor,
   allowEmbedDepth,
-  indicateEmbedding, ...rest }) {
+  indicateEmbedding,
+  indicateLeadsFromThread,
+  indicateTrailsFromThread,
+  ...rest }) {
   const nextAllowEmbedDepth = typeof allowEmbedDepth === 'number' ? allowEmbedDepth - 1 : DEFAULT_EMBED_DEPTH;
   return (
     <PostFrame className={className} {...rest}>
@@ -64,6 +67,9 @@ export function Post({
             allowEmbedDepth={nextAllowEmbedDepth}
             indicateEmbedding={indicateEmbedding}
           />
+        // indicateLeadsFromThread={indicateLeadsFromThread}
+        // indicateTrailsFromThread={indicateTrailsFromThread}
+
       }
     </PostFrame>
   );
