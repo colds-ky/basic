@@ -2,15 +2,16 @@
 
 import React from 'react';
 import { forAwait, useForAwait } from '../../coldsky/src/api/forAwait';
-import { getProfileHistory } from '../api/record-cache';
 import { Visible } from '../widgets/visible';
+import { useDB } from '..';
 
 /**
  * @param {{
- *  shortDID: string
+ *  shortDID?: string
  * }} _
  */
 export function Timeline({ shortDID }) {
+  const db = useDB();
 
   const [{ timeline } = {}, next] = useForAwait(shortDID, getTimeline);
 
@@ -39,15 +40,18 @@ export function Timeline({ shortDID }) {
       </Visible>
     </>
   );
-}
 
-async function* getTimeline(shortDID) {
-  try {
-    for await (const timeline of getProfileHistory(shortDID)) {
-      yield { timeline };
+
+  async function* getTimeline(shortDID) {
+    try {
+      const entries = await db.searchPosts(shortDID);
+      yield { timeline: entries };
+      // for await (const timeline of db.searchPosts(shortDID)) {
+      //   yield { timeline };
+      // }
+      console.log('timeline to end...');
+    } finally {
+      console.log('timeline finally');
     }
-    console.log('timeline to end...');
-  } finally {
-    console.log('timeline finally');
   }
 }

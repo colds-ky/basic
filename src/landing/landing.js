@@ -12,6 +12,7 @@ import { localise } from '../localise';
 import { AccountLabel } from '../widgets/account';
 import { searchAccounts } from '../api/search';
 import { useDB } from '..';
+import { replaceIcon } from '../icon-inject';
 
 export const uppercase_GIST = localise('𝓖𝓘𝓢𝓣', { uk: '𝓷𝓮𝓹𝓮𝓬𝔂𝓰' });
 
@@ -19,6 +20,7 @@ export function Landing() {
   useEffect(() => {
     document.documentElement.classList.remove('account');
     document.title = uppercase_GIST;
+    replaceIcon(null);
   });
 
   return (
@@ -45,7 +47,7 @@ export function LandingCore() {
 
     timeout.timeout = setTimeout(async () => {
       setSearchParams({ q: searchText });
-      for await (const searchResults of searchAccounts({ text: searchText, db })) {
+      for await (const searchResults of db.searchProfilesIncrementally(searchText)) {
         if (timeout.searchText !== searchText) return;
         setSearchResults(searchResults);
       }

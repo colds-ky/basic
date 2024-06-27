@@ -11,29 +11,26 @@ import { BSKY_PUBLIC_URL } from '../../coldsky/lib/coldsky-agent';
 
 
 /**
- * @param {ReturnType<typeof defineCacheIndexedDBStore>} db
- * @returns {AsyncIterable<ThreadViewPost[]>}
+ * @param {import('..').DBAccess} db
+ * @returns {AsyncIterable<import('../../coldsky/lib').CompactThreadPostSet[]>}
  */
 export function firehoseThreads(db) {
   return streamBuffer(
     /**
-     * @param {import('../../coldsky/src/api/akpa').StreamParameters<ThreadViewPost, ThreadViewPost[]>} streaming 
+     * @param {import('../../coldsky/src/api/akpa').StreamParameters<import('../../coldsky/lib').CompactThreadPostSet, import('../../coldsky/lib').CompactThreadPostSet[]>} streaming 
      */
     async streaming => {
-      const publicAgent = new ColdskyAgent({
-        service: BSKY_PUBLIC_URL
-      });
 
       const getPostThreadCached = throttledAsyncCache(
-        (uri) => {
+        async (uri) => {
           if (streaming.isEnded) return;
-          return publicAgent.getPostThread({ uri }).then(res => {
-            const threadView = res?.data?.thread;
-            if (threadView.post) db.captureThreadView(
-              /** @type {ThreadViewPost} */(threadView),
-              Date.now());
-            return threadView;
-          });
+          let lastUpdatedThread;
+          for await (const thread of db.getPostThreadIncrementally(uri)) {
+            if (streaming.isEnded) return;
+
+            if (thread) lastUpdatedThread = thread;
+          }
+          return lastUpdatedThread;
         });
 
       keepMonitoringFirehose();
@@ -42,23 +39,22 @@ export function firehoseThreads(db) {
       console.log('firehoseThreads ended');
 
       async function keepMonitoringFirehose() {
-        for await (const chunk of firehose()) {
+        for await (const chunk of db.firehose()) {
           if (streaming.isEnded) break;
-          for (const entry of chunk) {
-            for (const msg of entry.messages) {
-              db.captureRecord(msg, entry.receiveTimestamp);
-              switch (msg.$type) {
-                case 'app.bsky.feed.like': handleLike(msg); continue;
-                case 'app.bsky.feed.post': handlePost(msg); continue;
-                case 'app.bsky.feed.repost': handleRepost(msg); continue;
-              }
+          for (const msg of chunk.messages) {
+            switch (msg.$type) {
+              case 'app.bsky.feed.like': handleLike(msg); continue;
+              case 'app.bsky.feed.post': handlePost(msg); continue;
+              case 'app.bsky.feed.repost': handleRepost(msg); continue;
             }
           }
         }
       }
-      
+
+      /**
+       * @param {import('../../coldsky/lib').CompactThreadPostSet} thread 
+       */
       function yieldThread(thread) {
-        cacheAllMentionedAccounts(thread);
         streaming.yield(thread, buf => {
           if (!buf) return [thread];
           buf.push(thread);
@@ -67,14 +63,7 @@ export function firehoseThreads(db) {
       }
 
       /**
-       * @param {ThreadViewPost} thread
-       */
-      function cacheAllMentionedAccounts(thread) {
-        db.captureThreadView(thread, Date.now());
-      }
-
-      /**
-       * @param {import('../../coldsky/lib/firehose').FirehoseMessageOfType<'app.bsky.feed.like'>} msg 
+       * @param {import('../../coldsky/lib/firehose').FirehoseRecord$Typed<'app.bsky.feed.like'>} msg 
        */
       async function handleLike(msg) {
         const thread = await getPostThreadCached(msg.subject.uri);
@@ -83,7 +72,7 @@ export function firehoseThreads(db) {
       }
 
       /**
-       * @param {import('../../coldsky/lib/firehose').FirehoseMessageOfType<'app.bsky.feed.post'>} msg 
+       * @param {import('../../coldsky/lib/firehose').FirehoseRecord$Typed<'app.bsky.feed.post'>} msg 
        */
       async function handlePost(msg) {
         const thread = await getPostThreadCached('at://' + msg.repo + '/' + msg.path);
@@ -92,7 +81,7 @@ export function firehoseThreads(db) {
       }
 
       /**
-       * @param {import('../../coldsky/lib/firehose').FirehoseMessageOfType<'app.bsky.feed.repost'>} msg 
+       * @param {import('../../coldsky/lib/firehose').FirehoseRecord$Typed<'app.bsky.feed.repost'>} msg 
        */
       async function handleRepost(msg) {
         const thread = await getPostThreadCached(msg.subject.uri);

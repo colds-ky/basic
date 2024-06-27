@@ -9,6 +9,7 @@ import { forAwait } from '../../coldsky/src/api/forAwait';
 import { AccountLabel } from '../widgets/account';
 import { useNavigate } from 'react-router-dom';
 import { useDB } from '..';
+import { makeFeedUri } from '../../coldsky/lib';
 
 const POST_DEBOUNCE_MSEC = 5000;
 const POST_MAX_AGE = 1000 * 40;
@@ -24,7 +25,7 @@ export function FunBackground() {
 
         {
           bestThreads && bestThreads.map((thread, i) => (
-            <ThreadBubble key={thread?.post?.uri || 'undefined'}
+            <ThreadBubble key={(thread?.current?.shortDID + thread?.current?.rev) || 'undefined'}
               thread={thread}
             />
           ))
@@ -36,7 +37,7 @@ export function FunBackground() {
 }
 
 /**
- * @param {ReturnType<typeof import('../../coldsky').defineCacheIndexedDBStore>} db
+ * @param {import('..').DBAccess} db
  */
 async function* getFirehoseThreads(db) {
 
@@ -44,17 +45,20 @@ async function* getFirehoseThreads(db) {
   const seenPostWhen = new Map();
 
   /**
-   * @type {import('../api/firehose-threads').ThreadViewPost[]}
+   * @type {import('../../coldsky/lib').CompactThreadPostSet[]}
    */
   let bestCurrentThreads = [];
 
   for await (const chunk of firehoseThreads(db)) {
+    /** @type {import('../../coldsky/lib').CompactThreadPostSet[]} */
     const bestThreads = [];
     const now = Date.now();
 
     const threadTooOld = now - POST_MAX_AGE;
     for (const oldThread of bestCurrentThreads) {
-      if (seenPostWhen.get(oldThread.post.uri) > threadTooOld) {
+      const currentURI = makeFeedUri(oldThread.current.shortDID, oldThread.current.rev);
+      const seen = seenPostWhen.get(currentURI);
+      if (seen && seen > threadTooOld) {
         bestThreads.push(oldThread);
       }
     }
@@ -62,21 +66,22 @@ async function* getFirehoseThreads(db) {
     const newThreads = [];
 
     for (const thread of chunk) {
-      if (!thread?.post?.record.text) continue;
-      if (seenPostWhen.has(thread?.post?.uri)) continue;
-      seenPostWhen.set(thread?.post?.uri, now);
+      if (!thread?.current?.text) continue;
+      const currentURI = makeFeedUri(thread.current.shortDID, thread.current.rev);
+      if (seenPostWhen.has(currentURI)) continue;
+      seenPostWhen.set(currentURI, now);
 
       newThreads.push(thread);
     }
 
     newThreads.sort((t1, t2) => {
       const likes1 =
-        (t1.post?.likeCount || 0) +
-        (t2.parent?.post?.likeCount || 0);
+        (t1.current?.likeCount || 0) +
+        (t1.root?.likeCount || 0);
 
       const likes2 =
-        (t2.post?.likeCount || 0) +
-        (t1.parent?.post?.likeCount || 0);
+        (t2.current?.likeCount || 0) +
+        (t2.root?.likeCount || 0);
 
       return likes2 - likes1;
     });
@@ -96,11 +101,12 @@ async function* getFirehoseThreads(db) {
 
 /**
  * @param {{
- *  thread: import('@atproto/api/dist/client/types/app/bsky/feed/defs').ThreadViewPost
+ *  thread: import('../../coldsky/lib').CompactThreadPostSet
  * }} _ 
  */
 function ThreadBubble({ thread }) {
-  const hash = calcHash(thread?.post?.uri);
+  const db = useDB();
+  const hash = calcHash(thread?.current?.shortDID + ' ' + thread?.current?.rev);
   let rnd = nextRandom(Math.abs(hash / 1000 + hash));
   const slideDuration = 20 + rnd * 30; 
   rnd = nextRandom(rnd);
@@ -117,25 +123,30 @@ function ThreadBubble({ thread }) {
         animationDuration: `${slideDuration.toFixed(2)}s`,
         left: `${left.toFixed(2)}%`
       }}
-      onClick={() => {
-        navigate(thread.post.author.handle);
+      onClick={async () => {
+        for await (const profile of db.getProfileIncrementally(thread.current.shortDID)) {
+          if (profile?.handle) {
+            navigate(profile.handle);
+            break;
+          }
+        }
       }}
     >
       <div className='fun-background-thread'
         style={{
           animationDuration: `${rockDuration.toFixed(2)}s`
         }}>
-        <AccountLabel className='fun-background-thread-author' account={thread?.post?.author} />
+        <AccountLabel className='fun-background-thread-author' account={thread.current.shortDID} />
         <div className='fun-background-thread-content'>
           {
-            thread?.post?.record.text
+            thread.current.text
           }
         </div>
         <div className='fun-background-thread-likes'>
           <FavoriteBorder />
           {
-            !thread?.post?.likeCount ? '' :
-              thread?.post?.likeCount.toLocaleString()
+            !thread?.current?.likeCount ? '' :
+              thread.current.likeCount.toLocaleString()
           }
         </div>
       </div>

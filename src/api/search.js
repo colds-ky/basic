@@ -1,7 +1,7 @@
 // @ts-check
 
 import { breakIntoWords } from '../../coldsky/lib/data/capture-records/compact-post-words';
-import { BSKY_PUBLIC_URL, ColdskyAgent, shortenDID } from '../../coldsky/libs';
+import { BSKY_PUBLIC_URL, ColdskyAgent, shortenDID } from '../../coldsky/lib';
 import { streamBuffer } from '../../coldsky/src/api/akpa';
 
 /** @typedef {import ('@atproto/api/dist/client/types/app/bsky/actor/defs').ProfileView} ProfileView */

@@ -12,9 +12,9 @@ import {
 import { createTheme, ThemeProvider } from '@mui/material';
 import { Landing } from './landing';
 import { History } from './history';
-import { defineCacheIndexedDBStore } from '../coldsky/lib';
+import { defineCachedStore } from '../coldsky/lib';
 
-/** @typedef {ReturnType<typeof defineCacheIndexedDBStore>} DBAccess */
+/** @typedef {ReturnType<typeof defineCachedStore>} DBAccess */
 var db;
 const DB_NAME = 'gisting-cache';
 
@@ -26,7 +26,7 @@ export const useDB = () => React.useContext(DBContext);
 function runApp() {
 
   if (!db) {
-    db = defineCacheIndexedDBStore(DB_NAME);
+    db = defineCachedStore({ dbName: DB_NAME });
   }
 
   const basename =

@@ -1,5 +1,8 @@
 // @ts-check
 
+/**
+ * @param {string} avatarURL
+ */
 export async function overlayAvatar(avatarURL) {
 
   const png = await fetch('https://corsproxy.io/?' + avatarURL).then(r => r.blob());
@@ -49,7 +52,7 @@ export async function overlayAvatar(avatarURL) {
   scratchCtx.lineWidth = 8;
   scratchCtx.globalCompositeOperation = 'source-over'; //default
   scratchCtx.beginPath();
-  scratchCtx.arc(64, 64, 56, 0, 2 * Math.PI, true);
+  scratchCtx.arc(64, 64, 60, 0, 2 * Math.PI, true);
   scratchCtx.closePath();
   scratchCtx.stroke();
 
@@ -65,7 +68,6 @@ export async function overlayAvatar(avatarURL) {
 function awaitImageOnload(src) {
   return new Promise((resolve, reject) => {
     const img = document.createElement('img');
-    console.log(img);
     img.src = src;
     img.onload = () => resolve(img);
     img.onerror = (event, source, lineno, colno, error) => reject(error || event);

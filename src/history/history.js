@@ -1,20 +1,19 @@
 // @ts-check
 
 import React, { useEffect } from 'react';
-
 import { useNavigate, useParams } from 'react-router-dom';
-import { unwrapShortHandle } from '../../coldsky/lib';
+
 import { forAwait } from '../../coldsky/src/api/forAwait';
-import { resolveHandleOrDIDToProfile, resolveProfileViaRequest } from '../api/record-cache';
 import { uppercase_GIST } from '../landing/landing';
 import { localise } from '../localise';
 import { FullHandle, breakHandleParts } from '../widgets/account/full-handle';
 
-import './history.css';
 import { applyModifier } from '../api/unicode-styles/apply-modifier';
 import { Timeline } from './timeline';
-import { overlayAvatar } from '../icon-inject/overlay-avatar';
-import { replaceIcon } from '../icon-inject/replace-icon';
+import { overlayAvatar, replaceIcon } from '../icon-inject';
+import { useDB } from '..';
+
+import './history.css';
 
 const middledot = '\u00B7';
 
@@ -58,11 +57,12 @@ export function History() {
 
 function HistoryCore() {
 
+  const db = useDB();
   let { handle } = useParams();
 
   const resolved = forAwait(
     handle,
-    () => resolveHandleOrDIDToProfile(handle)) || {
+    () => db.getProfileIncrementally(handle)) || {
     did: 'did:plc:1234567890',
     handle: localise('loading....bsky.social', { uk: 'хвилиночку....bsky.social' }),
     displayName: localise('Just a moment', { uk: 'Зачекайте, зара буде' }),
