@@ -100157,8 +100157,10 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       post: handlePostUpdate,
       profile: handleProfileUpdate
     });
-    const outstandingPostUpdatesByURI = /* @__PURE__ */ new Map();
-    const outstandingProfileUpdatesByShortDID = /* @__PURE__ */ new Map();
+    let outstandingPostUpdatesByURI = /* @__PURE__ */ new Map();
+    let outstandingPostUpdatesInProgressByURI = /* @__PURE__ */ new Map();
+    let outstandingProfileUpdatesByShortDID = /* @__PURE__ */ new Map();
+    let outstandingProfileUpdatesInProgressByShortDID = /* @__PURE__ */ new Map();
     var queueTimeoutDebounce;
     var queueTimeoutMax;
     return {
@@ -100187,25 +100189,41 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       queueUpdate();
     }
     function queueUpdate() {
+      if (outstandingPostUpdatesInProgressByURI.size || outstandingProfileUpdatesInProgressByShortDID.size)
+        return;
       if (!queueTimeoutMax)
         queueTimeoutMax = setTimeout(performUpdate, UPDATE_DB_MAX_TIME);
       clearTimeout(queueTimeoutDebounce);
       queueTimeoutDebounce = setTimeout(performUpdate, DEFAULT_DB_DEBOUNCE_TIME);
     }
     function performUpdate() {
-      clearTimeout(queueTimeoutMax);
-      clearTimeout(queueTimeoutDebounce);
-      queueTimeoutMax = queueTimeoutDebounce = void 0;
-      const updateReport = {};
-      if (outstandingPostUpdatesByURI.size) {
-        db2.posts.bulkPut(updateReport.posts = [...outstandingPostUpdatesByURI.values()]);
-        outstandingPostUpdatesByURI.clear();
-      }
-      if (outstandingProfileUpdatesByShortDID.size) {
-        db2.profiles.bulkPut(updateReport.profiles = [...outstandingProfileUpdatesByShortDID.values()]);
-        outstandingProfileUpdatesByShortDID.clear();
-      }
-      console.log("dumping to indexedDB: ", updateReport);
+      return __async(this, null, function* () {
+        if (outstandingPostUpdatesInProgressByURI.size || outstandingProfileUpdatesInProgressByShortDID.size)
+          return;
+        clearTimeout(queueTimeoutMax);
+        clearTimeout(queueTimeoutDebounce);
+        queueTimeoutMax = queueTimeoutDebounce = void 0;
+        const updateReport = {};
+        let postUpdatePromise;
+        if (outstandingPostUpdatesByURI.size) {
+          postUpdatePromise = db2.posts.bulkPut(updateReport.posts = [...outstandingPostUpdatesByURI.values()]);
+          const tmp = outstandingPostUpdatesByURI;
+          outstandingPostUpdatesByURI = outstandingPostUpdatesInProgressByURI;
+          outstandingPostUpdatesInProgressByURI = tmp;
+        }
+        let profileUpdatePromise;
+        if (outstandingProfileUpdatesByShortDID.size) {
+          profileUpdatePromise = db2.profiles.bulkPut(updateReport.profiles = [...outstandingProfileUpdatesByShortDID.values()]);
+          const tmp = outstandingProfileUpdatesByShortDID;
+          outstandingProfileUpdatesByShortDID = outstandingProfileUpdatesInProgressByShortDID;
+          outstandingProfileUpdatesInProgressByShortDID = tmp;
+        }
+        console.log("dumping to indexedDB: ", updateReport);
+        yield postUpdatePromise;
+        yield profileUpdatePromise;
+        outstandingPostUpdatesInProgressByURI.clear();
+        outstandingProfileUpdatesInProgressByShortDID.clear();
+      });
     }
     function getPostOnly(uri) {
       if (!uri)
@@ -100239,15 +100257,20 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         const shortDID = (_a3 = breakFeedUri(uri)) == null ? void 0 : _a3.shortDID;
         if (!shortDID)
           return;
-        let veryPost = outstandingPostUpdatesByURI.get(uri);
+        let veryPost = outstandingPostUpdatesByURI.get(uri) || outstandingPostUpdatesInProgressByURI.get(uri);
         let threadStart = (veryPost == null ? void 0 : veryPost.threadStart) || uri;
         let asThreadStartPromise = db2.posts.where("threadStart").equals((veryPost == null ? void 0 : veryPost.threadStart) || uri).toArray();
         if (!veryPost)
           veryPost = yield db2.posts.get(uri);
         const dbPosts = yield asThreadStartPromise;
-        if (veryPost && !dbPosts.find((post) => post.shortDID === veryPost.shortDID && post.uri === veryPost.uri))
+        if (veryPost && !dbPosts.find((post) => post.uri === veryPost.uri))
           dbPosts.push(veryPost);
-        const uncachedPostsForThread = [...outstandingPostUpdatesByURI.values()].filter((p) => p.shortDID === (veryPost == null ? void 0 : veryPost.shortDID) && p.uri === (veryPost == null ? void 0 : veryPost.uri) || threadStart && p.threadStart === threadStart);
+        const uncachedPostsForThread = [
+          ...outstandingPostUpdatesByURI.values(),
+          ...outstandingPostUpdatesInProgressByURI.values()
+        ].filter(
+          (p) => p.uri === (veryPost == null ? void 0 : veryPost.uri) || threadStart && p.threadStart === threadStart
+        );
         const postsByUri = new Map(dbPosts.concat(uncachedPostsForThread).map((p) => [p.uri, p]));
         const all = [...postsByUri.values()];
         const current = postsByUri.get(uri) || createSpeculativePost(shortDID, uri);
@@ -100267,7 +100290,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     }
     function searchPosts(did, text) {
       return __async(this, null, function* () {
-        var _a3;
+        var _a3, _b;
         const words = detectWordStartsNormalized(text, void 0);
         if (!(words == null ? void 0 : words.length) && !did)
           return;
@@ -100283,8 +100306,13 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         for (const post of dbPost) {
           map.set(post.uri, post);
         }
-        for (const uncachedPost of outstandingPostUpdatesByURI.values()) {
+        for (const uncachedPost of outstandingPostUpdatesInProgressByURI.values()) {
           if ((_a3 = uncachedPost.words) == null ? void 0 : _a3.some(wordMatcher)) {
+            map.set(uncachedPost.uri, uncachedPost);
+          }
+        }
+        for (const uncachedPost of outstandingPostUpdatesByURI.values()) {
+          if ((_b = uncachedPost.words) == null ? void 0 : _b.some(wordMatcher)) {
             map.set(uncachedPost.uri, uncachedPost);
           }
         }
@@ -100557,12 +100585,10 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       return __asyncGenerator(this, null, function* () {
         var _a3, _b, _c, _d;
         let REPORT_UPDATES_FREQUENCY_MSEC = 700;
-        const cachedMatchesPromise = dbStore.searchPosts(shortDID, text);
-        const allCachedHistoryPromise = !text ? cachedMatchesPromise : dbStore.searchPosts(shortDID, text);
         const plcDirHistoryPromise = plcDirectoryHistoryRaw(shortDID);
         let lastSearchReport = 0;
         let anyUpdates = false;
-        let lastMatches = yield new __await(cachedMatchesPromise);
+        let lastMatches;
         if (lastMatches == null ? void 0 : lastMatches.length) {
           lastSearchReport = Date.now();
           yield lastMatches;
@@ -100584,8 +100610,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
             limit: Math.random() * 10 + 88
           }));
           if (!knownHistoryUri) {
-            const allHistory = yield new __await(allCachedHistoryPromise);
-            knownHistoryUri = new Set((allHistory || []).map((rec) => rec.uri));
+            knownHistoryUri = /* @__PURE__ */ new Set();
           }
           if ((_c = (_b = moreData == null ? void 0 : moreData.data) == null ? void 0 : _b.records) == null ? void 0 : _c.length) {
             for (const rec of moreData.data.records) {
@@ -102258,6 +102283,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
               const entries = temp3.value;
               if (!(entries == null ? void 0 : entries.length))
                 continue;
+              entries.sort((p1, p2) => (p2.asOf || 0) - (p1.asOf || 0));
               for (const post of entries) {
                 if (seenPosts.has(post.threadStart || post.uri))
                   continue;

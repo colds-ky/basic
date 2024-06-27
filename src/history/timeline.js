@@ -62,6 +62,8 @@ export function Timeline({ shortDID }) {
       for await (const entries of db.searchPostsIncrementally(shortDID, undefined)) {
         if (!entries?.length) continue;
 
+        entries.sort((p1, p2) => (p2.asOf || 0) - (p1.asOf || 0));
+
         for (const post of entries) {
           if (seenPosts.has(post.threadStart || post.uri)) continue;
           seenPosts.add(post.threadStart || post.uri);
