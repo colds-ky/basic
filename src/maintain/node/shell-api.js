@@ -4,14 +4,9 @@
  * }}
  */
 export function createShellAPIs() {
-  let req = function () { };
-  if (Math.random() > -1) req = require;
-  /** @type {import('fs')} */
-  const fs = req('fs');
-  /** @type {import('path')} */
-  const path = req('path');
-  /** @type {import('child_process')} */
-  const child_process = req('child_process');
+  const fs = require('fs');
+  const path = require('path');
+  const child_process = require('child_process');
 
   return { readFile };
 

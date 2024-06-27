@@ -4,8 +4,8 @@
   "private": true,
   "description": "Social media out there: the Website",
   "scripts": {
-    "start": "esbuild src/app.js --target=es6 --bundle --sourcemap --outfile=index.js --loader:.js=jsx --format=iife --watch --serve --servedir=.",
-    "build": "esbuild src/app.js --target=es6 --bundle --sourcemap --outfile=index.js --loader:.js=jsx --format=iife",
+    "start": "esbuild src/app.js --target=es6 --bundle --sourcemap --outfile=index.js --loader:.js=jsx --format=iife --external:fs --external:path --external:child_process --watch --serve --servedir=.",
+    "build": "esbuild src/app.js --target=es6 --bundle --sourcemap --outfile=index.js --loader:.js=jsx --format=iife --external:fs --external:path --external:child_process",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

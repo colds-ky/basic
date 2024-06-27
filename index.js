@@ -65376,13 +65376,9 @@ if (cid) {
 
   // src/maintain/node/shell-api.js
   function createShellAPIs2() {
-    let req = function() {
-    };
-    if (Math.random() > -1)
-      req = __require;
-    const fs = req("fs");
-    const path = req("path");
-    const child_process = req("child_process");
+    const fs = __require("fs");
+    const path = __require("path");
+    const child_process = __require("child_process");
     return { readFile };
     function readFile(filePath) {
       return __async(this, null, function* () {
