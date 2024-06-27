@@ -1,2 +1,5 @@
 /lib
 /build.js
+/index.*
+/*.jpeg
+/*.jpg

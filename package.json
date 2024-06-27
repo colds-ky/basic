@@ -4,6 +4,9 @@
   "description": "Library for BlueSky",
   "main": "libs.js",
   "scripts": {
+    "build": "node build.js",
+    "watch": "node build.js --watch",
+    "start": "node build.js --serve",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -18,7 +21,7 @@
     "@atproto/api": "^0.8.0",
     "@ipld/car": "^5.2.6",
     "cbor-x": "^1.5.8",
-    "eslint": "^8.56.0",
+    "esbuild": "^0.19.11",
     "multiformats": "^13.0.1"
   }
 }
