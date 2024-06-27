@@ -51,9 +51,9 @@
   var __commonJS = (cb, mod) => function __require2() {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
-  var __export = (target2, all) => {
-    for (var name2 in all)
-      __defProp(target2, name2, { get: all[name2], enumerable: true });
+  var __export = (target2, all2) => {
+    for (var name2 in all2)
+      __defProp(target2, name2, { get: all2[name2], enumerable: true });
   };
   var __copyProps = (to, from6, except, desc) => {
     if (from6 && typeof from6 === "object" || typeof from6 === "function") {
@@ -147,88 +147,6 @@
     }, "return" in obj && method("return"), it;
   };
   var __forAwait = (obj, it, method) => (it = obj[__knownSymbol("asyncIterator")]) ? it.call(obj) : (obj = obj[__knownSymbol("iterator")](), it = {}, method = (key, fn) => (fn = obj[key]) && (it[key] = (arg) => new Promise((yes, no, done) => (arg = fn.call(obj, arg), done = arg.done, Promise.resolve(arg.value).then((value) => yes({ value, done }), no)))), method("next"), method("return"), it);
-
-  // lib/shorten.js
-  function likelyDID(text) {
-    return text && (!text.trim().indexOf("did:") || text.trim().length === 24 && !/[^\sa-z0-9]/i.test(text));
-  }
-  function shortenDID(did) {
-    return did && /** @type {T} */
-    (did.replace(_shortenDID_Regex, "").toLowerCase() || void 0);
-  }
-  function unwrapShortDID(shortDID) {
-    return !shortDID ? void 0 : shortDID.indexOf(":") < 0 ? "did:plc:" + shortDID.toLowerCase() : shortDID.toLowerCase();
-  }
-  function shortenHandle(handle) {
-    handle = cheapNormalizeHandle(handle);
-    return handle && /** @type {T} */
-    (handle.replace(_shortenHandle_Regex, "").toLowerCase() || void 0);
-  }
-  function unwrapShortHandle(shortHandle) {
-    if (likelyDID(shortHandle))
-      return unwrapShortDID(shortHandle);
-    shortHandle = cheapNormalizeHandle(shortHandle);
-    return !shortHandle ? void 0 : shortHandle.indexOf(".") < 0 ? shortHandle.toLowerCase() + ".bsky.social" : shortHandle.toLowerCase();
-  }
-  function cheapNormalizeHandle(handle) {
-    handle = handle && handle.trim().toLowerCase();
-    if (handle && handle.charCodeAt(0) === 64)
-      handle = handle.slice(1);
-    const urlprefix = "https://bsky.app/";
-    if (handle && handle.lastIndexOf(urlprefix, 0) === 0) {
-      const postURL = breakPostURL(handle);
-      if (postURL && postURL.shortDID)
-        return postURL.shortDID;
-    }
-    if (handle && handle.lastIndexOf("at:", 0) === 0) {
-      const feedUri = breakFeedUri(handle);
-      if (feedUri && feedUri.shortDID)
-        return feedUri.shortDID;
-      if (handle && handle.lastIndexOf("at://", 0) === 0)
-        handle = handle.slice(5);
-      else
-        handle = handle.slice(3);
-    }
-    return handle || void 0;
-  }
-  function breakPostURL(url) {
-    if (!url)
-      return;
-    const match = _breakPostURL_Regex.exec(url);
-    if (!match)
-      return;
-    return { shortDID: match[1], postID: match[2] };
-  }
-  function breakFeedUri(uri) {
-    if (!uri)
-      return;
-    const match = _breakFeedUri_Regex.exec(uri);
-    if (!match || !match[3])
-      return;
-    return { shortDID: match[2], postID: match[3] };
-  }
-  var _shortenDID_Regex, _shortenHandle_Regex, offsetTooLarge, _breakPostURL_Regex, _breakFeedUri_Regex;
-  var init_shorten = __esm({
-    "lib/shorten.js"() {
-      _shortenDID_Regex = /^did\:plc\:/;
-      _shortenHandle_Regex = /\.bsky\.social$/;
-      offsetTooLarge = Date.UTC(2022, 1, 1);
-      _breakPostURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/post\/([a-z0-9]+)$/;
-      _breakFeedUri_Regex = /^at\:\/\/(did:plc:)?([a-z0-9]+)\/[a-z\.]+\/?(.*)?$/;
-    }
-  });
-
-  // lib/is-promise.js
-  function isPromise(x) {
-    if (!x || typeof x !== "object")
-      return false;
-    else
-      return typeof x.then === "function";
-  }
-  var init_is_promise = __esm({
-    "lib/is-promise.js"() {
-    }
-  });
 
   // node_modules/@atproto/syntax/dist/handle.js
   var require_handle = __commonJS({
@@ -7724,16 +7642,16 @@ if (cid) {
          * @returns {number}
          */
         static shouldBreak(start, mid, end, startEmoji, midEmoji, endEmoji) {
-          const all = [start].concat(mid).concat([end]);
+          const all2 = [start].concat(mid).concat([end]);
           const allEmoji = [startEmoji].concat(midEmoji).concat([endEmoji]);
-          const previous = all[all.length - 2];
+          const previous = all2[all2.length - 2];
           const next = end;
           const nextEmoji = endEmoji;
-          const rIIndex = all.lastIndexOf(boundaries_1.CLUSTER_BREAK.REGIONAL_INDICATOR);
-          if (rIIndex > 0 && all.slice(1, rIIndex).every(function(c) {
+          const rIIndex = all2.lastIndexOf(boundaries_1.CLUSTER_BREAK.REGIONAL_INDICATOR);
+          if (rIIndex > 0 && all2.slice(1, rIIndex).every(function(c) {
             return c === boundaries_1.CLUSTER_BREAK.REGIONAL_INDICATOR;
           }) && [boundaries_1.CLUSTER_BREAK.PREPEND, boundaries_1.CLUSTER_BREAK.REGIONAL_INDICATOR].indexOf(previous) === -1) {
-            if (all.filter(function(c) {
+            if (all2.filter(function(c) {
               return c === boundaries_1.CLUSTER_BREAK.REGIONAL_INDICATOR;
             }).length % 2 === 1) {
               return BreakLastRegional;
@@ -7761,7 +7679,7 @@ if (cid) {
             return NotBreak;
           }
           const previousNonExtendIndex = allEmoji.slice(0, -1).lastIndexOf(boundaries_1.EXTENDED_PICTOGRAPHIC);
-          if (previousNonExtendIndex !== -1 && allEmoji[previousNonExtendIndex] === boundaries_1.EXTENDED_PICTOGRAPHIC && all.slice(previousNonExtendIndex + 1, -2).every(function(c) {
+          if (previousNonExtendIndex !== -1 && allEmoji[previousNonExtendIndex] === boundaries_1.EXTENDED_PICTOGRAPHIC && all2.slice(previousNonExtendIndex + 1, -2).every(function(c) {
             return c === boundaries_1.CLUSTER_BREAK.EXTEND;
           }) && previous === boundaries_1.CLUSTER_BREAK.ZWJ && nextEmoji === boundaries_1.EXTENDED_PICTOGRAPHIC) {
             return NotBreak;
@@ -35303,8 +35221,8 @@ if (cid) {
 
   // node_modules/tlds/index.json
   var require_tlds = __commonJS({
-    "node_modules/tlds/index.json"(exports, module) {
-      module.exports = [
+    "node_modules/tlds/index.json"(exports, module2) {
+      module2.exports = [
         "aaa",
         "aarp",
         "abb",
@@ -39317,6 +39235,165 @@ if (cid) {
     }
   });
 
+  // node_modules/varint/encode.js
+  var require_encode = __commonJS({
+    "node_modules/varint/encode.js"(exports, module2) {
+      module2.exports = encode13;
+      var MSB5 = 128;
+      var REST5 = 127;
+      var MSBALL5 = ~REST5;
+      var INT5 = Math.pow(2, 31);
+      function encode13(num, out, offset) {
+        if (Number.MAX_SAFE_INTEGER && num > Number.MAX_SAFE_INTEGER) {
+          encode13.bytes = 0;
+          throw new RangeError("Could not encode varint");
+        }
+        out = out || [];
+        offset = offset || 0;
+        var oldOffset = offset;
+        while (num >= INT5) {
+          out[offset++] = num & 255 | MSB5;
+          num /= 128;
+        }
+        while (num & MSBALL5) {
+          out[offset++] = num & 255 | MSB5;
+          num >>>= 7;
+        }
+        out[offset] = num | 0;
+        encode13.bytes = offset - oldOffset + 1;
+        return out;
+      }
+    }
+  });
+
+  // node_modules/varint/decode.js
+  var require_decode = __commonJS({
+    "node_modules/varint/decode.js"(exports, module2) {
+      module2.exports = read6;
+      var MSB5 = 128;
+      var REST5 = 127;
+      function read6(buf2, offset) {
+        var res = 0, offset = offset || 0, shift = 0, counter = offset, b, l = buf2.length;
+        do {
+          if (counter >= l || shift > 49) {
+            read6.bytes = 0;
+            throw new RangeError("Could not decode varint");
+          }
+          b = buf2[counter++];
+          res += shift < 28 ? (b & REST5) << shift : (b & REST5) * Math.pow(2, shift);
+          shift += 7;
+        } while (b >= MSB5);
+        read6.bytes = counter - offset;
+        return res;
+      }
+    }
+  });
+
+  // node_modules/varint/length.js
+  var require_length = __commonJS({
+    "node_modules/varint/length.js"(exports, module2) {
+      var N15 = Math.pow(2, 7);
+      var N25 = Math.pow(2, 14);
+      var N35 = Math.pow(2, 21);
+      var N45 = Math.pow(2, 28);
+      var N55 = Math.pow(2, 35);
+      var N65 = Math.pow(2, 42);
+      var N75 = Math.pow(2, 49);
+      var N85 = Math.pow(2, 56);
+      var N95 = Math.pow(2, 63);
+      module2.exports = function(value) {
+        return value < N15 ? 1 : value < N25 ? 2 : value < N35 ? 3 : value < N45 ? 4 : value < N55 ? 5 : value < N65 ? 6 : value < N75 ? 7 : value < N85 ? 8 : value < N95 ? 9 : 10;
+      };
+    }
+  });
+
+  // node_modules/varint/index.js
+  var require_varint = __commonJS({
+    "node_modules/varint/index.js"(exports, module2) {
+      module2.exports = {
+        encode: require_encode(),
+        decode: require_decode(),
+        encodingLength: require_length()
+      };
+    }
+  });
+
+  // lib/shorten.js
+  function likelyDID(text) {
+    return text && (!text.trim().indexOf("did:") || text.trim().length === 24 && !/[^\sa-z0-9]/i.test(text));
+  }
+  function shortenDID(did) {
+    return did && /** @type {T} */
+    (did.replace(_shortenDID_Regex, "").toLowerCase() || void 0);
+  }
+  var _shortenDID_Regex = /^did\:plc\:/;
+  function unwrapShortDID(shortDID) {
+    return !shortDID ? void 0 : shortDID.indexOf(":") < 0 ? "did:plc:" + shortDID.toLowerCase() : shortDID.toLowerCase();
+  }
+  function shortenHandle(handle) {
+    handle = cheapNormalizeHandle(handle);
+    return handle && /** @type {T} */
+    (handle.replace(_shortenHandle_Regex, "").toLowerCase() || void 0);
+  }
+  var _shortenHandle_Regex = /\.bsky\.social$/;
+  function unwrapShortHandle(shortHandle) {
+    if (likelyDID(shortHandle))
+      return unwrapShortDID(shortHandle);
+    shortHandle = cheapNormalizeHandle(shortHandle);
+    return !shortHandle ? void 0 : shortHandle.indexOf(".") < 0 ? shortHandle.toLowerCase() + ".bsky.social" : shortHandle.toLowerCase();
+  }
+  function cheapNormalizeHandle(handle) {
+    handle = handle && handle.trim().toLowerCase();
+    if (handle && handle.charCodeAt(0) === 64)
+      handle = handle.slice(1);
+    const urlprefix = "https://bsky.app/";
+    if (handle && handle.lastIndexOf(urlprefix, 0) === 0) {
+      const postURL = breakPostURL(handle);
+      if (postURL && postURL.shortDID)
+        return postURL.shortDID;
+    }
+    if (handle && handle.lastIndexOf("at:", 0) === 0) {
+      const feedUri = breakFeedUri(handle);
+      if (feedUri && feedUri.shortDID)
+        return feedUri.shortDID;
+      if (handle && handle.lastIndexOf("at://", 0) === 0)
+        handle = handle.slice(5);
+      else
+        handle = handle.slice(3);
+    }
+    return handle || void 0;
+  }
+  var offsetTooLarge = Date.UTC(2022, 1, 1);
+  function breakPostURL(url) {
+    if (!url)
+      return;
+    const match = _breakPostURL_Regex.exec(url);
+    if (!match)
+      return;
+    return { shortDID: match[1], postID: match[2] };
+  }
+  var _breakPostURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/post\/([a-z0-9]+)$/;
+  function breakFeedUri(uri) {
+    if (!uri)
+      return;
+    const match = _breakFeedUri_Regex.exec(uri);
+    if (!match || !match[3])
+      return;
+    return { shortDID: match[2], postID: match[3] };
+  }
+  var _breakFeedUri_Regex = /^at\:\/\/(did:plc:)?([a-z0-9]+)\/[a-z\.]+\/?(.*)?$/;
+
+  // lib/is-promise.js
+  function isPromise(x) {
+    if (!x || typeof x !== "object")
+      return false;
+    else
+      return typeof x.then === "function";
+  }
+
+  // lib/coldsky-agent.js
+  var import_api = __toESM(require_dist6());
+
   // lib/throttled-async-cache.js
   function throttledAsyncCache(call, { maxConcurrency = 3, interval = 100 } = {}) {
     const cache2 = multikeyMap();
@@ -39437,13 +39514,41 @@ if (cid) {
       return storeMap.clear();
     }
   }
-  var init_throttled_async_cache = __esm({
-    "lib/throttled-async-cache.js"() {
-      init_is_promise();
-    }
-  });
 
   // lib/coldsky-agent.js
+  var BSKY_SOCIAL_URL = "https://bsky.social/";
+  var BSKY_NETWORK_URL = "https://bsky.network/";
+  var ColdskyAgent = class extends import_api.BskyAgent {
+    /** @param {Omit<ConstructorParameters<typeof BskyAgent>[0], 'service'>} args */
+    constructor(args) {
+      var _a2, _b;
+      super(__spreadProps(__spreadValues({}, args), {
+        // most of methods work fine on bsky.social
+        service: BSKY_SOCIAL_URL
+      }));
+      for (const key in this.com.atproto) {
+        const ns = this.com.atproto[key];
+        const baseClient = (_b = (_a2 = ns._service) == null ? void 0 : _a2.xrpc) == null ? void 0 : _b.baseClient;
+        if (baseClient)
+          this.patchBaseClient(baseClient);
+      }
+    }
+    /**
+     * @param {typeof this.com.atproto.sync._service.xrpc.baseClient} baseClient 
+     */
+    patchBaseClient(baseClient) {
+      baseClient.lex.assertValidXrpcOutput = function(lexUri, value, ...rest) {
+        return true;
+      };
+      if (
+        /** @type {*} */
+        baseClient.fetch._patchedFetch
+      )
+        return;
+      baseClient.fetch = overrideFetch(baseClient.fetch.bind(baseClient));
+    }
+  };
+  var typedCaches = {};
   function overrideFetch(baseFetch) {
     if (baseFetch._patchedFetch)
       return baseFetch;
@@ -39497,48 +39602,186 @@ if (cid) {
       }
     }
   }
-  var import_api, BSKY_SOCIAL_URL, BSKY_NETWORK_URL, ColdskyAgent, typedCaches;
-  var init_coldsky_agent = __esm({
-    "lib/coldsky-agent.js"() {
-      import_api = __toESM(require_dist6());
-      init_throttled_async_cache();
-      BSKY_SOCIAL_URL = "https://bsky.social/";
-      BSKY_NETWORK_URL = "https://bsky.network/";
-      ColdskyAgent = class extends import_api.BskyAgent {
-        /** @param {Omit<ConstructorParameters<typeof BskyAgent>[0], 'service'>} args */
-        constructor(args) {
-          var _a2, _b;
-          super(__spreadProps(__spreadValues({}, args), {
-            // most of methods work fine on bsky.social
-            service: BSKY_SOCIAL_URL
-          }));
-          for (const key in this.com.atproto) {
-            const ns = this.com.atproto[key];
-            const baseClient = (_b = (_a2 = ns._service) == null ? void 0 : _a2.xrpc) == null ? void 0 : _b.baseClient;
-            if (baseClient)
-              this.patchBaseClient(baseClient);
-          }
-        }
-        /**
-         * @param {typeof this.com.atproto.sync._service.xrpc.baseClient} baseClient 
-         */
-        patchBaseClient(baseClient) {
-          baseClient.lex.assertValidXrpcOutput = function(lexUri, value, ...rest) {
-            return true;
-          };
-          if (
-            /** @type {*} */
-            baseClient.fetch._patchedFetch
-          )
-            return;
-          baseClient.fetch = overrideFetch(baseClient.fetch.bind(baseClient));
-        }
-      };
-      typedCaches = {};
-    }
-  });
 
   // node_modules/cbor-x/decode.js
+  var decoder;
+  try {
+    decoder = new TextDecoder();
+  } catch (error) {
+  }
+  var src4;
+  var srcEnd;
+  var position = 0;
+  var EMPTY_ARRAY = [];
+  var LEGACY_RECORD_INLINE_ID = 105;
+  var RECORD_DEFINITIONS_ID = 57342;
+  var RECORD_INLINE_ID = 57343;
+  var BUNDLED_STRINGS_ID = 57337;
+  var PACKED_REFERENCE_TAG_ID = 6;
+  var STOP_CODE = {};
+  var strings = EMPTY_ARRAY;
+  var stringPosition = 0;
+  var currentDecoder = {};
+  var currentStructures;
+  var srcString;
+  var srcStringStart = 0;
+  var srcStringEnd = 0;
+  var bundledStrings;
+  var referenceMap;
+  var currentExtensions = [];
+  var currentExtensionRanges = [];
+  var packedValues;
+  var dataView;
+  var restoreMapsAsObject;
+  var defaultOptions = {
+    useRecords: false,
+    mapsAsObjects: true
+  };
+  var sequentialMode = false;
+  var inlineObjectReadThreshold = 2;
+  try {
+    new Function("");
+  } catch (error) {
+    inlineObjectReadThreshold = Infinity;
+  }
+  var Decoder4 = class _Decoder {
+    constructor(options) {
+      if (options) {
+        if ((options.keyMap || options._keyMap) && !options.useRecords) {
+          options.useRecords = false;
+          options.mapsAsObjects = true;
+        }
+        if (options.useRecords === false && options.mapsAsObjects === void 0)
+          options.mapsAsObjects = true;
+        if (options.getStructures)
+          options.getShared = options.getStructures;
+        if (options.getShared && !options.structures)
+          (options.structures = []).uninitialized = true;
+        if (options.keyMap) {
+          this.mapKey = /* @__PURE__ */ new Map();
+          for (let [k, v] of Object.entries(options.keyMap))
+            this.mapKey.set(v, k);
+        }
+      }
+      Object.assign(this, options);
+    }
+    /*
+    decodeKey(key) {
+    	return this.keyMap
+    		? Object.keys(this.keyMap)[Object.values(this.keyMap).indexOf(key)] || key
+    		: key
+    }
+    */
+    decodeKey(key) {
+      return this.keyMap ? this.mapKey.get(key) || key : key;
+    }
+    encodeKey(key) {
+      return this.keyMap && this.keyMap.hasOwnProperty(key) ? this.keyMap[key] : key;
+    }
+    encodeKeys(rec) {
+      if (!this._keyMap)
+        return rec;
+      let map = /* @__PURE__ */ new Map();
+      for (let [k, v] of Object.entries(rec))
+        map.set(this._keyMap.hasOwnProperty(k) ? this._keyMap[k] : k, v);
+      return map;
+    }
+    decodeKeys(map) {
+      if (!this._keyMap || map.constructor.name != "Map")
+        return map;
+      if (!this._mapKey) {
+        this._mapKey = /* @__PURE__ */ new Map();
+        for (let [k, v] of Object.entries(this._keyMap))
+          this._mapKey.set(v, k);
+      }
+      let res = {};
+      map.forEach((v, k) => res[safeKey(this._mapKey.has(k) ? this._mapKey.get(k) : k)] = v);
+      return res;
+    }
+    mapDecode(source, end) {
+      let res = this.decode(source);
+      if (this._keyMap) {
+        switch (res.constructor.name) {
+          case "Array":
+            return res.map((r) => this.decodeKeys(r));
+        }
+      }
+      return res;
+    }
+    decode(source, end) {
+      if (src4) {
+        return saveState(() => {
+          clearSource();
+          return this ? this.decode(source, end) : _Decoder.prototype.decode.call(defaultOptions, source, end);
+        });
+      }
+      srcEnd = end > -1 ? end : source.length;
+      position = 0;
+      stringPosition = 0;
+      srcStringEnd = 0;
+      srcString = null;
+      strings = EMPTY_ARRAY;
+      bundledStrings = null;
+      src4 = source;
+      try {
+        dataView = source.dataView || (source.dataView = new DataView(source.buffer, source.byteOffset, source.byteLength));
+      } catch (error) {
+        src4 = null;
+        if (source instanceof Uint8Array)
+          throw error;
+        throw new Error("Source must be a Uint8Array or Buffer but was a " + (source && typeof source == "object" ? source.constructor.name : typeof source));
+      }
+      if (this instanceof _Decoder) {
+        currentDecoder = this;
+        packedValues = this.sharedValues && (this.pack ? new Array(this.maxPrivatePackedValues || 16).concat(this.sharedValues) : this.sharedValues);
+        if (this.structures) {
+          currentStructures = this.structures;
+          return checkedRead();
+        } else if (!currentStructures || currentStructures.length > 0) {
+          currentStructures = [];
+        }
+      } else {
+        currentDecoder = defaultOptions;
+        if (!currentStructures || currentStructures.length > 0)
+          currentStructures = [];
+        packedValues = null;
+      }
+      return checkedRead();
+    }
+    decodeMultiple(source, forEach) {
+      let values, lastPosition = 0;
+      try {
+        let size = source.length;
+        sequentialMode = true;
+        let value = this ? this.decode(source, size) : defaultDecoder.decode(source, size);
+        if (forEach) {
+          if (forEach(value) === false) {
+            return;
+          }
+          while (position < size) {
+            lastPosition = position;
+            if (forEach(checkedRead()) === false) {
+              return;
+            }
+          }
+        } else {
+          values = [value];
+          while (position < size) {
+            lastPosition = position;
+            values.push(checkedRead());
+          }
+          return values;
+        }
+      } catch (error) {
+        error.lastPosition = lastPosition;
+        error.values = values;
+        throw error;
+      } finally {
+        sequentialMode = false;
+        clearSource();
+      }
+    }
+  };
   function checkedRead() {
     try {
       let result = read4();
@@ -39799,6 +40042,7 @@ if (cid) {
         throw new Error("Unknown CBOR token " + token);
     }
   }
+  var validName = /^[a-zA-Z_$][a-zA-Z\d_$]*$/;
   function createStructureReader(structure) {
     function readObject() {
       let length5 = src4[position++];
@@ -39857,6 +40101,7 @@ if (cid) {
       return key + "";
     throw new Error("Invalid property name type " + typeof key);
   }
+  var readFixedString = readStringJS;
   function readStringJS(length5) {
     let result;
     if (length5 < 16) {
@@ -39903,6 +40148,7 @@ if (cid) {
     }
     return result;
   }
+  var fromCharCode = String.fromCharCode;
   function longStringInJS(length5) {
     let start = position;
     let bytes = new Array(length5);
@@ -40061,6 +40307,8 @@ if (cid) {
       Uint8Array.prototype.slice.call(src4, position, position += length5)
     ) : src4.subarray(position, position += length5);
   }
+  var f32Array = new Float32Array(1);
+  var u8Array = new Uint8Array(f32Array.buffer, 0, 4);
   function getFloat16() {
     let byte0 = src4[position++];
     let byte1 = src4[position++];
@@ -40082,6 +40330,145 @@ if (cid) {
     u8Array[0] = 0;
     return f32Array[0];
   }
+  var keyCache = new Array(4096);
+  var Tag = class {
+    constructor(value, tag) {
+      this.value = value;
+      this.tag = tag;
+    }
+  };
+  currentExtensions[0] = (dateString) => {
+    return new Date(dateString);
+  };
+  currentExtensions[1] = (epochSec) => {
+    return new Date(Math.round(epochSec * 1e3));
+  };
+  currentExtensions[2] = (buffer2) => {
+    let value = BigInt(0);
+    for (let i = 0, l = buffer2.byteLength; i < l; i++) {
+      value = BigInt(buffer2[i]) + value << BigInt(8);
+    }
+    return value;
+  };
+  currentExtensions[3] = (buffer2) => {
+    return BigInt(-1) - currentExtensions[2](buffer2);
+  };
+  currentExtensions[4] = (fraction) => {
+    return +(fraction[1] + "e" + fraction[0]);
+  };
+  currentExtensions[5] = (fraction) => {
+    return fraction[1] * Math.exp(fraction[0] * Math.log(2));
+  };
+  var recordDefinition = (id, structure) => {
+    id = id - 57344;
+    let existingStructure = currentStructures[id];
+    if (existingStructure && existingStructure.isShared) {
+      (currentStructures.restoreStructures || (currentStructures.restoreStructures = []))[id] = existingStructure;
+    }
+    currentStructures[id] = structure;
+    structure.read = createStructureReader(structure);
+  };
+  currentExtensions[LEGACY_RECORD_INLINE_ID] = (data) => {
+    let length5 = data.length;
+    let structure = data[1];
+    recordDefinition(data[0], structure);
+    let object = {};
+    for (let i = 2; i < length5; i++) {
+      let key = structure[i - 2];
+      object[safeKey(key)] = data[i];
+    }
+    return object;
+  };
+  currentExtensions[14] = (value) => {
+    if (bundledStrings)
+      return bundledStrings[0].slice(bundledStrings.position0, bundledStrings.position0 += value);
+    return new Tag(value, 14);
+  };
+  currentExtensions[15] = (value) => {
+    if (bundledStrings)
+      return bundledStrings[1].slice(bundledStrings.position1, bundledStrings.position1 += value);
+    return new Tag(value, 15);
+  };
+  var glbl = { Error, RegExp };
+  currentExtensions[27] = (data) => {
+    return (glbl[data[0]] || Error)(data[1], data[2]);
+  };
+  var packedTable = (read6) => {
+    if (src4[position++] != 132) {
+      let error = new Error("Packed values structure must be followed by a 4 element array");
+      if (src4.length < position)
+        error.incomplete = true;
+      throw error;
+    }
+    let newPackedValues = read6();
+    if (!newPackedValues || !newPackedValues.length) {
+      let error = new Error("Packed values structure must be followed by a 4 element array");
+      error.incomplete = true;
+      throw error;
+    }
+    packedValues = packedValues ? newPackedValues.concat(packedValues.slice(newPackedValues.length)) : newPackedValues;
+    packedValues.prefixes = read6();
+    packedValues.suffixes = read6();
+    return read6();
+  };
+  packedTable.handlesRead = true;
+  currentExtensions[51] = packedTable;
+  currentExtensions[PACKED_REFERENCE_TAG_ID] = (data) => {
+    if (!packedValues) {
+      if (currentDecoder.getShared)
+        loadShared();
+      else
+        return new Tag(data, PACKED_REFERENCE_TAG_ID);
+    }
+    if (typeof data == "number")
+      return packedValues[16 + (data >= 0 ? 2 * data : -2 * data - 1)];
+    let error = new Error("No support for non-integer packed references yet");
+    if (data === void 0)
+      error.incomplete = true;
+    throw error;
+  };
+  currentExtensions[28] = (read6) => {
+    if (!referenceMap) {
+      referenceMap = /* @__PURE__ */ new Map();
+      referenceMap.id = 0;
+    }
+    let id = referenceMap.id++;
+    let startingPosition = position;
+    let token = src4[position];
+    let target2;
+    if (token >> 5 == 4)
+      target2 = [];
+    else
+      target2 = {};
+    let refEntry = { target: target2 };
+    referenceMap.set(id, refEntry);
+    let targetProperties = read6();
+    if (refEntry.used) {
+      if (Object.getPrototypeOf(target2) !== Object.getPrototypeOf(targetProperties)) {
+        position = startingPosition;
+        target2 = targetProperties;
+        referenceMap.set(id, { target: target2 });
+        targetProperties = read6();
+      }
+      return Object.assign(target2, targetProperties);
+    }
+    refEntry.target = targetProperties;
+    return targetProperties;
+  };
+  currentExtensions[28].handlesRead = true;
+  currentExtensions[29] = (id) => {
+    let refEntry = referenceMap.get(id);
+    refEntry.used = true;
+    return refEntry.target;
+  };
+  currentExtensions[258] = (array) => new Set(array);
+  (currentExtensions[259] = (read6) => {
+    if (currentDecoder.mapsAsObjects) {
+      currentDecoder.mapsAsObjects = false;
+      restoreMapsAsObject = true;
+    }
+    return read6();
+  }).handlesRead = true;
   function combine(a, b) {
     if (typeof a === "string")
       return a + b;
@@ -40097,6 +40484,48 @@ if (cid) {
         throw new Error("No packed values available");
     }
     return packedValues;
+  }
+  var SHARED_DATA_TAG_ID = 1399353956;
+  currentExtensionRanges.push((tag, input) => {
+    if (tag >= 225 && tag <= 255)
+      return combine(getPackedValues().prefixes[tag - 224], input);
+    if (tag >= 28704 && tag <= 32767)
+      return combine(getPackedValues().prefixes[tag - 28672], input);
+    if (tag >= 1879052288 && tag <= 2147483647)
+      return combine(getPackedValues().prefixes[tag - 1879048192], input);
+    if (tag >= 216 && tag <= 223)
+      return combine(input, getPackedValues().suffixes[tag - 216]);
+    if (tag >= 27647 && tag <= 28671)
+      return combine(input, getPackedValues().suffixes[tag - 27639]);
+    if (tag >= 1811940352 && tag <= 1879048191)
+      return combine(input, getPackedValues().suffixes[tag - 1811939328]);
+    if (tag == SHARED_DATA_TAG_ID) {
+      return {
+        packedValues,
+        structures: currentStructures.slice(0),
+        version: input
+      };
+    }
+    if (tag == 55799)
+      return input;
+  });
+  var isLittleEndianMachine = new Uint8Array(new Uint16Array([1]).buffer)[0] == 1;
+  var typedArrays = [
+    Uint8Array,
+    Uint8ClampedArray,
+    Uint16Array,
+    Uint32Array,
+    typeof BigUint64Array == "undefined" ? { name: "BigUint64Array" } : BigUint64Array,
+    Int8Array,
+    Int16Array,
+    Int32Array,
+    typeof BigInt64Array == "undefined" ? { name: "BigInt64Array" } : BigInt64Array,
+    Float32Array,
+    Float64Array
+  ];
+  var typedArrayTags = [64, 68, 69, 70, 71, 72, 77, 78, 79, 85, 86];
+  for (let i = 0; i < typedArrays.length; i++) {
+    registerTypedArray(typedArrays[i], typedArrayTags[i]);
   }
   function registerTypedArray(TypedArray, tag) {
     let dvMethod = "get" + TypedArray.name.slice(0, -5);
@@ -40220,380 +40649,920 @@ if (cid) {
   function addExtension(extension) {
     currentExtensions[extension.tag] = extension.decode;
   }
-  var decoder, src4, srcEnd, position, EMPTY_ARRAY, LEGACY_RECORD_INLINE_ID, RECORD_DEFINITIONS_ID, RECORD_INLINE_ID, BUNDLED_STRINGS_ID, PACKED_REFERENCE_TAG_ID, STOP_CODE, strings, stringPosition, currentDecoder, currentStructures, srcString, srcStringStart, srcStringEnd, bundledStrings, referenceMap, currentExtensions, currentExtensionRanges, packedValues, dataView, restoreMapsAsObject, defaultOptions, sequentialMode, inlineObjectReadThreshold, Decoder4, validName, readFixedString, fromCharCode, f32Array, u8Array, keyCache, Tag, recordDefinition, glbl, packedTable, SHARED_DATA_TAG_ID, isLittleEndianMachine, typedArrays, typedArrayTags, mult10, defaultDecoder, decode14, decodeMultiple, FLOAT32_OPTIONS;
-  var init_decode = __esm({
-    "node_modules/cbor-x/decode.js"() {
-      try {
-        decoder = new TextDecoder();
-      } catch (error) {
+  var mult10 = new Array(147);
+  for (let i = 0; i < 256; i++) {
+    mult10[i] = +("1e" + Math.floor(45.15 - i * 0.30103));
+  }
+  var defaultDecoder = new Decoder4({ useRecords: false });
+  var decode14 = defaultDecoder.decode;
+  var decodeMultiple = defaultDecoder.decodeMultiple;
+  var FLOAT32_OPTIONS = {
+    NEVER: 0,
+    ALWAYS: 1,
+    DECIMAL_ROUND: 3,
+    DECIMAL_FIT: 4
+  };
+
+  // node_modules/cbor-x/encode.js
+  var textEncoder2;
+  try {
+    textEncoder2 = new TextEncoder();
+  } catch (error) {
+  }
+  var extensions;
+  var extensionClasses;
+  var Buffer2 = typeof globalThis === "object" && globalThis.Buffer;
+  var hasNodeBuffer = typeof Buffer2 !== "undefined";
+  var ByteArrayAllocate = hasNodeBuffer ? Buffer2.allocUnsafeSlow : Uint8Array;
+  var ByteArray = hasNodeBuffer ? Buffer2 : Uint8Array;
+  var MAX_STRUCTURES = 256;
+  var MAX_BUFFER_SIZE = hasNodeBuffer ? 4294967296 : 2144337920;
+  var throwOnIterable;
+  var target;
+  var targetView;
+  var position2 = 0;
+  var safeEnd;
+  var bundledStrings2 = null;
+  var MAX_BUNDLE_SIZE = 61440;
+  var hasNonLatin = /[\u0080-\uFFFF]/;
+  var RECORD_SYMBOL = Symbol("record-id");
+  var Encoder4 = class extends Decoder4 {
+    constructor(options) {
+      super(options);
+      this.offset = 0;
+      let typeBuffer;
+      let start;
+      let sharedStructures;
+      let hasSharedUpdate;
+      let structures;
+      let referenceMap2;
+      options = options || {};
+      let encodeUtf8 = ByteArray.prototype.utf8Write ? function(string2, position3, maxBytes) {
+        return target.utf8Write(string2, position3, maxBytes);
+      } : textEncoder2 && textEncoder2.encodeInto ? function(string2, position3) {
+        return textEncoder2.encodeInto(string2, target.subarray(position3)).written;
+      } : false;
+      let encoder = this;
+      let hasSharedStructures = options.structures || options.saveStructures;
+      let maxSharedStructures = options.maxSharedStructures;
+      if (maxSharedStructures == null)
+        maxSharedStructures = hasSharedStructures ? 128 : 0;
+      if (maxSharedStructures > 8190)
+        throw new Error("Maximum maxSharedStructure is 8190");
+      let isSequential = options.sequential;
+      if (isSequential) {
+        maxSharedStructures = 0;
       }
-      position = 0;
-      EMPTY_ARRAY = [];
-      LEGACY_RECORD_INLINE_ID = 105;
-      RECORD_DEFINITIONS_ID = 57342;
-      RECORD_INLINE_ID = 57343;
-      BUNDLED_STRINGS_ID = 57337;
-      PACKED_REFERENCE_TAG_ID = 6;
-      STOP_CODE = {};
-      strings = EMPTY_ARRAY;
-      stringPosition = 0;
-      currentDecoder = {};
-      srcStringStart = 0;
-      srcStringEnd = 0;
-      currentExtensions = [];
-      currentExtensionRanges = [];
-      defaultOptions = {
-        useRecords: false,
-        mapsAsObjects: true
+      if (!this.structures)
+        this.structures = [];
+      if (this.saveStructures)
+        this.saveShared = this.saveStructures;
+      let samplingPackedValues, packedObjectMap2, sharedValues = options.sharedValues;
+      let sharedPackedObjectMap2;
+      if (sharedValues) {
+        sharedPackedObjectMap2 = /* @__PURE__ */ Object.create(null);
+        for (let i = 0, l = sharedValues.length; i < l; i++) {
+          sharedPackedObjectMap2[sharedValues[i]] = i;
+        }
+      }
+      let recordIdsToRemove = [];
+      let transitionsCount = 0;
+      let serializationsSinceTransitionRebuild = 0;
+      this.mapEncode = function(value, encodeOptions2) {
+        if (this._keyMap && !this._mapped) {
+          switch (value.constructor.name) {
+            case "Array":
+              value = value.map((r) => this.encodeKeys(r));
+              break;
+          }
+        }
+        return this.encode(value, encodeOptions2);
       };
-      sequentialMode = false;
-      inlineObjectReadThreshold = 2;
-      try {
-        new Function("");
-      } catch (error) {
-        inlineObjectReadThreshold = Infinity;
-      }
-      Decoder4 = class _Decoder {
-        constructor(options) {
-          if (options) {
-            if ((options.keyMap || options._keyMap) && !options.useRecords) {
-              options.useRecords = false;
-              options.mapsAsObjects = true;
-            }
-            if (options.useRecords === false && options.mapsAsObjects === void 0)
-              options.mapsAsObjects = true;
-            if (options.getStructures)
-              options.getShared = options.getStructures;
-            if (options.getShared && !options.structures)
-              (options.structures = []).uninitialized = true;
-            if (options.keyMap) {
-              this.mapKey = /* @__PURE__ */ new Map();
-              for (let [k, v] of Object.entries(options.keyMap))
-                this.mapKey.set(v, k);
-            }
-          }
-          Object.assign(this, options);
+      this.encode = function(value, encodeOptions2) {
+        if (!target) {
+          target = new ByteArrayAllocate(8192);
+          targetView = new DataView(target.buffer, 0, 8192);
+          position2 = 0;
         }
-        /*
-        decodeKey(key) {
-        	return this.keyMap
-        		? Object.keys(this.keyMap)[Object.values(this.keyMap).indexOf(key)] || key
-        		: key
+        safeEnd = target.length - 10;
+        if (safeEnd - position2 < 2048) {
+          target = new ByteArrayAllocate(target.length);
+          targetView = new DataView(target.buffer, 0, target.length);
+          safeEnd = target.length - 10;
+          position2 = 0;
+        } else if (encodeOptions2 === REUSE_BUFFER_MODE)
+          position2 = position2 + 7 & 2147483640;
+        start = position2;
+        if (encoder.useSelfDescribedHeader) {
+          targetView.setUint32(position2, 3654940416);
+          position2 += 3;
         }
-        */
-        decodeKey(key) {
-          return this.keyMap ? this.mapKey.get(key) || key : key;
-        }
-        encodeKey(key) {
-          return this.keyMap && this.keyMap.hasOwnProperty(key) ? this.keyMap[key] : key;
-        }
-        encodeKeys(rec) {
-          if (!this._keyMap)
-            return rec;
-          let map = /* @__PURE__ */ new Map();
-          for (let [k, v] of Object.entries(rec))
-            map.set(this._keyMap.hasOwnProperty(k) ? this._keyMap[k] : k, v);
-          return map;
-        }
-        decodeKeys(map) {
-          if (!this._keyMap || map.constructor.name != "Map")
-            return map;
-          if (!this._mapKey) {
-            this._mapKey = /* @__PURE__ */ new Map();
-            for (let [k, v] of Object.entries(this._keyMap))
-              this._mapKey.set(v, k);
-          }
-          let res = {};
-          map.forEach((v, k) => res[safeKey(this._mapKey.has(k) ? this._mapKey.get(k) : k)] = v);
-          return res;
-        }
-        mapDecode(source, end) {
-          let res = this.decode(source);
-          if (this._keyMap) {
-            switch (res.constructor.name) {
-              case "Array":
-                return res.map((r) => this.decodeKeys(r));
+        referenceMap2 = encoder.structuredClone ? /* @__PURE__ */ new Map() : null;
+        if (encoder.bundleStrings && typeof value !== "string") {
+          bundledStrings2 = [];
+          bundledStrings2.size = Infinity;
+        } else
+          bundledStrings2 = null;
+        sharedStructures = encoder.structures;
+        if (sharedStructures) {
+          if (sharedStructures.uninitialized) {
+            let sharedData = encoder.getShared() || {};
+            encoder.structures = sharedStructures = sharedData.structures || [];
+            encoder.sharedVersion = sharedData.version;
+            let sharedValues2 = encoder.sharedValues = sharedData.packedValues;
+            if (sharedValues2) {
+              sharedPackedObjectMap2 = {};
+              for (let i = 0, l = sharedValues2.length; i < l; i++)
+                sharedPackedObjectMap2[sharedValues2[i]] = i;
             }
           }
-          return res;
+          let sharedStructuresLength = sharedStructures.length;
+          if (sharedStructuresLength > maxSharedStructures && !isSequential)
+            sharedStructuresLength = maxSharedStructures;
+          if (!sharedStructures.transitions) {
+            sharedStructures.transitions = /* @__PURE__ */ Object.create(null);
+            for (let i = 0; i < sharedStructuresLength; i++) {
+              let keys = sharedStructures[i];
+              if (!keys)
+                continue;
+              let nextTransition, transition = sharedStructures.transitions;
+              for (let j = 0, l = keys.length; j < l; j++) {
+                if (transition[RECORD_SYMBOL] === void 0)
+                  transition[RECORD_SYMBOL] = i;
+                let key = keys[j];
+                nextTransition = transition[key];
+                if (!nextTransition) {
+                  nextTransition = transition[key] = /* @__PURE__ */ Object.create(null);
+                }
+                transition = nextTransition;
+              }
+              transition[RECORD_SYMBOL] = i | 1048576;
+            }
+          }
+          if (!isSequential)
+            sharedStructures.nextId = sharedStructuresLength;
         }
-        decode(source, end) {
-          if (src4) {
-            return saveState(() => {
-              clearSource();
-              return this ? this.decode(source, end) : _Decoder.prototype.decode.call(defaultOptions, source, end);
-            });
+        if (hasSharedUpdate)
+          hasSharedUpdate = false;
+        structures = sharedStructures || [];
+        packedObjectMap2 = sharedPackedObjectMap2;
+        if (options.pack) {
+          let packedValues2 = /* @__PURE__ */ new Map();
+          packedValues2.values = [];
+          packedValues2.encoder = encoder;
+          packedValues2.maxValues = options.maxPrivatePackedValues || (sharedPackedObjectMap2 ? 16 : Infinity);
+          packedValues2.objectMap = sharedPackedObjectMap2 || false;
+          packedValues2.samplingPackedValues = samplingPackedValues;
+          findRepetitiveStrings(value, packedValues2);
+          if (packedValues2.values.length > 0) {
+            target[position2++] = 216;
+            target[position2++] = 51;
+            writeArrayHeader(4);
+            let valuesArray = packedValues2.values;
+            encode13(valuesArray);
+            writeArrayHeader(0);
+            writeArrayHeader(0);
+            packedObjectMap2 = Object.create(sharedPackedObjectMap2 || null);
+            for (let i = 0, l = valuesArray.length; i < l; i++) {
+              packedObjectMap2[valuesArray[i]] = i;
+            }
           }
-          srcEnd = end > -1 ? end : source.length;
-          position = 0;
-          stringPosition = 0;
-          srcStringEnd = 0;
-          srcString = null;
-          strings = EMPTY_ARRAY;
-          bundledStrings = null;
-          src4 = source;
-          try {
-            dataView = source.dataView || (source.dataView = new DataView(source.buffer, source.byteOffset, source.byteLength));
-          } catch (error) {
-            src4 = null;
-            if (source instanceof Uint8Array)
-              throw error;
-            throw new Error("Source must be a Uint8Array or Buffer but was a " + (source && typeof source == "object" ? source.constructor.name : typeof source));
+        }
+        throwOnIterable = encodeOptions2 & THROW_ON_ITERABLE;
+        try {
+          if (throwOnIterable)
+            return;
+          encode13(value);
+          if (bundledStrings2) {
+            writeBundles(start, encode13);
           }
-          if (this instanceof _Decoder) {
-            currentDecoder = this;
-            packedValues = this.sharedValues && (this.pack ? new Array(this.maxPrivatePackedValues || 16).concat(this.sharedValues) : this.sharedValues);
-            if (this.structures) {
-              currentStructures = this.structures;
-              return checkedRead();
-            } else if (!currentStructures || currentStructures.length > 0) {
-              currentStructures = [];
+          encoder.offset = position2;
+          if (referenceMap2 && referenceMap2.idsToInsert) {
+            position2 += referenceMap2.idsToInsert.length * 2;
+            if (position2 > safeEnd)
+              makeRoom(position2);
+            encoder.offset = position2;
+            let serialized = insertIds(target.subarray(start, position2), referenceMap2.idsToInsert);
+            referenceMap2 = null;
+            return serialized;
+          }
+          if (encodeOptions2 & REUSE_BUFFER_MODE) {
+            target.start = start;
+            target.end = position2;
+            return target;
+          }
+          return target.subarray(start, position2);
+        } finally {
+          if (sharedStructures) {
+            if (serializationsSinceTransitionRebuild < 10)
+              serializationsSinceTransitionRebuild++;
+            if (sharedStructures.length > maxSharedStructures)
+              sharedStructures.length = maxSharedStructures;
+            if (transitionsCount > 1e4) {
+              sharedStructures.transitions = null;
+              serializationsSinceTransitionRebuild = 0;
+              transitionsCount = 0;
+              if (recordIdsToRemove.length > 0)
+                recordIdsToRemove = [];
+            } else if (recordIdsToRemove.length > 0 && !isSequential) {
+              for (let i = 0, l = recordIdsToRemove.length; i < l; i++) {
+                recordIdsToRemove[i][RECORD_SYMBOL] = void 0;
+              }
+              recordIdsToRemove = [];
+            }
+          }
+          if (hasSharedUpdate && encoder.saveShared) {
+            if (encoder.structures.length > maxSharedStructures) {
+              encoder.structures = encoder.structures.slice(0, maxSharedStructures);
+            }
+            let returnBuffer = target.subarray(start, position2);
+            if (encoder.updateSharedData() === false)
+              return encoder.encode(value);
+            return returnBuffer;
+          }
+          if (encodeOptions2 & RESET_BUFFER_MODE)
+            position2 = start;
+        }
+      };
+      this.findCommonStringsToPack = () => {
+        samplingPackedValues = /* @__PURE__ */ new Map();
+        if (!sharedPackedObjectMap2)
+          sharedPackedObjectMap2 = /* @__PURE__ */ Object.create(null);
+        return (options2) => {
+          let threshold = options2 && options2.threshold || 4;
+          let position3 = this.pack ? options2.maxPrivatePackedValues || 16 : 0;
+          if (!sharedValues)
+            sharedValues = this.sharedValues = [];
+          for (let [key, status] of samplingPackedValues) {
+            if (status.count > threshold) {
+              sharedPackedObjectMap2[key] = position3++;
+              sharedValues.push(key);
+              hasSharedUpdate = true;
+            }
+          }
+          while (this.saveShared && this.updateSharedData() === false) {
+          }
+          samplingPackedValues = null;
+        };
+      };
+      const encode13 = (value) => {
+        if (position2 > safeEnd)
+          target = makeRoom(position2);
+        var type = typeof value;
+        var length5;
+        if (type === "string") {
+          if (packedObjectMap2) {
+            let packedPosition = packedObjectMap2[value];
+            if (packedPosition >= 0) {
+              if (packedPosition < 16)
+                target[position2++] = packedPosition + 224;
+              else {
+                target[position2++] = 198;
+                if (packedPosition & 1)
+                  encode13(15 - packedPosition >> 1);
+                else
+                  encode13(packedPosition - 16 >> 1);
+              }
+              return;
+            } else if (samplingPackedValues && !options.pack) {
+              let status = samplingPackedValues.get(value);
+              if (status)
+                status.count++;
+              else
+                samplingPackedValues.set(value, {
+                  count: 1
+                });
+            }
+          }
+          let strLength = value.length;
+          if (bundledStrings2 && strLength >= 4 && strLength < 1024) {
+            if ((bundledStrings2.size += strLength) > MAX_BUNDLE_SIZE) {
+              let extStart;
+              let maxBytes2 = (bundledStrings2[0] ? bundledStrings2[0].length * 3 + bundledStrings2[1].length : 0) + 10;
+              if (position2 + maxBytes2 > safeEnd)
+                target = makeRoom(position2 + maxBytes2);
+              target[position2++] = 217;
+              target[position2++] = 223;
+              target[position2++] = 249;
+              target[position2++] = bundledStrings2.position ? 132 : 130;
+              target[position2++] = 26;
+              extStart = position2 - start;
+              position2 += 4;
+              if (bundledStrings2.position) {
+                writeBundles(start, encode13);
+              }
+              bundledStrings2 = ["", ""];
+              bundledStrings2.size = 0;
+              bundledStrings2.position = extStart;
+            }
+            let twoByte = hasNonLatin.test(value);
+            bundledStrings2[twoByte ? 0 : 1] += value;
+            target[position2++] = twoByte ? 206 : 207;
+            encode13(strLength);
+            return;
+          }
+          let headerSize;
+          if (strLength < 32) {
+            headerSize = 1;
+          } else if (strLength < 256) {
+            headerSize = 2;
+          } else if (strLength < 65536) {
+            headerSize = 3;
+          } else {
+            headerSize = 5;
+          }
+          let maxBytes = strLength * 3;
+          if (position2 + maxBytes > safeEnd)
+            target = makeRoom(position2 + maxBytes);
+          if (strLength < 64 || !encodeUtf8) {
+            let i, c1, c2, strPosition = position2 + headerSize;
+            for (i = 0; i < strLength; i++) {
+              c1 = value.charCodeAt(i);
+              if (c1 < 128) {
+                target[strPosition++] = c1;
+              } else if (c1 < 2048) {
+                target[strPosition++] = c1 >> 6 | 192;
+                target[strPosition++] = c1 & 63 | 128;
+              } else if ((c1 & 64512) === 55296 && ((c2 = value.charCodeAt(i + 1)) & 64512) === 56320) {
+                c1 = 65536 + ((c1 & 1023) << 10) + (c2 & 1023);
+                i++;
+                target[strPosition++] = c1 >> 18 | 240;
+                target[strPosition++] = c1 >> 12 & 63 | 128;
+                target[strPosition++] = c1 >> 6 & 63 | 128;
+                target[strPosition++] = c1 & 63 | 128;
+              } else {
+                target[strPosition++] = c1 >> 12 | 224;
+                target[strPosition++] = c1 >> 6 & 63 | 128;
+                target[strPosition++] = c1 & 63 | 128;
+              }
+            }
+            length5 = strPosition - position2 - headerSize;
+          } else {
+            length5 = encodeUtf8(value, position2 + headerSize, maxBytes);
+          }
+          if (length5 < 24) {
+            target[position2++] = 96 | length5;
+          } else if (length5 < 256) {
+            if (headerSize < 2) {
+              target.copyWithin(position2 + 2, position2 + 1, position2 + 1 + length5);
+            }
+            target[position2++] = 120;
+            target[position2++] = length5;
+          } else if (length5 < 65536) {
+            if (headerSize < 3) {
+              target.copyWithin(position2 + 3, position2 + 2, position2 + 2 + length5);
+            }
+            target[position2++] = 121;
+            target[position2++] = length5 >> 8;
+            target[position2++] = length5 & 255;
+          } else {
+            if (headerSize < 5) {
+              target.copyWithin(position2 + 5, position2 + 3, position2 + 3 + length5);
+            }
+            target[position2++] = 122;
+            targetView.setUint32(position2, length5);
+            position2 += 4;
+          }
+          position2 += length5;
+        } else if (type === "number") {
+          if (!this.alwaysUseFloat && value >>> 0 === value) {
+            if (value < 24) {
+              target[position2++] = value;
+            } else if (value < 256) {
+              target[position2++] = 24;
+              target[position2++] = value;
+            } else if (value < 65536) {
+              target[position2++] = 25;
+              target[position2++] = value >> 8;
+              target[position2++] = value & 255;
+            } else {
+              target[position2++] = 26;
+              targetView.setUint32(position2, value);
+              position2 += 4;
+            }
+          } else if (!this.alwaysUseFloat && value >> 0 === value) {
+            if (value >= -24) {
+              target[position2++] = 31 - value;
+            } else if (value >= -256) {
+              target[position2++] = 56;
+              target[position2++] = ~value;
+            } else if (value >= -65536) {
+              target[position2++] = 57;
+              targetView.setUint16(position2, ~value);
+              position2 += 2;
+            } else {
+              target[position2++] = 58;
+              targetView.setUint32(position2, ~value);
+              position2 += 4;
             }
           } else {
-            currentDecoder = defaultOptions;
-            if (!currentStructures || currentStructures.length > 0)
-              currentStructures = [];
-            packedValues = null;
-          }
-          return checkedRead();
-        }
-        decodeMultiple(source, forEach) {
-          let values, lastPosition = 0;
-          try {
-            let size = source.length;
-            sequentialMode = true;
-            let value = this ? this.decode(source, size) : defaultDecoder.decode(source, size);
-            if (forEach) {
-              if (forEach(value) === false) {
+            let useFloat32;
+            if ((useFloat32 = this.useFloat32) > 0 && value < 4294967296 && value >= -2147483648) {
+              target[position2++] = 250;
+              targetView.setFloat32(position2, value);
+              let xShifted;
+              if (useFloat32 < 4 || // this checks for rounding of numbers that were encoded in 32-bit float to nearest significant decimal digit that could be preserved
+              (xShifted = value * mult10[(target[position2] & 127) << 1 | target[position2 + 1] >> 7]) >> 0 === xShifted) {
+                position2 += 4;
                 return;
+              } else
+                position2--;
+            }
+            target[position2++] = 251;
+            targetView.setFloat64(position2, value);
+            position2 += 8;
+          }
+        } else if (type === "object") {
+          if (!value)
+            target[position2++] = 246;
+          else {
+            if (referenceMap2) {
+              let referee = referenceMap2.get(value);
+              if (referee) {
+                target[position2++] = 216;
+                target[position2++] = 29;
+                target[position2++] = 25;
+                if (!referee.references) {
+                  let idsToInsert = referenceMap2.idsToInsert || (referenceMap2.idsToInsert = []);
+                  referee.references = [];
+                  idsToInsert.push(referee);
+                }
+                referee.references.push(position2 - start);
+                position2 += 2;
+                return;
+              } else
+                referenceMap2.set(value, { offset: position2 - start });
+            }
+            let constructor = value.constructor;
+            if (constructor === Object) {
+              writeObject(value);
+            } else if (constructor === Array) {
+              length5 = value.length;
+              if (length5 < 24) {
+                target[position2++] = 128 | length5;
+              } else {
+                writeArrayHeader(length5);
               }
-              while (position < size) {
-                lastPosition = position;
-                if (forEach(checkedRead()) === false) {
-                  return;
+              for (let i = 0; i < length5; i++) {
+                encode13(value[i]);
+              }
+            } else if (constructor === Map) {
+              if (this.mapsAsObjects ? this.useTag259ForMaps !== false : this.useTag259ForMaps) {
+                target[position2++] = 217;
+                target[position2++] = 1;
+                target[position2++] = 3;
+              }
+              length5 = value.size;
+              if (length5 < 24) {
+                target[position2++] = 160 | length5;
+              } else if (length5 < 256) {
+                target[position2++] = 184;
+                target[position2++] = length5;
+              } else if (length5 < 65536) {
+                target[position2++] = 185;
+                target[position2++] = length5 >> 8;
+                target[position2++] = length5 & 255;
+              } else {
+                target[position2++] = 186;
+                targetView.setUint32(position2, length5);
+                position2 += 4;
+              }
+              if (encoder.keyMap) {
+                for (let [key, entryValue] of value) {
+                  encode13(encoder.encodeKey(key));
+                  encode13(entryValue);
+                }
+              } else {
+                for (let [key, entryValue] of value) {
+                  encode13(key);
+                  encode13(entryValue);
                 }
               }
             } else {
-              values = [value];
-              while (position < size) {
-                lastPosition = position;
-                values.push(checkedRead());
+              for (let i = 0, l = extensions.length; i < l; i++) {
+                let extensionClass = extensionClasses[i];
+                if (value instanceof extensionClass) {
+                  let extension = extensions[i];
+                  let tag = extension.tag;
+                  if (tag == void 0)
+                    tag = extension.getTag && extension.getTag.call(this, value);
+                  if (tag < 24) {
+                    target[position2++] = 192 | tag;
+                  } else if (tag < 256) {
+                    target[position2++] = 216;
+                    target[position2++] = tag;
+                  } else if (tag < 65536) {
+                    target[position2++] = 217;
+                    target[position2++] = tag >> 8;
+                    target[position2++] = tag & 255;
+                  } else if (tag > -1) {
+                    target[position2++] = 218;
+                    targetView.setUint32(position2, tag);
+                    position2 += 4;
+                  }
+                  extension.encode.call(this, value, encode13, makeRoom);
+                  return;
+                }
               }
-              return values;
+              if (value[Symbol.iterator]) {
+                if (throwOnIterable) {
+                  let error = new Error("Iterable should be serialized as iterator");
+                  error.iteratorNotHandled = true;
+                  throw error;
+                }
+                target[position2++] = 159;
+                for (let entry of value) {
+                  encode13(entry);
+                }
+                target[position2++] = 255;
+                return;
+              }
+              if (value[Symbol.asyncIterator] || isBlob(value)) {
+                let error = new Error("Iterable/blob should be serialized as iterator");
+                error.iteratorNotHandled = true;
+                throw error;
+              }
+              if (this.useToJSON && value.toJSON) {
+                const json = value.toJSON();
+                if (json !== value)
+                  return encode13(json);
+              }
+              writeObject(value);
             }
-          } catch (error) {
-            error.lastPosition = lastPosition;
-            error.values = values;
-            throw error;
-          } finally {
-            sequentialMode = false;
-            clearSource();
+          }
+        } else if (type === "boolean") {
+          target[position2++] = value ? 245 : 244;
+        } else if (type === "bigint") {
+          if (value < BigInt(1) << BigInt(64) && value >= 0) {
+            target[position2++] = 27;
+            targetView.setBigUint64(position2, value);
+          } else if (value > -(BigInt(1) << BigInt(64)) && value < 0) {
+            target[position2++] = 59;
+            targetView.setBigUint64(position2, -value - BigInt(1));
+          } else {
+            if (this.largeBigIntToFloat) {
+              target[position2++] = 251;
+              targetView.setFloat64(position2, Number(value));
+            } else {
+              throw new RangeError(value + " was too large to fit in CBOR 64-bit integer format, set largeBigIntToFloat to convert to float-64");
+            }
+          }
+          position2 += 8;
+        } else if (type === "undefined") {
+          target[position2++] = 247;
+        } else {
+          throw new Error("Unknown type: " + type);
+        }
+      };
+      const writeObject = this.useRecords === false ? this.variableMapSize ? (object) => {
+        let keys = Object.keys(object);
+        let vals = Object.values(object);
+        let length5 = keys.length;
+        if (length5 < 24) {
+          target[position2++] = 160 | length5;
+        } else if (length5 < 256) {
+          target[position2++] = 184;
+          target[position2++] = length5;
+        } else if (length5 < 65536) {
+          target[position2++] = 185;
+          target[position2++] = length5 >> 8;
+          target[position2++] = length5 & 255;
+        } else {
+          target[position2++] = 186;
+          targetView.setUint32(position2, length5);
+          position2 += 4;
+        }
+        let key;
+        if (encoder.keyMap) {
+          for (let i = 0; i < length5; i++) {
+            encode13(encoder.encodeKey(keys[i]));
+            encode13(vals[i]);
+          }
+        } else {
+          for (let i = 0; i < length5; i++) {
+            encode13(keys[i]);
+            encode13(vals[i]);
           }
         }
-      };
-      validName = /^[a-zA-Z_$][a-zA-Z\d_$]*$/;
-      readFixedString = readStringJS;
-      fromCharCode = String.fromCharCode;
-      f32Array = new Float32Array(1);
-      u8Array = new Uint8Array(f32Array.buffer, 0, 4);
-      keyCache = new Array(4096);
-      Tag = class {
-        constructor(value, tag) {
-          this.value = value;
-          this.tag = tag;
+      } : (object) => {
+        target[position2++] = 185;
+        let objectOffset = position2 - start;
+        position2 += 2;
+        let size = 0;
+        if (encoder.keyMap) {
+          for (let key in object)
+            if (typeof object.hasOwnProperty !== "function" || object.hasOwnProperty(key)) {
+              encode13(encoder.encodeKey(key));
+              encode13(object[key]);
+              size++;
+            }
+        } else {
+          for (let key in object)
+            if (typeof object.hasOwnProperty !== "function" || object.hasOwnProperty(key)) {
+              encode13(key);
+              encode13(object[key]);
+              size++;
+            }
         }
-      };
-      currentExtensions[0] = (dateString) => {
-        return new Date(dateString);
-      };
-      currentExtensions[1] = (epochSec) => {
-        return new Date(Math.round(epochSec * 1e3));
-      };
-      currentExtensions[2] = (buffer2) => {
-        let value = BigInt(0);
-        for (let i = 0, l = buffer2.byteLength; i < l; i++) {
-          value = BigInt(buffer2[i]) + value << BigInt(8);
+        target[objectOffset++ + start] = size >> 8;
+        target[objectOffset + start] = size & 255;
+      } : (object, skipValues) => {
+        let nextTransition, transition = structures.transitions || (structures.transitions = /* @__PURE__ */ Object.create(null));
+        let newTransitions = 0;
+        let length5 = 0;
+        let parentRecordId;
+        let keys;
+        if (this.keyMap) {
+          keys = Object.keys(object).map((k) => this.encodeKey(k));
+          length5 = keys.length;
+          for (let i = 0; i < length5; i++) {
+            let key = keys[i];
+            nextTransition = transition[key];
+            if (!nextTransition) {
+              nextTransition = transition[key] = /* @__PURE__ */ Object.create(null);
+              newTransitions++;
+            }
+            transition = nextTransition;
+          }
+        } else {
+          for (let key in object)
+            if (typeof object.hasOwnProperty !== "function" || object.hasOwnProperty(key)) {
+              nextTransition = transition[key];
+              if (!nextTransition) {
+                if (transition[RECORD_SYMBOL] & 1048576) {
+                  parentRecordId = transition[RECORD_SYMBOL] & 65535;
+                }
+                nextTransition = transition[key] = /* @__PURE__ */ Object.create(null);
+                newTransitions++;
+              }
+              transition = nextTransition;
+              length5++;
+            }
         }
-        return value;
-      };
-      currentExtensions[3] = (buffer2) => {
-        return BigInt(-1) - currentExtensions[2](buffer2);
-      };
-      currentExtensions[4] = (fraction) => {
-        return +(fraction[1] + "e" + fraction[0]);
-      };
-      currentExtensions[5] = (fraction) => {
-        return fraction[1] * Math.exp(fraction[0] * Math.log(2));
-      };
-      recordDefinition = (id, structure) => {
-        id = id - 57344;
-        let existingStructure = currentStructures[id];
-        if (existingStructure && existingStructure.isShared) {
-          (currentStructures.restoreStructures || (currentStructures.restoreStructures = []))[id] = existingStructure;
+        let recordId = transition[RECORD_SYMBOL];
+        if (recordId !== void 0) {
+          recordId &= 65535;
+          target[position2++] = 217;
+          target[position2++] = recordId >> 8 | 224;
+          target[position2++] = recordId & 255;
+        } else {
+          if (!keys)
+            keys = transition.__keys__ || (transition.__keys__ = Object.keys(object));
+          if (parentRecordId === void 0) {
+            recordId = structures.nextId++;
+            if (!recordId) {
+              recordId = 0;
+              structures.nextId = 1;
+            }
+            if (recordId >= MAX_STRUCTURES) {
+              structures.nextId = (recordId = maxSharedStructures) + 1;
+            }
+          } else {
+            recordId = parentRecordId;
+          }
+          structures[recordId] = keys;
+          if (recordId < maxSharedStructures) {
+            target[position2++] = 217;
+            target[position2++] = recordId >> 8 | 224;
+            target[position2++] = recordId & 255;
+            transition = structures.transitions;
+            for (let i = 0; i < length5; i++) {
+              if (transition[RECORD_SYMBOL] === void 0 || transition[RECORD_SYMBOL] & 1048576)
+                transition[RECORD_SYMBOL] = recordId;
+              transition = transition[keys[i]];
+            }
+            transition[RECORD_SYMBOL] = recordId | 1048576;
+            hasSharedUpdate = true;
+          } else {
+            transition[RECORD_SYMBOL] = recordId;
+            targetView.setUint32(position2, 3655335680);
+            position2 += 3;
+            if (newTransitions)
+              transitionsCount += serializationsSinceTransitionRebuild * newTransitions;
+            if (recordIdsToRemove.length >= MAX_STRUCTURES - maxSharedStructures)
+              recordIdsToRemove.shift()[RECORD_SYMBOL] = void 0;
+            recordIdsToRemove.push(transition);
+            writeArrayHeader(length5 + 2);
+            encode13(57344 + recordId);
+            encode13(keys);
+            if (skipValues)
+              return;
+            for (let key in object)
+              if (typeof object.hasOwnProperty !== "function" || object.hasOwnProperty(key))
+                encode13(object[key]);
+            return;
+          }
         }
-        currentStructures[id] = structure;
-        structure.read = createStructureReader(structure);
-      };
-      currentExtensions[LEGACY_RECORD_INLINE_ID] = (data) => {
-        let length5 = data.length;
-        let structure = data[1];
-        recordDefinition(data[0], structure);
-        let object = {};
-        for (let i = 2; i < length5; i++) {
-          let key = structure[i - 2];
-          object[safeKey(key)] = data[i];
+        if (length5 < 24) {
+          target[position2++] = 128 | length5;
+        } else {
+          writeArrayHeader(length5);
         }
-        return object;
+        if (skipValues)
+          return;
+        for (let key in object)
+          if (typeof object.hasOwnProperty !== "function" || object.hasOwnProperty(key))
+            encode13(object[key]);
       };
-      currentExtensions[14] = (value) => {
-        if (bundledStrings)
-          return bundledStrings[0].slice(bundledStrings.position0, bundledStrings.position0 += value);
-        return new Tag(value, 14);
-      };
-      currentExtensions[15] = (value) => {
-        if (bundledStrings)
-          return bundledStrings[1].slice(bundledStrings.position1, bundledStrings.position1 += value);
-        return new Tag(value, 15);
-      };
-      glbl = { Error, RegExp };
-      currentExtensions[27] = (data) => {
-        return (glbl[data[0]] || Error)(data[1], data[2]);
-      };
-      packedTable = (read6) => {
-        if (src4[position++] != 132) {
-          let error = new Error("Packed values structure must be followed by a 4 element array");
-          if (src4.length < position)
-            error.incomplete = true;
-          throw error;
-        }
-        let newPackedValues = read6();
-        if (!newPackedValues || !newPackedValues.length) {
-          let error = new Error("Packed values structure must be followed by a 4 element array");
-          error.incomplete = true;
-          throw error;
-        }
-        packedValues = packedValues ? newPackedValues.concat(packedValues.slice(newPackedValues.length)) : newPackedValues;
-        packedValues.prefixes = read6();
-        packedValues.suffixes = read6();
-        return read6();
-      };
-      packedTable.handlesRead = true;
-      currentExtensions[51] = packedTable;
-      currentExtensions[PACKED_REFERENCE_TAG_ID] = (data) => {
-        if (!packedValues) {
-          if (currentDecoder.getShared)
-            loadShared();
-          else
-            return new Tag(data, PACKED_REFERENCE_TAG_ID);
-        }
-        if (typeof data == "number")
-          return packedValues[16 + (data >= 0 ? 2 * data : -2 * data - 1)];
-        let error = new Error("No support for non-integer packed references yet");
-        if (data === void 0)
-          error.incomplete = true;
-        throw error;
-      };
-      currentExtensions[28] = (read6) => {
-        if (!referenceMap) {
-          referenceMap = /* @__PURE__ */ new Map();
-          referenceMap.id = 0;
-        }
-        let id = referenceMap.id++;
-        let startingPosition = position;
-        let token = src4[position];
-        let target2;
-        if (token >> 5 == 4)
-          target2 = [];
+      const makeRoom = (end) => {
+        let newSize;
+        if (end > 16777216) {
+          if (end - start > MAX_BUFFER_SIZE)
+            throw new Error("Encoded buffer would be larger than maximum buffer size");
+          newSize = Math.min(
+            MAX_BUFFER_SIZE,
+            Math.round(Math.max((end - start) * (end > 67108864 ? 1.25 : 2), 4194304) / 4096) * 4096
+          );
+        } else
+          newSize = (Math.max(end - start << 2, target.length - 1) >> 12) + 1 << 12;
+        let newBuffer = new ByteArrayAllocate(newSize);
+        targetView = new DataView(newBuffer.buffer, 0, newSize);
+        if (target.copy)
+          target.copy(newBuffer, 0, start, end);
         else
-          target2 = {};
-        let refEntry = { target: target2 };
-        referenceMap.set(id, refEntry);
-        let targetProperties = read6();
-        if (refEntry.used) {
-          if (Object.getPrototypeOf(target2) !== Object.getPrototypeOf(targetProperties)) {
-            position = startingPosition;
-            target2 = targetProperties;
-            referenceMap.set(id, { target: target2 });
-            targetProperties = read6();
+          newBuffer.set(target.slice(start, end));
+        position2 -= start;
+        start = 0;
+        safeEnd = newBuffer.length - 10;
+        return target = newBuffer;
+      };
+      let chunkThreshold = 100;
+      let continuedChunkThreshold = 1e3;
+      this.encodeAsIterable = function(value, options2) {
+        return startEncoding(value, options2, encodeObjectAsIterable);
+      };
+      this.encodeAsAsyncIterable = function(value, options2) {
+        return startEncoding(value, options2, encodeObjectAsAsyncIterable);
+      };
+      function* encodeObjectAsIterable(object, iterateProperties, finalIterable) {
+        let constructor = object.constructor;
+        if (constructor === Object) {
+          let useRecords = encoder.useRecords !== false;
+          if (useRecords)
+            writeObject(object, true);
+          else
+            writeEntityLength(Object.keys(object).length, 160);
+          for (let key in object) {
+            let value = object[key];
+            if (!useRecords)
+              encode13(key);
+            if (value && typeof value === "object") {
+              if (iterateProperties[key])
+                yield* __yieldStar(encodeObjectAsIterable(value, iterateProperties[key]));
+              else
+                yield* __yieldStar(tryEncode(value, iterateProperties, key));
+            } else
+              encode13(value);
           }
-          return Object.assign(target2, targetProperties);
+        } else if (constructor === Array) {
+          let length5 = object.length;
+          writeArrayHeader(length5);
+          for (let i = 0; i < length5; i++) {
+            let value = object[i];
+            if (value && (typeof value === "object" || position2 - start > chunkThreshold)) {
+              if (iterateProperties.element)
+                yield* __yieldStar(encodeObjectAsIterable(value, iterateProperties.element));
+              else
+                yield* __yieldStar(tryEncode(value, iterateProperties, "element"));
+            } else
+              encode13(value);
+          }
+        } else if (object[Symbol.iterator]) {
+          target[position2++] = 159;
+          for (let value of object) {
+            if (value && (typeof value === "object" || position2 - start > chunkThreshold)) {
+              if (iterateProperties.element)
+                yield* __yieldStar(encodeObjectAsIterable(value, iterateProperties.element));
+              else
+                yield* __yieldStar(tryEncode(value, iterateProperties, "element"));
+            } else
+              encode13(value);
+          }
+          target[position2++] = 255;
+        } else if (isBlob(object)) {
+          writeEntityLength(object.size, 64);
+          yield target.subarray(start, position2);
+          yield object;
+          restartEncoding();
+        } else if (object[Symbol.asyncIterator]) {
+          target[position2++] = 159;
+          yield target.subarray(start, position2);
+          yield object;
+          restartEncoding();
+          target[position2++] = 255;
+        } else {
+          encode13(object);
         }
-        refEntry.target = targetProperties;
-        return targetProperties;
-      };
-      currentExtensions[28].handlesRead = true;
-      currentExtensions[29] = (id) => {
-        let refEntry = referenceMap.get(id);
-        refEntry.used = true;
-        return refEntry.target;
-      };
-      currentExtensions[258] = (array) => new Set(array);
-      (currentExtensions[259] = (read6) => {
-        if (currentDecoder.mapsAsObjects) {
-          currentDecoder.mapsAsObjects = false;
-          restoreMapsAsObject = true;
+        if (finalIterable && position2 > start)
+          yield target.subarray(start, position2);
+        else if (position2 - start > chunkThreshold) {
+          yield target.subarray(start, position2);
+          restartEncoding();
         }
-        return read6();
-      }).handlesRead = true;
-      SHARED_DATA_TAG_ID = 1399353956;
-      currentExtensionRanges.push((tag, input) => {
-        if (tag >= 225 && tag <= 255)
-          return combine(getPackedValues().prefixes[tag - 224], input);
-        if (tag >= 28704 && tag <= 32767)
-          return combine(getPackedValues().prefixes[tag - 28672], input);
-        if (tag >= 1879052288 && tag <= 2147483647)
-          return combine(getPackedValues().prefixes[tag - 1879048192], input);
-        if (tag >= 216 && tag <= 223)
-          return combine(input, getPackedValues().suffixes[tag - 216]);
-        if (tag >= 27647 && tag <= 28671)
-          return combine(input, getPackedValues().suffixes[tag - 27639]);
-        if (tag >= 1811940352 && tag <= 1879048191)
-          return combine(input, getPackedValues().suffixes[tag - 1811939328]);
-        if (tag == SHARED_DATA_TAG_ID) {
-          return {
-            packedValues,
-            structures: currentStructures.slice(0),
-            version: input
-          };
-        }
-        if (tag == 55799)
-          return input;
-      });
-      isLittleEndianMachine = new Uint8Array(new Uint16Array([1]).buffer)[0] == 1;
-      typedArrays = [
-        Uint8Array,
-        Uint8ClampedArray,
-        Uint16Array,
-        Uint32Array,
-        typeof BigUint64Array == "undefined" ? { name: "BigUint64Array" } : BigUint64Array,
-        Int8Array,
-        Int16Array,
-        Int32Array,
-        typeof BigInt64Array == "undefined" ? { name: "BigInt64Array" } : BigInt64Array,
-        Float32Array,
-        Float64Array
-      ];
-      typedArrayTags = [64, 68, 69, 70, 71, 72, 77, 78, 79, 85, 86];
-      for (let i = 0; i < typedArrays.length; i++) {
-        registerTypedArray(typedArrays[i], typedArrayTags[i]);
       }
-      mult10 = new Array(147);
-      for (let i = 0; i < 256; i++) {
-        mult10[i] = +("1e" + Math.floor(45.15 - i * 0.30103));
+      function* tryEncode(value, iterateProperties, key) {
+        let restart = position2 - start;
+        try {
+          encode13(value);
+          if (position2 - start > chunkThreshold) {
+            yield target.subarray(start, position2);
+            restartEncoding();
+          }
+        } catch (error) {
+          if (error.iteratorNotHandled) {
+            iterateProperties[key] = {};
+            position2 = start + restart;
+            yield* __yieldStar(encodeObjectAsIterable.call(this, value, iterateProperties[key]));
+          } else
+            throw error;
+        }
       }
-      defaultDecoder = new Decoder4({ useRecords: false });
-      decode14 = defaultDecoder.decode;
-      decodeMultiple = defaultDecoder.decodeMultiple;
-      FLOAT32_OPTIONS = {
-        NEVER: 0,
-        ALWAYS: 1,
-        DECIMAL_ROUND: 3,
-        DECIMAL_FIT: 4
-      };
+      function restartEncoding() {
+        chunkThreshold = continuedChunkThreshold;
+        encoder.encode(null, THROW_ON_ITERABLE);
+      }
+      function startEncoding(value, options2, encodeIterable) {
+        if (options2 && options2.chunkThreshold)
+          chunkThreshold = continuedChunkThreshold = options2.chunkThreshold;
+        else
+          chunkThreshold = 100;
+        if (value && typeof value === "object") {
+          encoder.encode(null, THROW_ON_ITERABLE);
+          return encodeIterable(value, encoder.iterateProperties || (encoder.iterateProperties = {}), true);
+        }
+        return [encoder.encode(value)];
+      }
+      function encodeObjectAsAsyncIterable(value, iterateProperties) {
+        return __asyncGenerator(this, null, function* () {
+          for (let encodedValue of encodeObjectAsIterable(value, iterateProperties, true)) {
+            let constructor = encodedValue.constructor;
+            if (constructor === ByteArray || constructor === Uint8Array)
+              yield encodedValue;
+            else if (isBlob(encodedValue)) {
+              let reader = encodedValue.stream().getReader();
+              let next;
+              while (!(next = yield new __await(reader.read())).done) {
+                yield next.value;
+              }
+            } else if (encodedValue[Symbol.asyncIterator]) {
+              try {
+                for (var iter = __forAwait(encodedValue), more, temp, error; more = !(temp = yield new __await(iter.next())).done; more = false) {
+                  let asyncValue = temp.value;
+                  restartEncoding();
+                  if (asyncValue)
+                    yield* __yieldStar(encodeObjectAsAsyncIterable(asyncValue, iterateProperties.async || (iterateProperties.async = {})));
+                  else
+                    yield encoder.encode(asyncValue);
+                }
+              } catch (temp) {
+                error = [temp];
+              } finally {
+                try {
+                  more && (temp = iter.return) && (yield new __await(temp.call(iter)));
+                } finally {
+                  if (error)
+                    throw error[0];
+                }
+              }
+            } else {
+              yield encodedValue;
+            }
+          }
+        });
+      }
     }
-  });
-
-  // node_modules/cbor-x/encode.js
+    useBuffer(buffer2) {
+      target = buffer2;
+      targetView = new DataView(target.buffer, target.byteOffset, target.byteLength);
+      position2 = 0;
+    }
+    clearSharedData() {
+      if (this.structures)
+        this.structures = [];
+      if (this.sharedValues)
+        this.sharedValues = void 0;
+    }
+    updateSharedData() {
+      let lastVersion = this.sharedVersion || 0;
+      this.sharedVersion = lastVersion + 1;
+      let structuresCopy = this.structures.slice(0);
+      let sharedData = new SharedData(structuresCopy, this.sharedValues, this.sharedVersion);
+      let saveResults = this.saveShared(
+        sharedData,
+        (existingShared) => (existingShared && existingShared.version || 0) == lastVersion
+      );
+      if (saveResults === false) {
+        sharedData = this.getShared() || {};
+        this.structures = sharedData.structures || [];
+        this.sharedValues = sharedData.packedValues;
+        this.sharedVersion = sharedData.version;
+        this.structures.nextId = this.structures.length;
+      } else {
+        structuresCopy.forEach((structure, i) => this.structures[i] = structure);
+      }
+      return saveResults;
+    }
+  };
   function writeEntityLength(length5, majorValue) {
     if (length5 < 24)
       target[position2++] = majorValue | length5;
@@ -40610,6 +41579,13 @@ if (cid) {
       position2 += 4;
     }
   }
+  var SharedData = class {
+    constructor(structures, values, version5) {
+      this.structures = structures;
+      this.packedValues = values;
+      this.version = version5;
+    }
+  };
   function writeArrayHeader(length5) {
     if (length5 < 24)
       target[position2++] = 128 | length5;
@@ -40626,6 +41602,8 @@ if (cid) {
       position2 += 4;
     }
   }
+  var BlobConstructor = typeof Blob === "undefined" ? function() {
+  } : Blob;
   function isBlob(object) {
     if (object instanceof BlobConstructor)
       return true;
@@ -40681,6 +41659,137 @@ if (cid) {
         console.log(value);
     }
   }
+  var isLittleEndianMachine2 = new Uint8Array(new Uint16Array([1]).buffer)[0] == 1;
+  extensionClasses = [
+    Date,
+    Set,
+    Error,
+    RegExp,
+    Tag,
+    ArrayBuffer,
+    Uint8Array,
+    Uint8ClampedArray,
+    Uint16Array,
+    Uint32Array,
+    typeof BigUint64Array == "undefined" ? function() {
+    } : BigUint64Array,
+    Int8Array,
+    Int16Array,
+    Int32Array,
+    typeof BigInt64Array == "undefined" ? function() {
+    } : BigInt64Array,
+    Float32Array,
+    Float64Array,
+    SharedData
+  ];
+  extensions = [
+    {
+      // Date
+      tag: 1,
+      encode(date, encode13) {
+        let seconds = date.getTime() / 1e3;
+        if ((this.useTimestamp32 || date.getMilliseconds() === 0) && seconds >= 0 && seconds < 4294967296) {
+          target[position2++] = 26;
+          targetView.setUint32(position2, seconds);
+          position2 += 4;
+        } else {
+          target[position2++] = 251;
+          targetView.setFloat64(position2, seconds);
+          position2 += 8;
+        }
+      }
+    },
+    {
+      // Set
+      tag: 258,
+      // https://github.com/input-output-hk/cbor-sets-spec/blob/master/CBOR_SETS.md
+      encode(set, encode13) {
+        let array = Array.from(set);
+        encode13(array);
+      }
+    },
+    {
+      // Error
+      tag: 27,
+      // http://cbor.schmorp.de/generic-object
+      encode(error, encode13) {
+        encode13([error.name, error.message]);
+      }
+    },
+    {
+      // RegExp
+      tag: 27,
+      // http://cbor.schmorp.de/generic-object
+      encode(regex, encode13) {
+        encode13(["RegExp", regex.source, regex.flags]);
+      }
+    },
+    {
+      // Tag
+      getTag(tag) {
+        return tag.tag;
+      },
+      encode(tag, encode13) {
+        encode13(tag.value);
+      }
+    },
+    {
+      // ArrayBuffer
+      encode(arrayBuffer, encode13, makeRoom) {
+        writeBuffer(arrayBuffer, makeRoom);
+      }
+    },
+    {
+      // Uint8Array
+      getTag(typedArray) {
+        if (typedArray.constructor === Uint8Array) {
+          if (this.tagUint8Array || hasNodeBuffer && this.tagUint8Array !== false)
+            return 64;
+        }
+      },
+      encode(typedArray, encode13, makeRoom) {
+        writeBuffer(typedArray, makeRoom);
+      }
+    },
+    typedArrayEncoder(68, 1),
+    typedArrayEncoder(69, 2),
+    typedArrayEncoder(70, 4),
+    typedArrayEncoder(71, 8),
+    typedArrayEncoder(72, 1),
+    typedArrayEncoder(77, 2),
+    typedArrayEncoder(78, 4),
+    typedArrayEncoder(79, 8),
+    typedArrayEncoder(85, 4),
+    typedArrayEncoder(86, 8),
+    {
+      encode(sharedData, encode13) {
+        let packedValues2 = sharedData.packedValues || [];
+        let sharedStructures = sharedData.structures || [];
+        if (packedValues2.values.length > 0) {
+          target[position2++] = 216;
+          target[position2++] = 51;
+          writeArrayHeader(4);
+          let valuesArray = packedValues2.values;
+          encode13(valuesArray);
+          writeArrayHeader(0);
+          writeArrayHeader(0);
+          packedObjectMap = Object.create(sharedPackedObjectMap || null);
+          for (let i = 0, l = valuesArray.length; i < l; i++) {
+            packedObjectMap[valuesArray[i]] = i;
+          }
+        }
+        if (sharedStructures) {
+          targetView.setUint32(position2, 3655335424);
+          position2 += 3;
+          let definitions = sharedStructures.slice(0);
+          definitions.unshift(57344);
+          definitions.push(new Tag(sharedData.version, 1399353956));
+          encode13(definitions);
+        } else
+          encode13(new Tag(sharedData.version, 1399353956));
+      }
+    }
+  ];
   function typedArrayEncoder(tag, size) {
     if (!isLittleEndianMachine2 && size > 1)
       tag -= 4;
@@ -40756,1073 +41865,17 @@ if (cid) {
     }
     addExtension(extension);
   }
-  var textEncoder2, extensions, extensionClasses, Buffer2, hasNodeBuffer, ByteArrayAllocate, ByteArray, MAX_STRUCTURES, MAX_BUFFER_SIZE, throwOnIterable, target, targetView, position2, safeEnd, bundledStrings2, MAX_BUNDLE_SIZE, hasNonLatin, RECORD_SYMBOL, Encoder4, SharedData, BlobConstructor, isLittleEndianMachine2, defaultEncoder, encode9, encodeAsIterable, encodeAsAsyncIterable, NEVER, ALWAYS, DECIMAL_ROUND, DECIMAL_FIT, REUSE_BUFFER_MODE, RESET_BUFFER_MODE, THROW_ON_ITERABLE;
-  var init_encode = __esm({
-    "node_modules/cbor-x/encode.js"() {
-      init_decode();
-      init_decode();
-      init_decode();
-      try {
-        textEncoder2 = new TextEncoder();
-      } catch (error) {
-      }
-      Buffer2 = typeof globalThis === "object" && globalThis.Buffer;
-      hasNodeBuffer = typeof Buffer2 !== "undefined";
-      ByteArrayAllocate = hasNodeBuffer ? Buffer2.allocUnsafeSlow : Uint8Array;
-      ByteArray = hasNodeBuffer ? Buffer2 : Uint8Array;
-      MAX_STRUCTURES = 256;
-      MAX_BUFFER_SIZE = hasNodeBuffer ? 4294967296 : 2144337920;
-      position2 = 0;
-      bundledStrings2 = null;
-      MAX_BUNDLE_SIZE = 61440;
-      hasNonLatin = /[\u0080-\uFFFF]/;
-      RECORD_SYMBOL = Symbol("record-id");
-      Encoder4 = class extends Decoder4 {
-        constructor(options) {
-          super(options);
-          this.offset = 0;
-          let typeBuffer;
-          let start;
-          let sharedStructures;
-          let hasSharedUpdate;
-          let structures;
-          let referenceMap2;
-          options = options || {};
-          let encodeUtf8 = ByteArray.prototype.utf8Write ? function(string2, position3, maxBytes) {
-            return target.utf8Write(string2, position3, maxBytes);
-          } : textEncoder2 && textEncoder2.encodeInto ? function(string2, position3) {
-            return textEncoder2.encodeInto(string2, target.subarray(position3)).written;
-          } : false;
-          let encoder = this;
-          let hasSharedStructures = options.structures || options.saveStructures;
-          let maxSharedStructures = options.maxSharedStructures;
-          if (maxSharedStructures == null)
-            maxSharedStructures = hasSharedStructures ? 128 : 0;
-          if (maxSharedStructures > 8190)
-            throw new Error("Maximum maxSharedStructure is 8190");
-          let isSequential = options.sequential;
-          if (isSequential) {
-            maxSharedStructures = 0;
-          }
-          if (!this.structures)
-            this.structures = [];
-          if (this.saveStructures)
-            this.saveShared = this.saveStructures;
-          let samplingPackedValues, packedObjectMap2, sharedValues = options.sharedValues;
-          let sharedPackedObjectMap2;
-          if (sharedValues) {
-            sharedPackedObjectMap2 = /* @__PURE__ */ Object.create(null);
-            for (let i = 0, l = sharedValues.length; i < l; i++) {
-              sharedPackedObjectMap2[sharedValues[i]] = i;
-            }
-          }
-          let recordIdsToRemove = [];
-          let transitionsCount = 0;
-          let serializationsSinceTransitionRebuild = 0;
-          this.mapEncode = function(value, encodeOptions2) {
-            if (this._keyMap && !this._mapped) {
-              switch (value.constructor.name) {
-                case "Array":
-                  value = value.map((r) => this.encodeKeys(r));
-                  break;
-              }
-            }
-            return this.encode(value, encodeOptions2);
-          };
-          this.encode = function(value, encodeOptions2) {
-            if (!target) {
-              target = new ByteArrayAllocate(8192);
-              targetView = new DataView(target.buffer, 0, 8192);
-              position2 = 0;
-            }
-            safeEnd = target.length - 10;
-            if (safeEnd - position2 < 2048) {
-              target = new ByteArrayAllocate(target.length);
-              targetView = new DataView(target.buffer, 0, target.length);
-              safeEnd = target.length - 10;
-              position2 = 0;
-            } else if (encodeOptions2 === REUSE_BUFFER_MODE)
-              position2 = position2 + 7 & 2147483640;
-            start = position2;
-            if (encoder.useSelfDescribedHeader) {
-              targetView.setUint32(position2, 3654940416);
-              position2 += 3;
-            }
-            referenceMap2 = encoder.structuredClone ? /* @__PURE__ */ new Map() : null;
-            if (encoder.bundleStrings && typeof value !== "string") {
-              bundledStrings2 = [];
-              bundledStrings2.size = Infinity;
-            } else
-              bundledStrings2 = null;
-            sharedStructures = encoder.structures;
-            if (sharedStructures) {
-              if (sharedStructures.uninitialized) {
-                let sharedData = encoder.getShared() || {};
-                encoder.structures = sharedStructures = sharedData.structures || [];
-                encoder.sharedVersion = sharedData.version;
-                let sharedValues2 = encoder.sharedValues = sharedData.packedValues;
-                if (sharedValues2) {
-                  sharedPackedObjectMap2 = {};
-                  for (let i = 0, l = sharedValues2.length; i < l; i++)
-                    sharedPackedObjectMap2[sharedValues2[i]] = i;
-                }
-              }
-              let sharedStructuresLength = sharedStructures.length;
-              if (sharedStructuresLength > maxSharedStructures && !isSequential)
-                sharedStructuresLength = maxSharedStructures;
-              if (!sharedStructures.transitions) {
-                sharedStructures.transitions = /* @__PURE__ */ Object.create(null);
-                for (let i = 0; i < sharedStructuresLength; i++) {
-                  let keys = sharedStructures[i];
-                  if (!keys)
-                    continue;
-                  let nextTransition, transition = sharedStructures.transitions;
-                  for (let j = 0, l = keys.length; j < l; j++) {
-                    if (transition[RECORD_SYMBOL] === void 0)
-                      transition[RECORD_SYMBOL] = i;
-                    let key = keys[j];
-                    nextTransition = transition[key];
-                    if (!nextTransition) {
-                      nextTransition = transition[key] = /* @__PURE__ */ Object.create(null);
-                    }
-                    transition = nextTransition;
-                  }
-                  transition[RECORD_SYMBOL] = i | 1048576;
-                }
-              }
-              if (!isSequential)
-                sharedStructures.nextId = sharedStructuresLength;
-            }
-            if (hasSharedUpdate)
-              hasSharedUpdate = false;
-            structures = sharedStructures || [];
-            packedObjectMap2 = sharedPackedObjectMap2;
-            if (options.pack) {
-              let packedValues2 = /* @__PURE__ */ new Map();
-              packedValues2.values = [];
-              packedValues2.encoder = encoder;
-              packedValues2.maxValues = options.maxPrivatePackedValues || (sharedPackedObjectMap2 ? 16 : Infinity);
-              packedValues2.objectMap = sharedPackedObjectMap2 || false;
-              packedValues2.samplingPackedValues = samplingPackedValues;
-              findRepetitiveStrings(value, packedValues2);
-              if (packedValues2.values.length > 0) {
-                target[position2++] = 216;
-                target[position2++] = 51;
-                writeArrayHeader(4);
-                let valuesArray = packedValues2.values;
-                encode13(valuesArray);
-                writeArrayHeader(0);
-                writeArrayHeader(0);
-                packedObjectMap2 = Object.create(sharedPackedObjectMap2 || null);
-                for (let i = 0, l = valuesArray.length; i < l; i++) {
-                  packedObjectMap2[valuesArray[i]] = i;
-                }
-              }
-            }
-            throwOnIterable = encodeOptions2 & THROW_ON_ITERABLE;
-            try {
-              if (throwOnIterable)
-                return;
-              encode13(value);
-              if (bundledStrings2) {
-                writeBundles(start, encode13);
-              }
-              encoder.offset = position2;
-              if (referenceMap2 && referenceMap2.idsToInsert) {
-                position2 += referenceMap2.idsToInsert.length * 2;
-                if (position2 > safeEnd)
-                  makeRoom(position2);
-                encoder.offset = position2;
-                let serialized = insertIds(target.subarray(start, position2), referenceMap2.idsToInsert);
-                referenceMap2 = null;
-                return serialized;
-              }
-              if (encodeOptions2 & REUSE_BUFFER_MODE) {
-                target.start = start;
-                target.end = position2;
-                return target;
-              }
-              return target.subarray(start, position2);
-            } finally {
-              if (sharedStructures) {
-                if (serializationsSinceTransitionRebuild < 10)
-                  serializationsSinceTransitionRebuild++;
-                if (sharedStructures.length > maxSharedStructures)
-                  sharedStructures.length = maxSharedStructures;
-                if (transitionsCount > 1e4) {
-                  sharedStructures.transitions = null;
-                  serializationsSinceTransitionRebuild = 0;
-                  transitionsCount = 0;
-                  if (recordIdsToRemove.length > 0)
-                    recordIdsToRemove = [];
-                } else if (recordIdsToRemove.length > 0 && !isSequential) {
-                  for (let i = 0, l = recordIdsToRemove.length; i < l; i++) {
-                    recordIdsToRemove[i][RECORD_SYMBOL] = void 0;
-                  }
-                  recordIdsToRemove = [];
-                }
-              }
-              if (hasSharedUpdate && encoder.saveShared) {
-                if (encoder.structures.length > maxSharedStructures) {
-                  encoder.structures = encoder.structures.slice(0, maxSharedStructures);
-                }
-                let returnBuffer = target.subarray(start, position2);
-                if (encoder.updateSharedData() === false)
-                  return encoder.encode(value);
-                return returnBuffer;
-              }
-              if (encodeOptions2 & RESET_BUFFER_MODE)
-                position2 = start;
-            }
-          };
-          this.findCommonStringsToPack = () => {
-            samplingPackedValues = /* @__PURE__ */ new Map();
-            if (!sharedPackedObjectMap2)
-              sharedPackedObjectMap2 = /* @__PURE__ */ Object.create(null);
-            return (options2) => {
-              let threshold = options2 && options2.threshold || 4;
-              let position3 = this.pack ? options2.maxPrivatePackedValues || 16 : 0;
-              if (!sharedValues)
-                sharedValues = this.sharedValues = [];
-              for (let [key, status] of samplingPackedValues) {
-                if (status.count > threshold) {
-                  sharedPackedObjectMap2[key] = position3++;
-                  sharedValues.push(key);
-                  hasSharedUpdate = true;
-                }
-              }
-              while (this.saveShared && this.updateSharedData() === false) {
-              }
-              samplingPackedValues = null;
-            };
-          };
-          const encode13 = (value) => {
-            if (position2 > safeEnd)
-              target = makeRoom(position2);
-            var type = typeof value;
-            var length5;
-            if (type === "string") {
-              if (packedObjectMap2) {
-                let packedPosition = packedObjectMap2[value];
-                if (packedPosition >= 0) {
-                  if (packedPosition < 16)
-                    target[position2++] = packedPosition + 224;
-                  else {
-                    target[position2++] = 198;
-                    if (packedPosition & 1)
-                      encode13(15 - packedPosition >> 1);
-                    else
-                      encode13(packedPosition - 16 >> 1);
-                  }
-                  return;
-                } else if (samplingPackedValues && !options.pack) {
-                  let status = samplingPackedValues.get(value);
-                  if (status)
-                    status.count++;
-                  else
-                    samplingPackedValues.set(value, {
-                      count: 1
-                    });
-                }
-              }
-              let strLength = value.length;
-              if (bundledStrings2 && strLength >= 4 && strLength < 1024) {
-                if ((bundledStrings2.size += strLength) > MAX_BUNDLE_SIZE) {
-                  let extStart;
-                  let maxBytes2 = (bundledStrings2[0] ? bundledStrings2[0].length * 3 + bundledStrings2[1].length : 0) + 10;
-                  if (position2 + maxBytes2 > safeEnd)
-                    target = makeRoom(position2 + maxBytes2);
-                  target[position2++] = 217;
-                  target[position2++] = 223;
-                  target[position2++] = 249;
-                  target[position2++] = bundledStrings2.position ? 132 : 130;
-                  target[position2++] = 26;
-                  extStart = position2 - start;
-                  position2 += 4;
-                  if (bundledStrings2.position) {
-                    writeBundles(start, encode13);
-                  }
-                  bundledStrings2 = ["", ""];
-                  bundledStrings2.size = 0;
-                  bundledStrings2.position = extStart;
-                }
-                let twoByte = hasNonLatin.test(value);
-                bundledStrings2[twoByte ? 0 : 1] += value;
-                target[position2++] = twoByte ? 206 : 207;
-                encode13(strLength);
-                return;
-              }
-              let headerSize;
-              if (strLength < 32) {
-                headerSize = 1;
-              } else if (strLength < 256) {
-                headerSize = 2;
-              } else if (strLength < 65536) {
-                headerSize = 3;
-              } else {
-                headerSize = 5;
-              }
-              let maxBytes = strLength * 3;
-              if (position2 + maxBytes > safeEnd)
-                target = makeRoom(position2 + maxBytes);
-              if (strLength < 64 || !encodeUtf8) {
-                let i, c1, c2, strPosition = position2 + headerSize;
-                for (i = 0; i < strLength; i++) {
-                  c1 = value.charCodeAt(i);
-                  if (c1 < 128) {
-                    target[strPosition++] = c1;
-                  } else if (c1 < 2048) {
-                    target[strPosition++] = c1 >> 6 | 192;
-                    target[strPosition++] = c1 & 63 | 128;
-                  } else if ((c1 & 64512) === 55296 && ((c2 = value.charCodeAt(i + 1)) & 64512) === 56320) {
-                    c1 = 65536 + ((c1 & 1023) << 10) + (c2 & 1023);
-                    i++;
-                    target[strPosition++] = c1 >> 18 | 240;
-                    target[strPosition++] = c1 >> 12 & 63 | 128;
-                    target[strPosition++] = c1 >> 6 & 63 | 128;
-                    target[strPosition++] = c1 & 63 | 128;
-                  } else {
-                    target[strPosition++] = c1 >> 12 | 224;
-                    target[strPosition++] = c1 >> 6 & 63 | 128;
-                    target[strPosition++] = c1 & 63 | 128;
-                  }
-                }
-                length5 = strPosition - position2 - headerSize;
-              } else {
-                length5 = encodeUtf8(value, position2 + headerSize, maxBytes);
-              }
-              if (length5 < 24) {
-                target[position2++] = 96 | length5;
-              } else if (length5 < 256) {
-                if (headerSize < 2) {
-                  target.copyWithin(position2 + 2, position2 + 1, position2 + 1 + length5);
-                }
-                target[position2++] = 120;
-                target[position2++] = length5;
-              } else if (length5 < 65536) {
-                if (headerSize < 3) {
-                  target.copyWithin(position2 + 3, position2 + 2, position2 + 2 + length5);
-                }
-                target[position2++] = 121;
-                target[position2++] = length5 >> 8;
-                target[position2++] = length5 & 255;
-              } else {
-                if (headerSize < 5) {
-                  target.copyWithin(position2 + 5, position2 + 3, position2 + 3 + length5);
-                }
-                target[position2++] = 122;
-                targetView.setUint32(position2, length5);
-                position2 += 4;
-              }
-              position2 += length5;
-            } else if (type === "number") {
-              if (!this.alwaysUseFloat && value >>> 0 === value) {
-                if (value < 24) {
-                  target[position2++] = value;
-                } else if (value < 256) {
-                  target[position2++] = 24;
-                  target[position2++] = value;
-                } else if (value < 65536) {
-                  target[position2++] = 25;
-                  target[position2++] = value >> 8;
-                  target[position2++] = value & 255;
-                } else {
-                  target[position2++] = 26;
-                  targetView.setUint32(position2, value);
-                  position2 += 4;
-                }
-              } else if (!this.alwaysUseFloat && value >> 0 === value) {
-                if (value >= -24) {
-                  target[position2++] = 31 - value;
-                } else if (value >= -256) {
-                  target[position2++] = 56;
-                  target[position2++] = ~value;
-                } else if (value >= -65536) {
-                  target[position2++] = 57;
-                  targetView.setUint16(position2, ~value);
-                  position2 += 2;
-                } else {
-                  target[position2++] = 58;
-                  targetView.setUint32(position2, ~value);
-                  position2 += 4;
-                }
-              } else {
-                let useFloat32;
-                if ((useFloat32 = this.useFloat32) > 0 && value < 4294967296 && value >= -2147483648) {
-                  target[position2++] = 250;
-                  targetView.setFloat32(position2, value);
-                  let xShifted;
-                  if (useFloat32 < 4 || // this checks for rounding of numbers that were encoded in 32-bit float to nearest significant decimal digit that could be preserved
-                  (xShifted = value * mult10[(target[position2] & 127) << 1 | target[position2 + 1] >> 7]) >> 0 === xShifted) {
-                    position2 += 4;
-                    return;
-                  } else
-                    position2--;
-                }
-                target[position2++] = 251;
-                targetView.setFloat64(position2, value);
-                position2 += 8;
-              }
-            } else if (type === "object") {
-              if (!value)
-                target[position2++] = 246;
-              else {
-                if (referenceMap2) {
-                  let referee = referenceMap2.get(value);
-                  if (referee) {
-                    target[position2++] = 216;
-                    target[position2++] = 29;
-                    target[position2++] = 25;
-                    if (!referee.references) {
-                      let idsToInsert = referenceMap2.idsToInsert || (referenceMap2.idsToInsert = []);
-                      referee.references = [];
-                      idsToInsert.push(referee);
-                    }
-                    referee.references.push(position2 - start);
-                    position2 += 2;
-                    return;
-                  } else
-                    referenceMap2.set(value, { offset: position2 - start });
-                }
-                let constructor = value.constructor;
-                if (constructor === Object) {
-                  writeObject(value);
-                } else if (constructor === Array) {
-                  length5 = value.length;
-                  if (length5 < 24) {
-                    target[position2++] = 128 | length5;
-                  } else {
-                    writeArrayHeader(length5);
-                  }
-                  for (let i = 0; i < length5; i++) {
-                    encode13(value[i]);
-                  }
-                } else if (constructor === Map) {
-                  if (this.mapsAsObjects ? this.useTag259ForMaps !== false : this.useTag259ForMaps) {
-                    target[position2++] = 217;
-                    target[position2++] = 1;
-                    target[position2++] = 3;
-                  }
-                  length5 = value.size;
-                  if (length5 < 24) {
-                    target[position2++] = 160 | length5;
-                  } else if (length5 < 256) {
-                    target[position2++] = 184;
-                    target[position2++] = length5;
-                  } else if (length5 < 65536) {
-                    target[position2++] = 185;
-                    target[position2++] = length5 >> 8;
-                    target[position2++] = length5 & 255;
-                  } else {
-                    target[position2++] = 186;
-                    targetView.setUint32(position2, length5);
-                    position2 += 4;
-                  }
-                  if (encoder.keyMap) {
-                    for (let [key, entryValue] of value) {
-                      encode13(encoder.encodeKey(key));
-                      encode13(entryValue);
-                    }
-                  } else {
-                    for (let [key, entryValue] of value) {
-                      encode13(key);
-                      encode13(entryValue);
-                    }
-                  }
-                } else {
-                  for (let i = 0, l = extensions.length; i < l; i++) {
-                    let extensionClass = extensionClasses[i];
-                    if (value instanceof extensionClass) {
-                      let extension = extensions[i];
-                      let tag = extension.tag;
-                      if (tag == void 0)
-                        tag = extension.getTag && extension.getTag.call(this, value);
-                      if (tag < 24) {
-                        target[position2++] = 192 | tag;
-                      } else if (tag < 256) {
-                        target[position2++] = 216;
-                        target[position2++] = tag;
-                      } else if (tag < 65536) {
-                        target[position2++] = 217;
-                        target[position2++] = tag >> 8;
-                        target[position2++] = tag & 255;
-                      } else if (tag > -1) {
-                        target[position2++] = 218;
-                        targetView.setUint32(position2, tag);
-                        position2 += 4;
-                      }
-                      extension.encode.call(this, value, encode13, makeRoom);
-                      return;
-                    }
-                  }
-                  if (value[Symbol.iterator]) {
-                    if (throwOnIterable) {
-                      let error = new Error("Iterable should be serialized as iterator");
-                      error.iteratorNotHandled = true;
-                      throw error;
-                    }
-                    target[position2++] = 159;
-                    for (let entry of value) {
-                      encode13(entry);
-                    }
-                    target[position2++] = 255;
-                    return;
-                  }
-                  if (value[Symbol.asyncIterator] || isBlob(value)) {
-                    let error = new Error("Iterable/blob should be serialized as iterator");
-                    error.iteratorNotHandled = true;
-                    throw error;
-                  }
-                  if (this.useToJSON && value.toJSON) {
-                    const json = value.toJSON();
-                    if (json !== value)
-                      return encode13(json);
-                  }
-                  writeObject(value);
-                }
-              }
-            } else if (type === "boolean") {
-              target[position2++] = value ? 245 : 244;
-            } else if (type === "bigint") {
-              if (value < BigInt(1) << BigInt(64) && value >= 0) {
-                target[position2++] = 27;
-                targetView.setBigUint64(position2, value);
-              } else if (value > -(BigInt(1) << BigInt(64)) && value < 0) {
-                target[position2++] = 59;
-                targetView.setBigUint64(position2, -value - BigInt(1));
-              } else {
-                if (this.largeBigIntToFloat) {
-                  target[position2++] = 251;
-                  targetView.setFloat64(position2, Number(value));
-                } else {
-                  throw new RangeError(value + " was too large to fit in CBOR 64-bit integer format, set largeBigIntToFloat to convert to float-64");
-                }
-              }
-              position2 += 8;
-            } else if (type === "undefined") {
-              target[position2++] = 247;
-            } else {
-              throw new Error("Unknown type: " + type);
-            }
-          };
-          const writeObject = this.useRecords === false ? this.variableMapSize ? (object) => {
-            let keys = Object.keys(object);
-            let vals = Object.values(object);
-            let length5 = keys.length;
-            if (length5 < 24) {
-              target[position2++] = 160 | length5;
-            } else if (length5 < 256) {
-              target[position2++] = 184;
-              target[position2++] = length5;
-            } else if (length5 < 65536) {
-              target[position2++] = 185;
-              target[position2++] = length5 >> 8;
-              target[position2++] = length5 & 255;
-            } else {
-              target[position2++] = 186;
-              targetView.setUint32(position2, length5);
-              position2 += 4;
-            }
-            let key;
-            if (encoder.keyMap) {
-              for (let i = 0; i < length5; i++) {
-                encode13(encoder.encodeKey(keys[i]));
-                encode13(vals[i]);
-              }
-            } else {
-              for (let i = 0; i < length5; i++) {
-                encode13(keys[i]);
-                encode13(vals[i]);
-              }
-            }
-          } : (object) => {
-            target[position2++] = 185;
-            let objectOffset = position2 - start;
-            position2 += 2;
-            let size = 0;
-            if (encoder.keyMap) {
-              for (let key in object)
-                if (typeof object.hasOwnProperty !== "function" || object.hasOwnProperty(key)) {
-                  encode13(encoder.encodeKey(key));
-                  encode13(object[key]);
-                  size++;
-                }
-            } else {
-              for (let key in object)
-                if (typeof object.hasOwnProperty !== "function" || object.hasOwnProperty(key)) {
-                  encode13(key);
-                  encode13(object[key]);
-                  size++;
-                }
-            }
-            target[objectOffset++ + start] = size >> 8;
-            target[objectOffset + start] = size & 255;
-          } : (object, skipValues) => {
-            let nextTransition, transition = structures.transitions || (structures.transitions = /* @__PURE__ */ Object.create(null));
-            let newTransitions = 0;
-            let length5 = 0;
-            let parentRecordId;
-            let keys;
-            if (this.keyMap) {
-              keys = Object.keys(object).map((k) => this.encodeKey(k));
-              length5 = keys.length;
-              for (let i = 0; i < length5; i++) {
-                let key = keys[i];
-                nextTransition = transition[key];
-                if (!nextTransition) {
-                  nextTransition = transition[key] = /* @__PURE__ */ Object.create(null);
-                  newTransitions++;
-                }
-                transition = nextTransition;
-              }
-            } else {
-              for (let key in object)
-                if (typeof object.hasOwnProperty !== "function" || object.hasOwnProperty(key)) {
-                  nextTransition = transition[key];
-                  if (!nextTransition) {
-                    if (transition[RECORD_SYMBOL] & 1048576) {
-                      parentRecordId = transition[RECORD_SYMBOL] & 65535;
-                    }
-                    nextTransition = transition[key] = /* @__PURE__ */ Object.create(null);
-                    newTransitions++;
-                  }
-                  transition = nextTransition;
-                  length5++;
-                }
-            }
-            let recordId = transition[RECORD_SYMBOL];
-            if (recordId !== void 0) {
-              recordId &= 65535;
-              target[position2++] = 217;
-              target[position2++] = recordId >> 8 | 224;
-              target[position2++] = recordId & 255;
-            } else {
-              if (!keys)
-                keys = transition.__keys__ || (transition.__keys__ = Object.keys(object));
-              if (parentRecordId === void 0) {
-                recordId = structures.nextId++;
-                if (!recordId) {
-                  recordId = 0;
-                  structures.nextId = 1;
-                }
-                if (recordId >= MAX_STRUCTURES) {
-                  structures.nextId = (recordId = maxSharedStructures) + 1;
-                }
-              } else {
-                recordId = parentRecordId;
-              }
-              structures[recordId] = keys;
-              if (recordId < maxSharedStructures) {
-                target[position2++] = 217;
-                target[position2++] = recordId >> 8 | 224;
-                target[position2++] = recordId & 255;
-                transition = structures.transitions;
-                for (let i = 0; i < length5; i++) {
-                  if (transition[RECORD_SYMBOL] === void 0 || transition[RECORD_SYMBOL] & 1048576)
-                    transition[RECORD_SYMBOL] = recordId;
-                  transition = transition[keys[i]];
-                }
-                transition[RECORD_SYMBOL] = recordId | 1048576;
-                hasSharedUpdate = true;
-              } else {
-                transition[RECORD_SYMBOL] = recordId;
-                targetView.setUint32(position2, 3655335680);
-                position2 += 3;
-                if (newTransitions)
-                  transitionsCount += serializationsSinceTransitionRebuild * newTransitions;
-                if (recordIdsToRemove.length >= MAX_STRUCTURES - maxSharedStructures)
-                  recordIdsToRemove.shift()[RECORD_SYMBOL] = void 0;
-                recordIdsToRemove.push(transition);
-                writeArrayHeader(length5 + 2);
-                encode13(57344 + recordId);
-                encode13(keys);
-                if (skipValues)
-                  return;
-                for (let key in object)
-                  if (typeof object.hasOwnProperty !== "function" || object.hasOwnProperty(key))
-                    encode13(object[key]);
-                return;
-              }
-            }
-            if (length5 < 24) {
-              target[position2++] = 128 | length5;
-            } else {
-              writeArrayHeader(length5);
-            }
-            if (skipValues)
-              return;
-            for (let key in object)
-              if (typeof object.hasOwnProperty !== "function" || object.hasOwnProperty(key))
-                encode13(object[key]);
-          };
-          const makeRoom = (end) => {
-            let newSize;
-            if (end > 16777216) {
-              if (end - start > MAX_BUFFER_SIZE)
-                throw new Error("Encoded buffer would be larger than maximum buffer size");
-              newSize = Math.min(
-                MAX_BUFFER_SIZE,
-                Math.round(Math.max((end - start) * (end > 67108864 ? 1.25 : 2), 4194304) / 4096) * 4096
-              );
-            } else
-              newSize = (Math.max(end - start << 2, target.length - 1) >> 12) + 1 << 12;
-            let newBuffer = new ByteArrayAllocate(newSize);
-            targetView = new DataView(newBuffer.buffer, 0, newSize);
-            if (target.copy)
-              target.copy(newBuffer, 0, start, end);
-            else
-              newBuffer.set(target.slice(start, end));
-            position2 -= start;
-            start = 0;
-            safeEnd = newBuffer.length - 10;
-            return target = newBuffer;
-          };
-          let chunkThreshold = 100;
-          let continuedChunkThreshold = 1e3;
-          this.encodeAsIterable = function(value, options2) {
-            return startEncoding(value, options2, encodeObjectAsIterable);
-          };
-          this.encodeAsAsyncIterable = function(value, options2) {
-            return startEncoding(value, options2, encodeObjectAsAsyncIterable);
-          };
-          function* encodeObjectAsIterable(object, iterateProperties, finalIterable) {
-            let constructor = object.constructor;
-            if (constructor === Object) {
-              let useRecords = encoder.useRecords !== false;
-              if (useRecords)
-                writeObject(object, true);
-              else
-                writeEntityLength(Object.keys(object).length, 160);
-              for (let key in object) {
-                let value = object[key];
-                if (!useRecords)
-                  encode13(key);
-                if (value && typeof value === "object") {
-                  if (iterateProperties[key])
-                    yield* __yieldStar(encodeObjectAsIterable(value, iterateProperties[key]));
-                  else
-                    yield* __yieldStar(tryEncode(value, iterateProperties, key));
-                } else
-                  encode13(value);
-              }
-            } else if (constructor === Array) {
-              let length5 = object.length;
-              writeArrayHeader(length5);
-              for (let i = 0; i < length5; i++) {
-                let value = object[i];
-                if (value && (typeof value === "object" || position2 - start > chunkThreshold)) {
-                  if (iterateProperties.element)
-                    yield* __yieldStar(encodeObjectAsIterable(value, iterateProperties.element));
-                  else
-                    yield* __yieldStar(tryEncode(value, iterateProperties, "element"));
-                } else
-                  encode13(value);
-              }
-            } else if (object[Symbol.iterator]) {
-              target[position2++] = 159;
-              for (let value of object) {
-                if (value && (typeof value === "object" || position2 - start > chunkThreshold)) {
-                  if (iterateProperties.element)
-                    yield* __yieldStar(encodeObjectAsIterable(value, iterateProperties.element));
-                  else
-                    yield* __yieldStar(tryEncode(value, iterateProperties, "element"));
-                } else
-                  encode13(value);
-              }
-              target[position2++] = 255;
-            } else if (isBlob(object)) {
-              writeEntityLength(object.size, 64);
-              yield target.subarray(start, position2);
-              yield object;
-              restartEncoding();
-            } else if (object[Symbol.asyncIterator]) {
-              target[position2++] = 159;
-              yield target.subarray(start, position2);
-              yield object;
-              restartEncoding();
-              target[position2++] = 255;
-            } else {
-              encode13(object);
-            }
-            if (finalIterable && position2 > start)
-              yield target.subarray(start, position2);
-            else if (position2 - start > chunkThreshold) {
-              yield target.subarray(start, position2);
-              restartEncoding();
-            }
-          }
-          function* tryEncode(value, iterateProperties, key) {
-            let restart = position2 - start;
-            try {
-              encode13(value);
-              if (position2 - start > chunkThreshold) {
-                yield target.subarray(start, position2);
-                restartEncoding();
-              }
-            } catch (error) {
-              if (error.iteratorNotHandled) {
-                iterateProperties[key] = {};
-                position2 = start + restart;
-                yield* __yieldStar(encodeObjectAsIterable.call(this, value, iterateProperties[key]));
-              } else
-                throw error;
-            }
-          }
-          function restartEncoding() {
-            chunkThreshold = continuedChunkThreshold;
-            encoder.encode(null, THROW_ON_ITERABLE);
-          }
-          function startEncoding(value, options2, encodeIterable) {
-            if (options2 && options2.chunkThreshold)
-              chunkThreshold = continuedChunkThreshold = options2.chunkThreshold;
-            else
-              chunkThreshold = 100;
-            if (value && typeof value === "object") {
-              encoder.encode(null, THROW_ON_ITERABLE);
-              return encodeIterable(value, encoder.iterateProperties || (encoder.iterateProperties = {}), true);
-            }
-            return [encoder.encode(value)];
-          }
-          function encodeObjectAsAsyncIterable(value, iterateProperties) {
-            return __asyncGenerator(this, null, function* () {
-              for (let encodedValue of encodeObjectAsIterable(value, iterateProperties, true)) {
-                let constructor = encodedValue.constructor;
-                if (constructor === ByteArray || constructor === Uint8Array)
-                  yield encodedValue;
-                else if (isBlob(encodedValue)) {
-                  let reader = encodedValue.stream().getReader();
-                  let next;
-                  while (!(next = yield new __await(reader.read())).done) {
-                    yield next.value;
-                  }
-                } else if (encodedValue[Symbol.asyncIterator]) {
-                  try {
-                    for (var iter = __forAwait(encodedValue), more, temp, error; more = !(temp = yield new __await(iter.next())).done; more = false) {
-                      let asyncValue = temp.value;
-                      restartEncoding();
-                      if (asyncValue)
-                        yield* __yieldStar(encodeObjectAsAsyncIterable(asyncValue, iterateProperties.async || (iterateProperties.async = {})));
-                      else
-                        yield encoder.encode(asyncValue);
-                    }
-                  } catch (temp) {
-                    error = [temp];
-                  } finally {
-                    try {
-                      more && (temp = iter.return) && (yield new __await(temp.call(iter)));
-                    } finally {
-                      if (error)
-                        throw error[0];
-                    }
-                  }
-                } else {
-                  yield encodedValue;
-                }
-              }
-            });
-          }
-        }
-        useBuffer(buffer2) {
-          target = buffer2;
-          targetView = new DataView(target.buffer, target.byteOffset, target.byteLength);
-          position2 = 0;
-        }
-        clearSharedData() {
-          if (this.structures)
-            this.structures = [];
-          if (this.sharedValues)
-            this.sharedValues = void 0;
-        }
-        updateSharedData() {
-          let lastVersion = this.sharedVersion || 0;
-          this.sharedVersion = lastVersion + 1;
-          let structuresCopy = this.structures.slice(0);
-          let sharedData = new SharedData(structuresCopy, this.sharedValues, this.sharedVersion);
-          let saveResults = this.saveShared(
-            sharedData,
-            (existingShared) => (existingShared && existingShared.version || 0) == lastVersion
-          );
-          if (saveResults === false) {
-            sharedData = this.getShared() || {};
-            this.structures = sharedData.structures || [];
-            this.sharedValues = sharedData.packedValues;
-            this.sharedVersion = sharedData.version;
-            this.structures.nextId = this.structures.length;
-          } else {
-            structuresCopy.forEach((structure, i) => this.structures[i] = structure);
-          }
-          return saveResults;
-        }
-      };
-      SharedData = class {
-        constructor(structures, values, version5) {
-          this.structures = structures;
-          this.packedValues = values;
-          this.version = version5;
-        }
-      };
-      BlobConstructor = typeof Blob === "undefined" ? function() {
-      } : Blob;
-      isLittleEndianMachine2 = new Uint8Array(new Uint16Array([1]).buffer)[0] == 1;
-      extensionClasses = [
-        Date,
-        Set,
-        Error,
-        RegExp,
-        Tag,
-        ArrayBuffer,
-        Uint8Array,
-        Uint8ClampedArray,
-        Uint16Array,
-        Uint32Array,
-        typeof BigUint64Array == "undefined" ? function() {
-        } : BigUint64Array,
-        Int8Array,
-        Int16Array,
-        Int32Array,
-        typeof BigInt64Array == "undefined" ? function() {
-        } : BigInt64Array,
-        Float32Array,
-        Float64Array,
-        SharedData
-      ];
-      extensions = [
-        {
-          // Date
-          tag: 1,
-          encode(date, encode13) {
-            let seconds = date.getTime() / 1e3;
-            if ((this.useTimestamp32 || date.getMilliseconds() === 0) && seconds >= 0 && seconds < 4294967296) {
-              target[position2++] = 26;
-              targetView.setUint32(position2, seconds);
-              position2 += 4;
-            } else {
-              target[position2++] = 251;
-              targetView.setFloat64(position2, seconds);
-              position2 += 8;
-            }
-          }
-        },
-        {
-          // Set
-          tag: 258,
-          // https://github.com/input-output-hk/cbor-sets-spec/blob/master/CBOR_SETS.md
-          encode(set, encode13) {
-            let array = Array.from(set);
-            encode13(array);
-          }
-        },
-        {
-          // Error
-          tag: 27,
-          // http://cbor.schmorp.de/generic-object
-          encode(error, encode13) {
-            encode13([error.name, error.message]);
-          }
-        },
-        {
-          // RegExp
-          tag: 27,
-          // http://cbor.schmorp.de/generic-object
-          encode(regex, encode13) {
-            encode13(["RegExp", regex.source, regex.flags]);
-          }
-        },
-        {
-          // Tag
-          getTag(tag) {
-            return tag.tag;
-          },
-          encode(tag, encode13) {
-            encode13(tag.value);
-          }
-        },
-        {
-          // ArrayBuffer
-          encode(arrayBuffer, encode13, makeRoom) {
-            writeBuffer(arrayBuffer, makeRoom);
-          }
-        },
-        {
-          // Uint8Array
-          getTag(typedArray) {
-            if (typedArray.constructor === Uint8Array) {
-              if (this.tagUint8Array || hasNodeBuffer && this.tagUint8Array !== false)
-                return 64;
-            }
-          },
-          encode(typedArray, encode13, makeRoom) {
-            writeBuffer(typedArray, makeRoom);
-          }
-        },
-        typedArrayEncoder(68, 1),
-        typedArrayEncoder(69, 2),
-        typedArrayEncoder(70, 4),
-        typedArrayEncoder(71, 8),
-        typedArrayEncoder(72, 1),
-        typedArrayEncoder(77, 2),
-        typedArrayEncoder(78, 4),
-        typedArrayEncoder(79, 8),
-        typedArrayEncoder(85, 4),
-        typedArrayEncoder(86, 8),
-        {
-          encode(sharedData, encode13) {
-            let packedValues2 = sharedData.packedValues || [];
-            let sharedStructures = sharedData.structures || [];
-            if (packedValues2.values.length > 0) {
-              target[position2++] = 216;
-              target[position2++] = 51;
-              writeArrayHeader(4);
-              let valuesArray = packedValues2.values;
-              encode13(valuesArray);
-              writeArrayHeader(0);
-              writeArrayHeader(0);
-              packedObjectMap = Object.create(sharedPackedObjectMap || null);
-              for (let i = 0, l = valuesArray.length; i < l; i++) {
-                packedObjectMap[valuesArray[i]] = i;
-              }
-            }
-            if (sharedStructures) {
-              targetView.setUint32(position2, 3655335424);
-              position2 += 3;
-              let definitions = sharedStructures.slice(0);
-              definitions.unshift(57344);
-              definitions.push(new Tag(sharedData.version, 1399353956));
-              encode13(definitions);
-            } else
-              encode13(new Tag(sharedData.version, 1399353956));
-          }
-        }
-      ];
-      defaultEncoder = new Encoder4({ useRecords: false });
-      encode9 = defaultEncoder.encode;
-      encodeAsIterable = defaultEncoder.encodeAsIterable;
-      encodeAsAsyncIterable = defaultEncoder.encodeAsAsyncIterable;
-      ({ NEVER, ALWAYS, DECIMAL_ROUND, DECIMAL_FIT } = FLOAT32_OPTIONS);
-      REUSE_BUFFER_MODE = 512;
-      RESET_BUFFER_MODE = 1024;
-      THROW_ON_ITERABLE = 2048;
-    }
-  });
-
-  // node_modules/cbor-x/iterators.js
-  var init_iterators = __esm({
-    "node_modules/cbor-x/iterators.js"() {
-      init_encode();
-      init_decode();
-    }
-  });
-
-  // node_modules/cbor-x/index.js
-  var init_cbor_x = __esm({
-    "node_modules/cbor-x/index.js"() {
-      init_encode();
-      init_decode();
-      init_iterators();
-    }
-  });
+  var defaultEncoder = new Encoder4({ useRecords: false });
+  var encode9 = defaultEncoder.encode;
+  var encodeAsIterable = defaultEncoder.encodeAsIterable;
+  var encodeAsAsyncIterable = defaultEncoder.encodeAsAsyncIterable;
+  var { NEVER, ALWAYS, DECIMAL_ROUND, DECIMAL_FIT } = FLOAT32_OPTIONS;
+  var REUSE_BUFFER_MODE = 512;
+  var RESET_BUFFER_MODE = 1024;
+  var THROW_ON_ITERABLE = 2048;
 
   // node_modules/multiformats/dist/src/bytes.js
+  var empty4 = new Uint8Array(0);
   function equals8(aa, bb) {
     if (aa === bb)
       return true;
@@ -41846,12 +41899,6 @@ if (cid) {
     }
     throw new Error("Unknown type, must be binary type");
   }
-  var empty4;
-  var init_bytes4 = __esm({
-    "node_modules/multiformats/dist/src/bytes.js"() {
-      empty4 = new Uint8Array(0);
-    }
-  });
 
   // node_modules/multiformats/dist/src/vendor/base-x.js
   function base4(ALPHABET, name2) {
@@ -41985,20 +42032,100 @@ if (cid) {
       decode: decode21
     };
   }
-  var src5, _brrp__multiformats_scope_baseX4, base_x_default4;
-  var init_base_x4 = __esm({
-    "node_modules/multiformats/dist/src/vendor/base-x.js"() {
-      src5 = base4;
-      _brrp__multiformats_scope_baseX4 = src5;
-      base_x_default4 = _brrp__multiformats_scope_baseX4;
-    }
-  });
+  var src5 = base4;
+  var _brrp__multiformats_scope_baseX4 = src5;
+  var base_x_default4 = _brrp__multiformats_scope_baseX4;
 
   // node_modules/multiformats/dist/src/bases/base.js
+  var Encoder5 = class {
+    constructor(name2, prefix, baseEncode) {
+      __publicField(this, "name");
+      __publicField(this, "prefix");
+      __publicField(this, "baseEncode");
+      this.name = name2;
+      this.prefix = prefix;
+      this.baseEncode = baseEncode;
+    }
+    encode(bytes) {
+      if (bytes instanceof Uint8Array) {
+        return `${this.prefix}${this.baseEncode(bytes)}`;
+      } else {
+        throw Error("Unknown type, must be binary type");
+      }
+    }
+  };
+  var Decoder5 = class {
+    constructor(name2, prefix, baseDecode) {
+      __publicField(this, "name");
+      __publicField(this, "prefix");
+      __publicField(this, "baseDecode");
+      __publicField(this, "prefixCodePoint");
+      this.name = name2;
+      this.prefix = prefix;
+      if (prefix.codePointAt(0) === void 0) {
+        throw new Error("Invalid prefix character");
+      }
+      this.prefixCodePoint = prefix.codePointAt(0);
+      this.baseDecode = baseDecode;
+    }
+    decode(text) {
+      if (typeof text === "string") {
+        if (text.codePointAt(0) !== this.prefixCodePoint) {
+          throw Error(`Unable to decode multibase string ${JSON.stringify(text)}, ${this.name} decoder only supports inputs prefixed with ${this.prefix}`);
+        }
+        return this.baseDecode(text.slice(this.prefix.length));
+      } else {
+        throw Error("Can only multibase decode strings");
+      }
+    }
+    or(decoder2) {
+      return or4(this, decoder2);
+    }
+  };
+  var ComposedDecoder4 = class {
+    constructor(decoders) {
+      __publicField(this, "decoders");
+      this.decoders = decoders;
+    }
+    or(decoder2) {
+      return or4(this, decoder2);
+    }
+    decode(input) {
+      const prefix = input[0];
+      const decoder2 = this.decoders[prefix];
+      if (decoder2 != null) {
+        return decoder2.decode(input);
+      } else {
+        throw RangeError(`Unable to decode multibase string ${JSON.stringify(input)}, only inputs prefixed with ${Object.keys(this.decoders)} are supported`);
+      }
+    }
+  };
   function or4(left, right) {
     var _a2, _b;
     return new ComposedDecoder4(__spreadValues(__spreadValues({}, (_a2 = left.decoders) != null ? _a2 : { [left.prefix]: left }), (_b = right.decoders) != null ? _b : { [right.prefix]: right }));
   }
+  var Codec4 = class {
+    constructor(name2, prefix, baseEncode, baseDecode) {
+      __publicField(this, "name");
+      __publicField(this, "prefix");
+      __publicField(this, "baseEncode");
+      __publicField(this, "baseDecode");
+      __publicField(this, "encoder");
+      __publicField(this, "decoder");
+      this.name = name2;
+      this.prefix = prefix;
+      this.baseEncode = baseEncode;
+      this.baseDecode = baseDecode;
+      this.encoder = new Encoder5(name2, prefix, baseEncode);
+      this.decoder = new Decoder5(name2, prefix, baseDecode);
+    }
+    encode(input) {
+      return this.encoder.encode(input);
+    }
+    decode(input) {
+      return this.decoder.decode(input);
+    }
+  };
   function from5({ name: name2, prefix, encode: encode13, decode: decode21 }) {
     return new Codec4(name2, prefix, encode13, decode21);
   }
@@ -42077,180 +42204,81 @@ if (cid) {
       }
     });
   }
-  var Encoder5, Decoder5, ComposedDecoder4, Codec4;
-  var init_base4 = __esm({
-    "node_modules/multiformats/dist/src/bases/base.js"() {
-      init_bytes4();
-      init_base_x4();
-      Encoder5 = class {
-        constructor(name2, prefix, baseEncode) {
-          __publicField(this, "name");
-          __publicField(this, "prefix");
-          __publicField(this, "baseEncode");
-          this.name = name2;
-          this.prefix = prefix;
-          this.baseEncode = baseEncode;
-        }
-        encode(bytes) {
-          if (bytes instanceof Uint8Array) {
-            return `${this.prefix}${this.baseEncode(bytes)}`;
-          } else {
-            throw Error("Unknown type, must be binary type");
-          }
-        }
-      };
-      Decoder5 = class {
-        constructor(name2, prefix, baseDecode) {
-          __publicField(this, "name");
-          __publicField(this, "prefix");
-          __publicField(this, "baseDecode");
-          __publicField(this, "prefixCodePoint");
-          this.name = name2;
-          this.prefix = prefix;
-          if (prefix.codePointAt(0) === void 0) {
-            throw new Error("Invalid prefix character");
-          }
-          this.prefixCodePoint = prefix.codePointAt(0);
-          this.baseDecode = baseDecode;
-        }
-        decode(text) {
-          if (typeof text === "string") {
-            if (text.codePointAt(0) !== this.prefixCodePoint) {
-              throw Error(`Unable to decode multibase string ${JSON.stringify(text)}, ${this.name} decoder only supports inputs prefixed with ${this.prefix}`);
-            }
-            return this.baseDecode(text.slice(this.prefix.length));
-          } else {
-            throw Error("Can only multibase decode strings");
-          }
-        }
-        or(decoder2) {
-          return or4(this, decoder2);
-        }
-      };
-      ComposedDecoder4 = class {
-        constructor(decoders) {
-          __publicField(this, "decoders");
-          this.decoders = decoders;
-        }
-        or(decoder2) {
-          return or4(this, decoder2);
-        }
-        decode(input) {
-          const prefix = input[0];
-          const decoder2 = this.decoders[prefix];
-          if (decoder2 != null) {
-            return decoder2.decode(input);
-          } else {
-            throw RangeError(`Unable to decode multibase string ${JSON.stringify(input)}, only inputs prefixed with ${Object.keys(this.decoders)} are supported`);
-          }
-        }
-      };
-      Codec4 = class {
-        constructor(name2, prefix, baseEncode, baseDecode) {
-          __publicField(this, "name");
-          __publicField(this, "prefix");
-          __publicField(this, "baseEncode");
-          __publicField(this, "baseDecode");
-          __publicField(this, "encoder");
-          __publicField(this, "decoder");
-          this.name = name2;
-          this.prefix = prefix;
-          this.baseEncode = baseEncode;
-          this.baseDecode = baseDecode;
-          this.encoder = new Encoder5(name2, prefix, baseEncode);
-          this.decoder = new Decoder5(name2, prefix, baseDecode);
-        }
-        encode(input) {
-          return this.encoder.encode(input);
-        }
-        decode(input) {
-          return this.decoder.decode(input);
-        }
-      };
-    }
-  });
 
   // node_modules/multiformats/dist/src/bases/base32.js
-  var base324, base32upper4, base32pad4, base32padupper4, base32hex4, base32hexupper4, base32hexpad4, base32hexpadupper4, base32z4;
-  var init_base324 = __esm({
-    "node_modules/multiformats/dist/src/bases/base32.js"() {
-      init_base4();
-      base324 = rfc46484({
-        prefix: "b",
-        name: "base32",
-        alphabet: "abcdefghijklmnopqrstuvwxyz234567",
-        bitsPerChar: 5
-      });
-      base32upper4 = rfc46484({
-        prefix: "B",
-        name: "base32upper",
-        alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567",
-        bitsPerChar: 5
-      });
-      base32pad4 = rfc46484({
-        prefix: "c",
-        name: "base32pad",
-        alphabet: "abcdefghijklmnopqrstuvwxyz234567=",
-        bitsPerChar: 5
-      });
-      base32padupper4 = rfc46484({
-        prefix: "C",
-        name: "base32padupper",
-        alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567=",
-        bitsPerChar: 5
-      });
-      base32hex4 = rfc46484({
-        prefix: "v",
-        name: "base32hex",
-        alphabet: "0123456789abcdefghijklmnopqrstuv",
-        bitsPerChar: 5
-      });
-      base32hexupper4 = rfc46484({
-        prefix: "V",
-        name: "base32hexupper",
-        alphabet: "0123456789ABCDEFGHIJKLMNOPQRSTUV",
-        bitsPerChar: 5
-      });
-      base32hexpad4 = rfc46484({
-        prefix: "t",
-        name: "base32hexpad",
-        alphabet: "0123456789abcdefghijklmnopqrstuv=",
-        bitsPerChar: 5
-      });
-      base32hexpadupper4 = rfc46484({
-        prefix: "T",
-        name: "base32hexpadupper",
-        alphabet: "0123456789ABCDEFGHIJKLMNOPQRSTUV=",
-        bitsPerChar: 5
-      });
-      base32z4 = rfc46484({
-        prefix: "h",
-        name: "base32z",
-        alphabet: "ybndrfg8ejkmcpqxot1uwisza345h769",
-        bitsPerChar: 5
-      });
-    }
+  var base324 = rfc46484({
+    prefix: "b",
+    name: "base32",
+    alphabet: "abcdefghijklmnopqrstuvwxyz234567",
+    bitsPerChar: 5
+  });
+  var base32upper4 = rfc46484({
+    prefix: "B",
+    name: "base32upper",
+    alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567",
+    bitsPerChar: 5
+  });
+  var base32pad4 = rfc46484({
+    prefix: "c",
+    name: "base32pad",
+    alphabet: "abcdefghijklmnopqrstuvwxyz234567=",
+    bitsPerChar: 5
+  });
+  var base32padupper4 = rfc46484({
+    prefix: "C",
+    name: "base32padupper",
+    alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567=",
+    bitsPerChar: 5
+  });
+  var base32hex4 = rfc46484({
+    prefix: "v",
+    name: "base32hex",
+    alphabet: "0123456789abcdefghijklmnopqrstuv",
+    bitsPerChar: 5
+  });
+  var base32hexupper4 = rfc46484({
+    prefix: "V",
+    name: "base32hexupper",
+    alphabet: "0123456789ABCDEFGHIJKLMNOPQRSTUV",
+    bitsPerChar: 5
+  });
+  var base32hexpad4 = rfc46484({
+    prefix: "t",
+    name: "base32hexpad",
+    alphabet: "0123456789abcdefghijklmnopqrstuv=",
+    bitsPerChar: 5
+  });
+  var base32hexpadupper4 = rfc46484({
+    prefix: "T",
+    name: "base32hexpadupper",
+    alphabet: "0123456789ABCDEFGHIJKLMNOPQRSTUV=",
+    bitsPerChar: 5
+  });
+  var base32z4 = rfc46484({
+    prefix: "h",
+    name: "base32z",
+    alphabet: "ybndrfg8ejkmcpqxot1uwisza345h769",
+    bitsPerChar: 5
   });
 
   // node_modules/multiformats/dist/src/bases/base58.js
-  var base58btc4, base58flickr4;
-  var init_base584 = __esm({
-    "node_modules/multiformats/dist/src/bases/base58.js"() {
-      init_base4();
-      base58btc4 = baseX4({
-        name: "base58btc",
-        prefix: "z",
-        alphabet: "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
-      });
-      base58flickr4 = baseX4({
-        name: "base58flickr",
-        prefix: "Z",
-        alphabet: "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ"
-      });
-    }
+  var base58btc4 = baseX4({
+    name: "base58btc",
+    prefix: "z",
+    alphabet: "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+  });
+  var base58flickr4 = baseX4({
+    name: "base58flickr",
+    prefix: "Z",
+    alphabet: "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ"
   });
 
   // node_modules/multiformats/dist/src/vendor/varint.js
+  var encode_14 = encode11;
+  var MSB4 = 128;
+  var REST4 = 127;
+  var MSBALL4 = ~REST4;
+  var INT4 = Math.pow(2, 31);
   function encode11(num, out, offset) {
     out = out || [];
     offset = offset || 0;
@@ -42267,6 +42295,9 @@ if (cid) {
     encode11.bytes = offset - oldOffset + 1;
     return out;
   }
+  var decode16 = read5;
+  var MSB$14 = 128;
+  var REST$14 = 127;
   function read5(buf2, offset) {
     var res = 0, offset = offset || 0, shift = 0, counter = offset, b, l = buf2.length;
     do {
@@ -42281,38 +42312,25 @@ if (cid) {
     read5.bytes = counter - offset;
     return res;
   }
-  var encode_14, MSB4, REST4, MSBALL4, INT4, decode16, MSB$14, REST$14, N14, N24, N34, N44, N54, N64, N74, N84, N94, length4, varint4, _brrp_varint4, varint_default4;
-  var init_varint7 = __esm({
-    "node_modules/multiformats/dist/src/vendor/varint.js"() {
-      encode_14 = encode11;
-      MSB4 = 128;
-      REST4 = 127;
-      MSBALL4 = ~REST4;
-      INT4 = Math.pow(2, 31);
-      decode16 = read5;
-      MSB$14 = 128;
-      REST$14 = 127;
-      N14 = Math.pow(2, 7);
-      N24 = Math.pow(2, 14);
-      N34 = Math.pow(2, 21);
-      N44 = Math.pow(2, 28);
-      N54 = Math.pow(2, 35);
-      N64 = Math.pow(2, 42);
-      N74 = Math.pow(2, 49);
-      N84 = Math.pow(2, 56);
-      N94 = Math.pow(2, 63);
-      length4 = function(value) {
-        return value < N14 ? 1 : value < N24 ? 2 : value < N34 ? 3 : value < N44 ? 4 : value < N54 ? 5 : value < N64 ? 6 : value < N74 ? 7 : value < N84 ? 8 : value < N94 ? 9 : 10;
-      };
-      varint4 = {
-        encode: encode_14,
-        decode: decode16,
-        encodingLength: length4
-      };
-      _brrp_varint4 = varint4;
-      varint_default4 = _brrp_varint4;
-    }
-  });
+  var N14 = Math.pow(2, 7);
+  var N24 = Math.pow(2, 14);
+  var N34 = Math.pow(2, 21);
+  var N44 = Math.pow(2, 28);
+  var N54 = Math.pow(2, 35);
+  var N64 = Math.pow(2, 42);
+  var N74 = Math.pow(2, 49);
+  var N84 = Math.pow(2, 56);
+  var N94 = Math.pow(2, 63);
+  var length4 = function(value) {
+    return value < N14 ? 1 : value < N24 ? 2 : value < N34 ? 3 : value < N44 ? 4 : value < N54 ? 5 : value < N64 ? 6 : value < N74 ? 7 : value < N84 ? 8 : value < N94 ? 9 : 10;
+  };
+  var varint4 = {
+    encode: encode_14,
+    decode: decode16,
+    encodingLength: length4
+  };
+  var _brrp_varint4 = varint4;
+  var varint_default4 = _brrp_varint4;
 
   // node_modules/multiformats/dist/src/varint.js
   function decode17(data, offset = 0) {
@@ -42326,11 +42344,6 @@ if (cid) {
   function encodingLength4(int) {
     return varint_default4.encodingLength(int);
   }
-  var init_varint8 = __esm({
-    "node_modules/multiformats/dist/src/varint.js"() {
-      init_varint7();
-    }
-  });
 
   // node_modules/multiformats/dist/src/hashes/digest.js
   function create4(code2, digest2) {
@@ -42361,34 +42374,21 @@ if (cid) {
       return a.code === data.code && a.size === data.size && data.bytes instanceof Uint8Array && equals8(a.bytes, data.bytes);
     }
   }
-  var Digest4;
-  var init_digest4 = __esm({
-    "node_modules/multiformats/dist/src/hashes/digest.js"() {
-      init_bytes4();
-      init_varint8();
-      Digest4 = class {
-        /**
-         * Creates a multihash digest.
-         */
-        constructor(code2, size, digest2, bytes) {
-          __publicField(this, "code");
-          __publicField(this, "size");
-          __publicField(this, "digest");
-          __publicField(this, "bytes");
-          this.code = code2;
-          this.size = size;
-          this.digest = digest2;
-          this.bytes = bytes;
-        }
-      };
+  var Digest4 = class {
+    /**
+     * Creates a multihash digest.
+     */
+    constructor(code2, size, digest2, bytes) {
+      __publicField(this, "code");
+      __publicField(this, "size");
+      __publicField(this, "digest");
+      __publicField(this, "bytes");
+      this.code = code2;
+      this.size = size;
+      this.digest = digest2;
+      this.bytes = bytes;
     }
-  });
-
-  // node_modules/multiformats/dist/src/link/interface.js
-  var init_interface = __esm({
-    "node_modules/multiformats/dist/src/link/interface.js"() {
-    }
-  });
+  };
 
   // node_modules/multiformats/dist/src/cid.js
   function format(link, base5) {
@@ -42400,6 +42400,7 @@ if (cid) {
         return toStringV14(bytes, baseCache(link), base5 != null ? base5 : base324.encoder);
     }
   }
+  var cache = /* @__PURE__ */ new WeakMap();
   function baseCache(cid) {
     const baseCache2 = cache.get(cid);
     if (baseCache2 == null) {
@@ -42409,6 +42410,255 @@ if (cid) {
     }
     return baseCache2;
   }
+  var _a;
+  var CID4 = class _CID {
+    /**
+     * @param version - Version of the CID
+     * @param code - Code of the codec content is encoded in, see https://github.com/multiformats/multicodec/blob/master/table.csv
+     * @param multihash - (Multi)hash of the of the content.
+     */
+    constructor(version5, code2, multihash, bytes) {
+      __publicField(this, "code");
+      __publicField(this, "version");
+      __publicField(this, "multihash");
+      __publicField(this, "bytes");
+      __publicField(this, "/");
+      __publicField(this, _a, "CID");
+      this.code = code2;
+      this.version = version5;
+      this.multihash = multihash;
+      this.bytes = bytes;
+      this["/"] = bytes;
+    }
+    /**
+     * Signalling `cid.asCID === cid` has been replaced with `cid['/'] === cid.bytes`
+     * please either use `CID.asCID(cid)` or switch to new signalling mechanism
+     *
+     * @deprecated
+     */
+    get asCID() {
+      return this;
+    }
+    // ArrayBufferView
+    get byteOffset() {
+      return this.bytes.byteOffset;
+    }
+    // ArrayBufferView
+    get byteLength() {
+      return this.bytes.byteLength;
+    }
+    toV0() {
+      switch (this.version) {
+        case 0: {
+          return this;
+        }
+        case 1: {
+          const { code: code2, multihash } = this;
+          if (code2 !== DAG_PB_CODE4) {
+            throw new Error("Cannot convert a non dag-pb CID to CIDv0");
+          }
+          if (multihash.code !== SHA_256_CODE4) {
+            throw new Error("Cannot convert non sha2-256 multihash CID to CIDv0");
+          }
+          return _CID.createV0(multihash);
+        }
+        default: {
+          throw Error(`Can not convert CID version ${this.version} to version 0. This is a bug please report`);
+        }
+      }
+    }
+    toV1() {
+      switch (this.version) {
+        case 0: {
+          const { code: code2, digest: digest2 } = this.multihash;
+          const multihash = create4(code2, digest2);
+          return _CID.createV1(this.code, multihash);
+        }
+        case 1: {
+          return this;
+        }
+        default: {
+          throw Error(`Can not convert CID version ${this.version} to version 1. This is a bug please report`);
+        }
+      }
+    }
+    equals(other) {
+      return _CID.equals(this, other);
+    }
+    static equals(self, other) {
+      const unknown = other;
+      return unknown != null && self.code === unknown.code && self.version === unknown.version && equals9(self.multihash, unknown.multihash);
+    }
+    toString(base5) {
+      return format(this, base5);
+    }
+    toJSON() {
+      return { "/": format(this) };
+    }
+    link() {
+      return this;
+    }
+    // Legacy
+    [(_a = Symbol.toStringTag, Symbol.for("nodejs.util.inspect.custom"))]() {
+      return `CID(${this.toString()})`;
+    }
+    /**
+     * Takes any input `value` and returns a `CID` instance if it was
+     * a `CID` otherwise returns `null`. If `value` is instanceof `CID`
+     * it will return value back. If `value` is not instance of this CID
+     * class, but is compatible CID it will return new instance of this
+     * `CID` class. Otherwise returns null.
+     *
+     * This allows two different incompatible versions of CID library to
+     * co-exist and interop as long as binary interface is compatible.
+     */
+    static asCID(input) {
+      if (input == null) {
+        return null;
+      }
+      const value = input;
+      if (value instanceof _CID) {
+        return value;
+      } else if (value["/"] != null && value["/"] === value.bytes || value.asCID === value) {
+        const { version: version5, code: code2, multihash, bytes } = value;
+        return new _CID(version5, code2, multihash, bytes != null ? bytes : encodeCID4(version5, code2, multihash.bytes));
+      } else if (value[cidSymbol4] === true) {
+        const { version: version5, multihash, code: code2 } = value;
+        const digest2 = decode18(multihash);
+        return _CID.create(version5, code2, digest2);
+      } else {
+        return null;
+      }
+    }
+    /**
+     * @param version - Version of the CID
+     * @param code - Code of the codec content is encoded in, see https://github.com/multiformats/multicodec/blob/master/table.csv
+     * @param digest - (Multi)hash of the of the content.
+     */
+    static create(version5, code2, digest2) {
+      if (typeof code2 !== "number") {
+        throw new Error("String codecs are no longer supported");
+      }
+      if (!(digest2.bytes instanceof Uint8Array)) {
+        throw new Error("Invalid digest");
+      }
+      switch (version5) {
+        case 0: {
+          if (code2 !== DAG_PB_CODE4) {
+            throw new Error(`Version 0 CID must use dag-pb (code: ${DAG_PB_CODE4}) block encoding`);
+          } else {
+            return new _CID(version5, code2, digest2, digest2.bytes);
+          }
+        }
+        case 1: {
+          const bytes = encodeCID4(version5, code2, digest2.bytes);
+          return new _CID(version5, code2, digest2, bytes);
+        }
+        default: {
+          throw new Error("Invalid version");
+        }
+      }
+    }
+    /**
+     * Simplified version of `create` for CIDv0.
+     */
+    static createV0(digest2) {
+      return _CID.create(0, DAG_PB_CODE4, digest2);
+    }
+    /**
+     * Simplified version of `create` for CIDv1.
+     *
+     * @param code - Content encoding format code.
+     * @param digest - Multihash of the content.
+     */
+    static createV1(code2, digest2) {
+      return _CID.create(1, code2, digest2);
+    }
+    /**
+     * Decoded a CID from its binary representation. The byte array must contain
+     * only the CID with no additional bytes.
+     *
+     * An error will be thrown if the bytes provided do not contain a valid
+     * binary representation of a CID.
+     */
+    static decode(bytes) {
+      const [cid, remainder] = _CID.decodeFirst(bytes);
+      if (remainder.length !== 0) {
+        throw new Error("Incorrect length");
+      }
+      return cid;
+    }
+    /**
+     * Decoded a CID from its binary representation at the beginning of a byte
+     * array.
+     *
+     * Returns an array with the first element containing the CID and the second
+     * element containing the remainder of the original byte array. The remainder
+     * will be a zero-length byte array if the provided bytes only contained a
+     * binary CID representation.
+     */
+    static decodeFirst(bytes) {
+      const specs = _CID.inspectBytes(bytes);
+      const prefixSize = specs.size - specs.multihashSize;
+      const multihashBytes = coerce4(bytes.subarray(prefixSize, prefixSize + specs.multihashSize));
+      if (multihashBytes.byteLength !== specs.multihashSize) {
+        throw new Error("Incorrect length");
+      }
+      const digestBytes = multihashBytes.subarray(specs.multihashSize - specs.digestSize);
+      const digest2 = new Digest4(specs.multihashCode, specs.digestSize, digestBytes, multihashBytes);
+      const cid = specs.version === 0 ? _CID.createV0(digest2) : _CID.createV1(specs.codec, digest2);
+      return [cid, bytes.subarray(specs.size)];
+    }
+    /**
+     * Inspect the initial bytes of a CID to determine its properties.
+     *
+     * Involves decoding up to 4 varints. Typically this will require only 4 to 6
+     * bytes but for larger multicodec code values and larger multihash digest
+     * lengths these varints can be quite large. It is recommended that at least
+     * 10 bytes be made available in the `initialBytes` argument for a complete
+     * inspection.
+     */
+    static inspectBytes(initialBytes) {
+      let offset = 0;
+      const next = () => {
+        const [i, length5] = decode17(initialBytes.subarray(offset));
+        offset += length5;
+        return i;
+      };
+      let version5 = next();
+      let codec = DAG_PB_CODE4;
+      if (version5 === 18) {
+        version5 = 0;
+        offset = 0;
+      } else {
+        codec = next();
+      }
+      if (version5 !== 0 && version5 !== 1) {
+        throw new RangeError(`Invalid CID version ${version5}`);
+      }
+      const prefixSize = offset;
+      const multihashCode = next();
+      const digestSize = next();
+      const size = offset + digestSize;
+      const multihashSize = size - prefixSize;
+      return { version: version5, codec, multihashCode, digestSize, multihashSize, size };
+    }
+    /**
+     * Takes cid in a string representation and creates an instance. If `base`
+     * decoder is not provided will use a default from the configuration. It will
+     * throw an error if encoding of the CID is not compatible with supplied (or
+     * a default decoder).
+     */
+    static parse(source, base5) {
+      const [prefix, bytes] = parseCIDtoBytes4(source, base5);
+      const cid = _CID.decode(bytes);
+      if (cid.version === 0 && source[0] !== "Q") {
+        throw Error("Version 0 CID string must not include multibase prefix");
+      }
+      baseCache(cid).set(prefix, source);
+      return cid;
+    }
+  };
   function parseCIDtoBytes4(source, base5) {
     switch (source[0]) {
       case "Q": {
@@ -42459,6 +42709,8 @@ if (cid) {
       return cid;
     }
   }
+  var DAG_PB_CODE4 = 112;
+  var SHA_256_CODE4 = 18;
   function encodeCID4(version5, code2, multihash) {
     const codeOffset = encodingLength4(version5);
     const hashOffset = codeOffset + encodingLength4(code2);
@@ -42468,325 +42720,51 @@ if (cid) {
     bytes.set(multihash, hashOffset);
     return bytes;
   }
-  var cache, _a, CID4, DAG_PB_CODE4, SHA_256_CODE4, cidSymbol4;
-  var init_cid4 = __esm({
-    "node_modules/multiformats/dist/src/cid.js"() {
-      init_base324();
-      init_base584();
-      init_bytes4();
-      init_digest4();
-      init_varint8();
-      init_interface();
-      cache = /* @__PURE__ */ new WeakMap();
-      CID4 = class _CID {
-        /**
-         * @param version - Version of the CID
-         * @param code - Code of the codec content is encoded in, see https://github.com/multiformats/multicodec/blob/master/table.csv
-         * @param multihash - (Multi)hash of the of the content.
-         */
-        constructor(version5, code2, multihash, bytes) {
-          __publicField(this, "code");
-          __publicField(this, "version");
-          __publicField(this, "multihash");
-          __publicField(this, "bytes");
-          __publicField(this, "/");
-          __publicField(this, _a, "CID");
-          this.code = code2;
-          this.version = version5;
-          this.multihash = multihash;
-          this.bytes = bytes;
-          this["/"] = bytes;
-        }
-        /**
-         * Signalling `cid.asCID === cid` has been replaced with `cid['/'] === cid.bytes`
-         * please either use `CID.asCID(cid)` or switch to new signalling mechanism
-         *
-         * @deprecated
-         */
-        get asCID() {
-          return this;
-        }
-        // ArrayBufferView
-        get byteOffset() {
-          return this.bytes.byteOffset;
-        }
-        // ArrayBufferView
-        get byteLength() {
-          return this.bytes.byteLength;
-        }
-        toV0() {
-          switch (this.version) {
-            case 0: {
-              return this;
-            }
-            case 1: {
-              const { code: code2, multihash } = this;
-              if (code2 !== DAG_PB_CODE4) {
-                throw new Error("Cannot convert a non dag-pb CID to CIDv0");
-              }
-              if (multihash.code !== SHA_256_CODE4) {
-                throw new Error("Cannot convert non sha2-256 multihash CID to CIDv0");
-              }
-              return _CID.createV0(multihash);
-            }
-            default: {
-              throw Error(`Can not convert CID version ${this.version} to version 0. This is a bug please report`);
-            }
-          }
-        }
-        toV1() {
-          switch (this.version) {
-            case 0: {
-              const { code: code2, digest: digest2 } = this.multihash;
-              const multihash = create4(code2, digest2);
-              return _CID.createV1(this.code, multihash);
-            }
-            case 1: {
-              return this;
-            }
-            default: {
-              throw Error(`Can not convert CID version ${this.version} to version 1. This is a bug please report`);
-            }
-          }
-        }
-        equals(other) {
-          return _CID.equals(this, other);
-        }
-        static equals(self, other) {
-          const unknown = other;
-          return unknown != null && self.code === unknown.code && self.version === unknown.version && equals9(self.multihash, unknown.multihash);
-        }
-        toString(base5) {
-          return format(this, base5);
-        }
-        toJSON() {
-          return { "/": format(this) };
-        }
-        link() {
-          return this;
-        }
-        // Legacy
-        [(_a = Symbol.toStringTag, Symbol.for("nodejs.util.inspect.custom"))]() {
-          return `CID(${this.toString()})`;
-        }
-        /**
-         * Takes any input `value` and returns a `CID` instance if it was
-         * a `CID` otherwise returns `null`. If `value` is instanceof `CID`
-         * it will return value back. If `value` is not instance of this CID
-         * class, but is compatible CID it will return new instance of this
-         * `CID` class. Otherwise returns null.
-         *
-         * This allows two different incompatible versions of CID library to
-         * co-exist and interop as long as binary interface is compatible.
-         */
-        static asCID(input) {
-          if (input == null) {
-            return null;
-          }
-          const value = input;
-          if (value instanceof _CID) {
-            return value;
-          } else if (value["/"] != null && value["/"] === value.bytes || value.asCID === value) {
-            const { version: version5, code: code2, multihash, bytes } = value;
-            return new _CID(version5, code2, multihash, bytes != null ? bytes : encodeCID4(version5, code2, multihash.bytes));
-          } else if (value[cidSymbol4] === true) {
-            const { version: version5, multihash, code: code2 } = value;
-            const digest2 = decode18(multihash);
-            return _CID.create(version5, code2, digest2);
-          } else {
-            return null;
-          }
-        }
-        /**
-         * @param version - Version of the CID
-         * @param code - Code of the codec content is encoded in, see https://github.com/multiformats/multicodec/blob/master/table.csv
-         * @param digest - (Multi)hash of the of the content.
-         */
-        static create(version5, code2, digest2) {
-          if (typeof code2 !== "number") {
-            throw new Error("String codecs are no longer supported");
-          }
-          if (!(digest2.bytes instanceof Uint8Array)) {
-            throw new Error("Invalid digest");
-          }
-          switch (version5) {
-            case 0: {
-              if (code2 !== DAG_PB_CODE4) {
-                throw new Error(`Version 0 CID must use dag-pb (code: ${DAG_PB_CODE4}) block encoding`);
-              } else {
-                return new _CID(version5, code2, digest2, digest2.bytes);
-              }
-            }
-            case 1: {
-              const bytes = encodeCID4(version5, code2, digest2.bytes);
-              return new _CID(version5, code2, digest2, bytes);
-            }
-            default: {
-              throw new Error("Invalid version");
-            }
-          }
-        }
-        /**
-         * Simplified version of `create` for CIDv0.
-         */
-        static createV0(digest2) {
-          return _CID.create(0, DAG_PB_CODE4, digest2);
-        }
-        /**
-         * Simplified version of `create` for CIDv1.
-         *
-         * @param code - Content encoding format code.
-         * @param digest - Multihash of the content.
-         */
-        static createV1(code2, digest2) {
-          return _CID.create(1, code2, digest2);
-        }
-        /**
-         * Decoded a CID from its binary representation. The byte array must contain
-         * only the CID with no additional bytes.
-         *
-         * An error will be thrown if the bytes provided do not contain a valid
-         * binary representation of a CID.
-         */
-        static decode(bytes) {
-          const [cid, remainder] = _CID.decodeFirst(bytes);
-          if (remainder.length !== 0) {
-            throw new Error("Incorrect length");
-          }
-          return cid;
-        }
-        /**
-         * Decoded a CID from its binary representation at the beginning of a byte
-         * array.
-         *
-         * Returns an array with the first element containing the CID and the second
-         * element containing the remainder of the original byte array. The remainder
-         * will be a zero-length byte array if the provided bytes only contained a
-         * binary CID representation.
-         */
-        static decodeFirst(bytes) {
-          const specs = _CID.inspectBytes(bytes);
-          const prefixSize = specs.size - specs.multihashSize;
-          const multihashBytes = coerce4(bytes.subarray(prefixSize, prefixSize + specs.multihashSize));
-          if (multihashBytes.byteLength !== specs.multihashSize) {
-            throw new Error("Incorrect length");
-          }
-          const digestBytes = multihashBytes.subarray(specs.multihashSize - specs.digestSize);
-          const digest2 = new Digest4(specs.multihashCode, specs.digestSize, digestBytes, multihashBytes);
-          const cid = specs.version === 0 ? _CID.createV0(digest2) : _CID.createV1(specs.codec, digest2);
-          return [cid, bytes.subarray(specs.size)];
-        }
-        /**
-         * Inspect the initial bytes of a CID to determine its properties.
-         *
-         * Involves decoding up to 4 varints. Typically this will require only 4 to 6
-         * bytes but for larger multicodec code values and larger multihash digest
-         * lengths these varints can be quite large. It is recommended that at least
-         * 10 bytes be made available in the `initialBytes` argument for a complete
-         * inspection.
-         */
-        static inspectBytes(initialBytes) {
-          let offset = 0;
-          const next = () => {
-            const [i, length5] = decode17(initialBytes.subarray(offset));
-            offset += length5;
-            return i;
-          };
-          let version5 = next();
-          let codec = DAG_PB_CODE4;
-          if (version5 === 18) {
-            version5 = 0;
-            offset = 0;
-          } else {
-            codec = next();
-          }
-          if (version5 !== 0 && version5 !== 1) {
-            throw new RangeError(`Invalid CID version ${version5}`);
-          }
-          const prefixSize = offset;
-          const multihashCode = next();
-          const digestSize = next();
-          const size = offset + digestSize;
-          const multihashSize = size - prefixSize;
-          return { version: version5, codec, multihashCode, digestSize, multihashSize, size };
-        }
-        /**
-         * Takes cid in a string representation and creates an instance. If `base`
-         * decoder is not provided will use a default from the configuration. It will
-         * throw an error if encoding of the CID is not compatible with supplied (or
-         * a default decoder).
-         */
-        static parse(source, base5) {
-          const [prefix, bytes] = parseCIDtoBytes4(source, base5);
-          const cid = _CID.decode(bytes);
-          if (cid.version === 0 && source[0] !== "Q") {
-            throw Error("Version 0 CID string must not include multibase prefix");
-          }
-          baseCache(cid).set(prefix, source);
-          return cid;
-        }
-      };
-      DAG_PB_CODE4 = 112;
-      SHA_256_CODE4 = 18;
-      cidSymbol4 = Symbol.for("@ipld/js-cid/CID");
-    }
-  });
-
-  // node_modules/multiformats/dist/src/hashes/hasher.js
-  var init_hasher2 = __esm({
-    "node_modules/multiformats/dist/src/hashes/hasher.js"() {
-      init_digest4();
-    }
-  });
-
-  // node_modules/multiformats/dist/src/bases/interface.js
-  var init_interface2 = __esm({
-    "node_modules/multiformats/dist/src/bases/interface.js"() {
-    }
-  });
-
-  // node_modules/multiformats/dist/src/hashes/interface.js
-  var init_interface3 = __esm({
-    "node_modules/multiformats/dist/src/hashes/interface.js"() {
-    }
-  });
-
-  // node_modules/multiformats/dist/src/codecs/interface.js
-  var init_interface4 = __esm({
-    "node_modules/multiformats/dist/src/codecs/interface.js"() {
-    }
-  });
-
-  // node_modules/multiformats/dist/src/block/interface.js
-  var init_interface5 = __esm({
-    "node_modules/multiformats/dist/src/block/interface.js"() {
-    }
-  });
-
-  // node_modules/multiformats/dist/src/interface.js
-  var init_interface6 = __esm({
-    "node_modules/multiformats/dist/src/interface.js"() {
-      init_interface2();
-      init_interface3();
-      init_interface4();
-      init_interface();
-      init_interface5();
-    }
-  });
-
-  // node_modules/multiformats/dist/src/index.js
-  var init_src3 = __esm({
-    "node_modules/multiformats/dist/src/index.js"() {
-      init_bytes4();
-      init_cid4();
-      init_digest4();
-      init_hasher2();
-      init_varint8();
-      init_interface6();
-    }
-  });
+  var cidSymbol4 = Symbol.for("@ipld/js-cid/CID");
 
   // node_modules/cborg/lib/is.js
+  var typeofs = [
+    "string",
+    "number",
+    "bigint",
+    "symbol"
+  ];
+  var objectTypeNames = [
+    "Function",
+    "Generator",
+    "AsyncGenerator",
+    "GeneratorFunction",
+    "AsyncGeneratorFunction",
+    "AsyncFunction",
+    "Observable",
+    "Array",
+    "Buffer",
+    "Object",
+    "RegExp",
+    "Date",
+    "Error",
+    "Map",
+    "Set",
+    "WeakMap",
+    "WeakSet",
+    "ArrayBuffer",
+    "SharedArrayBuffer",
+    "DataView",
+    "Promise",
+    "URL",
+    "HTMLElement",
+    "Int8Array",
+    "Uint8Array",
+    "Uint8ClampedArray",
+    "Int16Array",
+    "Uint16Array",
+    "Int32Array",
+    "Uint32Array",
+    "Float32Array",
+    "Float64Array",
+    "BigInt64Array",
+    "BigUint64Array"
+  ];
   function is(value) {
     if (value === null) {
       return "null";
@@ -42826,117 +42804,71 @@ if (cid) {
     }
     return void 0;
   }
-  var typeofs, objectTypeNames;
-  var init_is = __esm({
-    "node_modules/cborg/lib/is.js"() {
-      typeofs = [
-        "string",
-        "number",
-        "bigint",
-        "symbol"
-      ];
-      objectTypeNames = [
-        "Function",
-        "Generator",
-        "AsyncGenerator",
-        "GeneratorFunction",
-        "AsyncGeneratorFunction",
-        "AsyncFunction",
-        "Observable",
-        "Array",
-        "Buffer",
-        "Object",
-        "RegExp",
-        "Date",
-        "Error",
-        "Map",
-        "Set",
-        "WeakMap",
-        "WeakSet",
-        "ArrayBuffer",
-        "SharedArrayBuffer",
-        "DataView",
-        "Promise",
-        "URL",
-        "HTMLElement",
-        "Int8Array",
-        "Uint8Array",
-        "Uint8ClampedArray",
-        "Int16Array",
-        "Uint16Array",
-        "Int32Array",
-        "Uint32Array",
-        "Float32Array",
-        "Float64Array",
-        "BigInt64Array",
-        "BigUint64Array"
-      ];
-    }
-  });
 
   // node_modules/cborg/lib/token.js
-  var Type, Token;
-  var init_token = __esm({
-    "node_modules/cborg/lib/token.js"() {
-      Type = class {
-        /**
-         * @param {number} major
-         * @param {string} name
-         * @param {boolean} terminal
-         */
-        constructor(major, name2, terminal) {
-          this.major = major;
-          this.majorEncoded = major << 5;
-          this.name = name2;
-          this.terminal = terminal;
-        }
-        /* c8 ignore next 3 */
-        toString() {
-          return `Type[${this.major}].${this.name}`;
-        }
-        /**
-         * @param {Type} typ
-         * @returns {number}
-         */
-        compare(typ) {
-          return this.major < typ.major ? -1 : this.major > typ.major ? 1 : 0;
-        }
-      };
-      Type.uint = new Type(0, "uint", true);
-      Type.negint = new Type(1, "negint", true);
-      Type.bytes = new Type(2, "bytes", true);
-      Type.string = new Type(3, "string", true);
-      Type.array = new Type(4, "array", false);
-      Type.map = new Type(5, "map", false);
-      Type.tag = new Type(6, "tag", false);
-      Type.float = new Type(7, "float", true);
-      Type.false = new Type(7, "false", true);
-      Type.true = new Type(7, "true", true);
-      Type.null = new Type(7, "null", true);
-      Type.undefined = new Type(7, "undefined", true);
-      Type.break = new Type(7, "break", true);
-      Token = class {
-        /**
-         * @param {Type} type
-         * @param {any} [value]
-         * @param {number} [encodedLength]
-         */
-        constructor(type, value, encodedLength) {
-          this.type = type;
-          this.value = value;
-          this.encodedLength = encodedLength;
-          this.encodedBytes = void 0;
-          this.byteValue = void 0;
-        }
-        /* c8 ignore next 3 */
-        toString() {
-          return `Token[${this.type}].${this.value}`;
-        }
-      };
+  var Type = class {
+    /**
+     * @param {number} major
+     * @param {string} name
+     * @param {boolean} terminal
+     */
+    constructor(major, name2, terminal) {
+      this.major = major;
+      this.majorEncoded = major << 5;
+      this.name = name2;
+      this.terminal = terminal;
     }
-  });
+    /* c8 ignore next 3 */
+    toString() {
+      return `Type[${this.major}].${this.name}`;
+    }
+    /**
+     * @param {Type} typ
+     * @returns {number}
+     */
+    compare(typ) {
+      return this.major < typ.major ? -1 : this.major > typ.major ? 1 : 0;
+    }
+  };
+  Type.uint = new Type(0, "uint", true);
+  Type.negint = new Type(1, "negint", true);
+  Type.bytes = new Type(2, "bytes", true);
+  Type.string = new Type(3, "string", true);
+  Type.array = new Type(4, "array", false);
+  Type.map = new Type(5, "map", false);
+  Type.tag = new Type(6, "tag", false);
+  Type.float = new Type(7, "float", true);
+  Type.false = new Type(7, "false", true);
+  Type.true = new Type(7, "true", true);
+  Type.null = new Type(7, "null", true);
+  Type.undefined = new Type(7, "undefined", true);
+  Type.break = new Type(7, "break", true);
+  var Token = class {
+    /**
+     * @param {Type} type
+     * @param {any} [value]
+     * @param {number} [encodedLength]
+     */
+    constructor(type, value, encodedLength) {
+      this.type = type;
+      this.value = value;
+      this.encodedLength = encodedLength;
+      this.encodedBytes = void 0;
+      this.byteValue = void 0;
+    }
+    /* c8 ignore next 3 */
+    toString() {
+      return `Token[${this.type}].${this.value}`;
+    }
+  };
 
   // node_modules/cborg/lib/byte-utils.js
+  var useBuffer = globalThis.process && // @ts-ignore
+  !globalThis.process.browser && // @ts-ignore
+  globalThis.Buffer && // @ts-ignore
+  typeof globalThis.Buffer.isBuffer === "function";
+  var textDecoder2 = new TextDecoder();
+  var textEncoder3 = new TextEncoder();
   function isBuffer2(buf2) {
     return useBuffer && globalThis.Buffer.isBuffer(buf2);
   }
@@ -42946,6 +42878,130 @@ if (cid) {
     }
     return isBuffer2(buf2) ? new Uint8Array(buf2.buffer, buf2.byteOffset, buf2.byteLength) : buf2;
   }
+  var toString3 = useBuffer ? (
+    // eslint-disable-line operator-linebreak
+    /**
+     * @param {Uint8Array} bytes
+     * @param {number} start
+     * @param {number} end
+     */
+    (bytes, start, end) => {
+      return end - start > 64 ? (
+        // eslint-disable-line operator-linebreak
+        // @ts-ignore
+        globalThis.Buffer.from(bytes.subarray(start, end)).toString("utf8")
+      ) : utf8Slice(bytes, start, end);
+    }
+  ) : (
+    // eslint-disable-line operator-linebreak
+    /**
+     * @param {Uint8Array} bytes
+     * @param {number} start
+     * @param {number} end
+     */
+    (bytes, start, end) => {
+      return end - start > 64 ? textDecoder2.decode(bytes.subarray(start, end)) : utf8Slice(bytes, start, end);
+    }
+  );
+  var fromString3 = useBuffer ? (
+    // eslint-disable-line operator-linebreak
+    /**
+     * @param {string} string
+     */
+    (string2) => {
+      return string2.length > 64 ? (
+        // eslint-disable-line operator-linebreak
+        // @ts-ignore
+        globalThis.Buffer.from(string2)
+      ) : utf8ToBytes(string2);
+    }
+  ) : (
+    // eslint-disable-line operator-linebreak
+    /**
+     * @param {string} string
+     */
+    (string2) => {
+      return string2.length > 64 ? textEncoder3.encode(string2) : utf8ToBytes(string2);
+    }
+  );
+  var slice = useBuffer ? (
+    // eslint-disable-line operator-linebreak
+    /**
+     * @param {Uint8Array} bytes
+     * @param {number} start
+     * @param {number} end
+     */
+    (bytes, start, end) => {
+      if (isBuffer2(bytes)) {
+        return new Uint8Array(bytes.subarray(start, end));
+      }
+      return bytes.slice(start, end);
+    }
+  ) : (
+    // eslint-disable-line operator-linebreak
+    /**
+     * @param {Uint8Array} bytes
+     * @param {number} start
+     * @param {number} end
+     */
+    (bytes, start, end) => {
+      return bytes.slice(start, end);
+    }
+  );
+  var concat2 = useBuffer ? (
+    // eslint-disable-line operator-linebreak
+    /**
+     * @param {Uint8Array[]} chunks
+     * @param {number} length
+     * @returns {Uint8Array}
+     */
+    (chunks, length5) => {
+      chunks = chunks.map((c) => c instanceof Uint8Array ? c : (
+        // eslint-disable-line operator-linebreak
+        // @ts-ignore
+        globalThis.Buffer.from(c)
+      ));
+      return asU8A(globalThis.Buffer.concat(chunks, length5));
+    }
+  ) : (
+    // eslint-disable-line operator-linebreak
+    /**
+     * @param {Uint8Array[]} chunks
+     * @param {number} length
+     * @returns {Uint8Array}
+     */
+    (chunks, length5) => {
+      const out = new Uint8Array(length5);
+      let off = 0;
+      for (let b of chunks) {
+        if (off + b.length > out.length) {
+          b = b.subarray(0, out.length - off);
+        }
+        out.set(b, off);
+        off += b.length;
+      }
+      return out;
+    }
+  );
+  var alloc = useBuffer ? (
+    // eslint-disable-line operator-linebreak
+    /**
+     * @param {number} size
+     * @returns {Uint8Array}
+     */
+    (size) => {
+      return globalThis.Buffer.allocUnsafe(size);
+    }
+  ) : (
+    // eslint-disable-line operator-linebreak
+    /**
+     * @param {number} size
+     * @returns {Uint8Array}
+     */
+    (size) => {
+      return new Uint8Array(size);
+    }
+  );
   function compare2(b1, b2) {
     if (isBuffer2(b1) && isBuffer2(b2)) {
       return b1.compare(b2);
@@ -43040,6 +43096,7 @@ if (cid) {
     }
     return decodeCodePointsArray(res);
   }
+  var MAX_ARGUMENTS_LENGTH = 4096;
   function decodeCodePointsArray(codePoints) {
     const len = codePoints.length;
     if (len <= MAX_ARGUMENTS_LENGTH) {
@@ -43055,251 +43112,105 @@ if (cid) {
     }
     return res;
   }
-  var useBuffer, textDecoder2, textEncoder3, toString3, fromString3, slice, concat2, alloc, MAX_ARGUMENTS_LENGTH;
-  var init_byte_utils = __esm({
-    "node_modules/cborg/lib/byte-utils.js"() {
-      useBuffer = globalThis.process && // @ts-ignore
-      !globalThis.process.browser && // @ts-ignore
-      globalThis.Buffer && // @ts-ignore
-      typeof globalThis.Buffer.isBuffer === "function";
-      textDecoder2 = new TextDecoder();
-      textEncoder3 = new TextEncoder();
-      toString3 = useBuffer ? (
-        // eslint-disable-line operator-linebreak
-        /**
-         * @param {Uint8Array} bytes
-         * @param {number} start
-         * @param {number} end
-         */
-        (bytes, start, end) => {
-          return end - start > 64 ? (
-            // eslint-disable-line operator-linebreak
-            // @ts-ignore
-            globalThis.Buffer.from(bytes.subarray(start, end)).toString("utf8")
-          ) : utf8Slice(bytes, start, end);
-        }
-      ) : (
-        // eslint-disable-line operator-linebreak
-        /**
-         * @param {Uint8Array} bytes
-         * @param {number} start
-         * @param {number} end
-         */
-        (bytes, start, end) => {
-          return end - start > 64 ? textDecoder2.decode(bytes.subarray(start, end)) : utf8Slice(bytes, start, end);
-        }
-      );
-      fromString3 = useBuffer ? (
-        // eslint-disable-line operator-linebreak
-        /**
-         * @param {string} string
-         */
-        (string2) => {
-          return string2.length > 64 ? (
-            // eslint-disable-line operator-linebreak
-            // @ts-ignore
-            globalThis.Buffer.from(string2)
-          ) : utf8ToBytes(string2);
-        }
-      ) : (
-        // eslint-disable-line operator-linebreak
-        /**
-         * @param {string} string
-         */
-        (string2) => {
-          return string2.length > 64 ? textEncoder3.encode(string2) : utf8ToBytes(string2);
-        }
-      );
-      slice = useBuffer ? (
-        // eslint-disable-line operator-linebreak
-        /**
-         * @param {Uint8Array} bytes
-         * @param {number} start
-         * @param {number} end
-         */
-        (bytes, start, end) => {
-          if (isBuffer2(bytes)) {
-            return new Uint8Array(bytes.subarray(start, end));
-          }
-          return bytes.slice(start, end);
-        }
-      ) : (
-        // eslint-disable-line operator-linebreak
-        /**
-         * @param {Uint8Array} bytes
-         * @param {number} start
-         * @param {number} end
-         */
-        (bytes, start, end) => {
-          return bytes.slice(start, end);
-        }
-      );
-      concat2 = useBuffer ? (
-        // eslint-disable-line operator-linebreak
-        /**
-         * @param {Uint8Array[]} chunks
-         * @param {number} length
-         * @returns {Uint8Array}
-         */
-        (chunks, length5) => {
-          chunks = chunks.map((c) => c instanceof Uint8Array ? c : (
-            // eslint-disable-line operator-linebreak
-            // @ts-ignore
-            globalThis.Buffer.from(c)
-          ));
-          return asU8A(globalThis.Buffer.concat(chunks, length5));
-        }
-      ) : (
-        // eslint-disable-line operator-linebreak
-        /**
-         * @param {Uint8Array[]} chunks
-         * @param {number} length
-         * @returns {Uint8Array}
-         */
-        (chunks, length5) => {
-          const out = new Uint8Array(length5);
-          let off = 0;
-          for (let b of chunks) {
-            if (off + b.length > out.length) {
-              b = b.subarray(0, out.length - off);
-            }
-            out.set(b, off);
-            off += b.length;
-          }
-          return out;
-        }
-      );
-      alloc = useBuffer ? (
-        // eslint-disable-line operator-linebreak
-        /**
-         * @param {number} size
-         * @returns {Uint8Array}
-         */
-        (size) => {
-          return globalThis.Buffer.allocUnsafe(size);
-        }
-      ) : (
-        // eslint-disable-line operator-linebreak
-        /**
-         * @param {number} size
-         * @returns {Uint8Array}
-         */
-        (size) => {
-          return new Uint8Array(size);
-        }
-      );
-      MAX_ARGUMENTS_LENGTH = 4096;
-    }
-  });
 
   // node_modules/cborg/lib/bl.js
-  var defaultChunkSize, Bl;
-  var init_bl = __esm({
-    "node_modules/cborg/lib/bl.js"() {
-      init_byte_utils();
-      defaultChunkSize = 256;
-      Bl = class {
-        /**
-         * @param {number} [chunkSize]
-         */
-        constructor(chunkSize = defaultChunkSize) {
-          this.chunkSize = chunkSize;
-          this.cursor = 0;
-          this.maxCursor = -1;
-          this.chunks = [];
-          this._initReuseChunk = null;
-        }
-        reset() {
-          this.cursor = 0;
-          this.maxCursor = -1;
-          if (this.chunks.length) {
-            this.chunks = [];
-          }
-          if (this._initReuseChunk !== null) {
-            this.chunks.push(this._initReuseChunk);
-            this.maxCursor = this._initReuseChunk.length - 1;
-          }
-        }
-        /**
-         * @param {Uint8Array|number[]} bytes
-         */
-        push(bytes) {
-          let topChunk = this.chunks[this.chunks.length - 1];
-          const newMax = this.cursor + bytes.length;
-          if (newMax <= this.maxCursor + 1) {
-            const chunkPos = topChunk.length - (this.maxCursor - this.cursor) - 1;
-            topChunk.set(bytes, chunkPos);
-          } else {
-            if (topChunk) {
-              const chunkPos = topChunk.length - (this.maxCursor - this.cursor) - 1;
-              if (chunkPos < topChunk.length) {
-                this.chunks[this.chunks.length - 1] = topChunk.subarray(0, chunkPos);
-                this.maxCursor = this.cursor - 1;
-              }
-            }
-            if (bytes.length < 64 && bytes.length < this.chunkSize) {
-              topChunk = alloc(this.chunkSize);
-              this.chunks.push(topChunk);
-              this.maxCursor += topChunk.length;
-              if (this._initReuseChunk === null) {
-                this._initReuseChunk = topChunk;
-              }
-              topChunk.set(bytes, 0);
-            } else {
-              this.chunks.push(bytes);
-              this.maxCursor += bytes.length;
-            }
-          }
-          this.cursor += bytes.length;
-        }
-        /**
-         * @param {boolean} [reset]
-         * @returns {Uint8Array}
-         */
-        toBytes(reset = false) {
-          let byts;
-          if (this.chunks.length === 1) {
-            const chunk = this.chunks[0];
-            if (reset && this.cursor > chunk.length / 2) {
-              byts = this.cursor === chunk.length ? chunk : chunk.subarray(0, this.cursor);
-              this._initReuseChunk = null;
-              this.chunks = [];
-            } else {
-              byts = slice(chunk, 0, this.cursor);
-            }
-          } else {
-            byts = concat2(this.chunks, this.cursor);
-          }
-          if (reset) {
-            this.reset();
-          }
-          return byts;
-        }
-      };
+  var defaultChunkSize = 256;
+  var Bl = class {
+    /**
+     * @param {number} [chunkSize]
+     */
+    constructor(chunkSize = defaultChunkSize) {
+      this.chunkSize = chunkSize;
+      this.cursor = 0;
+      this.maxCursor = -1;
+      this.chunks = [];
+      this._initReuseChunk = null;
     }
-  });
+    reset() {
+      this.cursor = 0;
+      this.maxCursor = -1;
+      if (this.chunks.length) {
+        this.chunks = [];
+      }
+      if (this._initReuseChunk !== null) {
+        this.chunks.push(this._initReuseChunk);
+        this.maxCursor = this._initReuseChunk.length - 1;
+      }
+    }
+    /**
+     * @param {Uint8Array|number[]} bytes
+     */
+    push(bytes) {
+      let topChunk = this.chunks[this.chunks.length - 1];
+      const newMax = this.cursor + bytes.length;
+      if (newMax <= this.maxCursor + 1) {
+        const chunkPos = topChunk.length - (this.maxCursor - this.cursor) - 1;
+        topChunk.set(bytes, chunkPos);
+      } else {
+        if (topChunk) {
+          const chunkPos = topChunk.length - (this.maxCursor - this.cursor) - 1;
+          if (chunkPos < topChunk.length) {
+            this.chunks[this.chunks.length - 1] = topChunk.subarray(0, chunkPos);
+            this.maxCursor = this.cursor - 1;
+          }
+        }
+        if (bytes.length < 64 && bytes.length < this.chunkSize) {
+          topChunk = alloc(this.chunkSize);
+          this.chunks.push(topChunk);
+          this.maxCursor += topChunk.length;
+          if (this._initReuseChunk === null) {
+            this._initReuseChunk = topChunk;
+          }
+          topChunk.set(bytes, 0);
+        } else {
+          this.chunks.push(bytes);
+          this.maxCursor += bytes.length;
+        }
+      }
+      this.cursor += bytes.length;
+    }
+    /**
+     * @param {boolean} [reset]
+     * @returns {Uint8Array}
+     */
+    toBytes(reset = false) {
+      let byts;
+      if (this.chunks.length === 1) {
+        const chunk = this.chunks[0];
+        if (reset && this.cursor > chunk.length / 2) {
+          byts = this.cursor === chunk.length ? chunk : chunk.subarray(0, this.cursor);
+          this._initReuseChunk = null;
+          this.chunks = [];
+        } else {
+          byts = slice(chunk, 0, this.cursor);
+        }
+      } else {
+        byts = concat2(this.chunks, this.cursor);
+      }
+      if (reset) {
+        this.reset();
+      }
+      return byts;
+    }
+  };
 
   // node_modules/cborg/lib/common.js
+  var decodeErrPrefix = "CBOR decode error:";
+  var encodeErrPrefix = "CBOR encode error:";
+  var uintMinorPrefixBytes = [];
+  uintMinorPrefixBytes[23] = 1;
+  uintMinorPrefixBytes[24] = 2;
+  uintMinorPrefixBytes[25] = 3;
+  uintMinorPrefixBytes[26] = 5;
+  uintMinorPrefixBytes[27] = 9;
   function assertEnoughData(data, pos, need) {
     if (data.length - pos < need) {
       throw new Error(`${decodeErrPrefix} not enough data for type`);
     }
   }
-  var decodeErrPrefix, encodeErrPrefix, uintMinorPrefixBytes;
-  var init_common = __esm({
-    "node_modules/cborg/lib/common.js"() {
-      decodeErrPrefix = "CBOR decode error:";
-      encodeErrPrefix = "CBOR encode error:";
-      uintMinorPrefixBytes = [];
-      uintMinorPrefixBytes[23] = 1;
-      uintMinorPrefixBytes[24] = 2;
-      uintMinorPrefixBytes[25] = 3;
-      uintMinorPrefixBytes[26] = 5;
-      uintMinorPrefixBytes[27] = 9;
-    }
-  });
 
   // node_modules/cborg/lib/0uint.js
+  var uintBoundaries = [24, 256, 65536, 4294967296, BigInt("18446744073709551616")];
   function readUint8(data, offset, options) {
     assertEnoughData(data, offset, 1);
     const value = data[offset];
@@ -43394,38 +43305,30 @@ if (cid) {
       }
     }
   }
-  var uintBoundaries;
-  var init_uint = __esm({
-    "node_modules/cborg/lib/0uint.js"() {
-      init_token();
-      init_common();
-      uintBoundaries = [24, 256, 65536, 4294967296, BigInt("18446744073709551616")];
-      encodeUint.encodedSize = function encodedSize(token) {
-        return encodeUintValue.encodedSize(token.value);
-      };
-      encodeUintValue.encodedSize = function encodedSize2(uint) {
-        if (uint < uintBoundaries[0]) {
-          return 1;
-        }
-        if (uint < uintBoundaries[1]) {
-          return 2;
-        }
-        if (uint < uintBoundaries[2]) {
-          return 3;
-        }
-        if (uint < uintBoundaries[3]) {
-          return 5;
-        }
-        return 9;
-      };
-      encodeUint.compareTokens = function compareTokens(tok1, tok2) {
-        return tok1.value < tok2.value ? -1 : tok1.value > tok2.value ? 1 : (
-          /* c8 ignore next */
-          0
-        );
-      };
+  encodeUint.encodedSize = function encodedSize(token) {
+    return encodeUintValue.encodedSize(token.value);
+  };
+  encodeUintValue.encodedSize = function encodedSize2(uint) {
+    if (uint < uintBoundaries[0]) {
+      return 1;
     }
-  });
+    if (uint < uintBoundaries[1]) {
+      return 2;
+    }
+    if (uint < uintBoundaries[2]) {
+      return 3;
+    }
+    if (uint < uintBoundaries[3]) {
+      return 5;
+    }
+    return 9;
+  };
+  encodeUint.compareTokens = function compareTokens(tok1, tok2) {
+    return tok1.value < tok2.value ? -1 : tok1.value > tok2.value ? 1 : (
+      /* c8 ignore next */
+      0
+    );
+  };
 
   // node_modules/cborg/lib/1negint.js
   function decodeNegint8(data, pos, _minor, options) {
@@ -43437,6 +43340,8 @@ if (cid) {
   function decodeNegint32(data, pos, _minor, options) {
     return new Token(Type.negint, -1 - readUint32(data, pos + 1, options), 5);
   }
+  var neg1b = BigInt(-1);
+  var pos1b = BigInt(1);
   function decodeNegint64(data, pos, _minor, options) {
     const int = readUint64(data, pos + 1, options);
     if (typeof int !== "bigint") {
@@ -43455,39 +43360,29 @@ if (cid) {
     const unsigned = typeof negint === "bigint" ? negint * neg1b - pos1b : negint * -1 - 1;
     encodeUintValue(buf2, token.type.majorEncoded, unsigned);
   }
-  var neg1b, pos1b;
-  var init_negint = __esm({
-    "node_modules/cborg/lib/1negint.js"() {
-      init_token();
-      init_uint();
-      init_common();
-      neg1b = BigInt(-1);
-      pos1b = BigInt(1);
-      encodeNegint.encodedSize = function encodedSize3(token) {
-        const negint = token.value;
-        const unsigned = typeof negint === "bigint" ? negint * neg1b - pos1b : negint * -1 - 1;
-        if (unsigned < uintBoundaries[0]) {
-          return 1;
-        }
-        if (unsigned < uintBoundaries[1]) {
-          return 2;
-        }
-        if (unsigned < uintBoundaries[2]) {
-          return 3;
-        }
-        if (unsigned < uintBoundaries[3]) {
-          return 5;
-        }
-        return 9;
-      };
-      encodeNegint.compareTokens = function compareTokens2(tok1, tok2) {
-        return tok1.value < tok2.value ? 1 : tok1.value > tok2.value ? -1 : (
-          /* c8 ignore next */
-          0
-        );
-      };
+  encodeNegint.encodedSize = function encodedSize3(token) {
+    const negint = token.value;
+    const unsigned = typeof negint === "bigint" ? negint * neg1b - pos1b : negint * -1 - 1;
+    if (unsigned < uintBoundaries[0]) {
+      return 1;
     }
-  });
+    if (unsigned < uintBoundaries[1]) {
+      return 2;
+    }
+    if (unsigned < uintBoundaries[2]) {
+      return 3;
+    }
+    if (unsigned < uintBoundaries[3]) {
+      return 5;
+    }
+    return 9;
+  };
+  encodeNegint.compareTokens = function compareTokens2(tok1, tok2) {
+    return tok1.value < tok2.value ? 1 : tok1.value > tok2.value ? -1 : (
+      /* c8 ignore next */
+      0
+    );
+  };
 
   // node_modules/cborg/lib/2bytes.js
   function toToken(data, pos, prefix, length5) {
@@ -43525,24 +43420,16 @@ if (cid) {
     encodeUintValue(buf2, token.type.majorEncoded, bytes.length);
     buf2.push(bytes);
   }
+  encodeBytes.encodedSize = function encodedSize4(token) {
+    const bytes = tokenBytes(token);
+    return encodeUintValue.encodedSize(bytes.length) + bytes.length;
+  };
+  encodeBytes.compareTokens = function compareTokens3(tok1, tok2) {
+    return compareBytes(tokenBytes(tok1), tokenBytes(tok2));
+  };
   function compareBytes(b1, b2) {
     return b1.length < b2.length ? -1 : b1.length > b2.length ? 1 : compare2(b1, b2);
   }
-  var init_bytes5 = __esm({
-    "node_modules/cborg/lib/2bytes.js"() {
-      init_token();
-      init_common();
-      init_uint();
-      init_byte_utils();
-      encodeBytes.encodedSize = function encodedSize4(token) {
-        const bytes = tokenBytes(token);
-        return encodeUintValue.encodedSize(bytes.length) + bytes.length;
-      };
-      encodeBytes.compareTokens = function compareTokens3(tok1, tok2) {
-        return compareBytes(tokenBytes(tok1), tokenBytes(tok2));
-      };
-    }
-  });
 
   // node_modules/cborg/lib/3string.js
   function toToken2(data, pos, prefix, length5, options) {
@@ -43573,17 +43460,7 @@ if (cid) {
     }
     return toToken2(data, pos, 9, l, options);
   }
-  var encodeString;
-  var init_string = __esm({
-    "node_modules/cborg/lib/3string.js"() {
-      init_token();
-      init_common();
-      init_uint();
-      init_bytes5();
-      init_byte_utils();
-      encodeString = encodeBytes;
-    }
-  });
+  var encodeString = encodeBytes;
 
   // node_modules/cborg/lib/4array.js
   function toToken3(_data, _pos, prefix, length5) {
@@ -43617,17 +43494,10 @@ if (cid) {
   function encodeArray(buf2, token) {
     encodeUintValue(buf2, Type.array.majorEncoded, token.value);
   }
-  var init_array = __esm({
-    "node_modules/cborg/lib/4array.js"() {
-      init_token();
-      init_uint();
-      init_common();
-      encodeArray.compareTokens = encodeUint.compareTokens;
-      encodeArray.encodedSize = function encodedSize5(token) {
-        return encodeUintValue.encodedSize(token.value);
-      };
-    }
-  });
+  encodeArray.compareTokens = encodeUint.compareTokens;
+  encodeArray.encodedSize = function encodedSize5(token) {
+    return encodeUintValue.encodedSize(token.value);
+  };
 
   // node_modules/cborg/lib/5map.js
   function toToken4(_data, _pos, prefix, length5) {
@@ -43661,17 +43531,10 @@ if (cid) {
   function encodeMap(buf2, token) {
     encodeUintValue(buf2, Type.map.majorEncoded, token.value);
   }
-  var init_map = __esm({
-    "node_modules/cborg/lib/5map.js"() {
-      init_token();
-      init_uint();
-      init_common();
-      encodeMap.compareTokens = encodeUint.compareTokens;
-      encodeMap.encodedSize = function encodedSize6(token) {
-        return encodeUintValue.encodedSize(token.value);
-      };
-    }
-  });
+  encodeMap.compareTokens = encodeUint.compareTokens;
+  encodeMap.encodedSize = function encodedSize6(token) {
+    return encodeUintValue.encodedSize(token.value);
+  };
 
   // node_modules/cborg/lib/6tag.js
   function decodeTagCompact(_data, _pos, minor, _options) {
@@ -43692,18 +43555,16 @@ if (cid) {
   function encodeTag(buf2, token) {
     encodeUintValue(buf2, Type.tag.majorEncoded, token.value);
   }
-  var init_tag = __esm({
-    "node_modules/cborg/lib/6tag.js"() {
-      init_token();
-      init_uint();
-      encodeTag.compareTokens = encodeUint.compareTokens;
-      encodeTag.encodedSize = function encodedSize7(token) {
-        return encodeUintValue.encodedSize(token.value);
-      };
-    }
-  });
+  encodeTag.compareTokens = encodeUint.compareTokens;
+  encodeTag.encodedSize = function encodedSize7(token) {
+    return encodeUintValue.encodedSize(token.value);
+  };
 
   // node_modules/cborg/lib/7float.js
+  var MINOR_FALSE = 20;
+  var MINOR_TRUE = 21;
+  var MINOR_NULL = 22;
+  var MINOR_UNDEFINED = 23;
   function decodeUndefined(_data, _pos, _minor, options) {
     if (options.allowUndefined === false) {
       throw new Error(`${decodeErrPrefix} undefined values are not supported`);
@@ -43776,6 +43637,28 @@ if (cid) {
       }
     }
   }
+  encodeFloat.encodedSize = function encodedSize8(token, options) {
+    const float = token.value;
+    if (float === false || float === true || float === null || float === void 0) {
+      return 1;
+    }
+    if (!options || options.float64 !== true) {
+      encodeFloat16(float);
+      let decoded = readFloat16(ui8a, 1);
+      if (float === decoded || Number.isNaN(float)) {
+        return 3;
+      }
+      encodeFloat32(float);
+      decoded = readFloat32(ui8a, 1);
+      if (float === decoded) {
+        return 5;
+      }
+    }
+    return 9;
+  };
+  var buffer = new ArrayBuffer(9);
+  var dataView2 = new DataView(buffer, 1);
+  var ui8a = new Uint8Array(buffer, 0);
   function encodeFloat16(inp) {
     if (inp === Infinity) {
       dataView2.setUint16(0, 31744, false);
@@ -43851,41 +43734,7 @@ if (cid) {
     const offset = (ui8a2.byteOffset || 0) + pos;
     return new DataView(ui8a2.buffer, offset, 8).getFloat64(0, false);
   }
-  var MINOR_FALSE, MINOR_TRUE, MINOR_NULL, MINOR_UNDEFINED, buffer, dataView2, ui8a;
-  var init_float = __esm({
-    "node_modules/cborg/lib/7float.js"() {
-      init_token();
-      init_common();
-      init_uint();
-      MINOR_FALSE = 20;
-      MINOR_TRUE = 21;
-      MINOR_NULL = 22;
-      MINOR_UNDEFINED = 23;
-      encodeFloat.encodedSize = function encodedSize8(token, options) {
-        const float = token.value;
-        if (float === false || float === true || float === null || float === void 0) {
-          return 1;
-        }
-        if (!options || options.float64 !== true) {
-          encodeFloat16(float);
-          let decoded = readFloat16(ui8a, 1);
-          if (float === decoded || Number.isNaN(float)) {
-            return 3;
-          }
-          encodeFloat32(float);
-          decoded = readFloat32(ui8a, 1);
-          if (float === decoded) {
-            return 5;
-          }
-        }
-        return 9;
-      };
-      buffer = new ArrayBuffer(9);
-      dataView2 = new DataView(buffer, 1);
-      ui8a = new Uint8Array(buffer, 0);
-      encodeFloat.compareTokens = encodeUint.compareTokens;
-    }
-  });
+  encodeFloat.compareTokens = encodeUint.compareTokens;
 
   // node_modules/cborg/lib/jump.js
   function invalidMinor(data, pos, minor) {
@@ -43896,129 +43745,113 @@ if (cid) {
       throw new Error(`${decodeErrPrefix} ${msg}`);
     };
   }
-  var jump, quick;
-  var init_jump = __esm({
-    "node_modules/cborg/lib/jump.js"() {
-      init_token();
-      init_uint();
-      init_negint();
-      init_bytes5();
-      init_string();
-      init_array();
-      init_map();
-      init_tag();
-      init_float();
-      init_common();
-      init_byte_utils();
-      jump = [];
-      for (let i = 0; i <= 23; i++) {
-        jump[i] = invalidMinor;
-      }
-      jump[24] = decodeUint8;
-      jump[25] = decodeUint16;
-      jump[26] = decodeUint32;
-      jump[27] = decodeUint64;
-      jump[28] = invalidMinor;
-      jump[29] = invalidMinor;
-      jump[30] = invalidMinor;
-      jump[31] = invalidMinor;
-      for (let i = 32; i <= 55; i++) {
-        jump[i] = invalidMinor;
-      }
-      jump[56] = decodeNegint8;
-      jump[57] = decodeNegint16;
-      jump[58] = decodeNegint32;
-      jump[59] = decodeNegint64;
-      jump[60] = invalidMinor;
-      jump[61] = invalidMinor;
-      jump[62] = invalidMinor;
-      jump[63] = invalidMinor;
-      for (let i = 64; i <= 87; i++) {
-        jump[i] = decodeBytesCompact;
-      }
-      jump[88] = decodeBytes8;
-      jump[89] = decodeBytes16;
-      jump[90] = decodeBytes32;
-      jump[91] = decodeBytes64;
-      jump[92] = invalidMinor;
-      jump[93] = invalidMinor;
-      jump[94] = invalidMinor;
-      jump[95] = errorer("indefinite length bytes/strings are not supported");
-      for (let i = 96; i <= 119; i++) {
-        jump[i] = decodeStringCompact;
-      }
-      jump[120] = decodeString8;
-      jump[121] = decodeString16;
-      jump[122] = decodeString32;
-      jump[123] = decodeString64;
-      jump[124] = invalidMinor;
-      jump[125] = invalidMinor;
-      jump[126] = invalidMinor;
-      jump[127] = errorer("indefinite length bytes/strings are not supported");
-      for (let i = 128; i <= 151; i++) {
-        jump[i] = decodeArrayCompact;
-      }
-      jump[152] = decodeArray8;
-      jump[153] = decodeArray16;
-      jump[154] = decodeArray32;
-      jump[155] = decodeArray64;
-      jump[156] = invalidMinor;
-      jump[157] = invalidMinor;
-      jump[158] = invalidMinor;
-      jump[159] = decodeArrayIndefinite;
-      for (let i = 160; i <= 183; i++) {
-        jump[i] = decodeMapCompact;
-      }
-      jump[184] = decodeMap8;
-      jump[185] = decodeMap16;
-      jump[186] = decodeMap32;
-      jump[187] = decodeMap64;
-      jump[188] = invalidMinor;
-      jump[189] = invalidMinor;
-      jump[190] = invalidMinor;
-      jump[191] = decodeMapIndefinite;
-      for (let i = 192; i <= 215; i++) {
-        jump[i] = decodeTagCompact;
-      }
-      jump[216] = decodeTag8;
-      jump[217] = decodeTag16;
-      jump[218] = decodeTag32;
-      jump[219] = decodeTag64;
-      jump[220] = invalidMinor;
-      jump[221] = invalidMinor;
-      jump[222] = invalidMinor;
-      jump[223] = invalidMinor;
-      for (let i = 224; i <= 243; i++) {
-        jump[i] = errorer("simple values are not supported");
-      }
-      jump[244] = invalidMinor;
-      jump[245] = invalidMinor;
-      jump[246] = invalidMinor;
-      jump[247] = decodeUndefined;
-      jump[248] = errorer("simple values are not supported");
-      jump[249] = decodeFloat16;
-      jump[250] = decodeFloat32;
-      jump[251] = decodeFloat64;
-      jump[252] = invalidMinor;
-      jump[253] = invalidMinor;
-      jump[254] = invalidMinor;
-      jump[255] = decodeBreak;
-      quick = [];
-      for (let i = 0; i < 24; i++) {
-        quick[i] = new Token(Type.uint, i, 1);
-      }
-      for (let i = -1; i >= -24; i--) {
-        quick[31 - i] = new Token(Type.negint, i, 1);
-      }
-      quick[64] = new Token(Type.bytes, new Uint8Array(0), 1);
-      quick[96] = new Token(Type.string, "", 1);
-      quick[128] = new Token(Type.array, 0, 1);
-      quick[160] = new Token(Type.map, 0, 1);
-      quick[244] = new Token(Type.false, false, 1);
-      quick[245] = new Token(Type.true, true, 1);
-      quick[246] = new Token(Type.null, null, 1);
-    }
-  });
+  var jump = [];
+  for (let i = 0; i <= 23; i++) {
+    jump[i] = invalidMinor;
+  }
+  jump[24] = decodeUint8;
+  jump[25] = decodeUint16;
+  jump[26] = decodeUint32;
+  jump[27] = decodeUint64;
+  jump[28] = invalidMinor;
+  jump[29] = invalidMinor;
+  jump[30] = invalidMinor;
+  jump[31] = invalidMinor;
+  for (let i = 32; i <= 55; i++) {
+    jump[i] = invalidMinor;
+  }
+  jump[56] = decodeNegint8;
+  jump[57] = decodeNegint16;
+  jump[58] = decodeNegint32;
+  jump[59] = decodeNegint64;
+  jump[60] = invalidMinor;
+  jump[61] = invalidMinor;
+  jump[62] = invalidMinor;
+  jump[63] = invalidMinor;
+  for (let i = 64; i <= 87; i++) {
+    jump[i] = decodeBytesCompact;
+  }
+  jump[88] = decodeBytes8;
+  jump[89] = decodeBytes16;
+  jump[90] = decodeBytes32;
+  jump[91] = decodeBytes64;
+  jump[92] = invalidMinor;
+  jump[93] = invalidMinor;
+  jump[94] = invalidMinor;
+  jump[95] = errorer("indefinite length bytes/strings are not supported");
+  for (let i = 96; i <= 119; i++) {
+    jump[i] = decodeStringCompact;
+  }
+  jump[120] = decodeString8;
+  jump[121] = decodeString16;
+  jump[122] = decodeString32;
+  jump[123] = decodeString64;
+  jump[124] = invalidMinor;
+  jump[125] = invalidMinor;
+  jump[126] = invalidMinor;
+  jump[127] = errorer("indefinite length bytes/strings are not supported");
+  for (let i = 128; i <= 151; i++) {
+    jump[i] = decodeArrayCompact;
+  }
+  jump[152] = decodeArray8;
+  jump[153] = decodeArray16;
+  jump[154] = decodeArray32;
+  jump[155] = decodeArray64;
+  jump[156] = invalidMinor;
+  jump[157] = invalidMinor;
+  jump[158] = invalidMinor;
+  jump[159] = decodeArrayIndefinite;
+  for (let i = 160; i <= 183; i++) {
+    jump[i] = decodeMapCompact;
+  }
+  jump[184] = decodeMap8;
+  jump[185] = decodeMap16;
+  jump[186] = decodeMap32;
+  jump[187] = decodeMap64;
+  jump[188] = invalidMinor;
+  jump[189] = invalidMinor;
+  jump[190] = invalidMinor;
+  jump[191] = decodeMapIndefinite;
+  for (let i = 192; i <= 215; i++) {
+    jump[i] = decodeTagCompact;
+  }
+  jump[216] = decodeTag8;
+  jump[217] = decodeTag16;
+  jump[218] = decodeTag32;
+  jump[219] = decodeTag64;
+  jump[220] = invalidMinor;
+  jump[221] = invalidMinor;
+  jump[222] = invalidMinor;
+  jump[223] = invalidMinor;
+  for (let i = 224; i <= 243; i++) {
+    jump[i] = errorer("simple values are not supported");
+  }
+  jump[244] = invalidMinor;
+  jump[245] = invalidMinor;
+  jump[246] = invalidMinor;
+  jump[247] = decodeUndefined;
+  jump[248] = errorer("simple values are not supported");
+  jump[249] = decodeFloat16;
+  jump[250] = decodeFloat32;
+  jump[251] = decodeFloat64;
+  jump[252] = invalidMinor;
+  jump[253] = invalidMinor;
+  jump[254] = invalidMinor;
+  jump[255] = decodeBreak;
+  var quick = [];
+  for (let i = 0; i < 24; i++) {
+    quick[i] = new Token(Type.uint, i, 1);
+  }
+  for (let i = -1; i >= -24; i--) {
+    quick[31 - i] = new Token(Type.negint, i, 1);
+  }
+  quick[64] = new Token(Type.bytes, new Uint8Array(0), 1);
+  quick[96] = new Token(Type.string, "", 1);
+  quick[128] = new Token(Type.array, 0, 1);
+  quick[160] = new Token(Type.map, 0, 1);
+  quick[244] = new Token(Type.false, false, 1);
+  quick[245] = new Token(Type.true, true, 1);
+  quick[246] = new Token(Type.null, null, 1);
 
   // node_modules/cborg/lib/encode.js
   function makeCborEncoders() {
@@ -44032,6 +43865,214 @@ if (cid) {
     encoders[Type.tag.major] = encodeTag;
     encoders[Type.float.major] = encodeFloat;
     return encoders;
+  }
+  var cborEncoders = makeCborEncoders();
+  var buf = new Bl();
+  var Ref = class _Ref {
+    /**
+     * @param {object|any[]} obj
+     * @param {Reference|undefined} parent
+     */
+    constructor(obj, parent) {
+      this.obj = obj;
+      this.parent = parent;
+    }
+    /**
+     * @param {object|any[]} obj
+     * @returns {boolean}
+     */
+    includes(obj) {
+      let p = this;
+      do {
+        if (p.obj === obj) {
+          return true;
+        }
+      } while (p = p.parent);
+      return false;
+    }
+    /**
+     * @param {Reference|undefined} stack
+     * @param {object|any[]} obj
+     * @returns {Reference}
+     */
+    static createCheck(stack, obj) {
+      if (stack && stack.includes(obj)) {
+        throw new Error(`${encodeErrPrefix} object contains circular references`);
+      }
+      return new _Ref(obj, stack);
+    }
+  };
+  var simpleTokens = {
+    null: new Token(Type.null, null),
+    undefined: new Token(Type.undefined, void 0),
+    true: new Token(Type.true, true),
+    false: new Token(Type.false, false),
+    emptyArray: new Token(Type.array, 0),
+    emptyMap: new Token(Type.map, 0)
+  };
+  var typeEncoders = {
+    /**
+     * @param {any} obj
+     * @param {string} _typ
+     * @param {EncodeOptions} _options
+     * @param {Reference} [_refStack]
+     * @returns {TokenOrNestedTokens}
+     */
+    number(obj, _typ, _options, _refStack) {
+      if (!Number.isInteger(obj) || !Number.isSafeInteger(obj)) {
+        return new Token(Type.float, obj);
+      } else if (obj >= 0) {
+        return new Token(Type.uint, obj);
+      } else {
+        return new Token(Type.negint, obj);
+      }
+    },
+    /**
+     * @param {any} obj
+     * @param {string} _typ
+     * @param {EncodeOptions} _options
+     * @param {Reference} [_refStack]
+     * @returns {TokenOrNestedTokens}
+     */
+    bigint(obj, _typ, _options, _refStack) {
+      if (obj >= BigInt(0)) {
+        return new Token(Type.uint, obj);
+      } else {
+        return new Token(Type.negint, obj);
+      }
+    },
+    /**
+     * @param {any} obj
+     * @param {string} _typ
+     * @param {EncodeOptions} _options
+     * @param {Reference} [_refStack]
+     * @returns {TokenOrNestedTokens}
+     */
+    Uint8Array(obj, _typ, _options, _refStack) {
+      return new Token(Type.bytes, obj);
+    },
+    /**
+     * @param {any} obj
+     * @param {string} _typ
+     * @param {EncodeOptions} _options
+     * @param {Reference} [_refStack]
+     * @returns {TokenOrNestedTokens}
+     */
+    string(obj, _typ, _options, _refStack) {
+      return new Token(Type.string, obj);
+    },
+    /**
+     * @param {any} obj
+     * @param {string} _typ
+     * @param {EncodeOptions} _options
+     * @param {Reference} [_refStack]
+     * @returns {TokenOrNestedTokens}
+     */
+    boolean(obj, _typ, _options, _refStack) {
+      return obj ? simpleTokens.true : simpleTokens.false;
+    },
+    /**
+     * @param {any} _obj
+     * @param {string} _typ
+     * @param {EncodeOptions} _options
+     * @param {Reference} [_refStack]
+     * @returns {TokenOrNestedTokens}
+     */
+    null(_obj, _typ, _options, _refStack) {
+      return simpleTokens.null;
+    },
+    /**
+     * @param {any} _obj
+     * @param {string} _typ
+     * @param {EncodeOptions} _options
+     * @param {Reference} [_refStack]
+     * @returns {TokenOrNestedTokens}
+     */
+    undefined(_obj, _typ, _options, _refStack) {
+      return simpleTokens.undefined;
+    },
+    /**
+     * @param {any} obj
+     * @param {string} _typ
+     * @param {EncodeOptions} _options
+     * @param {Reference} [_refStack]
+     * @returns {TokenOrNestedTokens}
+     */
+    ArrayBuffer(obj, _typ, _options, _refStack) {
+      return new Token(Type.bytes, new Uint8Array(obj));
+    },
+    /**
+     * @param {any} obj
+     * @param {string} _typ
+     * @param {EncodeOptions} _options
+     * @param {Reference} [_refStack]
+     * @returns {TokenOrNestedTokens}
+     */
+    DataView(obj, _typ, _options, _refStack) {
+      return new Token(Type.bytes, new Uint8Array(obj.buffer, obj.byteOffset, obj.byteLength));
+    },
+    /**
+     * @param {any} obj
+     * @param {string} _typ
+     * @param {EncodeOptions} options
+     * @param {Reference} [refStack]
+     * @returns {TokenOrNestedTokens}
+     */
+    Array(obj, _typ, options, refStack) {
+      if (!obj.length) {
+        if (options.addBreakTokens === true) {
+          return [simpleTokens.emptyArray, new Token(Type.break)];
+        }
+        return simpleTokens.emptyArray;
+      }
+      refStack = Ref.createCheck(refStack, obj);
+      const entries = [];
+      let i = 0;
+      for (const e of obj) {
+        entries[i++] = objectToTokens(e, options, refStack);
+      }
+      if (options.addBreakTokens) {
+        return [new Token(Type.array, obj.length), entries, new Token(Type.break)];
+      }
+      return [new Token(Type.array, obj.length), entries];
+    },
+    /**
+     * @param {any} obj
+     * @param {string} typ
+     * @param {EncodeOptions} options
+     * @param {Reference} [refStack]
+     * @returns {TokenOrNestedTokens}
+     */
+    Object(obj, typ, options, refStack) {
+      const isMap = typ !== "Object";
+      const keys = isMap ? obj.keys() : Object.keys(obj);
+      const length5 = isMap ? obj.size : keys.length;
+      if (!length5) {
+        if (options.addBreakTokens === true) {
+          return [simpleTokens.emptyMap, new Token(Type.break)];
+        }
+        return simpleTokens.emptyMap;
+      }
+      refStack = Ref.createCheck(refStack, obj);
+      const entries = [];
+      let i = 0;
+      for (const key of keys) {
+        entries[i++] = [
+          objectToTokens(key, options, refStack),
+          objectToTokens(isMap ? obj.get(key) : obj[key], options, refStack)
+        ];
+      }
+      sortMapEntries(entries, options);
+      if (options.addBreakTokens) {
+        return [new Token(Type.map, length5), entries, new Token(Type.break)];
+      }
+      return [new Token(Type.map, length5), entries];
+    }
+  };
+  typeEncoders.Map = typeEncoders.Object;
+  typeEncoders.Buffer = typeEncoders.Uint8Array;
+  for (const typ of "Uint8Clamped Uint16 Uint32 Int8 Int16 Int32 BigUint64 BigInt64 Float32 Float64".split(" ")) {
+    typeEncoders[`${typ}Array`] = typeEncoders.DataView;
   }
   function objectToTokens(obj, options = {}, refStack) {
     const typ = is(obj);
@@ -44054,235 +44095,47 @@ if (cid) {
       entries.sort(options.mapSorter);
     }
   }
-  var cborEncoders, buf, Ref, simpleTokens, typeEncoders;
-  var init_encode2 = __esm({
-    "node_modules/cborg/lib/encode.js"() {
-      init_is();
-      init_token();
-      init_bl();
-      init_common();
-      init_jump();
-      init_byte_utils();
-      init_uint();
-      init_negint();
-      init_bytes5();
-      init_string();
-      init_array();
-      init_map();
-      init_tag();
-      init_float();
-      cborEncoders = makeCborEncoders();
-      buf = new Bl();
-      Ref = class _Ref {
-        /**
-         * @param {object|any[]} obj
-         * @param {Reference|undefined} parent
-         */
-        constructor(obj, parent) {
-          this.obj = obj;
-          this.parent = parent;
-        }
-        /**
-         * @param {object|any[]} obj
-         * @returns {boolean}
-         */
-        includes(obj) {
-          let p = this;
-          do {
-            if (p.obj === obj) {
-              return true;
-            }
-          } while (p = p.parent);
-          return false;
-        }
-        /**
-         * @param {Reference|undefined} stack
-         * @param {object|any[]} obj
-         * @returns {Reference}
-         */
-        static createCheck(stack, obj) {
-          if (stack && stack.includes(obj)) {
-            throw new Error(`${encodeErrPrefix} object contains circular references`);
-          }
-          return new _Ref(obj, stack);
-        }
-      };
-      simpleTokens = {
-        null: new Token(Type.null, null),
-        undefined: new Token(Type.undefined, void 0),
-        true: new Token(Type.true, true),
-        false: new Token(Type.false, false),
-        emptyArray: new Token(Type.array, 0),
-        emptyMap: new Token(Type.map, 0)
-      };
-      typeEncoders = {
-        /**
-         * @param {any} obj
-         * @param {string} _typ
-         * @param {EncodeOptions} _options
-         * @param {Reference} [_refStack]
-         * @returns {TokenOrNestedTokens}
-         */
-        number(obj, _typ, _options, _refStack) {
-          if (!Number.isInteger(obj) || !Number.isSafeInteger(obj)) {
-            return new Token(Type.float, obj);
-          } else if (obj >= 0) {
-            return new Token(Type.uint, obj);
-          } else {
-            return new Token(Type.negint, obj);
-          }
-        },
-        /**
-         * @param {any} obj
-         * @param {string} _typ
-         * @param {EncodeOptions} _options
-         * @param {Reference} [_refStack]
-         * @returns {TokenOrNestedTokens}
-         */
-        bigint(obj, _typ, _options, _refStack) {
-          if (obj >= BigInt(0)) {
-            return new Token(Type.uint, obj);
-          } else {
-            return new Token(Type.negint, obj);
-          }
-        },
-        /**
-         * @param {any} obj
-         * @param {string} _typ
-         * @param {EncodeOptions} _options
-         * @param {Reference} [_refStack]
-         * @returns {TokenOrNestedTokens}
-         */
-        Uint8Array(obj, _typ, _options, _refStack) {
-          return new Token(Type.bytes, obj);
-        },
-        /**
-         * @param {any} obj
-         * @param {string} _typ
-         * @param {EncodeOptions} _options
-         * @param {Reference} [_refStack]
-         * @returns {TokenOrNestedTokens}
-         */
-        string(obj, _typ, _options, _refStack) {
-          return new Token(Type.string, obj);
-        },
-        /**
-         * @param {any} obj
-         * @param {string} _typ
-         * @param {EncodeOptions} _options
-         * @param {Reference} [_refStack]
-         * @returns {TokenOrNestedTokens}
-         */
-        boolean(obj, _typ, _options, _refStack) {
-          return obj ? simpleTokens.true : simpleTokens.false;
-        },
-        /**
-         * @param {any} _obj
-         * @param {string} _typ
-         * @param {EncodeOptions} _options
-         * @param {Reference} [_refStack]
-         * @returns {TokenOrNestedTokens}
-         */
-        null(_obj, _typ, _options, _refStack) {
-          return simpleTokens.null;
-        },
-        /**
-         * @param {any} _obj
-         * @param {string} _typ
-         * @param {EncodeOptions} _options
-         * @param {Reference} [_refStack]
-         * @returns {TokenOrNestedTokens}
-         */
-        undefined(_obj, _typ, _options, _refStack) {
-          return simpleTokens.undefined;
-        },
-        /**
-         * @param {any} obj
-         * @param {string} _typ
-         * @param {EncodeOptions} _options
-         * @param {Reference} [_refStack]
-         * @returns {TokenOrNestedTokens}
-         */
-        ArrayBuffer(obj, _typ, _options, _refStack) {
-          return new Token(Type.bytes, new Uint8Array(obj));
-        },
-        /**
-         * @param {any} obj
-         * @param {string} _typ
-         * @param {EncodeOptions} _options
-         * @param {Reference} [_refStack]
-         * @returns {TokenOrNestedTokens}
-         */
-        DataView(obj, _typ, _options, _refStack) {
-          return new Token(Type.bytes, new Uint8Array(obj.buffer, obj.byteOffset, obj.byteLength));
-        },
-        /**
-         * @param {any} obj
-         * @param {string} _typ
-         * @param {EncodeOptions} options
-         * @param {Reference} [refStack]
-         * @returns {TokenOrNestedTokens}
-         */
-        Array(obj, _typ, options, refStack) {
-          if (!obj.length) {
-            if (options.addBreakTokens === true) {
-              return [simpleTokens.emptyArray, new Token(Type.break)];
-            }
-            return simpleTokens.emptyArray;
-          }
-          refStack = Ref.createCheck(refStack, obj);
-          const entries = [];
-          let i = 0;
-          for (const e of obj) {
-            entries[i++] = objectToTokens(e, options, refStack);
-          }
-          if (options.addBreakTokens) {
-            return [new Token(Type.array, obj.length), entries, new Token(Type.break)];
-          }
-          return [new Token(Type.array, obj.length), entries];
-        },
-        /**
-         * @param {any} obj
-         * @param {string} typ
-         * @param {EncodeOptions} options
-         * @param {Reference} [refStack]
-         * @returns {TokenOrNestedTokens}
-         */
-        Object(obj, typ, options, refStack) {
-          const isMap = typ !== "Object";
-          const keys = isMap ? obj.keys() : Object.keys(obj);
-          const length5 = isMap ? obj.size : keys.length;
-          if (!length5) {
-            if (options.addBreakTokens === true) {
-              return [simpleTokens.emptyMap, new Token(Type.break)];
-            }
-            return simpleTokens.emptyMap;
-          }
-          refStack = Ref.createCheck(refStack, obj);
-          const entries = [];
-          let i = 0;
-          for (const key of keys) {
-            entries[i++] = [
-              objectToTokens(key, options, refStack),
-              objectToTokens(isMap ? obj.get(key) : obj[key], options, refStack)
-            ];
-          }
-          sortMapEntries(entries, options);
-          if (options.addBreakTokens) {
-            return [new Token(Type.map, length5), entries, new Token(Type.break)];
-          }
-          return [new Token(Type.map, length5), entries];
-        }
-      };
-      typeEncoders.Map = typeEncoders.Object;
-      typeEncoders.Buffer = typeEncoders.Uint8Array;
-      for (const typ of "Uint8Clamped Uint16 Uint32 Int8 Int16 Int32 BigUint64 BigInt64 Float32 Float64".split(" ")) {
-        typeEncoders[`${typ}Array`] = typeEncoders.DataView;
-      }
-    }
-  });
 
   // node_modules/cborg/lib/decode.js
+  var defaultDecodeOptions = {
+    strict: false,
+    allowIndefinite: true,
+    allowUndefined: true,
+    allowBigInt: true
+  };
+  var Tokeniser = class {
+    /**
+     * @param {Uint8Array} data
+     * @param {DecodeOptions} options
+     */
+    constructor(data, options = {}) {
+      this._pos = 0;
+      this.data = data;
+      this.options = options;
+    }
+    pos() {
+      return this._pos;
+    }
+    done() {
+      return this._pos >= this.data.length;
+    }
+    next() {
+      const byt = this.data[this._pos];
+      let token = quick[byt];
+      if (token === void 0) {
+        const decoder2 = jump[byt];
+        if (!decoder2) {
+          throw new Error(`${decodeErrPrefix} no decoder for major type ${byt >>> 5} (byte 0x${byt.toString(16).padStart(2, "0")})`);
+        }
+        const minor = byt & 31;
+        token = decoder2(this.data, this._pos, minor, this.options);
+      }
+      this._pos += token.encodedLength;
+      return token;
+    }
+  };
+  var DONE = Symbol.for("DONE");
+  var BREAK = Symbol.for("BREAK");
   function tokenToArray(token, tokeniser, options) {
     const arr = [];
     for (let i = 0; i < token.value; i++) {
@@ -44383,64 +44236,9 @@ if (cid) {
     }
     return decoded;
   }
-  var defaultDecodeOptions, Tokeniser, DONE, BREAK;
-  var init_decode2 = __esm({
-    "node_modules/cborg/lib/decode.js"() {
-      init_common();
-      init_token();
-      init_jump();
-      defaultDecodeOptions = {
-        strict: false,
-        allowIndefinite: true,
-        allowUndefined: true,
-        allowBigInt: true
-      };
-      Tokeniser = class {
-        /**
-         * @param {Uint8Array} data
-         * @param {DecodeOptions} options
-         */
-        constructor(data, options = {}) {
-          this._pos = 0;
-          this.data = data;
-          this.options = options;
-        }
-        pos() {
-          return this._pos;
-        }
-        done() {
-          return this._pos >= this.data.length;
-        }
-        next() {
-          const byt = this.data[this._pos];
-          let token = quick[byt];
-          if (token === void 0) {
-            const decoder2 = jump[byt];
-            if (!decoder2) {
-              throw new Error(`${decodeErrPrefix} no decoder for major type ${byt >>> 5} (byte 0x${byt.toString(16).padStart(2, "0")})`);
-            }
-            const minor = byt & 31;
-            token = decoder2(this.data, this._pos, minor, this.options);
-          }
-          this._pos += token.encodedLength;
-          return token;
-        }
-      };
-      DONE = Symbol.for("DONE");
-      BREAK = Symbol.for("BREAK");
-    }
-  });
-
-  // node_modules/cborg/cborg.js
-  var init_cborg = __esm({
-    "node_modules/cborg/cborg.js"() {
-      init_encode2();
-      init_decode2();
-      init_token();
-    }
-  });
 
   // node_modules/@ipld/dag-cbor/src/index.js
+  var CID_CBOR_TAG = 42;
   function toByteView(buf2) {
     if (buf2 instanceof ArrayBuffer) {
       return new Uint8Array(buf2, 0, buf2.byteLength);
@@ -44474,135 +44272,54 @@ if (cid) {
     }
     return null;
   }
+  var _encodeOptions = {
+    float64: true,
+    typeEncoders: {
+      Object: cidEncoder,
+      undefined: undefinedEncoder,
+      number: numberEncoder
+    }
+  };
+  var encodeOptions = __spreadProps(__spreadValues({}, _encodeOptions), {
+    typeEncoders: __spreadValues({}, _encodeOptions.typeEncoders)
+  });
   function cidDecoder(bytes) {
     if (bytes[0] !== 0) {
       throw new Error("Invalid CID for CBOR tag 42; expected leading 0x00");
     }
     return CID4.decode(bytes.subarray(1));
   }
-  var CID_CBOR_TAG, _encodeOptions, encodeOptions, _decodeOptions, decodeOptions, decode20;
-  var init_src4 = __esm({
-    "node_modules/@ipld/dag-cbor/src/index.js"() {
-      init_cborg();
-      init_cid4();
-      CID_CBOR_TAG = 42;
-      _encodeOptions = {
-        float64: true,
-        typeEncoders: {
-          Object: cidEncoder,
-          undefined: undefinedEncoder,
-          number: numberEncoder
-        }
-      };
-      encodeOptions = __spreadProps(__spreadValues({}, _encodeOptions), {
-        typeEncoders: __spreadValues({}, _encodeOptions.typeEncoders)
-      });
-      _decodeOptions = {
-        allowIndefinite: false,
-        coerceUndefinedToNull: true,
-        allowNaN: false,
-        allowInfinity: false,
-        allowBigInt: true,
-        // this will lead to BigInt for ints outside of
-        // safe-integer range, which may surprise users
-        strict: true,
-        useMaps: false,
-        rejectDuplicateMapKeys: true,
-        /** @type {import('cborg').TagDecoder[]} */
-        tags: []
-      };
-      _decodeOptions.tags[CID_CBOR_TAG] = cidDecoder;
-      decodeOptions = __spreadProps(__spreadValues({}, _decodeOptions), {
-        tags: _decodeOptions.tags.slice()
-      });
-      decode20 = (data) => decode19(toByteView(data), _decodeOptions);
-    }
+  var _decodeOptions = {
+    allowIndefinite: false,
+    coerceUndefinedToNull: true,
+    allowNaN: false,
+    allowInfinity: false,
+    allowBigInt: true,
+    // this will lead to BigInt for ints outside of
+    // safe-integer range, which may surprise users
+    strict: true,
+    useMaps: false,
+    rejectDuplicateMapKeys: true,
+    /** @type {import('cborg').TagDecoder[]} */
+    tags: []
+  };
+  _decodeOptions.tags[CID_CBOR_TAG] = cidDecoder;
+  var decodeOptions = __spreadProps(__spreadValues({}, _decodeOptions), {
+    tags: _decodeOptions.tags.slice()
   });
-
-  // node_modules/varint/encode.js
-  var require_encode = __commonJS({
-    "node_modules/varint/encode.js"(exports, module) {
-      module.exports = encode13;
-      var MSB5 = 128;
-      var REST5 = 127;
-      var MSBALL5 = ~REST5;
-      var INT5 = Math.pow(2, 31);
-      function encode13(num, out, offset) {
-        if (Number.MAX_SAFE_INTEGER && num > Number.MAX_SAFE_INTEGER) {
-          encode13.bytes = 0;
-          throw new RangeError("Could not encode varint");
-        }
-        out = out || [];
-        offset = offset || 0;
-        var oldOffset = offset;
-        while (num >= INT5) {
-          out[offset++] = num & 255 | MSB5;
-          num /= 128;
-        }
-        while (num & MSBALL5) {
-          out[offset++] = num & 255 | MSB5;
-          num >>>= 7;
-        }
-        out[offset] = num | 0;
-        encode13.bytes = offset - oldOffset + 1;
-        return out;
-      }
-    }
-  });
-
-  // node_modules/varint/decode.js
-  var require_decode = __commonJS({
-    "node_modules/varint/decode.js"(exports, module) {
-      module.exports = read6;
-      var MSB5 = 128;
-      var REST5 = 127;
-      function read6(buf2, offset) {
-        var res = 0, offset = offset || 0, shift = 0, counter = offset, b, l = buf2.length;
-        do {
-          if (counter >= l || shift > 49) {
-            read6.bytes = 0;
-            throw new RangeError("Could not decode varint");
-          }
-          b = buf2[counter++];
-          res += shift < 28 ? (b & REST5) << shift : (b & REST5) * Math.pow(2, shift);
-          shift += 7;
-        } while (b >= MSB5);
-        read6.bytes = counter - offset;
-        return res;
-      }
-    }
-  });
-
-  // node_modules/varint/length.js
-  var require_length = __commonJS({
-    "node_modules/varint/length.js"(exports, module) {
-      var N15 = Math.pow(2, 7);
-      var N25 = Math.pow(2, 14);
-      var N35 = Math.pow(2, 21);
-      var N45 = Math.pow(2, 28);
-      var N55 = Math.pow(2, 35);
-      var N65 = Math.pow(2, 42);
-      var N75 = Math.pow(2, 49);
-      var N85 = Math.pow(2, 56);
-      var N95 = Math.pow(2, 63);
-      module.exports = function(value) {
-        return value < N15 ? 1 : value < N25 ? 2 : value < N35 ? 3 : value < N45 ? 4 : value < N55 ? 5 : value < N65 ? 6 : value < N75 ? 7 : value < N85 ? 8 : value < N95 ? 9 : 10;
-      };
-    }
-  });
-
-  // node_modules/varint/index.js
-  var require_varint = __commonJS({
-    "node_modules/varint/index.js"(exports, module) {
-      module.exports = {
-        encode: require_encode(),
-        decode: require_decode(),
-        encodingLength: require_length()
-      };
-    }
-  });
+  var decode20 = (data) => decode19(toByteView(data), _decodeOptions);
 
   // node_modules/@ipld/car/src/decoder-common.js
+  var import_varint5 = __toESM(require_varint(), 1);
+  var CIDV0_BYTES = {
+    SHA2_256: 18,
+    LENGTH: 32,
+    DAG_PB: 112
+  };
+  var V2_HEADER_LENGTH = (
+    /* characteristics */
+    16 + 8 + 8 + 8
+  );
   function decodeVarint(bytes, seeker) {
     if (!bytes.length) {
       throw new Error("Unexpected end of data");
@@ -44644,246 +44361,228 @@ if (cid) {
     const mhLength = codeLength + lengthLength + length5;
     return mhLength;
   }
-  var import_varint5, CIDV0_BYTES, V2_HEADER_LENGTH;
-  var init_decoder_common = __esm({
-    "node_modules/@ipld/car/src/decoder-common.js"() {
-      import_varint5 = __toESM(require_varint(), 1);
-      CIDV0_BYTES = {
-        SHA2_256: 18,
-        LENGTH: 32,
-        DAG_PB: 112
-      };
-      V2_HEADER_LENGTH = /* characteristics */
-      16 + 8 + 8 + 8;
-    }
-  });
 
   // node_modules/@ipld/car/src/header-validator.js
-  var Kinds, Types, Reprs, CarV1HeaderOrV2Pragma;
-  var init_header_validator = __esm({
-    "node_modules/@ipld/car/src/header-validator.js"() {
-      Kinds = {
-        Null: (
-          /** @returns {undefined|null} */
-          (obj) => obj === null ? obj : void 0
-        ),
-        Int: (
-          /** @returns {undefined|number} */
-          (obj) => Number.isInteger(obj) ? obj : void 0
-        ),
-        Float: (
-          /** @returns {undefined|number} */
-          (obj) => typeof obj === "number" && Number.isFinite(obj) ? obj : void 0
-        ),
-        String: (
-          /** @returns {undefined|string} */
-          (obj) => typeof obj === "string" ? obj : void 0
-        ),
-        Bool: (
-          /** @returns {undefined|boolean} */
-          (obj) => typeof obj === "boolean" ? obj : void 0
-        ),
-        Bytes: (
-          /** @returns {undefined|Uint8Array} */
-          (obj) => obj instanceof Uint8Array ? obj : void 0
-        ),
-        Link: (
-          /** @returns {undefined|object} */
-          (obj) => obj !== null && typeof obj === "object" && obj.asCID === obj ? obj : void 0
-        ),
-        List: (
-          /** @returns {undefined|Array<any>} */
-          (obj) => Array.isArray(obj) ? obj : void 0
-        ),
-        Map: (
-          /** @returns {undefined|object} */
-          (obj) => obj !== null && typeof obj === "object" && obj.asCID !== obj && !Array.isArray(obj) && !(obj instanceof Uint8Array) ? obj : void 0
-        )
-      };
-      Types = {
-        "CarV1HeaderOrV2Pragma > roots (anon) > valueType (anon)": Kinds.Link,
-        "CarV1HeaderOrV2Pragma > roots (anon)": (
-          /** @returns {undefined|any} */
-          (obj) => {
-            if (Kinds.List(obj) === void 0) {
-              return void 0;
-            }
-            for (let i = 0; i < obj.length; i++) {
-              let v = obj[i];
-              v = Types["CarV1HeaderOrV2Pragma > roots (anon) > valueType (anon)"](v);
-              if (v === void 0) {
+  var Kinds = {
+    Null: (
+      /** @returns {undefined|null} */
+      (obj) => obj === null ? obj : void 0
+    ),
+    Int: (
+      /** @returns {undefined|number} */
+      (obj) => Number.isInteger(obj) ? obj : void 0
+    ),
+    Float: (
+      /** @returns {undefined|number} */
+      (obj) => typeof obj === "number" && Number.isFinite(obj) ? obj : void 0
+    ),
+    String: (
+      /** @returns {undefined|string} */
+      (obj) => typeof obj === "string" ? obj : void 0
+    ),
+    Bool: (
+      /** @returns {undefined|boolean} */
+      (obj) => typeof obj === "boolean" ? obj : void 0
+    ),
+    Bytes: (
+      /** @returns {undefined|Uint8Array} */
+      (obj) => obj instanceof Uint8Array ? obj : void 0
+    ),
+    Link: (
+      /** @returns {undefined|object} */
+      (obj) => obj !== null && typeof obj === "object" && obj.asCID === obj ? obj : void 0
+    ),
+    List: (
+      /** @returns {undefined|Array<any>} */
+      (obj) => Array.isArray(obj) ? obj : void 0
+    ),
+    Map: (
+      /** @returns {undefined|object} */
+      (obj) => obj !== null && typeof obj === "object" && obj.asCID !== obj && !Array.isArray(obj) && !(obj instanceof Uint8Array) ? obj : void 0
+    )
+  };
+  var Types = {
+    "CarV1HeaderOrV2Pragma > roots (anon) > valueType (anon)": Kinds.Link,
+    "CarV1HeaderOrV2Pragma > roots (anon)": (
+      /** @returns {undefined|any} */
+      (obj) => {
+        if (Kinds.List(obj) === void 0) {
+          return void 0;
+        }
+        for (let i = 0; i < obj.length; i++) {
+          let v = obj[i];
+          v = Types["CarV1HeaderOrV2Pragma > roots (anon) > valueType (anon)"](v);
+          if (v === void 0) {
+            return void 0;
+          }
+          if (v !== obj[i]) {
+            const ret = obj.slice(0, i);
+            for (let j = i; j < obj.length; j++) {
+              let v2 = obj[j];
+              v2 = Types["CarV1HeaderOrV2Pragma > roots (anon) > valueType (anon)"](v2);
+              if (v2 === void 0) {
                 return void 0;
               }
-              if (v !== obj[i]) {
-                const ret = obj.slice(0, i);
-                for (let j = i; j < obj.length; j++) {
-                  let v2 = obj[j];
-                  v2 = Types["CarV1HeaderOrV2Pragma > roots (anon) > valueType (anon)"](v2);
-                  if (v2 === void 0) {
-                    return void 0;
-                  }
-                  ret.push(v2);
-                }
-                return ret;
-              }
-            }
-            return obj;
-          }
-        ),
-        Int: Kinds.Int,
-        CarV1HeaderOrV2Pragma: (
-          /** @returns {undefined|any} */
-          (obj) => {
-            if (Kinds.Map(obj) === void 0) {
-              return void 0;
-            }
-            const entries = Object.entries(obj);
-            let ret = obj;
-            let requiredCount = 1;
-            for (let i = 0; i < entries.length; i++) {
-              const [key, value] = entries[i];
-              switch (key) {
-                case "roots":
-                  {
-                    const v = Types["CarV1HeaderOrV2Pragma > roots (anon)"](obj[key]);
-                    if (v === void 0) {
-                      return void 0;
-                    }
-                    if (v !== value || ret !== obj) {
-                      if (ret === obj) {
-                        ret = {};
-                        for (let j = 0; j < i; j++) {
-                          ret[entries[j][0]] = entries[j][1];
-                        }
-                      }
-                      ret.roots = v;
-                    }
-                  }
-                  break;
-                case "version":
-                  {
-                    requiredCount--;
-                    const v = Types.Int(obj[key]);
-                    if (v === void 0) {
-                      return void 0;
-                    }
-                    if (v !== value || ret !== obj) {
-                      if (ret === obj) {
-                        ret = {};
-                        for (let j = 0; j < i; j++) {
-                          ret[entries[j][0]] = entries[j][1];
-                        }
-                      }
-                      ret.version = v;
-                    }
-                  }
-                  break;
-                default:
-                  return void 0;
-              }
-            }
-            if (requiredCount > 0) {
-              return void 0;
+              ret.push(v2);
             }
             return ret;
           }
-        )
-      };
-      Reprs = {
-        "CarV1HeaderOrV2Pragma > roots (anon) > valueType (anon)": Kinds.Link,
-        "CarV1HeaderOrV2Pragma > roots (anon)": (
-          /** @returns {undefined|any} */
-          (obj) => {
-            if (Kinds.List(obj) === void 0) {
+        }
+        return obj;
+      }
+    ),
+    Int: Kinds.Int,
+    CarV1HeaderOrV2Pragma: (
+      /** @returns {undefined|any} */
+      (obj) => {
+        if (Kinds.Map(obj) === void 0) {
+          return void 0;
+        }
+        const entries = Object.entries(obj);
+        let ret = obj;
+        let requiredCount = 1;
+        for (let i = 0; i < entries.length; i++) {
+          const [key, value] = entries[i];
+          switch (key) {
+            case "roots":
+              {
+                const v = Types["CarV1HeaderOrV2Pragma > roots (anon)"](obj[key]);
+                if (v === void 0) {
+                  return void 0;
+                }
+                if (v !== value || ret !== obj) {
+                  if (ret === obj) {
+                    ret = {};
+                    for (let j = 0; j < i; j++) {
+                      ret[entries[j][0]] = entries[j][1];
+                    }
+                  }
+                  ret.roots = v;
+                }
+              }
+              break;
+            case "version":
+              {
+                requiredCount--;
+                const v = Types.Int(obj[key]);
+                if (v === void 0) {
+                  return void 0;
+                }
+                if (v !== value || ret !== obj) {
+                  if (ret === obj) {
+                    ret = {};
+                    for (let j = 0; j < i; j++) {
+                      ret[entries[j][0]] = entries[j][1];
+                    }
+                  }
+                  ret.version = v;
+                }
+              }
+              break;
+            default:
               return void 0;
-            }
-            for (let i = 0; i < obj.length; i++) {
-              let v = obj[i];
-              v = Reprs["CarV1HeaderOrV2Pragma > roots (anon) > valueType (anon)"](v);
-              if (v === void 0) {
+          }
+        }
+        if (requiredCount > 0) {
+          return void 0;
+        }
+        return ret;
+      }
+    )
+  };
+  var Reprs = {
+    "CarV1HeaderOrV2Pragma > roots (anon) > valueType (anon)": Kinds.Link,
+    "CarV1HeaderOrV2Pragma > roots (anon)": (
+      /** @returns {undefined|any} */
+      (obj) => {
+        if (Kinds.List(obj) === void 0) {
+          return void 0;
+        }
+        for (let i = 0; i < obj.length; i++) {
+          let v = obj[i];
+          v = Reprs["CarV1HeaderOrV2Pragma > roots (anon) > valueType (anon)"](v);
+          if (v === void 0) {
+            return void 0;
+          }
+          if (v !== obj[i]) {
+            const ret = obj.slice(0, i);
+            for (let j = i; j < obj.length; j++) {
+              let v2 = obj[j];
+              v2 = Reprs["CarV1HeaderOrV2Pragma > roots (anon) > valueType (anon)"](v2);
+              if (v2 === void 0) {
                 return void 0;
               }
-              if (v !== obj[i]) {
-                const ret = obj.slice(0, i);
-                for (let j = i; j < obj.length; j++) {
-                  let v2 = obj[j];
-                  v2 = Reprs["CarV1HeaderOrV2Pragma > roots (anon) > valueType (anon)"](v2);
-                  if (v2 === void 0) {
-                    return void 0;
-                  }
-                  ret.push(v2);
-                }
-                return ret;
-              }
-            }
-            return obj;
-          }
-        ),
-        Int: Kinds.Int,
-        CarV1HeaderOrV2Pragma: (
-          /** @returns {undefined|any} */
-          (obj) => {
-            if (Kinds.Map(obj) === void 0) {
-              return void 0;
-            }
-            const entries = Object.entries(obj);
-            let ret = obj;
-            let requiredCount = 1;
-            for (let i = 0; i < entries.length; i++) {
-              const [key, value] = entries[i];
-              switch (key) {
-                case "roots":
-                  {
-                    const v = Reprs["CarV1HeaderOrV2Pragma > roots (anon)"](value);
-                    if (v === void 0) {
-                      return void 0;
-                    }
-                    if (v !== value || ret !== obj) {
-                      if (ret === obj) {
-                        ret = {};
-                        for (let j = 0; j < i; j++) {
-                          ret[entries[j][0]] = entries[j][1];
-                        }
-                      }
-                      ret.roots = v;
-                    }
-                  }
-                  break;
-                case "version":
-                  {
-                    requiredCount--;
-                    const v = Reprs.Int(value);
-                    if (v === void 0) {
-                      return void 0;
-                    }
-                    if (v !== value || ret !== obj) {
-                      if (ret === obj) {
-                        ret = {};
-                        for (let j = 0; j < i; j++) {
-                          ret[entries[j][0]] = entries[j][1];
-                        }
-                      }
-                      ret.version = v;
-                    }
-                  }
-                  break;
-                default:
-                  return void 0;
-              }
-            }
-            if (requiredCount > 0) {
-              return void 0;
+              ret.push(v2);
             }
             return ret;
           }
-        )
-      };
-      CarV1HeaderOrV2Pragma = {
-        toTyped: Types.CarV1HeaderOrV2Pragma,
-        toRepresentation: Reprs.CarV1HeaderOrV2Pragma
-      };
-    }
-  });
+        }
+        return obj;
+      }
+    ),
+    Int: Kinds.Int,
+    CarV1HeaderOrV2Pragma: (
+      /** @returns {undefined|any} */
+      (obj) => {
+        if (Kinds.Map(obj) === void 0) {
+          return void 0;
+        }
+        const entries = Object.entries(obj);
+        let ret = obj;
+        let requiredCount = 1;
+        for (let i = 0; i < entries.length; i++) {
+          const [key, value] = entries[i];
+          switch (key) {
+            case "roots":
+              {
+                const v = Reprs["CarV1HeaderOrV2Pragma > roots (anon)"](value);
+                if (v === void 0) {
+                  return void 0;
+                }
+                if (v !== value || ret !== obj) {
+                  if (ret === obj) {
+                    ret = {};
+                    for (let j = 0; j < i; j++) {
+                      ret[entries[j][0]] = entries[j][1];
+                    }
+                  }
+                  ret.roots = v;
+                }
+              }
+              break;
+            case "version":
+              {
+                requiredCount--;
+                const v = Reprs.Int(value);
+                if (v === void 0) {
+                  return void 0;
+                }
+                if (v !== value || ret !== obj) {
+                  if (ret === obj) {
+                    ret = {};
+                    for (let j = 0; j < i; j++) {
+                      ret[entries[j][0]] = entries[j][1];
+                    }
+                  }
+                  ret.version = v;
+                }
+              }
+              break;
+            default:
+              return void 0;
+          }
+        }
+        if (requiredCount > 0) {
+          return void 0;
+        }
+        return ret;
+      }
+    )
+  };
+  var CarV1HeaderOrV2Pragma = {
+    toTyped: Types.CarV1HeaderOrV2Pragma,
+    toRepresentation: Reprs.CarV1HeaderOrV2Pragma
+  };
 
   // node_modules/@ipld/car/src/decoder.js
   function readHeader(reader, strictVersion) {
@@ -45130,17 +44829,158 @@ if (cid) {
       }
     };
   }
-  var init_decoder = __esm({
-    "node_modules/@ipld/car/src/decoder.js"() {
-      init_src4();
-      init_cid4();
-      init_digest4();
-      init_decoder_common();
-      init_header_validator();
-    }
-  });
 
   // node_modules/@ipld/car/src/reader-browser.js
+  var CarReader = class {
+    /**
+     * @constructs CarReader
+     * @param {CarHeader|CarV2Header} header
+     * @param {Block[]} blocks
+     */
+    constructor(header, blocks) {
+      this._header = header;
+      this._blocks = blocks;
+      this._keys = blocks.map((b) => b.cid.toString());
+    }
+    /**
+     * @property
+     * @memberof CarReader
+     * @instance
+     */
+    get version() {
+      return this._header.version;
+    }
+    /**
+     * Get the list of roots defined by the CAR referenced by this reader. May be
+     * zero or more `CID`s.
+     *
+     * @function
+     * @memberof CarReader
+     * @instance
+     * @async
+     * @returns {Promise<CID[]>}
+     */
+    getRoots() {
+      return __async(this, null, function* () {
+        return this._header.roots;
+      });
+    }
+    /**
+     * Check whether a given `CID` exists within the CAR referenced by this
+     * reader.
+     *
+     * @function
+     * @memberof CarReader
+     * @instance
+     * @async
+     * @param {CID} key
+     * @returns {Promise<boolean>}
+     */
+    has(key) {
+      return __async(this, null, function* () {
+        return this._keys.indexOf(key.toString()) > -1;
+      });
+    }
+    /**
+     * Fetch a `Block` (a `{ cid:CID, bytes:Uint8Array }` pair) from the CAR
+     * referenced by this reader matching the provided `CID`. In the case where
+     * the provided `CID` doesn't exist within the CAR, `undefined` will be
+     * returned.
+     *
+     * @function
+     * @memberof CarReader
+     * @instance
+     * @async
+     * @param {CID} key
+     * @returns {Promise<Block | undefined>}
+     */
+    get(key) {
+      return __async(this, null, function* () {
+        const index = this._keys.indexOf(key.toString());
+        return index > -1 ? this._blocks[index] : void 0;
+      });
+    }
+    /**
+     * Returns a `BlockIterator` (`AsyncIterable<Block>`) that iterates over all
+     * of the `Block`s (`{ cid:CID, bytes:Uint8Array }` pairs) contained within
+     * the CAR referenced by this reader.
+     *
+     * @function
+     * @memberof CarReader
+     * @instance
+     * @async
+     * @generator
+     * @returns {AsyncGenerator<Block>}
+     */
+    blocks() {
+      return __asyncGenerator(this, null, function* () {
+        for (const block of this._blocks) {
+          yield block;
+        }
+      });
+    }
+    /**
+     * Returns a `CIDIterator` (`AsyncIterable<CID>`) that iterates over all of
+     * the `CID`s contained within the CAR referenced by this reader.
+     *
+     * @function
+     * @memberof CarReader
+     * @instance
+     * @async
+     * @generator
+     * @returns {AsyncGenerator<CID>}
+     */
+    cids() {
+      return __asyncGenerator(this, null, function* () {
+        for (const block of this._blocks) {
+          yield block.cid;
+        }
+      });
+    }
+    /**
+     * Instantiate a {@link CarReader} from a `Uint8Array` blob. This performs a
+     * decode fully in memory and maintains the decoded state in memory for full
+     * access to the data via the `CarReader` API.
+     *
+     * @async
+     * @static
+     * @memberof CarReader
+     * @param {Uint8Array} bytes
+     * @returns {Promise<CarReader>}
+     */
+    static fromBytes(bytes) {
+      return __async(this, null, function* () {
+        if (!(bytes instanceof Uint8Array)) {
+          throw new TypeError("fromBytes() requires a Uint8Array");
+        }
+        return decodeReaderComplete(bytesReader(bytes));
+      });
+    }
+    /**
+     * Instantiate a {@link CarReader} from a `AsyncIterable<Uint8Array>`, such as
+     * a [modern Node.js stream](https://nodejs.org/api/stream.html#stream_streams_compatibility_with_async_generators_and_async_iterators).
+     * This performs a decode fully in memory and maintains the decoded state in
+     * memory for full access to the data via the `CarReader` API.
+     *
+     * Care should be taken for large archives; this API may not be appropriate
+     * where memory is a concern or the archive is potentially larger than the
+     * amount of memory that the runtime can handle.
+     *
+     * @async
+     * @static
+     * @memberof CarReader
+     * @param {AsyncIterable<Uint8Array>} asyncIterable
+     * @returns {Promise<CarReader>}
+     */
+    static fromIterable(asyncIterable) {
+      return __async(this, null, function* () {
+        if (!asyncIterable || !(typeof asyncIterable[Symbol.asyncIterator] === "function")) {
+          throw new TypeError("fromIterable() requires an async iterable");
+        }
+        return decodeReaderComplete(asyncIterableReader(asyncIterable));
+      });
+    }
+  };
   function decodeReaderComplete(reader) {
     return __async(this, null, function* () {
       const decoder2 = createDecoder(reader);
@@ -45164,164 +45004,20 @@ if (cid) {
       return new CarReader(header, blocks);
     });
   }
-  var CarReader;
-  var init_reader_browser = __esm({
-    "node_modules/@ipld/car/src/reader-browser.js"() {
-      init_decoder();
-      CarReader = class {
-        /**
-         * @constructs CarReader
-         * @param {CarHeader|CarV2Header} header
-         * @param {Block[]} blocks
-         */
-        constructor(header, blocks) {
-          this._header = header;
-          this._blocks = blocks;
-          this._keys = blocks.map((b) => b.cid.toString());
-        }
-        /**
-         * @property
-         * @memberof CarReader
-         * @instance
-         */
-        get version() {
-          return this._header.version;
-        }
-        /**
-         * Get the list of roots defined by the CAR referenced by this reader. May be
-         * zero or more `CID`s.
-         *
-         * @function
-         * @memberof CarReader
-         * @instance
-         * @async
-         * @returns {Promise<CID[]>}
-         */
-        getRoots() {
-          return __async(this, null, function* () {
-            return this._header.roots;
-          });
-        }
-        /**
-         * Check whether a given `CID` exists within the CAR referenced by this
-         * reader.
-         *
-         * @function
-         * @memberof CarReader
-         * @instance
-         * @async
-         * @param {CID} key
-         * @returns {Promise<boolean>}
-         */
-        has(key) {
-          return __async(this, null, function* () {
-            return this._keys.indexOf(key.toString()) > -1;
-          });
-        }
-        /**
-         * Fetch a `Block` (a `{ cid:CID, bytes:Uint8Array }` pair) from the CAR
-         * referenced by this reader matching the provided `CID`. In the case where
-         * the provided `CID` doesn't exist within the CAR, `undefined` will be
-         * returned.
-         *
-         * @function
-         * @memberof CarReader
-         * @instance
-         * @async
-         * @param {CID} key
-         * @returns {Promise<Block | undefined>}
-         */
-        get(key) {
-          return __async(this, null, function* () {
-            const index = this._keys.indexOf(key.toString());
-            return index > -1 ? this._blocks[index] : void 0;
-          });
-        }
-        /**
-         * Returns a `BlockIterator` (`AsyncIterable<Block>`) that iterates over all
-         * of the `Block`s (`{ cid:CID, bytes:Uint8Array }` pairs) contained within
-         * the CAR referenced by this reader.
-         *
-         * @function
-         * @memberof CarReader
-         * @instance
-         * @async
-         * @generator
-         * @returns {AsyncGenerator<Block>}
-         */
-        blocks() {
-          return __asyncGenerator(this, null, function* () {
-            for (const block of this._blocks) {
-              yield block;
-            }
-          });
-        }
-        /**
-         * Returns a `CIDIterator` (`AsyncIterable<CID>`) that iterates over all of
-         * the `CID`s contained within the CAR referenced by this reader.
-         *
-         * @function
-         * @memberof CarReader
-         * @instance
-         * @async
-         * @generator
-         * @returns {AsyncGenerator<CID>}
-         */
-        cids() {
-          return __asyncGenerator(this, null, function* () {
-            for (const block of this._blocks) {
-              yield block.cid;
-            }
-          });
-        }
-        /**
-         * Instantiate a {@link CarReader} from a `Uint8Array` blob. This performs a
-         * decode fully in memory and maintains the decoded state in memory for full
-         * access to the data via the `CarReader` API.
-         *
-         * @async
-         * @static
-         * @memberof CarReader
-         * @param {Uint8Array} bytes
-         * @returns {Promise<CarReader>}
-         */
-        static fromBytes(bytes) {
-          return __async(this, null, function* () {
-            if (!(bytes instanceof Uint8Array)) {
-              throw new TypeError("fromBytes() requires a Uint8Array");
-            }
-            return decodeReaderComplete(bytesReader(bytes));
-          });
-        }
-        /**
-         * Instantiate a {@link CarReader} from a `AsyncIterable<Uint8Array>`, such as
-         * a [modern Node.js stream](https://nodejs.org/api/stream.html#stream_streams_compatibility_with_async_generators_and_async_iterators).
-         * This performs a decode fully in memory and maintains the decoded state in
-         * memory for full access to the data via the `CarReader` API.
-         *
-         * Care should be taken for large archives; this API may not be appropriate
-         * where memory is a concern or the archive is potentially larger than the
-         * amount of memory that the runtime can handle.
-         *
-         * @async
-         * @static
-         * @memberof CarReader
-         * @param {AsyncIterable<Uint8Array>} asyncIterable
-         * @returns {Promise<CarReader>}
-         */
-        static fromIterable(asyncIterable) {
-          return __async(this, null, function* () {
-            if (!asyncIterable || !(typeof asyncIterable[Symbol.asyncIterator] === "function")) {
-              throw new TypeError("fromIterable() requires an async iterable");
-            }
-            return decodeReaderComplete(asyncIterableReader(asyncIterable));
-          });
-        }
-      };
-    }
-  });
 
   // lib/firehose.js
+  var knownTypes = [
+    "app.bsky.feed.like",
+    "app.bsky.feed.post",
+    "app.bsky.feed.repost",
+    "app.bsky.feed.threadgate",
+    "app.bsky.graph.follow",
+    "app.bsky.graph.block",
+    "app.bsky.graph.list",
+    "app.bsky.graph.listitem",
+    "app.bsky.actor.profile"
+  ];
+  var cbor_x_extended = false;
   function firehose() {
     return __asyncGenerator(this, null, function* () {
       ensureCborXExtended();
@@ -45453,34 +45149,9 @@ if (cid) {
     });
     cbor_x_extended = true;
   }
-  var knownTypes, cbor_x_extended;
-  var init_firehose = __esm({
-    "lib/firehose.js"() {
-      init_cbor_x();
-      init_src3();
-      init_reader_browser();
-      knownTypes = [
-        "app.bsky.feed.like",
-        "app.bsky.feed.post",
-        "app.bsky.feed.repost",
-        "app.bsky.feed.threadgate",
-        "app.bsky.graph.follow",
-        "app.bsky.graph.block",
-        "app.bsky.graph.list",
-        "app.bsky.graph.listitem",
-        "app.bsky.actor.profile"
-      ];
-      cbor_x_extended = false;
-    }
-  });
 
   // package.json
-  var version4;
-  var init_package = __esm({
-    "package.json"() {
-      version4 = "0.1.10";
-    }
-  });
+  var version4 = "0.1.11";
 
   // lib/firehose-short-dids.js
   function firehoseShortDIDs(filterShortDIDs) {
@@ -45585,12 +45256,6 @@ if (cid) {
       }
     });
   }
-  var init_firehose_short_dids = __esm({
-    "lib/firehose-short-dids.js"() {
-      init_firehose();
-      init_shorten();
-    }
-  });
 
   // src/api/akpa.js
   function streamBuffer(callback) {
@@ -45679,18 +45344,10 @@ if (cid) {
       }
     });
   }
-  var init_akpa = __esm({
-    "src/api/akpa.js"() {
-    }
-  });
-
-  // src/api/retry-fetch.js
-  var init_retry_fetch = __esm({
-    "src/api/retry-fetch.js"() {
-    }
-  });
 
   // lib/plc-directory.js
+  var FETCH_AHEAD_MSEC_MAX = 1e4;
+  var FETCH_AHEAD_COUNT_MAX = 1e4;
   function plcDirectory(since, overrides) {
     const useFetch = (overrides == null ? void 0 : overrides.fetch) || fetch;
     return streamBuffer((stream) => __async(this, null, function* () {
@@ -45768,60 +45425,39 @@ if (cid) {
       }
     }));
   }
-  var FETCH_AHEAD_MSEC_MAX, FETCH_AHEAD_COUNT_MAX;
-  var init_plc_directory = __esm({
-    "lib/plc-directory.js"() {
-      init_akpa();
-      init_retry_fetch();
-      init_shorten();
-      FETCH_AHEAD_MSEC_MAX = 1e4;
-      FETCH_AHEAD_COUNT_MAX = 1e4;
-    }
-  });
 
   // lib/index.js
-  var require_lib3 = __commonJS({
-    "lib/index.js"(exports, module) {
-      init_shorten();
-      init_is_promise();
-      init_coldsky_agent();
-      init_firehose();
-      init_package();
-      init_firehose_short_dids();
-      init_plc_directory();
-      var all = {
-        version: version4,
-        likelyDID,
-        shortenDID,
-        shortenHandle,
-        unwrapShortDID,
-        unwrapShortHandle,
-        breakFeedUri,
-        breakPostURL,
-        isPromise,
-        ColdskyAgent,
-        plcDirectory,
-        firehose,
-        firehoseShortDIDs
-      };
-      checkApplyGlobal();
-      function checkApplyGlobal() {
-        if (typeof process !== "undefined" && typeof (process == null ? void 0 : process.exit) === "function") {
-          if (typeof module !== "undefined" && (module == null ? void 0 : module.exports)) {
-            for (const key in all) {
-              module.exports[key] = all[key];
-            }
-          }
-          return;
-        }
-        if (typeof window !== "undefined" && window) {
-          window["coldsky"] = all;
-        } else if (typeof global !== "undefined" && global) {
-          global["coldsky"] = all;
+  var all = {
+    version: version4,
+    likelyDID,
+    shortenDID,
+    shortenHandle,
+    unwrapShortDID,
+    unwrapShortHandle,
+    breakFeedUri,
+    breakPostURL,
+    isPromise,
+    ColdskyAgent,
+    plcDirectory,
+    firehose,
+    firehoseShortDIDs
+  };
+  var lib_default = all;
+  checkApplyGlobal();
+  function checkApplyGlobal() {
+    if (typeof process !== "undefined" && typeof (process == null ? void 0 : process.exit) === "function") {
+      if (typeof module !== "undefined" && (module == null ? void 0 : module.exports)) {
+        for (const key in all) {
+          module.exports[key] = all[key];
         }
       }
+      return;
     }
-  });
-  require_lib3();
+    if (typeof window !== "undefined" && window) {
+      window["coldsky"] = all;
+    } else if (typeof global !== "undefined" && global) {
+      global["coldsky"] = all;
+    }
+  }
 })();
 //# sourceMappingURL=libs.js.map
