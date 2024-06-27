@@ -62,3 +62,8 @@
 .thread-conversation-view .post-date.post-timestamp-small-note:hover {
   text-decoration: underline;
 }
+
+.thread-conversation-view .insignificant-expandable-markers {
+  text-align:center;
+  font-size: 80%;
+}
