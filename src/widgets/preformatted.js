@@ -39,7 +39,7 @@ export function PreFormatted({ text, className, Component, ParagraphComponent, B
               {text.slice(spanStart, offset).replace('  ', '\u00A0 ')}
             </UseParagraphComponent>);
         }
-        trailingBreaks = [cp]
+        trailingBreaks = [cp];
       }
       spanStart = offset;
     } else if (trailingBreaks?.length) {
@@ -47,6 +47,7 @@ export function PreFormatted({ text, className, Component, ParagraphComponent, B
       spanStart = offset;
       spanClassName = typeof charClass === 'function' ? charClass(offset, text, cp) || '' : '';
     } else {
+      trailingBreaks = undefined;
       const currentClassName = typeof charClass === 'function' ? charClass(offset, text, cp) || '' : '';
       if (currentClassName !== spanClassName) {
         if (spanStart < offset) {

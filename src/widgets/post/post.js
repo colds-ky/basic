@@ -9,10 +9,11 @@ import { PreFormatted } from '../preformatted';
 
 import './post.css';
 import { FormatTime } from '../format-time';
-import { breakFeedUri } from '../../../coldsky/lib';
+import { breakFeedUri, breakPostURL } from '../../../coldsky/lib';
 import { useDB } from '../..';
 import { forAwait } from '../../../coldsky/src/api/forAwait';
 import { Link } from 'react-router-dom';
+import { PostEmbedsSection } from './embedded';
 
 /**
  * @typedef {import('../../../coldsky/lib').MatchCompactPost} MatchCompactPost
@@ -93,16 +94,7 @@ function LoadedPost({ post }) {
         }
       </div>
       <PreFormatted className='post-content' text={post.text} />
-      {
-        !post.embeds?.length ? undefined :
-          <div className='post-embeds'>
-            {
-              post.embeds.map((embed, idx) => (
-                <PostEmbed key={idx} embed={embed} />
-              ))
-            }
-          </div>
-      }
+      <PostEmbedsSection post={post} />
       <div className='post-likes'>
         <FavoriteBorder />
         {
@@ -111,71 +103,5 @@ function LoadedPost({ post }) {
         }
       </div>
     </div>
-  );
-}
-
-/**
- * @param {{
- *  className?: string,
- *  embed: import('../../../coldsky/lib').CompactEmbed
- * }} _
- */
-function PostEmbed({ className, embed, ...rest }) {
-  const parsedPostURL = breakFeedUri(embed.url);
-
-  return (
-    <div className={'post-embed ' + (className || '')} {...rest}>
-      {
-        parsedPostURL ?
-          <PostEmbeddedIntoAnother
-            uri={embed.url} /> :
-          <div className='post-embed-container'>
-            {
-              !embed.imgSrc ? undefined :
-                <img
-                  className='post-embed-image'
-                  src={embed.imgSrc} alt={embed.title || embed.description} />
-            }
-            {
-              !embed.title ? undefined :
-                <div className='post-embed-title'>
-                  {embed.title}
-                </div>
-            }
-            {
-              !embed.description ? undefined :
-                <div className='post-embed-description'>
-                  {embed.description}
-                </div>
-            }
-            <div className='post-embed-border'>
-            </div>
-          </div>
-      }
-    </div>
-  );
-}
-
-function PostEmbeddedIntoAnother({ uri }) {
-  const parsedURI = breakFeedUri(uri);
-  const db = useDB();
-  const resolveToHandle = forAwait(uri, async function*() {
-    for await (const profile of db.getProfileIncrementally(parsedURI?.shortDID)) {
-      if (profile.handle) {
-        yield profile.handle;
-        break;
-      }
-    }
-  });
-
-  const postURL =
-    '/' + (resolveToHandle || parsedURI?.shortDID) + '/' + parsedURI?.postID;
-
-  return (
-    <Link
-      className='post-embed-url'
-      to={postURL}>
-      <Post post={uri} />
-    </Link>
   );
 }

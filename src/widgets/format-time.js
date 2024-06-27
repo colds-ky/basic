@@ -75,6 +75,19 @@ export function formatTimeStr(time) {
   if (diffMsec < 59 * 60 * 1000) return Math.round(diffMsec / (60 * 60 * 1000)) + ' ' + localise('min ago', { uk: 'хв тому' });
   if (dtBuf.getFullYear() === dtNow.getFullYear() &&
     dtBuf.getMonth() === dtNow.getMonth() &&
-    dtBuf.getDate() === dtNow.getDate()) return dtBuf.toLocaleTimeString();
-  return dtBuf.toLocaleDateString();
+    dtBuf.getDate() === dtNow.getDate()) {
+    return localise(
+      dtBuf.getHours() + ':' + (dtBuf.getMinutes() + 100).toString().substring(1) + (dtBuf.getHours() < 12 ? 'am' : 'pm'),
+      {
+        uk: dtBuf.getHours() + ':' + (dtBuf.getMinutes() + 100).toString().substring(1)
+      });
+  }
+
+  if (dtBuf.getFullYear() === dtNow.getFullYear())
+    return dtBuf.getDate() + ' ' + localise(monthEN[dtBuf.getMonth()], { uk: monthUK[dtBuf.getMonth()] });
+  else
+    return dtBuf.toLocaleDateString();
 }
+
+const monthEN = 'Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec'.split(',');
+const monthUK = 'січня,лютого,березня,квітня,травня,червня,липня,серпня,вересня,жовтня,листопада,грудня'.split(',');
