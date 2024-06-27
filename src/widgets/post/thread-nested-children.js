@@ -22,11 +22,12 @@ export function ThreadNestedChildren({ className, branches, linkTimestamp, linkA
    *  branch: import('./thread-structure').ThreadBranch
    * }[]}
    */
-  const asideSegments = [];
+  let asideSegments = [];
   /** @type {import('./thread-structure').ThreadBranch[] | undefined} */
   let bendyLineInsignificants;
   collectAsides(branches);
 
+  if (!asideSegments.length) asideSegments = branches.map(branch => ({ leading: undefined, branch }));
   if (!asideSegments.length) return null;
 
   return (

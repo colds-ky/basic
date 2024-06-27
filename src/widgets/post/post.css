@@ -127,6 +127,15 @@
   bottom: 0;
 }
 
+.complete-post-content .post-notes-area .post-replies {
+  cursor: pointer;
+  transition: transform 300ms;;
+}
+
+.complete-post-content .post-notes-area .post-replies:hover {
+  transform: scale(1.1);
+}
+
 .complete-post-content .post-notes-area .post-replies .reply-avatars {
   display: flex;
   flex-direction: column;

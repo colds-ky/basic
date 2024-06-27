@@ -95,9 +95,22 @@
   padding: 1.5em;
   margin: 1.5em 0;
   margin-left: 1.5em;
-  border: solid 1px #f3c97d;
+  border: solid 1px #fdc3b5;
   border-radius: 1em;
   background: white;
+  box-shadow: inset 2px 2px 7px #0000001f;
+  display: flex;
+  flex-direction: column;
+  row-gap: 1.5em;
+}
+
+.complete-post-content .thread-post-expandos {
+  padding: 1.5em;
+  margin: 1.5em 0;
+  margin-left: 1.5em;
+  border: solid 1px #f3c97d;
+  border-radius: 1em;
+  background: rgb(255 254 250);
   box-shadow: inset 2px 2px 7px #0000001f;
   display: flex;
   flex-direction: column;
@@ -116,6 +129,10 @@
   display: flex;
   align-items: end;
   padding-left: 2em;
+}
+
+.complete-post-content .thread-post-expandos .bendy-line {
+  color: #ffb5a3;
 }
 
 .aside-interjection-section .bendy-line::after {

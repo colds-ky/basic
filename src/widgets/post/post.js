@@ -15,6 +15,7 @@ import { PostTimestamp } from './post-timestamp';
 import { PostTopLine } from './post-top-line';
 
 import './post.css';
+import { ThreadNestedChildren } from './thread-nested-children';
 
 /**
  * @typedef {import('../../../coldsky/lib').MatchCompactPost} MatchCompactPost
@@ -142,7 +143,7 @@ function LoadingPostInProgress({ uri, ...rest }) {
  *  suppressAuthor?: boolean,
  *  allowEmbedDepth?: number
  *  indicateEmbedding?: boolean,
- *  replies?: (import('../../../coldsky/lib').CompactPost | { post: import('../../../coldsky/lib').CompactPost })[]
+ *  replies?: import('./thread-structure').ThreadBranch[]
  * }} _
  */
 export function CompletePostContent({
@@ -157,11 +158,13 @@ export function CompletePostContent({
   indicateEmbedding,
   replies
 }) {
+  const [expanded, setExpanded] = React.useState(false);
+
   const replyAvatars = useMemo(() => collectReplyAvatars(replies), [replies]);
   const notesHeight = (replyAvatars?.length || 0) + (post.likeCount ? 1 : 0);
 
   let wholeClassName = className ? 'complete-post-content ' + className : 'complete-post-content';
-  if (notesHeight) wholeClassName += ' notes-height-' + notesHeight;
+  if (notesHeight && !expanded) wholeClassName += ' notes-height-' + notesHeight;
 
   return (
     <div
@@ -195,8 +198,9 @@ export function CompletePostContent({
 
       <div className='post-notes-area'>
         {
-          !replies?.length ? null :
-            <div className='post-replies'>
+          expanded || !replies?.length ? null :
+            <div className='post-replies'
+              onClick={() => setExpanded(true)}>
               <ReplyAvatars shortDIDs={replyAvatars} />
             </div>
         }
@@ -225,6 +229,16 @@ export function CompletePostContent({
           <FavoriteBorder className={post.likeCount ? 'heart-icon heart-icon-with-likes' : 'heart-icon heart-icon-no-likes'} />
         </div>
       </div>
+      {
+        !expanded || !replies?.length ? null :
+          <ThreadNestedChildren
+            className='thread-post-expandos'
+            branches={replies}
+            linkTimestamp={linkTimestamp}
+            linkAuthor={linkAuthor}
+          />
+          
+      }
     </div>
   );
 }
