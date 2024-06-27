@@ -1,6 +1,6 @@
 {
   "name": "coldsky",
-  "version": "0.1.16",
+  "version": "0.2.0",
   "description": "Library for BlueSky",
   "main": "libs.js",
   "scripts": {
@@ -18,10 +18,17 @@
   "author": "Oleg Mihailik",
   "license": "not yet",
   "devDependencies": {
-    "@atproto/api": "^0.12.2",
-    "@ipld/car": "^5.3.0",
-    "cbor-x": "^1.5.9",
-    "esbuild": "^0.20.2",
-    "multiformats": "^13.1.0"
+    "@atproto/api": "*",
+    "@babel/core": "*",
+    "@ipld/car": "*",
+    "@rollup/plugin-babel": "*",
+    "@rollup/plugin-commonjs": "*",
+    "@rollup/plugin-json": "*",
+    "@rollup/plugin-node-resolve": "*",
+    "cbor-x": "*",
+    "esbuild": "*",
+    "multiformats": "*",
+    "rollup": "*",
+    "ws": "*"
   }
 }

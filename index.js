@@ -328,100 +328,103 @@
 
   // src/api/akpa.js
   function streamBuffer(callback) {
-    return __asyncGenerator(this, null, function* () {
-      let finallyTrigger = () => {
-        args.isEnded = true;
-      };
-      let stop = false;
-      let buffer;
-      let continueTrigger = () => {
-      };
-      let continuePromise = new Promise((resolve) => continueTrigger = function continueTriggerInitiallySet() {
-        resolve();
-      });
-      let yieldPassedTrigger = () => {
-      };
-      let yieldPassedPromise = new Promise((resolve) => yieldPassedTrigger = resolve);
-      let rejectError;
-      const args = {
-        yield: yieldFn,
-        reject,
-        complete,
-        isEnded: false,
-        finally: new Promise((resolve) => {
-          finallyTrigger = () => {
-            args.isEnded = true;
-            resolve();
-          };
-        })
-      };
-      callback(args);
-      try {
-        while (!stop) {
-          yield new __await(continuePromise);
-          if (rejectError)
-            throw rejectError.error;
-          if (stop)
-            return;
-          continuePromise = new Promise((resolve) => continueTrigger = function continueTriggerSubsequentlySet() {
-            resolve();
-          });
-          const yieldBuffer = buffer;
-          buffer = void 0;
-          if (yieldBuffer) {
-            yield yieldBuffer;
-            const yieldCompleted = yieldPassedTrigger;
-            yieldPassedPromise = new Promise((resolve) => yieldPassedTrigger = resolve);
-            yieldCompleted();
-          }
-        }
-      } finally {
-        finallyTrigger();
-      }
-      function yieldFn(item, combine) {
-        if (stop) {
-          console.error("Cannot yield after complete.");
-          return (
-            /** @type Promise<void> */
-            new Promise((resolve) => resolve())
-          );
-        }
-        if (rejectError) {
-          console.error("Cannot yield after reject.");
-          return (
-            /** @type Promise<void> */
-            new Promise((resolve) => resolve())
-          );
-        }
-        if (typeof combine === "function") {
-          buffer = combine(buffer, item);
-        } else {
-          if (!buffer)
-            buffer = /** @type {TBuffer} */
-            [];
-          buffer.push(item);
-        }
-        continueTrigger();
-        return yieldPassedPromise;
-      }
-      function reject(error) {
-        if (stop) {
-          console.error("Cannot reject after complete.");
-          return;
-        }
-        if (rejectError) {
-          console.error("Cannot reject after reject.");
-          return;
-        }
-        rejectError = { error };
-        args.isEnded = true;
-      }
-      function complete() {
-        stop = true;
-        args.isEnded = true;
-        continueTrigger();
-      }
+    let finallyTrigger = () => {
+      args.isEnded = true;
+    };
+    let stop = false;
+    let buffer;
+    let continueTrigger = () => {
+    };
+    let continuePromise = new Promise((resolve) => continueTrigger = function continueTriggerInitiallySet() {
+      resolve();
     });
+    let yieldPassedTrigger = () => {
+    };
+    let yieldPassedPromise = new Promise((resolve) => yieldPassedTrigger = resolve);
+    let rejectError;
+    const args = {
+      yield: yieldFn,
+      reject,
+      complete,
+      isEnded: false,
+      finally: new Promise((resolve) => {
+        finallyTrigger = () => {
+          args.isEnded = true;
+          resolve();
+        };
+      })
+    };
+    callback(args);
+    return iterate();
+    function iterate() {
+      return __asyncGenerator(this, null, function* () {
+        try {
+          while (!stop) {
+            yield new __await(continuePromise);
+            if (rejectError)
+              throw rejectError.error;
+            if (stop)
+              return;
+            continuePromise = new Promise((resolve) => continueTrigger = function continueTriggerSubsequentlySet() {
+              resolve();
+            });
+            const yieldBuffer = buffer;
+            buffer = void 0;
+            if (yieldBuffer) {
+              yield yieldBuffer;
+              const yieldCompleted = yieldPassedTrigger;
+              yieldPassedPromise = new Promise((resolve) => yieldPassedTrigger = resolve);
+              yieldCompleted();
+            }
+          }
+        } finally {
+          finallyTrigger();
+        }
+      });
+    }
+    function yieldFn(item, combine) {
+      if (stop) {
+        console.error("Cannot yield after complete.");
+        return (
+          /** @type Promise<void> */
+          new Promise((resolve) => resolve())
+        );
+      }
+      if (rejectError) {
+        console.error("Cannot yield after reject.");
+        return (
+          /** @type Promise<void> */
+          new Promise((resolve) => resolve())
+        );
+      }
+      if (typeof combine === "function") {
+        buffer = combine(buffer, item);
+      } else {
+        if (!buffer)
+          buffer = /** @type {TBuffer} */
+          [];
+        buffer.push(item);
+      }
+      continueTrigger();
+      return yieldPassedPromise;
+    }
+    function reject(error) {
+      if (stop) {
+        console.error("Cannot reject after complete.");
+        return;
+      }
+      if (rejectError) {
+        console.error("Cannot reject after reject.");
+        return;
+      }
+      rejectError = { error };
+      args.isEnded = true;
+    }
+    function complete() {
+      stop = true;
+      args.isEnded = true;
+      continueTrigger();
+    }
   }
   var init_akpa = __esm({
     "src/api/akpa.js"() {
