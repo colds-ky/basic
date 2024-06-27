@@ -487,7 +487,8 @@
 
 /* src/history/timeline.css */
 .timeline-container {
-  margin-right: 0.4em;
+  margin-right: 0.8em;
+  margin-bottom: 1.3em;
 }
 .timeline-container > .sub-thread {
   margin-top: 1.6em;
