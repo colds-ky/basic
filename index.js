@@ -198,9 +198,15 @@ function coldsky() {
     var posInHandle =
       handle.indexOf(searchString);
 
+    var downRankRatio = 1;
+    if (posInHandle < 0) {
+      posInHandle = handle.replace(/[^a-z0-9]/g, '').indexOf(searchString);
+      if (posInHandle >= 0) downRankRatio = 0.5;
+    }
+
     if (posInHandle < 0) return 0;
-    if (posInHandle === 0) return searchString.length * 1.5;
-    else return searchString.length * 0.8;
+    if (posInHandle === 0) return searchString.length * 1.5 * downRankRatio;
+    else return searchString.length * 0.8 * downRankRatio;
   }
 
   function rankDisplayName(searchString, displayName) {
