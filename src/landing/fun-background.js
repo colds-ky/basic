@@ -131,6 +131,7 @@ function ThreadBubble({ thread }) {
         <Post
           post={thread.current}
           linkTimestamp
+          compact
         />
       </div>
     </div>

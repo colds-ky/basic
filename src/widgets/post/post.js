@@ -23,11 +23,12 @@ import { PostEmbedsSection } from './embedded';
  * @param {{
  *  className?: string,
  *  post: string | MatchCompactPost,
+ *  compact?: boolean,
  *  linkTimestamp?: boolean,
  *  linkAuthor?: boolean
  * }} _
  */
-export function Post({ className, post, linkTimestamp, linkAuthor, ...rest }) {
+export function Post({ className, post, compact, linkTimestamp, linkAuthor, ...rest }) {
   return (
     <PostFrame className={className} {...rest}>
       {
@@ -36,6 +37,7 @@ export function Post({ className, post, linkTimestamp, linkAuthor, ...rest }) {
             uri={post} /> :
           <LoadedPost
             post={post}
+            compact={compact}
             linkTimestamp={linkTimestamp}
             linkAuthor={linkAuthor}
           />
@@ -86,11 +88,12 @@ function LoadingPostInProgress({ uri }) {
 /**
  * @param {{
  *  post: MatchCompactPost,
+ *  compact?: boolean,
  *  linkTimestamp?: boolean,
  *  linkAuthor?: boolean
  * }} _
  */
-function LoadedPost({ post, linkTimestamp, linkAuthor }) {
+function LoadedPost({ post, compact, linkTimestamp, linkAuthor }) {
   return (
     <div className='post-loaded-content' onClick={() => {
       console.log('post clicked ', post);
@@ -99,12 +102,13 @@ function LoadedPost({ post, linkTimestamp, linkAuthor }) {
         <AccountLabel
           className='post-author'
           account={post.shortDID}
+          withDisplayName={!compact}
           linkToTimeline={linkAuthor}
         />
         <PostTimestamp post={post} linkTimestamp={linkTimestamp} />
       </div>
       <PreFormatted className='post-content' text={post.text} />
-      <PostEmbedsSection post={post} />
+      <PostEmbedsSection post={post} compact={compact} />
       <div className='post-likes'>
         <FavoriteBorder />
         {

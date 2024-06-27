@@ -8,10 +8,11 @@ import { EmbedImages } from './embed-images';
 
 /**
  * @param {{
- *  post: import('../../../../coldsky/lib').CompactPost
+ *  post: import('../../../../coldsky/lib').CompactPost,
+ *  compact?: boolean
  * }} _
  */
-export function PostEmbedsSection({ post }) {
+export function PostEmbedsSection({ compact, post }) {
   if (!post.embeds?.length) return null;
 
   const posts = [];
@@ -33,10 +34,13 @@ export function PostEmbedsSection({ post }) {
   }
 
   return (
-    <div className='post-embeds-section'>
+    <div className={
+      compact ? 'post-embeds-section post-embeds-section-compact' :
+        'post-embeds-section'}>
       {
         !posts?.length ? null :
           <EmbedQuotePostMultiple
+            compact={compact}
             parentPost={post}
             posts={/** @type {string[]} */(posts.map(entry => entry.embed?.url).filter(Boolean))} />
       }

@@ -51,7 +51,7 @@
   color: #365ca1;
 }
 .account-label .account-label-display-name {
-  padding-left: 0.15em;
+  padding-left: 0.3em;
 }
 
 /* src/landing/fun-background.css */
@@ -158,6 +158,9 @@
 }
 .post-embeds-section {
   margin: 0.7em 0;
+}
+.post-embeds-section.post-embeds-section-compact {
+  zoom: 65%;
 }
 .post-likes {
   text-align: right;

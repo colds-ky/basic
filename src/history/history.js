@@ -99,7 +99,11 @@ function HistoryCore() {
         {
           resolved.placeholder ? undefined :
             !post ? <Timeline shortDID={resolved.shortDID} /> :
-              <Thread uri={makeFeedUri(resolved.shortDID, post)} />
+              <Thread
+                uri={makeFeedUri(resolved.shortDID, post)}
+                linkAuthor
+                linkTimestamp
+              />
         }
       </div>
 

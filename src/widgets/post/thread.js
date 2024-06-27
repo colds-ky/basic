@@ -32,6 +32,8 @@ export function Thread({ className, uri, linkTimestamp, linkAuthor, ...rest }) {
       className={'thread ' + (className || '')}
       shortDID={thread.current.shortDID}
       thread={thread}
+      linkAuthor={linkAuthor}
+      linkTimestamp={linkTimestamp}
       {...rest}
     />
   );

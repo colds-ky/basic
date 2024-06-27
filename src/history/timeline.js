@@ -36,7 +36,7 @@ export function Timeline({ shortDID }) {
     if (anyPlaceholder) break;
   }
 
-  if (anyPlaceholder) {
+  if (anyPlaceholder || retrieved?.cachedOnly) {
     setTimeout(next, 300);
   }
 
@@ -110,7 +110,7 @@ export function Timeline({ shortDID }) {
           if (!postThreadRetrieved) continue;
 
           historicalPostThreads.push(postThreadRetrieved);
-          yield { timeline: historicalPostThreads };
+          yield { timeline: historicalPostThreads, cachedOnly: entries.cachedOnly };
         }
       }
       console.log('timeline to end...');

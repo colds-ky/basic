@@ -39,6 +39,10 @@
   margin: 0.7em 0;
 }
 
+.post-embeds-section.post-embeds-section-compact {
+  zoom: 65%;
+}
+
 .post-likes {
   text-align: right;
   opacity: 0.4;
