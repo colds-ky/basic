@@ -200,7 +200,7 @@
     }
   });
 
-  // src/api/indexing/persistence.js
+  // coldsky/api/indexing/persistence.js
   function parseRegistrationStore(file, jsonText) {
     const bucketMap = JSON.parse(jsonText);
     const store = createEmptyStore(file);
@@ -289,7 +289,7 @@
   }
   var MapExtended;
   var init_persistence = __esm({
-    "src/api/indexing/persistence.js"() {
+    "coldsky/api/indexing/persistence.js"() {
       init_shorten();
       MapExtended = class extends Map {
         constructor() {
@@ -304,7 +304,7 @@
     }
   });
 
-  // src/api/akpa.js
+  // lib/akpa.js
   function streamBuffer(callback) {
     let finallyTrigger = () => {
       args.isEnded = true;
@@ -403,89 +403,7 @@
     }
   }
   var init_akpa = __esm({
-    "src/api/akpa.js"() {
-    }
-  });
-
-  // src/api/retry-fetch.js
-  function retryFetch(req, init, ...rest) {
-    return __async(this, null, function* () {
-      let corsproxyMightBeNeeded = !(init == null ? void 0 : init.method) || ((init == null ? void 0 : init.method) || "").toUpperCase() === "get";
-      if (req.nocorsproxy || (init == null ? void 0 : init.nocorsproxy)) corsproxyMightBeNeeded = false;
-      const started = Date.now();
-      let tryCount = 0;
-      while (true) {
-        try {
-          const useCors = tryCount && corsproxyMightBeNeeded && Math.random() > 0.5;
-          const re = useCors ? yield fetchWithCors(req, init) : yield (
-            /** @type {*} */
-            fetch(req, init, ...rest)
-          );
-          if (re.status >= 200 && re.status < 400 || re.status === 404) {
-            if (!useCors) corsproxyMightBeNeeded = false;
-            return re;
-          }
-          retry(new Error("HTTP" + re.status + " " + re.statusText));
-        } catch (e) {
-          yield retry(e);
-        }
-      }
-      function retry(error) {
-        tryCount++;
-        let onretry = req.onretry || (init == null ? void 0 : init.onretry);
-        const now = Date.now();
-        let waitFor = Math.min(
-          3e4,
-          Math.max(300, (now - started) / 3)
-        ) * (0.7 + Math.random() * 0.6);
-        if (typeof onretry === "function") {
-          const args = { error, started, tryCount, waitUntil: now + waitFor };
-          onretry(args);
-          if (args.waitUntil >= now)
-            waitFor = args.waitUntil - now;
-        }
-        console.warn(
-          tryCount + " error" + (tryCount > 1 ? "s" : "") + ", retry in ",
-          waitFor,
-          "ms ",
-          req,
-          error
-        );
-        return new Promise((resolve) => setTimeout(resolve, waitFor));
-      }
-    });
-  }
-  function fetchWithCors(req, init, ...rest) {
-    if (typeof req === "string") {
-      req = wrapCorsProxy(req);
-    } else if (req instanceof Request) {
-      req = new Request(wrapCorsProxy(req.url), req);
-    } else if (req instanceof URL) {
-      req = new URL(wrapCorsProxy(req.href));
-    } else {
-      req = __spreadProps(__spreadValues(
-        {},
-        /** @type {*} */
-        req
-      ), {
-        url: wrapCorsProxy(
-          /** @type {*} */
-          req.url
-        )
-      });
-    }
-    return (
-      /** @type {*} */
-      fetch(req, init, ...rest)
-    );
-  }
-  function wrapCorsProxy(url) {
-    const dt2 = Date.now();
-    const wrappedURL = "https://corsproxy.io/?" + url + (url.indexOf("?") < 0 ? "?" : "&") + "t" + dt2 + "=" + (dt2 + 1);
-    return wrappedURL;
-  }
-  var init_retry_fetch = __esm({
-    "src/api/retry-fetch.js"() {
+    "lib/akpa.js"() {
     }
   });
 
@@ -602,14 +520,95 @@
   var init_plc_directory = __esm({
     "lib/plc-directory.js"() {
       init_akpa();
-      init_retry_fetch();
       init_shorten();
       FETCH_AHEAD_MSEC_MAX = 1e4;
       FETCH_AHEAD_COUNT_MAX = 1e4;
     }
   });
 
-  // src/api/indexing/indexing-run.js
+  // coldsky/api/retry-fetch.js
+  function retryFetch(req, init, ...rest) {
+    return __async(this, null, function* () {
+      let corsproxyMightBeNeeded = !(init == null ? void 0 : init.method) || ((init == null ? void 0 : init.method) || "").toUpperCase() === "get";
+      if (req.nocorsproxy || (init == null ? void 0 : init.nocorsproxy)) corsproxyMightBeNeeded = false;
+      const started = Date.now();
+      let tryCount = 0;
+      while (true) {
+        try {
+          const useCors = tryCount && corsproxyMightBeNeeded && Math.random() > 0.5;
+          const re = useCors ? yield fetchWithCors(req, init) : yield (
+            /** @type {*} */
+            fetch(req, init, ...rest)
+          );
+          if (re.status >= 200 && re.status < 400 || re.status === 404) {
+            if (!useCors) corsproxyMightBeNeeded = false;
+            return re;
+          }
+          retry(new Error("HTTP" + re.status + " " + re.statusText));
+        } catch (e) {
+          yield retry(e);
+        }
+      }
+      function retry(error) {
+        tryCount++;
+        let onretry = req.onretry || (init == null ? void 0 : init.onretry);
+        const now = Date.now();
+        let waitFor = Math.min(
+          3e4,
+          Math.max(300, (now - started) / 3)
+        ) * (0.7 + Math.random() * 0.6);
+        if (typeof onretry === "function") {
+          const args = { error, started, tryCount, waitUntil: now + waitFor };
+          onretry(args);
+          if (args.waitUntil >= now)
+            waitFor = args.waitUntil - now;
+        }
+        console.warn(
+          tryCount + " error" + (tryCount > 1 ? "s" : "") + ", retry in ",
+          waitFor,
+          "ms ",
+          req,
+          error
+        );
+        return new Promise((resolve) => setTimeout(resolve, waitFor));
+      }
+    });
+  }
+  function fetchWithCors(req, init, ...rest) {
+    if (typeof req === "string") {
+      req = wrapCorsProxy(req);
+    } else if (req instanceof Request) {
+      req = new Request(wrapCorsProxy(req.url), req);
+    } else if (req instanceof URL) {
+      req = new URL(wrapCorsProxy(req.href));
+    } else {
+      req = __spreadProps(__spreadValues(
+        {},
+        /** @type {*} */
+        req
+      ), {
+        url: wrapCorsProxy(
+          /** @type {*} */
+          req.url
+        )
+      });
+    }
+    return (
+      /** @type {*} */
+      fetch(req, init, ...rest)
+    );
+  }
+  function wrapCorsProxy(url) {
+    const dt2 = Date.now();
+    const wrappedURL = "https://corsproxy.io/?" + url + (url.indexOf("?") < 0 ? "?" : "&") + "t" + dt2 + "=" + (dt2 + 1);
+    return wrappedURL;
+  }
+  var init_retry_fetch = __esm({
+    "coldsky/api/retry-fetch.js"() {
+    }
+  });
+
+  // coldsky/api/indexing/indexing-run.js
   var indexing_run_exports = {};
   __export(indexing_run_exports, {
     indexingRun: () => indexingRun
@@ -1003,7 +1002,7 @@
   }
   var MAX_STORE_SIZE, dt;
   var init_indexing_run = __esm({
-    "src/api/indexing/indexing-run.js"() {
+    "coldsky/api/indexing/indexing-run.js"() {
       init_plc_directory();
       init_shorten();
       init_retry_fetch();
@@ -1013,7 +1012,7 @@
     }
   });
 
-  // src/api/indexing/pull-plc-directory.js
+  // coldsky/api/indexing/pull-plc-directory.js
   init_persistence();
   function pullPLCDirectoryCompact() {
     return __async(this, null, function* () {
@@ -1101,10 +1100,10 @@
     });
   }
 
-  // src/api/indexing/index.js
+  // coldsky/api/indexing/index.js
   init_indexing_run();
 
-  // src/index.js
+  // coldsky/index.js
   init_retry_fetch();
   function pullPLCDirectoryLocal() {
     return __async(this, null, function* () {

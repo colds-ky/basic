@@ -45,8 +45,8 @@ async function rollupBuilder() {
     }
   });
 
-  if (watcher.on) {
-    watcher.on('event', event => {
+  if (/** @type {rollup.RollupWatcher} */(watcher).on) {
+    /** @type {rollup.RollupWatcher} */(watcher).on('event', event => {
       console.log('rollup:' + event.code);
       if (event.code === 'BUNDLE_END') {
         event.result.write({
@@ -61,7 +61,7 @@ async function rollupBuilder() {
       }
     });
   } else {
-    const bundle = await watcher;
+    const bundle = /** @type {rollup.RollupBuild} */(await watcher);
     await bundle.write({
       file: 'libs.js',
       sourcemap: true,
@@ -164,8 +164,8 @@ function esbuildBuilder() {
 
     const options = {
       ...baseOptions,
-      entryPoints: ['src/index.js'],
-      outfile: 'index.js',
+      entryPoints: ['coldsky/index.js'],
+      outfile: 'coldsky/dist/index.js',
       plugins: [
         {
           name: 'post-export',
@@ -181,7 +181,7 @@ function esbuildBuilder() {
     if (mode === 'serve') {
       const ctx = await esbuild.context(options);
       const server = await ctx.serve({
-        servedir: __dirname,
+        servedir: path.resolve(__dirname, 'coldsky/dist'),
         fallback: 'index.html'
       });
       await ctx.watch();
