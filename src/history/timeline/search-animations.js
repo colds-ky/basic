@@ -88,13 +88,13 @@ function SearchAnimation({ toLeft, posts, filteredCount, processedAllCount }) {
           animationEndTimeout: /** @type {*} */(setTimeout(() => {
             const { flyingPosts, posts } = current;
             const newFlyingPosts = flyingPosts.filter(fp => fp.post.uri !== nextPost.uri);
-            console.log('animation end for ', nextPostEntry, nextPost.text, flyingPosts, ' --> ', newFlyingPosts);
+            //console.log('animation end for ', nextPostEntry, nextPost.text, flyingPosts, ' --> ', newFlyingPosts);
             setFlyingPosts(newFlyingPosts);
             current.flyingPosts = newFlyingPosts;
           }, FLYING_POST_ANIMATION_DURATION_MSEC * 1.5))
         };
         const newFlyingPosts = [...flyingPosts, nextPostEntry];
-        console.log('animation start for ', nextPostEntry, nextPost.text, flyingPosts, '-->', newFlyingPosts);
+        //console.log('animation start for ', nextPostEntry, nextPost.text, flyingPosts, '-->', newFlyingPosts);
         setFlyingPosts(newFlyingPosts);
         current.flyingPosts = newFlyingPosts;
       }
