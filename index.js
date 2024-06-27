@@ -99442,6 +99442,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     const rockDuration = 3 + rnd * 12;
     rnd = nextRandom(rnd);
     const left = rnd * 80 - 2;
+    const navigate = useNavigate();
     return /* @__PURE__ */ import_react10.default.createElement(
       "div",
       {
@@ -99449,6 +99450,9 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         style: {
           animationDuration: `${slideDuration.toFixed(2)}s`,
           left: `${left.toFixed(2)}%`
+        },
+        onClick: () => {
+          navigate(thread.post.author.handle);
         }
       },
       /* @__PURE__ */ import_react10.default.createElement(
@@ -99467,7 +99471,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // package.json
-  var version4 = "0.2.4";
+  var version4 = "0.2.5";
 
   // src/localise.js
   function localise(english, languageMap) {

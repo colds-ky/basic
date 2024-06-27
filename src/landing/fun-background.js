@@ -7,6 +7,7 @@ import { calcHash, firehoseThreads, nextRandom } from '../api';
 import { FavoriteBorder } from '@mui/icons-material';
 import { forAwait } from '../../coldsky/src/api/forAwait';
 import { AccountLabel } from '../widgets/account';
+import { useNavigate } from 'react-router-dom';
 
 const POST_DEBOUNCE_MSEC = 5000;
 const POST_MAX_AGE = 1000 * 40;
@@ -103,12 +104,18 @@ function ThreadBubble({ thread }) {
 
   const left = rnd * 80 - 2;
 
+  const navigate = useNavigate();
+
   return (
     <div className='fun-background-thread-bubble'
       style={{
         animationDuration: `${slideDuration.toFixed(2)}s`,
         left: `${left.toFixed(2)}%`
-      }}>
+      }}
+      onClick={() => {
+        navigate(thread.post.author.handle);
+      }}
+    >
       <div className='fun-background-thread'
         style={{
           animationDuration: `${rockDuration.toFixed(2)}s`
