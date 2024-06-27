@@ -43,6 +43,8 @@ export function PostTextContent({ post }) {
               for (let [start, end] of m.indices) {
                 if ((wordsNormalized?.length || 0) > 1) {
                   start++; end++;
+                } else {
+                  end++;
                 }
                 iMatch++;
                 if (offset >= start && offset < end) {
