@@ -35052,14 +35052,38 @@ if (cid) {
 	*/
 	function breakPostURL(url) {
 	  if (!url) return;
-	  const match = _breakPostURL_Regex.exec(url);
-	  if (!match) return;
-	  return {
-	    shortDID: match[1],
-	    postID: match[2]
+	  const matchBsky = _breakBskyPostURL_Regex.exec(url);
+	  if (matchBsky) return {
+	    shortDID: shortenDID(matchBsky[1]),
+	    postID: matchBsky[2]?.toString().toLowerCase()
+	  };
+	  const matchGisting = _breakGistingPostURL_Regex.exec(url);
+	  if (matchGisting) return {
+	    shortDID: shortenDID(matchGisting[2]),
+	    postID: matchGisting[3]?.toString().toLowerCase()
 	  };
 	}
-	const _breakPostURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/post\/([a-z0-9]+)$/;
+	const _breakBskyPostURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/post\/([a-z0-9]+)(\/|$)/i;
+	const _breakGistingPostURL_Regex = /^http[s]?\:\/\/(gist\.ing|gisti\.ng|gist\.ink)\/([a-z0-9\.\:]+)\/([a-z0-9]+)(\/|$)/i;
+
+	/**
+	* @param {string | null | undefined} url
+	*/
+	function detectProfileURL(url) {
+	  if (!url) return;
+	  const matchBsky = _detectBskyProfileURL_Regex.exec(url);
+	  if (matchBsky) return shortenDID(matchBsky[1]);
+	  const matchGisting = _detectGistingProfileURL_Regex.exec(url);
+	  if (matchGisting) return shortenDID(matchGisting[2]);
+	  const matchOyinboReceipts = _detectOyinboReceiptsURL_Regex.exec(url);
+	  if (matchOyinboReceipts) return shortenDID(matchOyinboReceipts[1]);
+	  const matchClearSky = _detectClearSkyProfileURL_Regex.exec(url);
+	  if (matchClearSky) return shortenDID(matchClearSky[2]);
+	}
+	const _detectBskyProfileURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)(\/|$)/i;
+	const _detectGistingProfileURL_Regex = /^http[s]?\:\/\/(gist\.ing|gisti\.ng|gist\.ink)\/([a-z0-9\.\:]+)(\/|$)/i;
+	const _detectOyinboReceiptsURL_Regex = /^http[s]?\:\/\/oyin\.bo\/receipts\/?\?handle\=([a-z0-9\.\:]+)(\/|$)/i;
+	const _detectClearSkyProfileURL_Regex = /^http[s]?\:\/\/(clearsky\.app|bsky\.thieflord\.dev)\/([a-z0-9\.\:]+)(\/|$)/i;
 	function makeFeedUri(shortDID, postID) {
 	  return 'at://' + unwrapShortDID(shortDID) + '/app.bsky.feed.post/' + postID;
 	}
@@ -41839,7 +41863,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.27";
+	var version = "0.2.28";
 
 	// @ts-check
 
@@ -50786,8 +50810,8 @@ if (cid) {
 	  for (const img of embedImages) {
 	    if (!img) continue;
 	    embeds = addToArray(embeds, /** @type {import('../..').CompactEmbed} */{
-	      imgSrc: getFeedBlobUrl(shortDID, String(img.image?.ref)),
-	      description: img.alt,
+	      imgSrc: getFeedBlobUrl(shortDID, img.image?.ref?.toString()),
+	      description: img.alt || undefined,
 	      aspectRatio: img.aspectRatio
 	    });
 	  }
@@ -50802,10 +50826,10 @@ if (cid) {
 	function addEmbedExternal(shortDID, embedExternal, embeds) {
 	  if (!embedExternal?.uri) return embeds;
 	  return addToArray(embeds, /** @type {import('../..').CompactEmbed} */{
-	    url: embedExternal.uri,
-	    title: embedExternal.title,
-	    description: embedExternal.description,
-	    imgSrc: getFeedBlobUrl(shortDID, String(embedExternal.thumb?.ref))
+	    url: embedExternal.uri || undefined,
+	    title: embedExternal.title || undefined,
+	    description: embedExternal.description || undefined,
+	    imgSrc: getFeedBlobUrl(shortDID, embedExternal.thumb?.ref?.toString())
 	  });
 	}
 
@@ -51387,6 +51411,7 @@ if (cid) {
 	exports.defineCacheIndexedDBStore = defineCacheIndexedDBStore;
 	exports.defineCachedStore = defineCachedStore;
 	exports.defineStore = defineStore;
+	exports.detectProfileURL = detectProfileURL;
 	exports.detectWordStartsNormalized = detectWordStartsNormalized;
 	exports.firehose = firehose;
 	exports.firehoseShortDIDs = firehoseShortDIDs;

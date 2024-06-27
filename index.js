@@ -171,10 +171,12 @@
     return str;
   }
   function breakPostURL(url) {
+    var _a, _b;
     if (!url) return;
-    const match = _breakPostURL_Regex.exec(url);
-    if (!match) return;
-    return { shortDID: match[1], postID: match[2] };
+    const matchBsky = _breakBskyPostURL_Regex.exec(url);
+    if (matchBsky) return { shortDID: shortenDID(matchBsky[1]), postID: (_a = matchBsky[2]) == null ? void 0 : _a.toString().toLowerCase() };
+    const matchGisting = _breakGistingPostURL_Regex.exec(url);
+    if (matchGisting) return { shortDID: shortenDID(matchGisting[2]), postID: (_b = matchGisting[3]) == null ? void 0 : _b.toString().toLowerCase() };
   }
   function breakFeedUri(uri) {
     if (!uri) return;
@@ -182,13 +184,14 @@
     if (!match || !match[3]) return;
     return { shortDID: match[2], postID: match[3] };
   }
-  var _shortenDID_Regex, _shortenHandle_Regex, offsetTooLarge, _breakPostURL_Regex, _breakFeedUri_Regex;
+  var _shortenDID_Regex, _shortenHandle_Regex, offsetTooLarge, _breakBskyPostURL_Regex, _breakGistingPostURL_Regex, _breakFeedUri_Regex;
   var init_shorten = __esm({
     "lib/shorten.js"() {
       _shortenDID_Regex = /^did\:plc\:/;
       _shortenHandle_Regex = /\.bsky\.social$/;
       offsetTooLarge = Date.UTC(2022, 1, 1);
-      _breakPostURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/post\/([a-z0-9]+)$/;
+      _breakBskyPostURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/post\/([a-z0-9]+)(\/|$)/i;
+      _breakGistingPostURL_Regex = /^http[s]?\:\/\/(gist\.ing|gisti\.ng|gist\.ink)\/([a-z0-9\.\:]+)\/([a-z0-9]+)(\/|$)/i;
       _breakFeedUri_Regex = /^at\:\/\/(did:plc:)?([a-z0-9]+)\/[a-z\.]+\/?(.*)?$/;
     }
   });
