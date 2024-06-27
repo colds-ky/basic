@@ -25,11 +25,11 @@
 
 .landing .landing-handle-band input {
   padding-left: 0.5em;
-  font-size: 6.7vw;
+  font-size: 6.7vh;
 }
 
 .landing .landing-handle-band label {
-  padding-left: 4.5vw;
+  padding-left: 4.5vh;
   padding-top: 2vh;
   font-style: italic;
 }
