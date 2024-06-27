@@ -42245,7 +42245,7 @@ if (cid) {
 	      // record.timestamp = commit.time ? Date.parse(commit.time) : Date.now(); 2024-05-13T19:59:10.457Z
 
 	      record.repo = commit.repo;
-	      record.uri = commit.repo + '/' + op.path;
+	      record.uri = 'at://' + commit.repo + '/' + op.path;
 	      record.action = op.action;
 	      let unexpected = op.action !== 'create' && op.action !== 'update' && op.action !== 'delete' || known$Types.indexOf(record.$type) < 0;
 	      if (unexpected) {
@@ -42300,7 +42300,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.38";
+	var version = "0.2.39";
 
 	// @ts-check
 
@@ -50960,10 +50960,64 @@ if (cid) {
 
 
 	/**
+	 * @param {string} shortDID
+	 * @param {ArrayBuffer | Uint8Array} messageBuf
+	 */
+	async function readCAR(shortDID, messageBuf) {
+	  const bytes = messageBuf instanceof ArrayBuffer ? new Uint8Array(messageBuf) : messageBuf;
+	  const car = await CarReader.fromBytes(bytes);
+	  const recordsByCID = new Map();
+	  const keyByCID = new Map();
+	  for await (const block of car.blocks()) {
+	    const record = decode$7(block.bytes);
+	    if (record.$type) recordsByCID.set(String(block.cid), record);else if (Array.isArray(record.e)) {
+	      let key = '';
+	      const decoder = new TextDecoder();
+	      for (const sub of record.e) {
+	        const keySuffix = decoder.decode(sub.k);
+	        key = key.slice(0, sub.p || 0) + keySuffix;
+	        const expandWithoutZero = sub.v.value[0] ? sub.v.value : /** @type {Uint8Array} */sub.v.value.subarray(1);
+	        try {
+	          const cid = CID.decode(expandWithoutZero);
+	          keyByCID.set(String(cid), key);
+	        } catch (error) {}
+	      }
+	    }
+	  }
+
+	  /** @type {import('./firehose').FirehoseRecord[]} */
+	  const records = [];
+	  const fullDID = unwrapShortDID(shortDID);
+	  for (const [cid, record] of recordsByCID) {
+	    const key = keyByCID.get(cid);
+	    if (key) {
+	      record.uri = 'at://' + fullDID + key;
+	    }
+	    records.push(record);
+	  }
+
+	  // record.seq = commit.seq; 471603945
+	  // record.since = /** @type {string} */(commit.since); 3ksfhcmgghv2g
+	  // record.action = op.action;
+	  // record.cid = cid;
+	  // record.path = op.path;
+	  // record.timestamp = commit.time ? Date.parse(commit.time) : Date.now(); 2024-05-13T19:59:10.457Z
+
+	  // record.repo = fullDID;
+	  // record.uri = fullDID + '/' + 'op.path';
+	  // record.action = 'create';
+
+	  return records;
+	}
+
+	// @ts-check
+
+
+	/**
 	 * @typedef {{
 	 *  shortDID: string | null | undefined,
 	 *  searchQuery: string | null | undefined,
-	 *  agent_searchPosts_throttled: (q: string, limit: number | undefined, sort: string | undefined, cursor?: string) => ReturnType<import('@atproto/api').BskyAgent['app']['bsky']['feed']['searchPosts']>
+	 *  agent_searchPosts_throttled: (q: string, limit: number | undefined, sort: string | undefined, cursor?: string) => ReturnType<import('@atproto/api').BskyAgent['app']['bsky']['feed']['searchPosts']>,
 	 *  dbStore: ReturnType<typeof import('../define-cache-indexedDB-store').defineCacheIndexedDBStore>
 	 * }} Args
 	 */
@@ -51000,9 +51054,6 @@ if (cid) {
 	  const cachedMatchesPromise = dbStore.searchPosts(shortDID, searchQuery);
 	  const allCachedHistoryPromise = !searchQuery ? cachedMatchesPromise : dbStore.searchPosts(shortDID, undefined);
 	  const plcDirHistoryPromise = plcDirectoryHistoryRaw( /** @type {string} */shortDID);
-	  const words = breakIntoWords(searchQuery || '');
-	  words.unshift(searchQuery || '');
-	  words.map(word => agent_searchPosts_throttled(word, undefined, 'latest'));
 	  let lastSearchReport = 0;
 	  /** @type {import('..').CompactPost[] | undefined}  */
 	  let processedBatch;
@@ -51027,12 +51078,19 @@ if (cid) {
 	  streaming => {
 	    const words = breakIntoWords(searchQuery || '');
 	    words.unshift(searchQuery || '');
-	    keepSearchingInRepository();
+	    const waitForAllCompletionPromises = [];
+	    let fullRepoIndexed = false;
+	    const waitUntilPageIndexed = Promise.race([fetchPaginatedAndIndex(), downloadFullRepoAndIndex()]);
+	    waitForAllCompletionPromises.push(waitUntilPageIndexed);
 	    for (const word of words) {
-	      searchForWord(word);
+	      waitForAllCompletionPromises.push(searchForWord(word));
 	    }
-	    async function keepSearchingInRepository() {
+	    Promise.all(waitForAllCompletionPromises.map(p => p.catch(() => {}))).then(() => {
+	      streaming.complete();
+	    });
+	    async function fetchPaginatedAndIndex() {
 	      for await (const batch of indexAccountHistoryPostsFromRepository(args)) {
+	        if (fullRepoIndexed) return;
 	        streaming.yield(batch);
 	      }
 	    }
@@ -51044,11 +51102,33 @@ if (cid) {
 	      const batch = [];
 	      if (searchResult?.data?.posts?.length) {
 	        for (const postRaw of searchResult.data.posts) {
+	          if (fullRepoIndexed) return;
 	          const post = dbStore.capturePostView(postRaw, Date.now());
 	          if (post) batch.push(post);
 	        }
 	      }
 	      streaming.yield(batch);
+	    }
+	    async function downloadFullRepoAndIndex() {
+	      const fullDID = unwrapShortDID( /** @type {string} */shortDID);
+	      const pdsAgent = new ColdskyAgent({
+	        service: profile?.history?.[0].pds
+	      });
+	      const repoData = await pdsAgent.com.atproto.sync.getRepo({
+	        did: fullDID
+	      });
+	      console.log('download data from repo', repoData);
+	      const block = await readCAR(shortDID || '', repoData.data);
+	      console.log('parsed downloaded data from repo ', block);
+	      const posts = [];
+	      for (const rec of block) {
+	        const post = dbStore.captureRecord(rec, Date.now());
+	        if (isCompactPost(post)) {
+	          posts.push(post);
+	        }
+	      }
+	      streaming.yield(posts);
+	      fullRepoIndexed = true;
 	    }
 	  });
 	  for await (const searchResult of parallelSearch) {
@@ -52364,12 +52444,14 @@ if (cid) {
 	exports.defineStore = defineStore;
 	exports.detectProfileURL = detectProfileURL;
 	exports.detectWordStartsNormalized = detectWordStartsNormalized;
+	exports.ensureCborXExtended = ensureCborXExtended;
 	exports.firehose = firehose$1;
 	exports.firehoseShortDIDs = firehoseShortDIDs;
 	exports.getFeedBlobUrl = getFeedBlobUrl;
 	exports.getProfileBlobUrl = getProfileBlobUrl;
 	exports.isCompactPost = isCompactPost;
 	exports.isPromise = isPromise;
+	exports.known$Types = known$Types;
 	exports.likelyDID = likelyDID;
 	exports.makeFeedUri = makeFeedUri;
 	exports.parseTimestampOffset = parseTimestampOffset;
