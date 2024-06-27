@@ -1,0 +1,34 @@
+{
+  "name": "gist.ing",
+  "version": "0.1.0",
+  "description": "Gisting on the Ski",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "build": "node build.js",
+    "watch": "node build.js --watch",
+    "start": "node build.js --serve"
+  },
+  "keywords": [],
+  "author": "Oleg Mihailik",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@atproto/api": "*",
+    "@atproto/repo": "*",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.14",
+    "@mui/material": "^5.15.14",
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.2",
+    "ag-grid-community": "^31.2.0",
+    "ag-grid-react": "^31.2.0",
+    "coldsky": "^0.1.10",
+    "esbuild": "^0.20.2",
+    "fuse.js": "^6.6.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.3",
+    "rollup": "^4.0.2"
+  }
+}

@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+if (/oyin\.bo|mihailik/i.test(location.hostname)) document.write('<base href="/receipts">');
+else if (location.pathname!=='/') document.write('<base href="/">');
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" sizes="any" href="gist-icon.png">
   <title>𝔤𝔦𝔰𝔱</title>
+
+  <link rel="shortcut icon" href="gist-icon.png" type="image/png">
+  <link rel="icon" href="gist-icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="gist-icon.png" type="image/png">
+
+  <link rel="stylesheet" href="index.css">
+
 </head>
 <body>
   <script src="index.js"></script>
-  <script src="https://unpkg.com/coldsky"></script>
-  <script>var exports = {}</script>
-  <script src="https://unpkg.com/three"></script>
-  <script>var THREE = exports; delete exports;</script>
-  <script src="https://unpkg.com/troika-three-text"></script>
-  <script>gist.allLoaded()</script>
 </body>
 </html>
