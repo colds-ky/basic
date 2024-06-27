@@ -55,8 +55,8 @@ export function Landing() {
           id="handle" name="handle"
           autoComplete="nickname"
           label={localise(
-            'Searching for someone?',
-            { uk: 'Кого шукаємо?' })}
+            'Searching for anything?',
+            { uk: 'Щось шукаємо, чи просто подивитись?' })}
           variant='standard'
           value={searchText}
           onChange={(e) => {

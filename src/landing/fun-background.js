@@ -8,9 +8,9 @@ import { FavoriteBorder } from '@mui/icons-material';
 import { forAwait } from '../../coldsky/src/api/forAwait';
 import { AccountLabel } from '../widgets/account';
 
-const POST_DEBOUNCE_MSEC = 1000;
+const POST_DEBOUNCE_MSEC = 5000;
 const POST_MAX_AGE = 1000 * 40;
-const DESIRED_POST_COUNT = 7;
+const DESIRED_POST_COUNT = 4;
 
 export function FunBackground() {
   const { bestThreads } = forAwait('now', getFirehoseThreads) || {};
@@ -96,29 +96,36 @@ async function* getFirehoseThreads() {
 function ThreadBubble({ thread }) {
   const hash = calcHash(thread?.post?.uri);
   let rnd = nextRandom(Math.abs(hash / 1000 + hash));
-  const animationDuration = 20 + rnd * 30; 
+  const slideDuration = 20 + rnd * 30; 
+  rnd = nextRandom(rnd);
+  const rockDuration = 3 + rnd * 12; 
   rnd = nextRandom(rnd);
 
   const left = rnd * 80 - 2;
 
   return (
-    <div className='fun-background-thread'
+    <div className='fun-background-thread-bubble'
       style={{
-        animationDuration: `${animationDuration.toFixed(2)}s`,
+        animationDuration: `${slideDuration.toFixed(2)}s`,
         left: `${left.toFixed(2)}%`
       }}>
-      <AccountLabel className='fun-background-thread-author' account={thread?.post?.author} />
-      <div className='fun-background-thread-content'>
-        {
-          thread?.post?.record.text
-        }
-      </div>
-      <div className='fun-background-thread-likes'>
-        <FavoriteBorder />
-        {
-          !thread?.post?.likeCount ? '' :
-          thread?.post?.likeCount.toLocaleString()
-        }
+      <div className='fun-background-thread'
+        style={{
+          animationDuration: `${rockDuration.toFixed(2)}s`
+        }}>
+        <AccountLabel className='fun-background-thread-author' account={thread?.post?.author} />
+        <div className='fun-background-thread-content'>
+          {
+            thread?.post?.record.text
+          }
+        </div>
+        <div className='fun-background-thread-likes'>
+          <FavoriteBorder />
+          {
+            !thread?.post?.likeCount ? '' :
+              thread?.post?.likeCount.toLocaleString()
+          }
+        </div>
       </div>
     </div>
   );

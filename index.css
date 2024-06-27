@@ -13,20 +13,24 @@
   top: 0;
   width: 100%;
   height: 100%;
+  transform: perspective(500px);
 }
-.fun-background .fun-background-scroller .fun-background-thread {
+.fun-background .fun-background-scroller .fun-background-thread-bubble {
   position: absolute;
-  bottom: -20em;
+  bottom: -50vh;
   margin: 1em;
-  padding: 1em;
-  border: solid 1px #e9da8a;
-  background: #fffbeb;
-  box-shadow: 2px 4px 10px #00000014;
-  border-radius: 0.5em;
   max-width: 20em;
   animation: 13s linear 1s forwards slidetop;
   font-family: sans-serif;
   font-size: 1.8vh;
+}
+.fun-background .fun-background-scroller .fun-background-thread {
+  padding: 1em;
+  border: solid 1px #e9da8a;
+  background: #fffbeb;
+  box-shadow: 5px 9px 19px #0000006e;
+  border-radius: 0.5em;
+  animation: 3s ease-in-out infinite alternate rock;
 }
 .fun-background .fun-background-scroller .fun-background-thread .fun-background-thread-author {
   white-space: nowrap;
@@ -41,19 +45,24 @@
 }
 @keyframes slidetop {
   from {
-    transform: translateY(0) rotate(-4deg);
+    transform: translateY(0);
   }
-  25% {
-    transform: translateY(-40vh) rotate(+5deg);
-  }
-  50% {
-    transform: translateY(-80vh) rotate(-7deg);
-  }
-  75% {
-    transform: translateY(-120vh) rotate(+5deg);
+  5% {
+    transform: translateY(-30vh);
   }
   to {
-    transform: translateY(-160vh) rotate(-5deg);
+    transform: translateY(-180vh);
+  }
+}
+@keyframes rock {
+  from {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(7deg);
+  }
+  to {
+    transform: rotate(-8deg);
   }
 }
 
@@ -121,11 +130,11 @@
   background:
     linear-gradient(
       to right,
-      #b2cdffd9,
-      #1667ff8f);
-  border-top: solid 1.5px #789cdc;
-  border-bottom: solid 1px #8eb6ff;
-  box-shadow: 0 8px 20px 5px #00000030;
+      #ffdf4ad9,
+      #ffd8008f);
+  border-top: solid 1.5px #dcca78;
+  border-bottom: solid 1px #1a160082;
+  box-shadow: 0 22px 36px 5px #00000045;
   backdrop-filter: blur(3px) contrast(0.7);
   display: grid;
 }
@@ -133,8 +142,8 @@
   background:
     linear-gradient(
       to right,
-      #c3d8fff5,
-      #1667ff8f);
+      #ffe055ec,
+      #ffd8008f);
 }
 .landing .landing-handle-band input {
   padding-left: 0.5em;
@@ -151,18 +160,24 @@
   grid-row: 4;
   align-self: start;
   justify-self: start;
-  background: rgb(255 255 255 / 80%);
+  background-color: #e5edfccc;
+  background-image:
+    linear-gradient(
+      178deg,
+      #d7c95e,
+      transparent 21px);
   padding: 0.5em;
   padding-right: 0.7em;
   padding-bottom: 0.25em;
   margin-left: 0.5em;
+  margin-top: -1vh;
   z-index: 1;
   border: solid 1px #2b2b2b;
   border-top: none;
   font-size: 2.5vh;
   font-family: sans-serif;
   backdrop-filter: blur(3px) contrast(0.7);
-  box-shadow: 0 8px 20px 5px #00000030;
+  box-shadow: 0 26px 20px 5px #00000030;
 }
 .landing .landing-auto-completion-area .landing-auto-complete-entry {
   white-space: nowrap;
@@ -176,6 +191,7 @@
   grid-row: 5;
   padding: 0.2em;
   font-family: sans-serif;
-  color: silver;
+  color: #bdd4fc;
+  text-shadow: 0 0 14px #0052ff, 0 0 2px black;
 }
 /*# sourceMappingURL=index.css.map */

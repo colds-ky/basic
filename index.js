@@ -99294,9 +99294,9 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // src/landing/fun-background.js
-  var POST_DEBOUNCE_MSEC = 1e3;
+  var POST_DEBOUNCE_MSEC = 5e3;
   var POST_MAX_AGE = 1e3 * 40;
-  var DESIRED_POST_COUNT = 7;
+  var DESIRED_POST_COUNT = 4;
   function FunBackground() {
     const { bestThreads } = forAwait("now", getFirehoseThreads) || {};
     return /* @__PURE__ */ import_react10.default.createElement("div", { className: "fun-background" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "fun-background-scroller" }, bestThreads && bestThreads.map((thread, i) => {
@@ -99366,21 +99366,32 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     var _a3, _b, _c, _d, _e;
     const hash2 = calcHash((_a3 = thread == null ? void 0 : thread.post) == null ? void 0 : _a3.uri);
     let rnd = nextRandom(Math.abs(hash2 / 1e3 + hash2));
-    const animationDuration = 20 + rnd * 30;
+    const slideDuration = 20 + rnd * 30;
+    rnd = nextRandom(rnd);
+    const rockDuration = 3 + rnd * 12;
     rnd = nextRandom(rnd);
     const left = rnd * 80 - 2;
     return /* @__PURE__ */ import_react10.default.createElement(
       "div",
       {
-        className: "fun-background-thread",
+        className: "fun-background-thread-bubble",
         style: {
-          animationDuration: `${animationDuration.toFixed(2)}s`,
+          animationDuration: `${slideDuration.toFixed(2)}s`,
           left: `${left.toFixed(2)}%`
         }
       },
-      /* @__PURE__ */ import_react10.default.createElement(AccountLabel, { className: "fun-background-thread-author", account: (_b = thread == null ? void 0 : thread.post) == null ? void 0 : _b.author }),
-      /* @__PURE__ */ import_react10.default.createElement("div", { className: "fun-background-thread-content" }, (_c = thread == null ? void 0 : thread.post) == null ? void 0 : _c.record.text),
-      /* @__PURE__ */ import_react10.default.createElement("div", { className: "fun-background-thread-likes" }, /* @__PURE__ */ import_react10.default.createElement(FavoriteBorder_default, null), !((_d = thread == null ? void 0 : thread.post) == null ? void 0 : _d.likeCount) ? "" : (_e = thread == null ? void 0 : thread.post) == null ? void 0 : _e.likeCount.toLocaleString())
+      /* @__PURE__ */ import_react10.default.createElement(
+        "div",
+        {
+          className: "fun-background-thread",
+          style: {
+            animationDuration: `${rockDuration.toFixed(2)}s`
+          }
+        },
+        /* @__PURE__ */ import_react10.default.createElement(AccountLabel, { className: "fun-background-thread-author", account: (_b = thread == null ? void 0 : thread.post) == null ? void 0 : _b.author }),
+        /* @__PURE__ */ import_react10.default.createElement("div", { className: "fun-background-thread-content" }, (_c = thread == null ? void 0 : thread.post) == null ? void 0 : _c.record.text),
+        /* @__PURE__ */ import_react10.default.createElement("div", { className: "fun-background-thread-likes" }, /* @__PURE__ */ import_react10.default.createElement(FavoriteBorder_default, null), !((_d = thread == null ? void 0 : thread.post) == null ? void 0 : _d.likeCount) ? "" : (_e = thread == null ? void 0 : thread.post) == null ? void 0 : _e.likeCount.toLocaleString())
+      )
     );
   }
 
@@ -99476,8 +99487,8 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         name: "handle",
         autoComplete: "nickname",
         label: localise(
-          "Searching for someone?",
-          { uk: "\u041A\u043E\u0433\u043E \u0448\u0443\u043A\u0430\u0454\u043C\u043E?" }
+          "Searching for anything?",
+          { uk: "\u0429\u043E\u0441\u044C \u0448\u0443\u043A\u0430\u0454\u043C\u043E, \u0447\u0438 \u043F\u0440\u043E\u0441\u0442\u043E \u043F\u043E\u0434\u0438\u0432\u0438\u0442\u0438\u0441\u044C?" }
         ),
         variant: "standard",
         value: searchText,
