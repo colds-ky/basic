@@ -66520,8 +66520,6 @@ if (cid) {
   function getKeyShortDID(did) {
     const shortDID = shortenDID(did);
     const fullDID = unwrapShortDID(did);
-    if (!shortDID)
-      return void 0;
     if (shortDID !== fullDID)
       return shortDID.slice(0, 2);
     return "web";

@@ -55,7 +55,6 @@ export function nextRandom(rnd) {
 export function getKeyShortDID(did) {
   const shortDID = shortenDID(did);
   const fullDID = unwrapShortDID(did);
-  if (!shortDID) return undefined;
   if (shortDID !== fullDID) return shortDID.slice(0, 2);
   return 'web';
 }
