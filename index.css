@@ -1,59 +1,3 @@
-/* src/widgets/account/full-handle.css */
-/* src/widgets/account/account-label.css */
-.account-label .account-handle {
-  display: flex;
-}
-.account-label a.account-handle {
-  color: inherit;
-  text-decoration: none;
-}
-.account-label .handle-bsky-social-suffix {
-  display: inline-block;
-  zoom: 0.7;
-  transform: scaleY(1.43) translateY(0.08em);
-  transform-origin: bottom;
-  opacity: 0.6;
-}
-.account-label .handle-bsky-social-suffix-dot {
-  opacity: 0.6;
-  padding-left: 0.05em;
-  padding-right: 0.1em;
-}
-.account-label .account-avatar {
-  background: no-repeat center center;
-  background-size: cover;
-  color: transparent;
-  border-radius: 200%;
-  display: inline-block;
-  width: 1.5em;
-  height: 1.5em;
-  margin-right: 0.25em;
-  position: relative;
-}
-.account-label .account-avatar.account-avatar-at-sign {
-  color: #7fa9f4;
-  display: inline-grid;
-  align-items: center;
-  justify-items: center;
-  transform: scale(1.2);
-}
-.account-label .handle-main-text {
-  color: #365ca1;
-}
-.account-label .handle-tld-suffix {
-  color: #123a82;
-  text-shadow: 0 0 1px #00389d;
-}
-.account-label .handle-bsky-social-suffix {
-  color: #365ca1;
-}
-.account-label .handle-bsky-social-suffix-dot {
-  color: #365ca1;
-}
-.account-label .account-label-display-name {
-  padding-left: 0.3em;
-}
-
 /* src/landing/fun-background.css */
 .fun-background {
   position: absolute;
@@ -123,6 +67,63 @@
   to {
     transform: rotate(-8deg);
   }
+}
+
+/* src/widgets/account/full-handle.css */
+
+/* src/widgets/account/account-label.css */
+.account-label .account-handle {
+  display: flex;
+}
+.account-label a.account-handle {
+  color: inherit;
+  text-decoration: none;
+}
+.account-label .handle-bsky-social-suffix {
+  display: inline-block;
+  zoom: 0.7;
+  transform: scaleY(1.43) translateY(0.08em);
+  transform-origin: bottom;
+  opacity: 0.6;
+}
+.account-label .handle-bsky-social-suffix-dot {
+  opacity: 0.6;
+  padding-left: 0.05em;
+  padding-right: 0.1em;
+}
+.account-label .account-avatar {
+  background: no-repeat center center;
+  background-size: cover;
+  color: transparent;
+  border-radius: 200%;
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  margin-right: 0.25em;
+  position: relative;
+}
+.account-label .account-avatar.account-avatar-at-sign {
+  color: #7fa9f4;
+  display: inline-grid;
+  align-items: center;
+  justify-items: center;
+  transform: scale(1.2);
+}
+.account-label .handle-main-text {
+  color: #365ca1;
+}
+.account-label .handle-tld-suffix {
+  color: #123a82;
+  text-shadow: 0 0 1px #00389d;
+}
+.account-label .handle-bsky-social-suffix {
+  color: #365ca1;
+}
+.account-label .handle-bsky-social-suffix-dot {
+  color: #365ca1;
+}
+.account-label .account-label-display-name {
+  padding-left: 0.3em;
 }
 
 /* src/widgets/post/post.css */
@@ -416,6 +417,17 @@
   padding: 0.2em 0;
   text-decoration: none;
   color: inherit;
+}
+.landing .landing-auto-completion-area .landing-auto-complete-entry-post .auto-complete-post-account {
+  display: inline-block;
+}
+.landing .landing-auto-completion-area .landing-auto-complete-entry-post .post-entry-first-line {
+  font-style: italic;
+  border: solid 1px cornflowerblue;
+  background: #ffffff85;
+  padding: 0 0.3em;
+  border-radius: 0.2em;
+  margin-left: 0.4em;
 }
 .landing .landing-bottom-bar {
   grid-row: 5;

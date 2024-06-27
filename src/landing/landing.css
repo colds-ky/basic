@@ -71,6 +71,19 @@ padding-left: 4.5vh;
   color: inherit;
 }
 
+.landing .landing-auto-completion-area .landing-auto-complete-entry-post .auto-complete-post-account {
+  display: inline-block;
+}
+
+.landing .landing-auto-completion-area .landing-auto-complete-entry-post .post-entry-first-line {
+  font-style: italic;
+  border: solid 1px cornflowerblue;
+  background: #ffffff85;
+  padding: 0 0.3em;
+  border-radius: 0.2em;
+  margin-left: 0.4em;
+}
+
 .landing .landing-bottom-bar {
   grid-row: 5;
   padding: 0.2em 0.4em;
