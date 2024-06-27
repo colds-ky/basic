@@ -2,20 +2,20 @@
 
 import { FavoriteBorder } from '@mui/icons-material';
 import React from 'react';
+import { Link } from 'react-router-dom';
 
+import { useDB } from '../..';
+import { breakFeedUri, breakPostURL } from '../../../coldsky/lib';
+import { forAwait } from '../../../coldsky/src/api/forAwait';
 import { localise } from '../../localise';
 import { AccountLabel } from '../account';
+import { AccountChip } from '../account/account-chip';
+import { FormatTime } from '../format-time';
 import { PreFormatted } from '../preformatted';
+import { PostEmbedsSection } from './embedded';
+import { PostTextContent } from './post-text-content';
 
 import './post.css';
-import { FormatTime } from '../format-time';
-import { breakFeedUri, breakPostURL } from '../../../coldsky/lib';
-import { useDB } from '../..';
-import { forAwait } from '../../../coldsky/src/api/forAwait';
-import { Link } from 'react-router-dom';
-import { PostEmbedsSection } from './embedded';
-import { AccountChip } from '../account/account-chip';
-import { PostTextContent } from './post-text-content';
 
 /**
  * @typedef {import('../../../coldsky/lib').MatchCompactPost} MatchCompactPost
@@ -31,11 +31,19 @@ const DEFAULT_EMBED_DEPTH = 25;
  *  linkTimestamp?: boolean,
  *  linkAuthor?: boolean,
  *  allowEmbedDepth?: number,
+ *  indicateEmbedding?: boolean,
  *  indicateLeadsFromThread?: boolean | import('../../../coldsky/lib').CompactThreadPostSet,
  *  indicateTrailsFromThread?: boolean | import('../../../coldsky/lib').CompactThreadPostSet,
  * }} _
  */
-export function Post({ className, post, compact, linkTimestamp, linkAuthor, allowEmbedDepth, ...rest }) {
+export function Post({
+  className,
+  post,
+  compact,
+  linkTimestamp,
+  linkAuthor,
+  allowEmbedDepth,
+  indicateEmbedding, ...rest }) {
   const nextAllowEmbedDepth = typeof allowEmbedDepth === 'number' ? allowEmbedDepth - 1 : DEFAULT_EMBED_DEPTH;
   return (
     <PostFrame className={className} {...rest}>
@@ -47,6 +55,7 @@ export function Post({ className, post, compact, linkTimestamp, linkAuthor, allo
             linkTimestamp={linkTimestamp}
             linkAuthor={linkAuthor}
             allowEmbedDepth={nextAllowEmbedDepth}
+            indicateEmbedding={indicateEmbedding}
           /> :
           <LoadedPost
             post={post}
@@ -54,6 +63,7 @@ export function Post({ className, post, compact, linkTimestamp, linkAuthor, allo
             linkTimestamp={linkTimestamp}
             linkAuthor={linkAuthor}
             allowEmbedDepth={nextAllowEmbedDepth}
+            indicateEmbedding={indicateEmbedding}
           />
       }
     </PostFrame>
@@ -82,7 +92,8 @@ export function PostFrame({ className, children, ...rest }) {
  *  linkTimestamp?: boolean,
  *  linkAuthor?: boolean,
  *  compact?: boolean,
- *  allowEmbedDepth?: number
+ *  allowEmbedDepth?: number,
+ *  indicateEmbedding?: boolean
  * }} _
  */
 function LoadingPostInProgress({ uri, ...rest }) {
@@ -122,14 +133,31 @@ function LoadingPostInProgress({ uri, ...rest }) {
  *  linkTimestamp?: boolean,
  *  linkAuthor?: boolean,
  *  allowEmbedDepth?: number
+ *  indicateEmbedding?: boolean
  * }} _
  */
-function LoadedPost({ post, compact, linkTimestamp, linkAuthor, allowEmbedDepth }) {
+function LoadedPost({
+  post,
+  compact,
+  linkTimestamp,
+  linkAuthor,
+  allowEmbedDepth,
+  indicateEmbedding
+}) {
   return (
     <div className='post-loaded-content' onClick={() => {
       console.log('post clicked ', post);
     }}>
       <div className='post-top-line'>
+        {
+          !indicateEmbedding ? undefined :
+            <span className='tiny-text-for-copy-paste'>
+              {localise(
+                'quoted post by: ',
+                { uk: 'процитовано від:'}
+              )}
+            </span>
+        }
         <AccountLabel
           className='post-author'
           account={post.shortDID}
@@ -147,10 +175,21 @@ function LoadedPost({ post, compact, linkTimestamp, linkAuthor, allowEmbedDepth 
         matches={post.matches}
       />
       <div className='post-likes'>
-        <FavoriteBorder />
+        <FavoriteBorder className='heart-icon' />
+        <span className='tiny-text-for-copy-paste'>
+          {
+            !post.likeCount ? undefined :
+            localise(
+              'likes: ',
+              { uk: 'вподобайки: ' }
+            )
+          }
+        </span>
         {
-          !post?.likeCount ? '' :
-            post.likeCount.toLocaleString()
+          !post?.likeCount ? undefined :
+            <span className='post-like-count'>
+              {post.likeCount.toLocaleString()}
+            </span>
         }
       </div>
     </div>

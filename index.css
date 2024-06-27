@@ -73,7 +73,7 @@
 
 /* src/widgets/account/account-label.css */
 .account-label .account-handle {
-  display: flex;
+  s-display: flex;
 }
 .account-label a.account-handle {
   color: inherit;
@@ -126,6 +126,36 @@
   padding-left: 0.3em;
 }
 
+/* src/widgets/account/account-chip.css */
+.account-avatar.account-avatar-chip {
+  background: no-repeat center center;
+  background-size: cover;
+  color: transparent;
+  border-radius: 200%;
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  margin-right: 0.25em;
+  position: relative;
+  top: -0.15em;
+}
+
+/* src/widgets/post/post-text-content.css */
+.search-match-highly-relevant {
+  background: gold;
+  border-radius: 0.3em;
+  padding: 0 0.1em;
+  margin: 0 -0.1em;
+}
+.search-match-relevant {
+  background-image:
+    linear-gradient(
+      to top,
+      #ffcd70,
+      transparent 0.6em);
+  border-radius: 0.2em;
+}
+
 /* src/widgets/post/post.css */
 .post-frame-outer {
   padding: 1em;
@@ -145,17 +175,20 @@
 }
 .post-top-line {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto 1fr auto;
   white-space: nowrap;
+}
+.post-top-line .tiny-text-for-copy-paste {
+  font-size: 0.1px;
 }
 .post-top-line .post-author {
   overflow: hidden;
   text-overflow: ellipsis;
-  grid-column: 1;
+  grid-column: 2;
   grid-row: 1;
 }
 .post-top-line .post-author-right-overlay {
-  grid-column: 1;
+  grid-column: 2;
   grid-row: 1;
   pointer-events: none;
   justify-self: end;
@@ -172,7 +205,7 @@
   }
 }
 .post-top-line .post-date {
-  grid-column: 2;
+  grid-column: 3;
   grid-row: 1;
   opacity: 0.5;
   color: inherit;
@@ -193,15 +226,20 @@
 .post-embeds-section.post-embeds-section-compact {
   zoom: 65%;
 }
-.post-likes {
+.post-loaded-content .post-likes {
   text-align: right;
   opacity: 0.4;
   margin-top: 0.2em;
-  display: flex;
-  justify-content: end;
-  align-items: center;
-  gap: 0.2em;
-  padding-right: 0.2em;
+}
+.post-loaded-content .post-likes .tiny-text-for-copy-paste {
+  font-size: 0.1px;
+}
+.post-loaded-content .post-likes .heart-icon {
+  position: relative;
+  top: 0.26em;
+}
+.post-loaded-content .post-likes .post-like-count {
+  margin-left: 0.2em;
 }
 .sub-thread {
   z-index: 1;
@@ -349,36 +387,6 @@
 }
 .post-embeds-section .post-embed-images-multiple .post-embed-image-and-description:first-child {
   border-top: none;
-}
-
-/* src/widgets/account/account-chip.css */
-.account-avatar.account-avatar-chip {
-  background: no-repeat center center;
-  background-size: cover;
-  color: transparent;
-  border-radius: 200%;
-  display: inline-block;
-  width: 1.5em;
-  height: 1.5em;
-  margin-right: 0.25em;
-  position: relative;
-  top: -0.15em;
-}
-
-/* src/widgets/post/post-text-content.css */
-.search-match-highly-relevant {
-  background: gold;
-  border-radius: 0.3em;
-  padding: 0 0.1em;
-  margin: 0 -0.1em;
-}
-.search-match-relevant {
-  background-image:
-    linear-gradient(
-      to top,
-      #ffcd70,
-      transparent 0.6em);
-  border-radius: 0.2em;
 }
 
 /* src/landing/landing.css */

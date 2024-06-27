@@ -18,6 +18,7 @@ export function EmbedQuotePost({ className, parentPost, post, ...rest }) {
     <Post
       className={className}
       post={post}
+      indicateEmbedding
       indicateLeadsFromThread
       indicateTrailsFromThread
       {...rest}
@@ -56,6 +57,7 @@ export function EmbedQuotePostMultiple({ className, parentPost, posts, compact, 
           post={post}
           compact={compact}
           allowEmbedDepth={allowEmbedDepth}
+          indicateEmbedding
           indicateLeadsFromThread
           indicateTrailsFromThread
         />

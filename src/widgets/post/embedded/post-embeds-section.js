@@ -6,6 +6,7 @@ import { EmbedQuotePostMultiple } from './embed-quote-post';
 import { EmbedLinks } from './embed-links';
 import { EmbedImages } from './embed-images';
 import { PostFrame } from '../post';
+import { localise } from '../../../localise';
 
 /**
  * @param {{
@@ -43,7 +44,14 @@ export function PostEmbedsSection({ compact, post, allowEmbedDepth }) {
       {
         allowEmbedDepth === 0 ?
           <PostFrame>
-            <span className='embed-too-many'>😵</span>
+            <span className='embed-too-many'>
+              <span className='tiny-text-for-copy-paste'>
+                {localise(
+                  '(more embedded posts omitted)',
+                  { uk: '(немає місця для решти повідомлень)' })}
+              </span>
+              😵
+            </span>
           </PostFrame> :
         !posts?.length ? null :
           <EmbedQuotePostMultiple

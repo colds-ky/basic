@@ -1,5 +1,5 @@
 .account-label .account-handle {
-  display: flex;
+  s-display: flex;
 }
 
 .account-label a.account-handle {
