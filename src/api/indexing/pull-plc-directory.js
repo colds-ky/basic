@@ -8,7 +8,7 @@ export async function pullPLCDirectoryCompact() {
 
   const { indexingRun } = require('./indexing-run');
 
-  console.log('PLC directory CACHE');
+  console.log('\n\n\nPLC directory CACHE');
 
   const directoryPath = path.resolve(__dirname, 'src/api/indexing/repos');
   const rootPath = path.resolve(directoryPath, 'colds-ky-dids-history.github.io');
@@ -21,12 +21,15 @@ export async function pullPLCDirectoryCompact() {
         normalizeLocalPath);
 
       fs.readFile(filePath, 'utf8', (err, data) => {
+        console.log('  READ>>', filePath, err ? 'ERROR' : 'OK');
+
         if (err) resolve(undefined);
         else resolve(data);
       });
     })
   });
 
+  let firstLoaded = true;
   for await (const progress of run) {
     const reportProgress = {};
     if (progress.affectedStores) reportProgress.affectedStores = progress.affectedStores.map(store => store.file);
@@ -36,16 +39,40 @@ export async function pullPLCDirectoryCompact() {
     if (progress.addedShortDIDs) reportProgress.addedShortDIDs = progress.addedShortDIDs.length;
     if (progress.affectedShortDIDs) reportProgress.affectedShortDIDs = progress.affectedShortDIDs.length;
 
+    if (firstLoaded && progress.loadedAllStores) {
+      firstLoaded = false;
+      console.log('\n\n');
+    }
     console.log(reportProgress);
+
+    // no write back if not all stores are loaded yet
+    if (!progress.loadedAllStores) continue;
+
     console.log('  WRITE>>');
 
     if (progress.affectedStores) {
-      for (const sto of progress.affectedStores) {
+      const storesInWritingOrder = progress.affectedStores.slice().sort((a, b) =>
+        a.latestRegistration - b.latestRegistration);
+
+      for (const sto of storesInWritingOrder) {
         const filePath = path.resolve(directoryPath, sto.file + '.json');
         process.stdout.write('  ' + filePath);
         const json = stringifyRegistrationStore(sto);
         fs.writeFileSync(filePath, json);
         console.log();
+      }
+
+      const inceptionPath = path.resolve(rootPath, 'inception.json');
+      const inceptionStr = JSON.stringify({
+        next: progress.stores[0].file,
+        stores: progress.stores.map(store => store.file)
+      }, null, 2);
+      const currentInception = fs.existsSync(inceptionPath) ?
+        fs.readFileSync(inceptionPath, 'utf8') : '';
+      if (currentInception !== inceptionStr) {
+        process.stdout.write('  ' + path.resolve(rootPath, 'inception.json'));
+        fs.writeFileSync(inceptionPath, inceptionStr);
+        console.log(' CHANGED.');
       }
     }
 

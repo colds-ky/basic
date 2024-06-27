@@ -42,22 +42,85 @@ export async function* indexingRun({ read, fetch: useFetch }) {
   for await (const progress of loadAllStores({ read })) {
     stores = progress.stores;
 
-    if (progress.latestAction) maxDate = progress.latestAction;
     for (const store of stores) {
       for (const shortDID of store.keys()) {
         storeByShortDID.set(shortDID, store);
+
+        if (store.latestRegistration > maxDate)
+          maxDate = store.latestRegistration;
       }
+      // validateStore(store);
     }
     yield progress;
   }
 
   if (!useFetch) useFetch = (req, opts) => retryFetch(req, { ...opts, nocorsproxy: true });
 
+  console.log(
+    '\n\n\nSTARTING TO PULL DIRECTORY', new Date(maxDate).toISOString());
+  
   for await (const progress of pullDirectory({ stores, storeByShortDID, startDate: maxDate, fetch: useFetch })) {
     stores = progress.stores;
+    for (const store of stores) {
+      validateStore(store);
+    }
+
     yield progress;
+    //break;
+  }
+}
+
+/** @param {RegistrationStore} store */
+function validateStore(store) {
+  let firstDate = 0;
+  let firstDateSource = 'uninitialized';
+  const invalidDates = [];
+  for (const { date, source } of dates()) {
+    if (!firstDate) {
+      firstDate = date;
+      firstDateSource = source;
+    }
+
+    if (getMonthStart(date) !== getMonthStart(firstDate)) {
+      invalidDates.push({ date, source });
+    }
   }
 
+  if (invalidDates.length) {
+    throw new Error(
+      invalidDates.length + ' Invalid dates in store ' + store.file + ':\n  ' +
+      invalidDates.map(({date, source}) => '[' + new Date(date).toLocaleDateString() + '] ' + source).join('\n  ') +
+      '\nfirstDate ' + firstDateSource + ' ' + new Date(firstDate).toLocaleDateString());
+  }
+
+  function* dates() {
+    yield { date: store.earliestRegistration, source: 'earliestRegistration' };
+    yield { date: store.latestRegistration, source: 'latestRegistration' };
+    // yield { date: store.latestAction, source: 'latestAction' };
+
+    let carryTimestamp = 0;
+    for (const shortDID of store.keys()) {
+      if (shortDID === 'next') throw new Error('next should not be a shortDID key');
+      const history = store.get(shortDID);
+      if (!history) throw new Error('No history for shortDID ' + shortDID);
+      yield { date: history.created, source: 'history[' + shortDID + '].created' };
+
+      const update = history.updates[0];
+      if (!carryTimestamp) carryTimestamp = new Date(update.t).getTime();
+      else carryTimestamp += parseTimestampOffset(update.t) || 0;
+
+      // history.created can differ by up to 1 second due to rounding
+      if (Math.abs(carryTimestamp - history.created) > 1001)
+        throw new Error(
+        store.file + ' ' + shortDID + ' ' +
+        'carryTimestamp !== history.created ' +
+        (history.created - carryTimestamp) + 'ms ' +
+        new Date(carryTimestamp).toISOString() + ' !== ' +
+        new Date(history.created).toISOString() + ' ' + shortDID + ' ' + store.file + ' ' + JSON.stringify(update));
+
+      yield { date: carryTimestamp, source: 'history[' + shortDID + '].updates[0] ' + JSON.stringify(update) };
+    }
+  }
 }
 
 /**
@@ -67,6 +130,7 @@ export async function* indexingRun({ read, fetch: useFetch }) {
  *  startDate: number,
  *  fetch?: typeof fetch
  * }} _
+ * @returns {AsyncIterable<IndexingRunProgress>}
  */
 async function* pullDirectory({ stores, storeByShortDID, startDate, fetch }) {
 
@@ -90,31 +154,38 @@ async function* pullDirectory({ stores, storeByShortDID, startDate, fetch }) {
         console.log();
       }
 
-      affectedShortDIDs.add(entry.shortDID);
-
-      /** @type {HistoryChange} */
-      const historyChange = {
-        h: clampShortHandle(entry.shortHandle),
-        p: entry.shortPDC
-      };
+      // /** @type {HistoryChange} */
+      // const historyChange = {
+      //   h: clampShortHandle(entry.shortHandle),
+      //   p: entry.shortPDC
+      // };
 
       const existingStore = storeByShortDID.get(entry.shortDID);
       if (existingStore) {
-        affectedStores.add(existingStore);
         // update history for the already registered shortDID
         const existingHistory = /** @type {RegistrationHistory} */(
           existingStore.get(entry.shortDID));
-        addHistoryToExistingShortDID(existingHistory, historyChange, entry);
+        if (!addHistoryToExistingShortDID(existingHistory, entry)) {
+          // no update required
+          continue;
+        }
+
         if (!latestAction || entry.timestamp > latestAction)
           latestAction = entry.timestamp;
 
+        affectedStores.add(existingStore);
+        affectedShortDIDs.add(entry.shortDID);
       } else {
+        affectedShortDIDs.add(entry.shortDID);
+
         /** @type {RegistrationHistory} */
         const history = {
           created: entry.timestamp,
-          updates: {
-            [new Date(entry.timestamp).toISOString()]: historyChange
-          }
+          updates: [{
+            t: new Date(entry.timestamp).toISOString(),
+            h: clampShortHandle(entry.shortHandle),
+            p: entry.shortPDC === '.s' ? undefined : entry.shortPDC
+          }]
         };
 
         addedShortDIDs.push(entry.shortDID);
@@ -167,25 +238,33 @@ async function* pullDirectory({ stores, storeByShortDID, startDate, fetch }) {
       latestRegistration,
       latestAction
     };
+
+    earliestRegistration = latestRegistration = latestAction = undefined;
   }
 }
 
 /**
  * @param {RegistrationHistory} history
- * @param {HistoryChange} historyChange
  * @param {import('../../../lib/plc-directory').PLCDirectoryEntryCompact} entry
  */
-function addHistoryToExistingShortDID(history, historyChange, entry) {
+function addHistoryToExistingShortDID(history, entry) {
+  const clampedShortHandle = entry.shortHandle ? clampShortHandle(entry.shortHandle) : undefined;
+  const defaultedPDC = entry.shortPDC === '.s' ? undefined : entry.shortPDC;
+
   let firstHistoryEntry = true;
   let carryTimestamp = history.created;
-  for (const dateOrTimestamp in history.updates) {
+  let carryClampedShortHandle;
+  let carryPDC;
+  for (let i = 0; i < history.updates.length; i++) {
+    const existingUpdate = history.updates[i];
+    const dateOrTimestamp = existingUpdate.t;
     let carryTimestampNext =
       firstHistoryEntry ? carryTimestamp :
-        carryTimestamp = parseTimestampOffset(dateOrTimestamp) || 0;
+        carryTimestamp += parseTimestampOffset(dateOrTimestamp) || 0;
 
     if (firstHistoryEntry) firstHistoryEntry = false;
 
-    if (carryTimestamp > entry.timestamp) {
+    if (carryTimestampNext > entry.timestamp) {
       console.warn(
         'Past history update? ',
         {
@@ -196,21 +275,46 @@ function addHistoryToExistingShortDID(history, historyChange, entry) {
         }
       );
 
-      /** @type {RegistrationHistory['updates']} */
-      const newUpdates = {};
-      for (const prevDateOrTimestamp in history.updates) {
-        if (prevDateOrTimestamp === dateOrTimestamp)
-          newUpdates[timestampOffsetToString(entry.timestamp)] = historyChange;
-        newUpdates[prevDateOrTimestamp] = history.updates[prevDateOrTimestamp];
-      }
+      const updateRequired = checkUpdateRequired(clampedShortHandle, defaultedPDC, carryClampedShortHandle, carryPDC);
+      if (!updateRequired) return false;
 
-      return;
+      history.updates.splice(i, 0, {
+        t: timestampOffsetToString(entry.timestamp - carryTimestamp),
+        h: clampedShortHandle === carryClampedShortHandle ? undefined : clampedShortHandle,
+        p: defaultedPDC === carryPDC ? undefined : defaultedPDC
+      });
+
+      return true;
     }
 
     carryTimestamp = carryTimestampNext;
+    if (existingUpdate.h) carryClampedShortHandle = existingUpdate.h;
+    if (existingUpdate.p) carryPDC = existingUpdate.p;
   }
 
-  history.updates[timestampOffsetToString(entry.timestamp)] = historyChange;
+  const updateRequired = checkUpdateRequired(clampedShortHandle, defaultedPDC, carryClampedShortHandle, carryPDC);
+  if (!updateRequired) return false;
+
+  history.updates.push({
+    t: timestampOffsetToString(entry.timestamp - carryTimestamp),
+    h: clampedShortHandle === carryClampedShortHandle ? undefined : clampedShortHandle,
+    p: defaultedPDC === carryPDC ? undefined : defaultedPDC
+  });
+
+  return true;
+}
+
+/**
+ * @param {string | undefined} clampedShortHandle
+ * @param {string | undefined} defaultedPDC
+ * @param {string | undefined} carryClampedShortHandle
+ * @param {string | undefined} carryPDC
+ */
+function checkUpdateRequired(clampedShortHandle, defaultedPDC, carryClampedShortHandle, carryPDC) {
+  const updateRequired =
+    (clampedShortHandle || carryClampedShortHandle) && clampedShortHandle !== carryClampedShortHandle ||
+    (defaultedPDC || carryPDC) && defaultedPDC !== carryPDC;
+  return updateRequired;
 }
 
 /**
@@ -221,7 +325,13 @@ function addHistoryToExistingShortDID(history, historyChange, entry) {
 function addNewShortDIDToExistingStoreEnd(store, history, entry) {
   store.set(entry.shortDID, history);
   if (!store.earliestRegistration) store.earliestRegistration = entry.timestamp;
+
+  if (store.latestRegistration) {
+    // store history start as a relative offset from the latest registration
+    history.updates[0].t = timestampOffsetToString(entry.timestamp - store.latestRegistration);
+  }
   store.latestRegistration = entry.timestamp;
+
   if (!store.latestAction || entry.timestamp > store.latestAction)
     store.latestAction = entry.timestamp;
 }
@@ -234,11 +344,33 @@ function addNewShortDIDToExistingStoreEnd(store, history, entry) {
 function addNewShortDIDToExistingStoreMiddle(store, history, entry) {
   const entries = Array.from(store.entries());
   store.clear();
+
+  let added = false;
+  let prevTimestamp = 0;
   for (const [existingShortDID, existingHistory] of entries) {
-    if (entry.timestamp >= existingHistory.created)
-      store.set(entry.shortDID, history);
+    if (entry.timestamp > existingHistory.created) {
+
+      // we are into history after the entry was created
+      if (!added) {
+        // not added: this is the place to add
+        if (prevTimestamp) {
+          // this condition would happen always,
+          // unless strange situation where the insert is needed before the first entry
+          history.updates[0].t = timestampOffsetToString(entry.timestamp - prevTimestamp);
+        }
+
+        store.set(entry.shortDID, history);
+        prevTimestamp = history.created; // subsequent entry should offset from this newly added
+        added = true;
+      }
+
+      // all subsequent entries should get recalculated timestamps
+      history.updates[0].t = timestampOffsetToString(existingHistory.created - prevTimestamp);
+    }
     store.set(existingShortDID, existingHistory);
+    prevTimestamp = existingHistory.created;
   }
+
   if (!store.has(entry.shortDID)) {
     console.warn(
       'This shortDID should not appear at the end according to latestCreation ' +
@@ -247,6 +379,7 @@ function addNewShortDIDToExistingStoreMiddle(store, history, entry) {
       { entry, store });
     store.set(entry.shortDID, history);
   }
+
   if (!store.latestAction || entry.timestamp > store.latestAction)
     store.latestAction = entry.timestamp;
 }
@@ -366,9 +499,8 @@ async function* loadAllStores({ read }) {
   /** @type {number | undefined} */
   let latestAction;
 
-
   while (next) {
-    const storeText = await read(next);
+    const storeText = await read(next + '.json');
     if (!storeText) break;
 
     const store = parseRegistrationStore(next, storeText);
@@ -406,6 +538,7 @@ async function* loadAllStores({ read }) {
       affectedStores: [store],
       affectedShortDIDs
     };
+    earliestRegistration = latestRegistration = latestAction = undefined;
   }
 
   yield {

@@ -158,7 +158,11 @@
     return offset;
   }
   function timestampOffsetToString(offset) {
-    offset = Math.floor(offset / 1e3);
+    if (offset > offsetTooLarge) {
+      console.error("timestampOffsetToString: offset too large", offset, new Date(offset));
+    }
+    const milliseconds = offset % 1e3;
+    offset = (offset - milliseconds) / 1e3;
     const seconds = offset % 60;
     offset = (offset - seconds) / 60;
     const minutes = offset % 60;
@@ -166,6 +170,9 @@
     const hours = offset % 24;
     const days = (offset - hours) / 24;
     let str = (100 + seconds).toString().slice(1);
+    if (milliseconds) {
+      str = str + "." + (1e3 + milliseconds).toString().slice(1).replace(/0+$/, "");
+    }
     if (days + hours + minutes) {
       str = (100 + minutes).toString().slice(1) + ":" + str;
       if (days + hours) {
@@ -195,11 +202,12 @@
       return;
     return { shortDID: match[2], postID: match[3] };
   }
-  var _shortenDID_Regex, _shortenHandle_Regex, _breakPostURL_Regex, _breakFeedUri_Regex;
+  var _shortenDID_Regex, _shortenHandle_Regex, offsetTooLarge, _breakPostURL_Regex, _breakFeedUri_Regex;
   var init_shorten = __esm({
     "lib/shorten.js"() {
       _shortenDID_Regex = /^did\:plc\:/;
       _shortenHandle_Regex = /\.bsky\.social$/;
+      offsetTooLarge = Date.UTC(2022, 1, 1);
       _breakPostURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/post\/([a-z0-9]+)$/;
       _breakFeedUri_Regex = /^at\:\/\/(did:plc:)?([a-z0-9]+)\/[a-z\.]+\/?(.*)?$/;
     }
@@ -211,14 +219,16 @@
     const store = createEmptyStore(file);
     let carryTimestamp = 0;
     for (const shortDID in bucketMap) {
-      if (shortDID === "next")
+      if (shortDID === "next") {
         store.next = bucketMap.next;
+        continue;
+      }
       const registrationHistory = bucketMap[shortDID];
-      for (const entry in registrationHistory) {
+      for (const entry of registrationHistory) {
         if (!carryTimestamp)
-          carryTimestamp = new Date(entry).getTime();
+          carryTimestamp = new Date(entry.t).getTime();
         else
-          carryTimestamp += parseTimestampOffset(entry) || 0;
+          carryTimestamp += parseTimestampOffset(entry.t) || 0;
         break;
       }
       const registrationEntry = {
@@ -292,6 +302,8 @@
       jsonText += first ? '"' + shortDID + '":' + JSON.stringify(registrationEntry.updates) : ',\n"' + shortDID + '":' + JSON.stringify(registrationEntry.updates);
       first = false;
     }
+    if (store.has("next"))
+      throw new Error("How come store has NEXT?");
     if (store.next)
       jsonText += ',\n"next":' + JSON.stringify(store.next);
     jsonText += "\n}\n";
@@ -306,9 +318,9 @@
           super(...arguments);
           __publicField(this, "file", "");
           __publicField(this, "next");
-          __publicField(this, "earliestRegistration");
-          __publicField(this, "latestRegistration");
-          __publicField(this, "latestAction");
+          __publicField(this, "earliestRegistration", 0);
+          __publicField(this, "latestRegistration", 0);
+          __publicField(this, "latestAction", 0);
         }
       };
     }
@@ -629,11 +641,11 @@
         for (var iter = __forAwait(loadAllStores({ read })), more, temp, error; more = !(temp = yield new __await(iter.next())).done; more = false) {
           const progress = temp.value;
           stores = progress.stores;
-          if (progress.latestAction)
-            maxDate = progress.latestAction;
           for (const store of stores) {
             for (const shortDID of store.keys()) {
               storeByShortDID.set(shortDID, store);
+              if (store.latestRegistration > maxDate)
+                maxDate = store.latestRegistration;
             }
           }
           yield progress;
@@ -650,10 +662,17 @@
       }
       if (!useFetch)
         useFetch = (req, opts) => retryFetch(req, __spreadProps(__spreadValues({}, opts), { nocorsproxy: true }));
+      console.log(
+        "\n\n\nSTARTING TO PULL DIRECTORY",
+        new Date(maxDate).toISOString()
+      );
       try {
         for (var iter2 = __forAwait(pullDirectory({ stores, storeByShortDID, startDate: maxDate, fetch: useFetch })), more2, temp2, error2; more2 = !(temp2 = yield new __await(iter2.next())).done; more2 = false) {
           const progress = temp2.value;
           stores = progress.stores;
+          for (const store of stores) {
+            validateStore(store);
+          }
           yield progress;
         }
       } catch (temp2) {
@@ -667,6 +686,48 @@
         }
       }
     });
+  }
+  function validateStore(store) {
+    let firstDate = 0;
+    let firstDateSource = "uninitialized";
+    const invalidDates = [];
+    for (const { date, source } of dates()) {
+      if (!firstDate) {
+        firstDate = date;
+        firstDateSource = source;
+      }
+      if (getMonthStart(date) !== getMonthStart(firstDate)) {
+        invalidDates.push({ date, source });
+      }
+    }
+    if (invalidDates.length) {
+      throw new Error(
+        invalidDates.length + " Invalid dates in store " + store.file + ":\n  " + invalidDates.map(({ date, source }) => "[" + new Date(date).toLocaleDateString() + "] " + source).join("\n  ") + "\nfirstDate " + firstDateSource + " " + new Date(firstDate).toLocaleDateString()
+      );
+    }
+    function* dates() {
+      yield { date: store.earliestRegistration, source: "earliestRegistration" };
+      yield { date: store.latestRegistration, source: "latestRegistration" };
+      let carryTimestamp = 0;
+      for (const shortDID of store.keys()) {
+        if (shortDID === "next")
+          throw new Error("next should not be a shortDID key");
+        const history = store.get(shortDID);
+        if (!history)
+          throw new Error("No history for shortDID " + shortDID);
+        yield { date: history.created, source: "history[" + shortDID + "].created" };
+        const update = history.updates[0];
+        if (!carryTimestamp)
+          carryTimestamp = new Date(update.t).getTime();
+        else
+          carryTimestamp += parseTimestampOffset(update.t) || 0;
+        if (Math.abs(carryTimestamp - history.created) > 1001)
+          throw new Error(
+            store.file + " " + shortDID + " carryTimestamp !== history.created " + (history.created - carryTimestamp) + "ms " + new Date(carryTimestamp).toISOString() + " !== " + new Date(history.created).toISOString() + " " + shortDID + " " + store.file + " " + JSON.stringify(update)
+          );
+        yield { date: carryTimestamp, source: "history[" + shortDID + "].updates[0] " + JSON.stringify(update) };
+      }
+    }
   }
   function pullDirectory(_0) {
     return __asyncGenerator(this, arguments, function* ({ stores, storeByShortDID, startDate, fetch: fetch2 }) {
@@ -684,27 +745,28 @@
               console.warn("How is it possible for affectedShortDIDs.has(entry.shortDID) but not storeByShortDID.has(entry.shortDID) ", entry.shortDID);
               console.log();
             }
-            affectedShortDIDs.add(entry.shortDID);
-            const historyChange = {
-              h: clampShortHandle(entry.shortHandle),
-              p: entry.shortPDC
-            };
             const existingStore = storeByShortDID.get(entry.shortDID);
             if (existingStore) {
-              affectedStores.add(existingStore);
               const existingHistory = (
                 /** @type {RegistrationHistory} */
                 existingStore.get(entry.shortDID)
               );
-              addHistoryToExistingShortDID(existingHistory, historyChange, entry);
+              if (!addHistoryToExistingShortDID(existingHistory, entry)) {
+                continue;
+              }
               if (!latestAction || entry.timestamp > latestAction)
                 latestAction = entry.timestamp;
+              affectedStores.add(existingStore);
+              affectedShortDIDs.add(entry.shortDID);
             } else {
+              affectedShortDIDs.add(entry.shortDID);
               const history = {
                 created: entry.timestamp,
-                updates: {
-                  [new Date(entry.timestamp).toISOString()]: historyChange
-                }
+                updates: [{
+                  t: new Date(entry.timestamp).toISOString(),
+                  h: clampShortHandle(entry.shortHandle),
+                  p: entry.shortPDC === ".s" ? void 0 : entry.shortPDC
+                }]
               };
               addedShortDIDs.push(entry.shortDID);
               if (addedShortDIDs.length > affectedShortDIDs.size) {
@@ -747,6 +809,7 @@
             latestRegistration,
             latestAction
           };
+          earliestRegistration = latestRegistration = latestAction = void 0;
         }
       } catch (temp) {
         error = [temp];
@@ -760,14 +823,20 @@
       }
     });
   }
-  function addHistoryToExistingShortDID(history, historyChange, entry) {
+  function addHistoryToExistingShortDID(history, entry) {
+    const clampedShortHandle = entry.shortHandle ? clampShortHandle(entry.shortHandle) : void 0;
+    const defaultedPDC = entry.shortPDC === ".s" ? void 0 : entry.shortPDC;
     let firstHistoryEntry = true;
     let carryTimestamp = history.created;
-    for (const dateOrTimestamp in history.updates) {
-      let carryTimestampNext = firstHistoryEntry ? carryTimestamp : carryTimestamp = parseTimestampOffset(dateOrTimestamp) || 0;
+    let carryClampedShortHandle;
+    let carryPDC;
+    for (let i = 0; i < history.updates.length; i++) {
+      const existingUpdate = history.updates[i];
+      const dateOrTimestamp = existingUpdate.t;
+      let carryTimestampNext = firstHistoryEntry ? carryTimestamp : carryTimestamp += parseTimestampOffset(dateOrTimestamp) || 0;
       if (firstHistoryEntry)
         firstHistoryEntry = false;
-      if (carryTimestamp > entry.timestamp) {
+      if (carryTimestampNext > entry.timestamp) {
         console.warn(
           "Past history update? ",
           {
@@ -777,22 +846,43 @@
             carryTimestampNext: new Date(carryTimestampNext)
           }
         );
-        const newUpdates = {};
-        for (const prevDateOrTimestamp in history.updates) {
-          if (prevDateOrTimestamp === dateOrTimestamp)
-            newUpdates[timestampOffsetToString(entry.timestamp)] = historyChange;
-          newUpdates[prevDateOrTimestamp] = history.updates[prevDateOrTimestamp];
-        }
-        return;
+        const updateRequired2 = checkUpdateRequired(clampedShortHandle, defaultedPDC, carryClampedShortHandle, carryPDC);
+        if (!updateRequired2)
+          return false;
+        history.updates.splice(i, 0, {
+          t: timestampOffsetToString(entry.timestamp - carryTimestamp),
+          h: clampedShortHandle === carryClampedShortHandle ? void 0 : clampedShortHandle,
+          p: defaultedPDC === carryPDC ? void 0 : defaultedPDC
+        });
+        return true;
       }
       carryTimestamp = carryTimestampNext;
+      if (existingUpdate.h)
+        carryClampedShortHandle = existingUpdate.h;
+      if (existingUpdate.p)
+        carryPDC = existingUpdate.p;
     }
-    history.updates[timestampOffsetToString(entry.timestamp)] = historyChange;
+    const updateRequired = checkUpdateRequired(clampedShortHandle, defaultedPDC, carryClampedShortHandle, carryPDC);
+    if (!updateRequired)
+      return false;
+    history.updates.push({
+      t: timestampOffsetToString(entry.timestamp - carryTimestamp),
+      h: clampedShortHandle === carryClampedShortHandle ? void 0 : clampedShortHandle,
+      p: defaultedPDC === carryPDC ? void 0 : defaultedPDC
+    });
+    return true;
+  }
+  function checkUpdateRequired(clampedShortHandle, defaultedPDC, carryClampedShortHandle, carryPDC) {
+    const updateRequired = (clampedShortHandle || carryClampedShortHandle) && clampedShortHandle !== carryClampedShortHandle || (defaultedPDC || carryPDC) && defaultedPDC !== carryPDC;
+    return updateRequired;
   }
   function addNewShortDIDToExistingStoreEnd(store, history, entry) {
     store.set(entry.shortDID, history);
     if (!store.earliestRegistration)
       store.earliestRegistration = entry.timestamp;
+    if (store.latestRegistration) {
+      history.updates[0].t = timestampOffsetToString(entry.timestamp - store.latestRegistration);
+    }
     store.latestRegistration = entry.timestamp;
     if (!store.latestAction || entry.timestamp > store.latestAction)
       store.latestAction = entry.timestamp;
@@ -800,10 +890,22 @@
   function addNewShortDIDToExistingStoreMiddle(store, history, entry) {
     const entries = Array.from(store.entries());
     store.clear();
+    let added = false;
+    let prevTimestamp = 0;
     for (const [existingShortDID, existingHistory] of entries) {
-      if (entry.timestamp >= existingHistory.created)
-        store.set(entry.shortDID, history);
+      if (entry.timestamp > existingHistory.created) {
+        if (!added) {
+          if (prevTimestamp) {
+            history.updates[0].t = timestampOffsetToString(entry.timestamp - prevTimestamp);
+          }
+          store.set(entry.shortDID, history);
+          prevTimestamp = history.created;
+          added = true;
+        }
+        history.updates[0].t = timestampOffsetToString(existingHistory.created - prevTimestamp);
+      }
       store.set(existingShortDID, existingHistory);
+      prevTimestamp = existingHistory.created;
     }
     if (!store.has(entry.shortDID)) {
       console.warn(
@@ -890,7 +992,7 @@
       let latestRegistration;
       let latestAction;
       while (next) {
-        const storeText = yield new __await(read(next));
+        const storeText = yield new __await(read(next + ".json"));
         if (!storeText)
           break;
         const store = parseRegistrationStore(next, storeText);
@@ -926,6 +1028,7 @@
           affectedStores: [store],
           affectedShortDIDs
         };
+        earliestRegistration = latestRegistration = latestAction = void 0;
       }
       yield {
         loadedAllStores: true,
@@ -957,7 +1060,7 @@
       const fs = __require("fs");
       const path = __require("path");
       const { indexingRun: indexingRun2 } = (init_indexing_run(), __toCommonJS(indexing_run_exports));
-      console.log("PLC directory CACHE");
+      console.log("\n\n\nPLC directory CACHE");
       const directoryPath = path.resolve(__dirname, "src/api/indexing/repos");
       const rootPath = path.resolve(directoryPath, "colds-ky-dids-history.github.io");
       const run = indexingRun2({
@@ -968,6 +1071,7 @@
             normalizeLocalPath
           );
           fs.readFile(filePath, "utf8", (err, data) => {
+            console.log("  READ>>", filePath, err ? "ERROR" : "OK");
             if (err)
               resolve(void 0);
             else
@@ -975,6 +1079,7 @@
           });
         })
       });
+      let firstLoaded = true;
       try {
         for (var iter = __forAwait(run), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
           const progress = temp.value;
@@ -991,15 +1096,33 @@
             reportProgress.addedShortDIDs = progress.addedShortDIDs.length;
           if (progress.affectedShortDIDs)
             reportProgress.affectedShortDIDs = progress.affectedShortDIDs.length;
+          if (firstLoaded && progress.loadedAllStores) {
+            firstLoaded = false;
+            console.log("\n\n");
+          }
           console.log(reportProgress);
+          if (!progress.loadedAllStores)
+            continue;
           console.log("  WRITE>>");
           if (progress.affectedStores) {
-            for (const sto of progress.affectedStores) {
+            const storesInWritingOrder = progress.affectedStores.slice().sort((a, b) => a.latestRegistration - b.latestRegistration);
+            for (const sto of storesInWritingOrder) {
               const filePath = path.resolve(directoryPath, sto.file + ".json");
               process.stdout.write("  " + filePath);
               const json = stringifyRegistrationStore(sto);
               fs.writeFileSync(filePath, json);
               console.log();
+            }
+            const inceptionPath = path.resolve(rootPath, "inception.json");
+            const inceptionStr = JSON.stringify({
+              next: progress.stores[0].file,
+              stores: progress.stores.map((store) => store.file)
+            }, null, 2);
+            const currentInception = fs.existsSync(inceptionPath) ? fs.readFileSync(inceptionPath, "utf8") : "";
+            if (currentInception !== inceptionStr) {
+              process.stdout.write("  " + path.resolve(rootPath, "inception.json"));
+              fs.writeFileSync(inceptionPath, inceptionStr);
+              console.log(" CHANGED.");
             }
           }
           console.log(" OK");
@@ -1028,6 +1151,7 @@
       console.log("Pulling PLC directory...");
       const run = indexingRun({
         read: (localPath) => __async(this, null, function* () {
+          return;
           try {
             const re = yield fetch(
               location.protocol + "//history.dids.colds.ky/" + localPath.replace(/^\//, "")

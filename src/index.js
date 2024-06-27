@@ -11,6 +11,7 @@ async function pullPLCDirectoryLocal() {
 
   const run = indexingRun({
     read: async (localPath) => {
+      return;
       try {
         const re = await fetch(
           location.protocol + '//' +
