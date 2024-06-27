@@ -28,6 +28,7 @@
     "cbor-x": "*",
     "dexie": "*",
     "esbuild": "*",
+    "fuse.js": "^7.0.0",
     "multiformats": "*",
     "rollup": "*",
     "ws": "*"
