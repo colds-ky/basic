@@ -73,6 +73,8 @@ function runApp() {
     [
       { path: '/', element: <Landing /> },
       { path: '/index.html', element: <Landing /> },
+      { path: '/profile/:handle/post/:post', element: <History /> },
+      { path: '/profile/:handle', element: <History /> },
       { path: '/:handle', element: <History /> },
       { path: '/:handle/:post', element: <History /> },
       { path: '*', element: <ParseLink /> },
