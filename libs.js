@@ -41834,7 +41834,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.17";
+	var version = "0.2.18";
 
 	// @ts-check
 
@@ -50712,9 +50712,9 @@ if (cid) {
 	 * @param {import('../..').CompactEmbed[] | undefined} embeds 
 	 */
 	function addEmbedExternal(shortDID, embedExternal, embeds) {
-	  if (!embedExternal) return embeds;
+	  if (!embedExternal?.uri) return embeds;
 	  return addToArray(embeds, /** @type {import('../..').CompactEmbed} */{
-	    url: embedExternal.url,
+	    url: embedExternal.uri,
 	    title: embedExternal.title,
 	    description: embedExternal.description,
 	    imgSrc: getFeedBlobUrl(shortDID, String(embedExternal.thumb?.ref))
@@ -50726,7 +50726,7 @@ if (cid) {
 	 * @param {import('../..').CompactEmbed[] | undefined} embeds 
 	 */
 	function addEmbedRecord(embedRecord, embeds) {
-	  if (!embedRecord) return embeds;
+	  if (!embedRecord?.uri) return embeds;
 	  return addToArray(embeds, /** @type {import('../..').CompactEmbed} */{
 	    url: embedRecord.uri
 	  });
@@ -50738,7 +50738,7 @@ if (cid) {
 	 * @param {import('../..').CompactEmbed[] | undefined} embeds 
 	 */
 	function addEmbedRecordMedia(shortDID, embedRecordMedia, embeds) {
-	  if (!embedRecordMedia) return embeds;
+	  if (!embedRecordMedia?.external && !embedRecordMedia?.images) return embeds;
 	  embeds = addEmbedImages(shortDID, /** @type {import('@atproto/api').AppBskyEmbedImages.Main} */embedRecordMedia.images, embeds);
 	  embeds = addEmbedExternal(shortDID, /** @type {import('@atproto/api').AppBskyEmbedExternal.Main} */embedRecordMedia.external, embeds);
 	  return embeds;
