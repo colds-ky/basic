@@ -41834,7 +41834,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.21";
+	var version = "0.2.22";
 
 	// @ts-check
 
@@ -49938,6 +49938,7 @@ if (cid) {
 	  return {
 	    captureRecord: memStore.captureRecord,
 	    captureThreadView: memStore.captureThreadView,
+	    capturePostView: memStore.captureThreadView,
 	    captureProfileView: memStore.captureProfileView,
 	    deleteRecord,
 	    capturePlcDirectoryEntries: memStore.capturePLCDirectoryEntries,
@@ -50073,10 +50074,11 @@ if (cid) {
 	  /**
 	   * @param {string | null | undefined} did
 	   * @param {string | null | undefined} text
+	   * @returns {Promise<import('.').MatchCompactPost[]>}
 	   */
 	  async function searchPosts(did, text) {
 	    const words = detectWordStartsNormalized(text, undefined);
-	    if (!words?.length && !did) return;
+	    if (!words?.length && !did) return [];
 	    const shortDID = shortenDID(did);
 	    const wordMatcher = !words ? () => true : /** @param {string} w */w => words.includes(w);
 
@@ -50109,7 +50111,8 @@ if (cid) {
 	      includeScore: true,
 	      keys: ['text'],
 	      includeMatches: true,
-	      shouldSort: true
+	      shouldSort: true,
+	      findAllMatches: true
 	    });
 	    const matches = fuse.search(text);
 
@@ -50186,7 +50189,8 @@ if (cid) {
 	      includeScore: true,
 	      keys: ['handle', 'displayName', 'description'],
 	      includeMatches: true,
-	      shouldSort: true
+	      shouldSort: true,
+	      findAllMatches: true
 	    });
 	    const matches = fuse.search(text, options?.max ? {
 	      limit: options?.max
@@ -50207,6 +50211,7 @@ if (cid) {
 
 	/** @typedef {import('.').CompactPost} CompactPost */
 	/** @typedef {import('.').CompactProfile} CompactProfile */
+	/** @typedef {import('.').MatchCompactPost} MatchCompactPost */
 
 	/**
 	 * @param {{
@@ -50253,6 +50258,12 @@ if (cid) {
 	  const agent_searchActors_throttled = throttledAsyncCache((q, limit) => agent.searchActors({
 	    q,
 	    limit
+	  }));
+	  const agent_searchPosts_throttled = throttledAsyncCache((q, limit, sort, cursor) => agent.app.bsky.feed.searchPosts({
+	    q,
+	    limit,
+	    sort,
+	    cursor
 	  }));
 	  return {
 	    firehose: firehose$1,
@@ -50391,7 +50402,7 @@ if (cid) {
 	  /**
 	   * @param {string | null | undefined} shortDID
 	   * @param {string | null | undefined} text
-	   * @returns {[] | AsyncGenerator<CompactPost[] & { cachedOnly?: boolean } | undefined>}
+	   * @returns {[] | AsyncGenerator<MatchCompactPost[] & { cachedOnly?: boolean }>}
 	   */
 	  function searchPostsIncrementally(shortDID, text) {
 	    if (shortDID) {
@@ -50415,7 +50426,7 @@ if (cid) {
 	    let lastSearchReport = 0;
 	    let anyUpdates = false;
 
-	    /** @type {CompactPost[] & { cachedOnly?: boolean } | undefined} */
+	    /** @type {MatchCompactPost[] & { cachedOnly?: boolean } | undefined} */
 	    let lastMatches = await cachedMatchesPromise;
 	    if (lastMatches?.length) {
 	      lastMatches.cachedOnly = true;
@@ -50455,7 +50466,7 @@ if (cid) {
 	        }
 	      }
 	      if (anyUpdates && Date.now() - lastSearchReport > REPORT_UPDATES_FREQUENCY_MSEC) {
-	        /** @type {typeof lastMatches} */
+	        /** @type {MatchCompactPost[] & { cachedOnly?: boolean } | undefined} */
 	        const newMatches = await dbStore.searchPosts(shortDID, text);
 	        if (newMatches?.length) {
 	          lastMatches = newMatches;
@@ -50472,11 +50483,35 @@ if (cid) {
 
 	  /**
 	   * @param {string} text
+	   * @returns {AsyncGenerator<MatchCompactPost[] & { cachedOnly?: boolean }>}
 	   */
 	  async function* searchAllPostsIncrementally(text) {
+	    const searchStringSanitised = (text || '').trim().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, ' ').replace(/\s+/g, ' ');
+	    let remoteSearchLatestPromise = agent_searchPosts_throttled(searchStringSanitised, 97, 'latest');
 	    const localResultsPromise = dbStore.searchPosts(undefined, text);
+	    /** @type {MatchCompactPost[] & { cachedOnly?: boolean }} */
 	    const localResults = await localResultsPromise;
-	    yield localResults;
+	    if (localResults?.length) {
+	      localResults.cachedOnly = true;
+	      yield localResults;
+	    }
+	    let cursor = '';
+	    while (true) {
+	      const remoteSearchData = (await remoteSearchLatestPromise).data;
+	      const now = Date.now();
+	      for (const postRaw of remoteSearchData?.posts || []) {
+	        dbStore.capturePostView(postRaw, now);
+	      }
+	      const refreshedResults = await dbStore.searchPosts(undefined, text);
+	      if (remoteSearchData?.cursor) {
+	        cursor = remoteSearchData.cursor;
+	        remoteSearchLatestPromise = agent_searchPosts_throttled(searchStringSanitised, 97, 'latest', cursor);
+	      }
+	      if (refreshedResults?.length) {
+	        yield refreshedResults;
+	      }
+	      if (!remoteSearchData?.cursor) break;
+	    }
 	  }
 
 	  /**
@@ -51191,6 +51226,7 @@ if (cid) {
 	  return {
 	    captureRecord,
 	    captureThreadView,
+	    capturePostView: capturePostView$1,
 	    captureProfileView,
 	    capturePLCDirectoryEntries,
 	    repos: store.repos
@@ -51210,6 +51246,16 @@ if (cid) {
 	   */
 	  function captureThreadView(threadView, now) {
 	    return captureThread(threadView, store.repos, now, intercepts);
+	  }
+
+	  /**
+	   * @param {import('@atproto/api').AppBskyFeedDefs.PostView} postView
+	   * @param {number} now
+	   */
+	  function capturePostView$1(postView, now) {
+	    /** @type {Set<string>} */
+	    const visitedRevs = new Set();
+	    return capturePostView(visitedRevs, postView, store.repos, now, intercepts);
 	  }
 
 	  /**
