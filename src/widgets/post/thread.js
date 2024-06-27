@@ -80,8 +80,8 @@ export function ThreadView({
           post={thread.root}
           linkTimestamp={linkTimestamp}
           linkAuthor={linkAuthor}
+          replies={threadBranch.insignificants}
         />
-        <InsignificantMarkers branches={threadBranch?.insignificants || []} />
       </PostFrame>
     );
   } else if (threadBranch.conversationDirection) {
