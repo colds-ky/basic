@@ -211,12 +211,7 @@ export async function* mergeMap(input, project) {
 
 /**
  * @template T
- * @param {(arg: {
- *  yield: (item: T) => Promise<void>,
- *  reject: (error: Error) => void,
- *  complete: () => void,
- *  finally: Promise<void>
- * }) => void } callback
+ * @param {(arg: StreamParameters<T>) => void } callback
  */
 export function streamEvery(callback) {
   return mergeMap(streamBuffer(callback));

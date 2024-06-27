@@ -42300,7 +42300,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.37";
+	var version = "0.2.38";
 
 	// @ts-check
 
@@ -42533,6 +42533,31 @@ if (cid) {
 	    args.isEnded = true;
 	    continueTrigger();
 	  }
+	}
+
+	/**
+	 * @template T
+	 * @template [TProject=T extends Array ? T[0] : T]
+	 * @param {AsyncIterable<T>} input
+	 * @param {(item: T) => Iterable<TProject> | AsyncIterable<TProject>} [project]
+	 * @returns {AsyncIterable<TProject>}
+	 * }}
+	 */
+	async function* mergeMap(input, project) {
+	  for await (const item of input) {
+	    const mapped = item;
+	    for await (const subItem of ( /** @type {AsyncIterable<TProject>} */mapped)) {
+	      yield subItem;
+	    }
+	  }
+	}
+
+	/**
+	 * @template T
+	 * @param {(arg: StreamParameters<T>) => void } callback
+	 */
+	function streamEvery(callback) {
+	  return mergeMap(streamBuffer(callback));
 	}
 
 	// @ts-check
@@ -50601,6 +50626,7 @@ if (cid) {
 
 	    // search by both shortDID and words
 	    const dbPosts = !shortDID ? await db.posts.where('words').anyOf(wordStarts || []).toArray() : !wordStarts?.length ? await db.posts.where('shortDID').equals(shortDID).toArray() : await db.posts.where('shortDID').equals(shortDID).and(post => !!post.words && post.words.some(wordMatcher)).toArray();
+	    const allPostsForShortDIDPromise = !shortDID ? undefined : db.posts.where('shortDID').equals(shortDID).count();
 	    for (const post of dbPosts) {
 	      map.set(post.uri, post);
 	    }
@@ -50634,7 +50660,7 @@ if (cid) {
 	    const matches = fuse.search(text).filter(m => (m.score || 0) <= FUSE_THRESHOLD);
 
 	    /**
-	     * @type {import('.').MatchCompactPost[]}
+	     * @type {import('.').MatchCompactPost[] & { processedAllCount?: number }}
 	     */
 	    const compact = matches.map(fuseMatch => {
 	      const joined = {
@@ -50645,6 +50671,7 @@ if (cid) {
 	      };
 	      return joined;
 	    });
+	    if (allPostsForShortDIDPromise) compact.processedAllCount = await allPostsForShortDIDPromise;
 	    return compact;
 	  }
 
@@ -50966,16 +50993,19 @@ if (cid) {
 	  const {
 	    shortDID,
 	    searchQuery,
-	    dbStore
+	    dbStore,
+	    agent_searchPosts_throttled
 	  } = args;
 	  let REPORT_UPDATES_FREQUENCY_MSEC = 700;
 	  const cachedMatchesPromise = dbStore.searchPosts(shortDID, searchQuery);
 	  const allCachedHistoryPromise = !searchQuery ? cachedMatchesPromise : dbStore.searchPosts(shortDID, undefined);
 	  const plcDirHistoryPromise = plcDirectoryHistoryRaw( /** @type {string} */shortDID);
+	  const words = breakIntoWords(searchQuery || '');
+	  words.unshift(searchQuery || '');
+	  words.map(word => agent_searchPosts_throttled(word, undefined, 'latest'));
 	  let lastSearchReport = 0;
 	  /** @type {import('..').CompactPost[] | undefined}  */
 	  let processedBatch;
-	  let anyUpdates = false;
 
 	  /** @type {import('.').IncrementalMatchCompactPosts | undefined} */
 	  let lastMatches = await cachedMatchesPromise;
@@ -50990,6 +51020,74 @@ if (cid) {
 	    lastSearchReport = Date.now();
 	    yield lastMatches;
 	  }
+	  const plcDirHistoryRecords = await plcDirHistoryPromise;
+	  dbStore.capturePlcDirectoryEntries(plcDirHistoryRecords);
+	  const profile = await dbStore.getProfile( /** @type {string} */shortDID);
+	  const parallelSearch = streamEvery( /** @param {import('../../../src/api/akpa').StreamParameters<import('..').CompactPost[] | undefined>} streaming  */
+	  streaming => {
+	    const words = breakIntoWords(searchQuery || '');
+	    words.unshift(searchQuery || '');
+	    keepSearchingInRepository();
+	    for (const word of words) {
+	      searchForWord(word);
+	    }
+	    async function keepSearchingInRepository() {
+	      for await (const batch of indexAccountHistoryPostsFromRepository(args)) {
+	        streaming.yield(batch);
+	      }
+	    }
+
+	    /** @param {string} word */
+	    async function searchForWord(word) {
+	      const wordSearchQuery = 'from:' + unwrapShortHandle(profile?.handle || '') + ' ' + word;
+	      const searchResult = await agent_searchPosts_throttled(wordSearchQuery, undefined, 'latest');
+	      const batch = [];
+	      if (searchResult?.data?.posts?.length) {
+	        for (const postRaw of searchResult.data.posts) {
+	          const post = dbStore.capturePostView(postRaw, Date.now());
+	          if (post) batch.push(post);
+	        }
+	      }
+	      streaming.yield(batch);
+	    }
+	  });
+	  for await (const searchResult of parallelSearch) {
+	    if (searchResult) {
+	      if (!processedBatch) processedBatch = searchResult;else processedBatch = processedBatch.concat(searchResult);
+	    }
+	    if (Date.now() - lastSearchReport > REPORT_UPDATES_FREQUENCY_MSEC) {
+	      /** @type {import('.').IncrementalMatchCompactPosts} */
+	      const newMatches = await dbStore.searchPosts(shortDID, searchQuery);
+	      lastMatches = newMatches;
+	      lastSearchReport = Date.now();
+	      newMatches.processedBatch = processedBatch;
+	      if (!newMatches.processedAllCount) newMatches.processedAllCount = knownHistoryUri.size;
+	      processedBatch = undefined;
+	      yield newMatches;
+	      lastSearchReport = Date.now();
+	    }
+	  }
+
+	  /** @type {import('.').IncrementalMatchCompactPosts} */
+	  const finalMatches = await dbStore.searchPosts(shortDID, searchQuery);
+	  finalMatches.processedBatch = processedBatch;
+	  if (!finalMatches.processedAllCount) finalMatches.processedAllCount = knownHistoryUri.size;
+	  processedBatch = undefined;
+	  yield finalMatches;
+	}
+
+	/**
+	 * @param {Args} args
+	 */
+	async function* indexAccountHistoryPostsFromRepository(args) {
+	  const {
+	    shortDID,
+	    dbStore
+	  } = args;
+	  const plcDirHistoryPromise = plcDirectoryHistoryRaw( /** @type {string} */shortDID);
+
+	  /** @type {import('..').CompactPost[] | undefined}  */
+	  let processedBatch;
 	  const plcDirHistoryRecords = await plcDirHistoryPromise;
 	  dbStore.capturePlcDirectoryEntries(plcDirHistoryRecords);
 	  const profile = await dbStore.getProfile( /** @type {string} */shortDID);
@@ -51016,24 +51114,9 @@ if (cid) {
 	        if (post) {
 	          if (!processedBatch) processedBatch = [post];else processedBatch.push(post);
 	        }
-	        if (!knownHistoryUri.has(rec.uri)) {
-	          knownHistoryUri.add(rec.uri);
-	          anyUpdates = true;
-	        }
 	      }
 	    }
-	    if (anyUpdates || Date.now() - lastSearchReport > REPORT_UPDATES_FREQUENCY_MSEC) {
-	      /** @type {import('.').IncrementalMatchCompactPosts} */
-	      const newMatches = await dbStore.searchPosts(shortDID, searchQuery);
-	      lastMatches = newMatches;
-	      lastSearchReport = Date.now();
-	      anyUpdates = false;
-	      newMatches.processedBatch = processedBatch;
-	      newMatches.processedAllCount = knownHistoryUri.size;
-	      processedBatch = undefined;
-	      yield newMatches;
-	      lastSearchReport = Date.now();
-	    }
+	    yield processedBatch;
 	    if (!moreData?.data?.cursor) break;
 	    cursor = moreData.data.cursor;
 	  }
