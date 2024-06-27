@@ -177,6 +177,10 @@
       const feedUri = breakFeedUri(handle);
       if (feedUri && feedUri.shortDID)
         return feedUri.shortDID;
+      if (handle && handle.lastIndexOf("at://", 0) === 0)
+        handle = handle.slice(5);
+      else
+        handle = handle.slice(3);
     }
     return handle || void 0;
   }
@@ -37944,72 +37948,81 @@ if (cid) {
 
   // lib/plc-directory.js
   function plcDirectory(since, overrides) {
-    return __asyncGenerator(this, null, function* () {
-      const useFetch = (overrides == null ? void 0 : overrides.fetch) || fetch;
-      return streamBuffer((stream) => __async(this, null, function* () {
-        const EXPORT_URL = "https://plc.directory/export";
-        let sinceTime;
-        if (since) {
-          if (typeof since === "string") {
-            since = new Date(since);
-          } else if (typeof since === "number") {
-            since = new Date(since);
-          }
-          if (Number.isFinite(since.getTime()))
-            sinceTime = since.toISOString();
+    const useFetch = (overrides == null ? void 0 : overrides.fetch) || fetch;
+    return streamBuffer((stream) => __async(this, null, function* () {
+      const EXPORT_URL = "https://plc.directory/export";
+      let sinceTime;
+      if (since) {
+        if (typeof since === "string") {
+          since = new Date(since);
+        } else if (typeof since === "number") {
+          since = new Date(since);
         }
-        const lastChunkLines = /* @__PURE__ */ new Set();
-        let lastWaitedForConsumptionAt = Date.now();
-        let collectedEntriesSinceLastWaitedForConsumption = 0;
-        while (true) {
-          const nextChunkRe = yield useFetch(
-            EXPORT_URL + (sinceTime ? "?since=" + sinceTime : "")
-          );
-          if (stream.isEnded)
-            return;
-          const nextChunkText = yield nextChunkRe.text();
-          const chunkLines = nextChunkText.split("\n");
-          let overlap = 0;
-          const nextChunkEnitres = [];
+        if (Number.isFinite(since.getTime()))
+          sinceTime = since.toISOString();
+      }
+      const lastChunkLines = /* @__PURE__ */ new Set();
+      let lastWaitedForConsumptionAt = Date.now();
+      let collectedEntriesSinceLastWaitedForConsumption = 0;
+      while (true) {
+        const nextChunkRe = yield useFetch(
+          EXPORT_URL + (sinceTime ? "?after=" + sinceTime : "")
+        );
+        if (stream.isEnded)
+          return;
+        const nextChunkText = yield nextChunkRe.text();
+        const chunkLines = nextChunkText.split("\n");
+        let overlap = 0;
+        const nextChunkEnitres = [];
+        for (const line of chunkLines) {
+          if (lastChunkLines.has(line)) {
+            overlap++;
+            continue;
+          }
+          if (!line)
+            continue;
+          nextChunkEnitres.push(JSON.parse(line));
+        }
+        if (nextChunkEnitres.length) {
+          lastChunkLines.clear();
           for (const line of chunkLines) {
-            if (lastChunkLines.has(line)) {
-              overlap++;
-              continue;
-            }
-            nextChunkEnitres.push(JSON.parse(line));
+            lastChunkLines.add(line);
           }
-          if (nextChunkEnitres.length) {
-            lastChunkLines.clear();
-            for (const line of chunkLines) {
-              lastChunkLines.add(line);
-            }
-            collectedEntriesSinceLastWaitedForConsumption += nextChunkEnitres.length;
+          collectedEntriesSinceLastWaitedForConsumption += nextChunkEnitres.length;
+        }
+        const waitForConsumption = stream.yield(
+          { entries: nextChunkEnitres, overlap },
+          (buffer2, item) => {
+            if (!buffer2)
+              return item;
+            buffer2.entries = buffer2.entries.concat(item.entries);
+            buffer2.overlap += item.overlap;
+            return buffer2;
           }
-          const waitForConsumption = stream.yield({ entries: nextChunkEnitres });
+        );
+        if (stream.isEnded)
+          return;
+        const shouldWaitForConsumption = collectedEntriesSinceLastWaitedForConsumption > FETCH_AHEAD_COUNT_MAX || Date.now() - lastWaitedForConsumptionAt > FETCH_AHEAD_MSEC_MAX || !nextChunkEnitres.length;
+        if (shouldWaitForConsumption) {
+          yield waitForConsumption;
           if (stream.isEnded)
             return;
-          const shouldWaitForConsumption = collectedEntriesSinceLastWaitedForConsumption > FETCH_AHEAD_COUNT_MAX || Date.now() - lastWaitedForConsumptionAt > FETCH_AHEAD_MSEC_MAX || !nextChunkEnitres.length;
-          if (shouldWaitForConsumption) {
-            yield waitForConsumption;
-            if (stream.isEnded)
-              return;
-          }
-          let nextSinceTime;
-          for (let i = 0; i < nextChunkEnitres.length; i++) {
-            const entry = nextChunkEnitres[nextChunkEnitres.length - i - 1];
-            if (entry.createdAt) {
-              const timestamp = new Date(entry.createdAt);
-              if (!nextSinceTime || timestamp.getTime()) {
-                nextSinceTime = timestamp;
-              } else if (nextSinceTime && timestamp.getTime() && timestamp.getTime() < nextSinceTime.getTime()) {
-                sinceTime = timestamp.toISOString();
-                break;
-              }
+        }
+        let nextSinceTime;
+        for (let i = 0; i < nextChunkEnitres.length; i++) {
+          const entry = nextChunkEnitres[nextChunkEnitres.length - i - 1];
+          if (entry.createdAt) {
+            const timestamp = new Date(entry.createdAt);
+            if (!nextSinceTime && timestamp.getTime()) {
+              nextSinceTime = timestamp;
+            } else if (nextSinceTime && timestamp.getTime() && timestamp.getTime() < nextSinceTime.getTime()) {
+              sinceTime = timestamp.toISOString();
+              break;
             }
           }
         }
-      }));
-    });
+      }
+    }));
   }
   var FETCH_AHEAD_MSEC_MAX, FETCH_AHEAD_COUNT_MAX;
   var init_plc_directory = __esm({
