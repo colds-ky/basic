@@ -1,0 +1,135 @@
+.landing {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 2fr auto 3fr auto;
+}
+
+.landing .landing-top-bar {
+  grid-row: 1;
+  padding: 0.2em;
+}
+
+.landing .landing-handle-band {
+  grid-row: 3;
+  background: linear-gradient(to right, #ffdf4ad9, #ffd8008f);
+  border-top: solid 1.5px #dcca78;
+  border-bottom: solid 1px #1a160082;
+  box-shadow: 0 22px 36px 5px #00000045;
+  backdrop-filter: blur(3px) contrast(0.7);
+  display: grid;
+}
+
+.landing .landing-handle-band:focus-within {
+  background: linear-gradient(to right, #ffe055ec,#ffd8008f);
+}
+
+.landing .landing-handle-band input {
+  padding-left: 0.5em;
+  font-size: 6.7vh;
+
+  /* disable autocomplete shading */
+  -webkit-background-clip: text;
+}
+
+.landing .landing-handle-band label {
+padding-left: 4.5vh;
+  padding-top: 1.5vh;
+  font-style: italic;
+  font-size: 2.5vh;
+}
+
+.landing .landing-auto-completion-area {
+  position: relative;
+  grid-row: 4;
+  align-self: start;
+  justify-self: start;
+  background-color: #e5edfccc;
+  background-image: linear-gradient(178deg, #d7c95e, transparent 21px);
+  padding: 0.5em;
+  padding-right: 0.7em;
+  padding-bottom: 0.25em;
+  margin-left: 0.5em;
+  margin-top: -1vh;
+  z-index: 1;
+  border: solid 1px #2b2b2b;
+  border-top: none;
+  font-size: 2.5vh;
+  font-family: sans-serif;
+  backdrop-filter: blur(3px) contrast(0.7);
+  box-shadow: 0 26px 20px 5px #00000030;
+}
+
+.landing .landing-auto-completion-area .landing-auto-complete-entry {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
+  padding: 0.2em 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.landing .landing-auto-completion-area .landing-auto-complete-entry-post .auto-complete-post-account {
+  display: inline-block;
+}
+
+.landing .landing-auto-completion-area .landing-auto-complete-entry-post .post-entry-first-line {
+  font-style: italic;
+  border: solid 1px cornflowerblue;
+  background: #ffffff85;
+  padding: 0.2em 0.3em;
+  border-radius: 0.2em;
+  margin-left: 0.4em;
+  color: #183691a8;
+}
+
+.landing .landing-auto-completion-area .landing-auto-completion-progress {
+  height: 0.1em;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  bottom: 0;
+  overflow: hidden;
+  transition: color 0.5s;
+}
+
+.landing .landing-auto-completion-area
+  .landing-auto-completion-progress.landing-auto-completion-progress-profile {
+  color: forestgreen;
+}
+
+.landing .landing-auto-completion-area
+  .landing-auto-completion-progress.landing-auto-completion-progress-post {
+  color: tomato;
+}
+
+.landing .landing-auto-completion-area
+  .landing-auto-completion-progress-post.landing-auto-completion-progress.landing-auto-completion-progress-profile {
+  color: cornflowerblue;
+}
+
+.landing .landing-auto-completion-area .landing-auto-completion-progress:before {
+  content: ' ';
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, currentColor 15%, transparent 30%);
+  animation: 2s linear infinite alternate bounce;
+}
+
+@keyframes bounce {
+  from { transform: translateX(0); }
+  to { transform: translateX(70%); }
+}
+
+.landing .landing-bottom-bar {
+  grid-row: 5;
+  padding: 0.2em 0.4em;
+  font-family: sans-serif;
+  color: #bdd4fc;
+  text-shadow: 0 0 14px #0052ff, 0 0 2px black;
+}

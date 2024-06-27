@@ -1,0 +1,12 @@
+.account-avatar.account-avatar-chip {
+  background: no-repeat center center;
+  background-size: cover;
+  color: transparent;
+  border-radius: 200%;
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  margin-right: 0.25em;
+  position: relative;
+  top: -0.15em;
+}

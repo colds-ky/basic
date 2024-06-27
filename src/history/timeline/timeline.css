@@ -1,0 +1,98 @@
+.timeline-container {
+  margin-right: 0.8em;
+  margin-bottom: 1.3em;
+}
+
+.timeline-container > .sub-thread {
+  margin-top: 1.6em;
+}
+
+.timeline-container > .post-frame-outer {
+  margin-left: 1em;
+  margin-top: 1.6em;
+}
+
+.timeline-container .sub-thread {
+  padding-left: 1em;
+}
+
+.timeline-container .timeline-bottom-visibility-spacer {
+  position: relative;
+  pointer-events: none;
+}
+
+.timeline-container .timeline-bottom-visibility-spacer .timeline-bottom-visibility-spacer-inner {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 150vh;
+}
+
+.timeline-container .timeline-footer {
+  width: 100%;
+  text-align: center;
+  padding-left: 1.6em;
+}
+
+.timeline-container .timeline-footer button.footer-button {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  padding-top: 2em;
+  color: gray;
+  animation: 10s linear 1s infinite alternate cycle-colors;
+}
+
+.timeline-container .timeline-footer.timeline-footer-complete button.footer-button,
+  .timeline-container .timeline-footer.timeline-footer-search-complete button.footer-button {
+  color: gray;
+  animation: none;
+}
+
+@keyframes cycle-colors {
+  0% {
+    color: gray;
+  }
+
+  25% {
+    color: #4c00ff;
+  }
+
+  50% {
+    color: #ff2700;
+  }
+
+  75% {
+    color: forestgreen;
+  }
+
+  100% {
+    color: gray;
+  }
+}
+
+.timeline-container .timeline-footer button.footer-button .footer-cog-icon {
+  animation: rotating 2s linear infinite;
+  transition: transform 2s;
+  position: relative;
+  top: 0.3em;
+  left: -0.1em;
+}
+
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.timeline-container .timeline-footer.timeline-footer-complete button.footer-button .footer-cog-icon,
+  .timeline-container .timeline-footer.timeline-footer-search-complete button.footer-button .footer-cog-icon {
+  animation: none;
+  transform: scale(0);
+}
