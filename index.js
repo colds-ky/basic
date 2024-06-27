@@ -2505,9 +2505,9 @@
           if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
             __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
           }
-          var React67 = require_react();
+          var React68 = require_react();
           var Scheduler = require_scheduler();
-          var ReactSharedInternals = React67.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+          var ReactSharedInternals = React68.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
           var suppressWarning = false;
           function setSuppressWarning(newSuppressWarning) {
             {
@@ -4112,7 +4112,7 @@
             {
               if (props.value == null) {
                 if (typeof props.children === "object" && props.children !== null) {
-                  React67.Children.forEach(props.children, function(child) {
+                  React68.Children.forEach(props.children, function(child) {
                     if (child == null) {
                       return;
                     }
@@ -12559,7 +12559,7 @@
             }
           }
           var fakeInternalInstance = {};
-          var emptyRefsObject = new React67.Component().refs;
+          var emptyRefsObject = new React68.Component().refs;
           var didWarnAboutStateAssignmentForComponent;
           var didWarnAboutUninitializedState;
           var didWarnAboutGetSnapshotBeforeUpdateWithoutDidUpdate;
@@ -27011,7 +27011,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
       if (true) {
         (function() {
           "use strict";
-          var React67 = require_react();
+          var React68 = require_react();
           var REACT_ELEMENT_TYPE = Symbol.for("react.element");
           var REACT_PORTAL_TYPE = Symbol.for("react.portal");
           var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
@@ -27037,7 +27037,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
             }
             return null;
           }
-          var ReactSharedInternals = React67.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+          var ReactSharedInternals = React68.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
           function error(format3) {
             {
               {
@@ -27904,7 +27904,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
         value: true
       });
       exports.default = StyledEngineProvider;
-      var React67 = _interopRequireWildcard(require_react());
+      var React68 = _interopRequireWildcard(require_react());
       var _propTypes = _interopRequireDefault(require_prop_types());
       var _react2 = (init_emotion_react_browser_esm(), __toCommonJS(emotion_react_browser_esm_exports));
       var _cache = _interopRequireDefault((init_emotion_cache_browser_esm(), __toCommonJS(emotion_cache_browser_esm_exports)));
@@ -27994,7 +27994,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
         value: true
       });
       exports.default = GlobalStyles3;
-      var React67 = _interopRequireWildcard(require_react());
+      var React68 = _interopRequireWildcard(require_react());
       var _propTypes = _interopRequireDefault(require_prop_types());
       var _react2 = (init_emotion_react_browser_esm(), __toCommonJS(emotion_react_browser_esm_exports));
       var _jsxRuntime = require_jsx_runtime();
@@ -75745,7 +75745,7 @@ if (cid) {
   });
 
   // src/index.js
-  var import_react13 = __toESM(require_react());
+  var import_react14 = __toESM(require_react());
   var import_client = __toESM(require_client());
 
   // node_modules/react-router-dom/dist/index.js
@@ -99467,7 +99467,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // package.json
-  var version4 = "0.2.2";
+  var version4 = "0.2.3";
 
   // src/localise.js
   function localise(english, languageMap) {
@@ -99580,7 +99580,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // src/history/history.js
-  var import_react12 = __toESM(require_react());
+  var import_react13 = __toESM(require_react());
 
   // src/api/unicode-styles/sanitize-for-regex.js
   var regex_escapeableRegexChars = /[#-.]|[[-^]|[?|{}]/g;
@@ -99877,11 +99877,17 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     return plainCh;
   }
 
+  // src/history/timeline.js
+  var import_react12 = __toESM(require_react());
+  function Timeline() {
+    return /* @__PURE__ */ import_react12.default.createElement("button", null, "thread...");
+  }
+
   // src/history/history.js
   var middledot = "\xB7";
   function History() {
     let { handle } = useParams();
-    (0, import_react12.useEffect)(() => {
+    (0, import_react13.useEffect)(() => {
       document.documentElement.classList.add("account");
       if (!handle) {
         document.title = uppercase_GIST;
@@ -99902,7 +99908,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         document.title = title;
       }
     });
-    return /* @__PURE__ */ import_react12.default.createElement(HistoryCore, null);
+    return /* @__PURE__ */ import_react13.default.createElement(HistoryCore, null);
   }
   function HistoryCore() {
     let { handle } = useParams();
@@ -99917,19 +99923,19 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       placeholder: true
     };
     console.log("profile ", resolved);
-    return /* @__PURE__ */ import_react12.default.createElement("div", { className: "history-view" }, /* @__PURE__ */ import_react12.default.createElement(
+    return /* @__PURE__ */ import_react13.default.createElement("div", { className: "history-view" }, /* @__PURE__ */ import_react13.default.createElement(
       "div",
       {
         className: suffixClassWhenEmpty("history-account-banner-bg", resolved.banner),
         style: !resolved.banner ? void 0 : { backgroundImage: `url(${resolved.banner})` }
       }
-    ), /* @__PURE__ */ import_react12.default.createElement(
+    ), /* @__PURE__ */ import_react13.default.createElement(
       "div",
       {
         className: suffixClassWhenEmpty("history-account-avatar", resolved.avatar),
         style: !resolved.avatar ? void 0 : { backgroundImage: `url(${resolved.avatar})` }
       }
-    ), /* @__PURE__ */ import_react12.default.createElement("div", { className: suffixClassWhenEmpty("history-account-displayName-and-handle", resolved.displayName) }, /* @__PURE__ */ import_react12.default.createElement("span", { className: "history-account-displayName" }, resolved.displayName), /* @__PURE__ */ import_react12.default.createElement("div", { className: "history-account-handle" }, /* @__PURE__ */ import_react12.default.createElement("span", { className: "at-sign" }, "@"), /* @__PURE__ */ import_react12.default.createElement(FullHandle, { shortHandle: resolved.handle }))), /* @__PURE__ */ import_react12.default.createElement("div", { className: suffixClassWhenEmpty("history-account-description", resolved.description) }, resolved.description));
+    ), /* @__PURE__ */ import_react13.default.createElement("div", { className: suffixClassWhenEmpty("history-account-displayName-and-handle", resolved.displayName) }, /* @__PURE__ */ import_react13.default.createElement("span", { className: "history-account-displayName" }, resolved.displayName), /* @__PURE__ */ import_react13.default.createElement("div", { className: "history-account-handle" }, /* @__PURE__ */ import_react13.default.createElement("span", { className: "at-sign" }, "@"), /* @__PURE__ */ import_react13.default.createElement(FullHandle, { shortHandle: resolved.handle }))), /* @__PURE__ */ import_react13.default.createElement("div", { className: suffixClassWhenEmpty("history-account-description", resolved.description) }, resolved.description), /* @__PURE__ */ import_react13.default.createElement("div", { className: "timeline-container" }, /* @__PURE__ */ import_react13.default.createElement(Timeline, null), /* @__PURE__ */ import_react13.default.createElement("pre", null, JSON.stringify(resolved, null, 2), /* @__PURE__ */ import_react13.default.createElement("hr", null), /* @__PURE__ */ import_react13.default.createElement("div", { style: { opacity: 0.6 } }, JSON.stringify(resolved, null, 2)), /* @__PURE__ */ import_react13.default.createElement("br", null), /* @__PURE__ */ import_react13.default.createElement("br", null), /* @__PURE__ */ import_react13.default.createElement("hr", null), JSON.stringify(resolved, null, 2))));
   }
   function suffixClassWhenEmpty(className, value) {
     return value ? className : className + " " + className + "-empty";
@@ -99941,9 +99947,9 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     const useRouter = /file/i.test(location.protocol) ? createHashRouter : createBrowserRouter;
     const router = useRouter(
       [
-        { path: "/", element: /* @__PURE__ */ import_react13.default.createElement(Landing, null) },
-        { path: "/index.html", element: /* @__PURE__ */ import_react13.default.createElement(Landing, null) },
-        { path: "/:handle", element: /* @__PURE__ */ import_react13.default.createElement(History, null) }
+        { path: "/", element: /* @__PURE__ */ import_react14.default.createElement(Landing, null) },
+        { path: "/index.html", element: /* @__PURE__ */ import_react14.default.createElement(Landing, null) },
+        { path: "/:handle", element: /* @__PURE__ */ import_react14.default.createElement(History, null) }
       ],
       {
         basename
@@ -99975,7 +99981,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       }
     });
     (0, import_client.createRoot)(root).render(
-      /* @__PURE__ */ import_react13.default.createElement(ThemeProvider5, { theme }, /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(RouterProvider, { router })))
+      /* @__PURE__ */ import_react14.default.createElement(ThemeProvider5, { theme }, /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Fragment, null, /* @__PURE__ */ import_react14.default.createElement(RouterProvider, { router })))
     );
   }
   runApp();

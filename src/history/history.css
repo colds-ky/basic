@@ -1,6 +1,10 @@
+html.account body {
+  overflow: auto;
+}
+
 .history-view {
   display: grid;
-  grid-template-rows: 20vh 7vh 7vh 14vh 1fr;
+  grid-template-rows: 20vh 7vh 7vh auto 1fr;
   grid-template-columns: 14vh 1fr;
   min-height: 100vh;
 }
@@ -77,4 +81,9 @@
   z-index: 4;
   position: relative;
   margin-top: 1vh;
+}
+
+.history-view .timeline-container {
+  grid-row: 5;
+  grid-column: 1 / 3;
 }

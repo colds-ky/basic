@@ -12,6 +12,7 @@ import { FullHandle, breakHandleParts } from '../widgets/account/full-handle';
 
 import './history.css';
 import { applyModifier } from '../api/unicode-styles/apply-modifier';
+import { Timeline } from './timeline';
 
 const middledot = '\u00B7';
 
@@ -95,6 +96,22 @@ function HistoryCore() {
 
       <div className={suffixClassWhenEmpty('history-account-description', resolved.description)}>
         {resolved.description}
+      </div>
+
+      <div className='timeline-container'>
+        <Timeline />
+        <pre>
+          {JSON.stringify(resolved, null, 2)}
+          <hr />
+          <div style={{ opacity: 0.6 }}>
+            {JSON.stringify(resolved, null, 2)}
+          </div>
+
+          <br /><br />
+          <hr />
+          {JSON.stringify(resolved, null, 2)}
+          
+        </pre>
       </div>
 
     </div>
