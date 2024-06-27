@@ -1,0 +1,3 @@
+[submodule "basic"]
+	path = basic
+	url = https://github.com/colds-ky/basic
