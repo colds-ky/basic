@@ -119,6 +119,7 @@ function esbuildBuilder() {
 
   async function buildLib(mode) {
 
+    /** @type {esbuild.BuildOptions} */
     const options = {
       ...baseOptions,
       format: 'esm',
@@ -162,7 +163,7 @@ function esbuildBuilder() {
 
   async function buildSite(mode) {
 
-    const options = {
+    const gistingOptions = {
       ...baseOptions,
       entryPoints: ['gisting/index.js'],
       outfile: 'gisting/dist/index.js',
@@ -178,23 +179,62 @@ function esbuildBuilder() {
         }]
     };
 
+    const coldskyOptions = {
+      ...baseOptions,
+      entryPoints: ['coldsky/index.js'],
+      outfile: 'coldsky/dist/index.js',
+      plugins: [
+        {
+          name: 'post-export',
+          /** @param {esbuild.PluginBuild} build */
+          setup(build) {
+            build.onStart(result => {
+              printBanner('COLDSKY-SITE');
+            });
+          }
+        }]
+    };
+
     if (mode === 'serve') {
-      const ctx = await esbuild.context(options);
-      const server = await ctx.serve({
-        servedir: path.resolve(__dirname, 'gisting/dist'),
-        fallback: 'index.html'
-      });
-      await ctx.watch();
-      console.log('SERVING SITE http://' + (server.host === '0.0.0.0' ? 'localhost' : server.host) + ':' + server.port + '/');
+      (async () => {
+        const gistingCtx = await esbuild.context(gistingOptions);
+        const gistingServer = await gistingCtx.serve({
+          servedir: path.resolve(__dirname, 'gisting/dist'),
+          fallback: 'index.html'
+        });
+        await gistingCtx.watch();
+        console.log('SERVING SITE http://' + (gistingServer.host === '0.0.0.0' ? 'localhost' : gistingServer.host) + ':' + gistingServer.port + '/');
+      })();
+
+      (async () => {
+        const coldskyCtx = await esbuild.context(coldskyOptions);
+        const coldskyServer = await coldskyCtx.serve({
+          servedir: path.resolve(__dirname, 'coldsky/dist'),
+          fallback: 'index.html',
+          port: 8081
+        });
+        await coldskyCtx.watch();
+        console.log('SERVING CODSKY SITE http://' + (coldskyServer.host === '0.0.0.0' ? 'localhost' : coldskyServer.host) + ':' + coldskyServer.port + '/');
+      })();
+
     } else if (mode === 'watch') {
-      const ctx = await esbuild.context(options);
-      await ctx.watch();
-      console.log('WATCHING SITE...');
+      (async () => {
+        const gistingCtx = await esbuild.context(gistingOptions);
+        await gistingCtx.watch();
+        console.log('WATCHING SITE...');
+      })();
+
+      (async () => {
+        const coldskyCtx = await esbuild.context(coldskyOptions);
+        await coldskyCtx.watch();
+        console.log('WATCHING COLDSKY SITE...');
+      })();
+
     } else {
-      await esbuild.build(options);
+      await esbuild.build(coldskyOptions);
     }
   }
 
-  // buildLib(mode);
+  buildLib(mode);
   buildSite(mode);
 }
