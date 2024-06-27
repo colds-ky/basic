@@ -14,6 +14,8 @@ import { useDB } from '../..';
 import { forAwait } from '../../../coldsky/src/api/forAwait';
 import { Link } from 'react-router-dom';
 import { PostEmbedsSection } from './embedded';
+import { AccountChip } from '../account/account-chip';
+import { PostTextContent } from './post-text-content';
 
 /**
  * @typedef {import('../../../coldsky/lib').MatchCompactPost} MatchCompactPost
@@ -135,24 +137,7 @@ function LoadedPost({ post, compact, linkTimestamp, linkAuthor, allowEmbedDepth 
         <span className='post-author-right-overlay'></span>
         <PostTimestamp post={post} linkTimestamp={linkTimestamp} />
       </div>
-      <PreFormatted
-        className='post-content'
-        text={post.text}
-        charClass={(offset, wholeString, ch) => {
-          post.matches;
-          if (!post.facets?.length) return null;
-          for (const facet of post.facets) {
-            if (offset >= facet.start && offset < facet.start + facet.length) {
-              return 'facet-' + (
-                facet.tag ? facet.tag :
-                  facet.mention ? 'mention' :
-                    facet.url ? 'url' :
-                      'other'
-              );
-            }
-          }
-        }}
-      />
+      <PostTextContent post={post} />
       <PostEmbedsSection
         post={post}
         compact={compact}

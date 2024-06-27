@@ -1,0 +1,11 @@
+.search-match-highly-relevant {
+  background: gold;
+  border-radius: 0.3em;
+  padding: 0 0.1em;
+  margin: 0 -0.1em;
+}
+
+.search-match-relevant {
+  background-image: linear-gradient(to top, #ffcd70, transparent 0.6em);
+  border-radius: 0.2em;
+}

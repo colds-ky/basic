@@ -8,76 +8,108 @@ import React from 'react';
  *  className?: string,
  *  Component?: any,
  *  ParagraphComponent?: any,
+ *  InlineComponent?: any,
  *  BreakComponent?: any,
- *  charClass?: (offset: number, wholeString: string, ch: string) => string | null | undefined
+ *  charClass?: (offset: number, wholeString: string, ch: string) => string | { toString(): string } | null | undefined
  * }} _
  */
-export function PreFormatted({ text, className, Component, ParagraphComponent, BreakComponent, charClass}) {
+export function PreFormatted({
+  text,
+  className,
+  Component,
+  ParagraphComponent,
+  InlineComponent,
+  BreakComponent,
+  charClass }) {
   if (!text) return null;
 
   const UseComponent = Component || 'div';
   const UseParagraphComponent = ParagraphComponent || 'p';
+  const UseInlineComponent = InlineComponent || 'span';
   const UseBreakComponent = BreakComponent || 'br';
 
-  const entries = [];
   const codePoints = [...text];
   let spanStart = 0;
-  /** @type {string} */
+  /** @type {{ toString(): string }} */
   let spanClassName = '';
+  let lineBreakCount = 0;
   let offset = 0;
-  /** @type {string[] | undefined} */
-  let trailingBreaks;
+
+  let paragraphs = [];
+  let spans = [];
+
   for (let iCp = 0; iCp < codePoints.length; iCp++) {
     const cp = codePoints[iCp];
 
     if (NEWLINE_REGEX.test(cp)) {
-      if (trailingBreaks) trailingBreaks.push(cp);
-      else {
+      if (!lineBreakCount) {
         if (spanStart < offset) {
-          entries.push(
-            <UseParagraphComponent key={entries.length} className={spanClassName}>
-              {text.slice(spanStart, offset).replace('  ', '\u00A0 ')}
-            </UseParagraphComponent>);
+          let spanText = text.slice(spanStart, offset).replace('  ', '\u00A0 ');
+          if (!paragraphs.length && !spans.length) spanText = spanText.trimStart();
+          spans.push(
+            <UseInlineComponent key={spans.length} className={spanClassName}>
+              {spanText}
+            </UseInlineComponent>);
         }
-        trailingBreaks = [cp];
+        if (spans.length) {
+          paragraphs.push(
+            <UseParagraphComponent key={paragraphs.length}>
+              {spans}
+            </UseParagraphComponent>);
+          spans = [];
+        }
       }
+
+      offset += cp.length;
       spanStart = offset;
-    } else if (trailingBreaks?.length) {
-      appendLineBreak(trailingBreaks, entries, UseBreakComponent);
-      spanStart = offset;
-      spanClassName = typeof charClass === 'function' ? charClass(offset, text, cp) || '' : '';
+
+      lineBreakCount++;
     } else {
-      trailingBreaks = undefined;
+      while (lineBreakCount > 1) {
+        lineBreakCount--;
+        paragraphs.push(<UseBreakComponent key={paragraphs.length} />);
+      }
+
       const currentClassName = typeof charClass === 'function' ? charClass(offset, text, cp) || '' : '';
-      if (currentClassName !== spanClassName) {
+      if (String(currentClassName) !== String(spanClassName)) {
         if (spanStart < offset) {
-          entries.push(
-            <UseParagraphComponent key={entries.length} className={spanClassName}>
-              {text.slice(spanStart, offset).replace('  ', '\u00A0 ')}
-            </UseParagraphComponent>);
+          let spanText = text.slice(spanStart, offset).replace('  ', '\u00A0 ');
+          if (!paragraphs.length && !spans.length) spanText = spanText.trimStart();
+
+          spans.push(
+            <UseInlineComponent key={spans.length} className={spanClassName}>
+              {spanText}
+            </UseInlineComponent>);
         }
+
         spanStart = offset;
         spanClassName = currentClassName;
       }
-    }
 
-    offset += cp.length;
+      offset += cp.length;
+    }
   }
 
-  if (trailingBreaks?.length) {
-    appendLineBreak(trailingBreaks, entries, UseBreakComponent);
-  } else if (spanStart < offset) {
-    if (spanStart < text.length) {
-      entries.push(
-        <UseParagraphComponent key={entries.length} className={spanClassName}>
-          {text.slice(spanStart).replace('  ', '\u00A0 ')}
-        </UseParagraphComponent>);
-    }
+  if (spanStart < offset) {
+    let spanText = text.slice(spanStart, offset).replace('  ', '\u00A0 ');
+    if (!paragraphs.length && !spans.length) spanText = spanText.trimStart();
+
+    spans.push(
+      <UseInlineComponent key={spans.length} className={spanClassName}>
+        {spanText}
+      </UseInlineComponent>);
+  }
+
+  if (spans.length) {
+    paragraphs.push(
+      <UseParagraphComponent key={paragraphs.length}>
+        {spans}
+      </UseParagraphComponent>);
   }
 
   return (
     <UseComponent className={className}>
-      {entries}
+      {paragraphs}
     </UseComponent>
   );
 }

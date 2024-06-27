@@ -105,6 +105,12 @@ export function Timeline({ shortDID, searchQuery }) {
 
         entries.sort((p1, p2) => (p2.asOf || 0) - (p1.asOf || 0));
 
+        /** @type {Map<string, import('../../coldsky/lib').CompactPost>} */
+        const searchMatchPosts = new Map();
+        for (const post of entries) {
+          searchMatchPosts.set(post.uri, post);
+        }
+
         for (const post of entries) {
           if (seenPosts.has(post.threadStart || post.uri)) continue;
           seenPosts.add(post.threadStart || post.uri);
@@ -115,6 +121,12 @@ export function Timeline({ shortDID, searchQuery }) {
           }
 
           if (!postThreadRetrieved) continue;
+          postThreadRetrieved = {
+            ...postThreadRetrieved,
+            all: postThreadRetrieved.all.map(post => searchMatchPosts.get(post.uri) || post),
+            current: searchMatchPosts.get(postThreadRetrieved.current.uri) || postThreadRetrieved.current,
+            root: searchMatchPosts.get(postThreadRetrieved.root.uri) || postThreadRetrieved.root
+          };
 
           historicalPostThreads.push(postThreadRetrieved);
           yield { timeline: historicalPostThreads, cachedOnly: entries.cachedOnly };

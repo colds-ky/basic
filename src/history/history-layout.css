@@ -211,13 +211,14 @@
 }
 
 .history-layout .history-search-bar #history-search-input {
-    border: none;
-    outline: none;
-    font-size: 110%;
-    background: transparent;
-    padding-left: 1em;
-    padding-right: 0.5em;
-    color: #725600;
+  border: none;
+  outline: none;
+  font-size: 110%;
+  background: transparent;
+  padding-left: 0.4em;
+  padding-right: 0;
+  color: #725600;
+  width: 100%;
 }
 
 @media (min-aspect-ratio: 5.5/5) {

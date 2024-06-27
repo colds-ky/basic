@@ -341,6 +341,36 @@
   border-top: none;
 }
 
+/* src/widgets/account/account-chip.css */
+.account-avatar.account-avatar-chip {
+  background: no-repeat center center;
+  background-size: cover;
+  color: transparent;
+  border-radius: 200%;
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  margin-right: 0.25em;
+  position: relative;
+  top: -0.15em;
+}
+
+/* src/widgets/post/post-text-content.css */
+.search-match-highly-relevant {
+  background: gold;
+  border-radius: 0.3em;
+  padding: 0 0.1em;
+  margin: 0 -0.1em;
+}
+.search-match-relevant {
+  background-image:
+    linear-gradient(
+      to top,
+      #ffcd70,
+      transparent 0.6em);
+  border-radius: 0.2em;
+}
+
 /* src/landing/landing.css */
 .landing {
   position: fixed;
@@ -477,20 +507,6 @@
   font-family: sans-serif;
   color: #bdd4fc;
   text-shadow: 0 0 14px #0052ff, 0 0 2px black;
-}
-
-/* src/widgets/account/account-chip.css */
-.account-avatar.account-avatar-chip {
-  background: no-repeat center center;
-  background-size: cover;
-  color: transparent;
-  border-radius: 200%;
-  display: inline-block;
-  width: 1.5em;
-  height: 1.5em;
-  margin-right: 0.25em;
-  position: relative;
-  top: -0.15em;
 }
 
 /* src/widgets/post/thread.css */
@@ -735,9 +751,10 @@
   outline: none;
   font-size: 110%;
   background: transparent;
-  padding-left: 1em;
-  padding-right: 0.5em;
+  padding-left: 0.4em;
+  padding-right: 0;
   color: #725600;
+  width: 100%;
 }
 @media (min-aspect-ratio: 5.5/5) {
   .history-layout {
