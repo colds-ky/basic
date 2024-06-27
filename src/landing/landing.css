@@ -16,11 +16,15 @@
 .landing .landing-handle-band {
   grid-row: 3;
   background: linear-gradient(to right, #b2cdffd9, #1667ff8f);
-  border-top: solid 1px #8eb6ff;
+  border-top: solid 1.5px #789cdc;
   border-bottom: solid 1px #8eb6ff;
   box-shadow: 0 8px 20px 5px #00000030;
   backdrop-filter: blur(3px) contrast(0.7);
   display: grid;
+}
+
+.landing .landing-handle-band:focus-within {
+  background: linear-gradient(to right, #c3d8fff5, #1667ff8f);
 }
 
 .landing .landing-handle-band input {
