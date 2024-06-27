@@ -1,0 +1,44 @@
+.landing {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 2fr auto 3fr auto;
+}
+
+.landing .landing-top-bar {
+  grid-row: 1;
+  padding: 0.2em;
+}
+
+.landing .landing-handle-band {
+  grid-row: 3;
+  background: linear-gradient(to right, #b2cdffd9, #1667ff8f);
+  border-top: solid 1px #8eb6ff;
+  border-bottom: solid 1px #8eb6ff;
+  box-shadow: 0 8px 20px 5px #00000030;
+  backdrop-filter: blur(3px) contrast(0.7);
+  display: grid;
+}
+
+.landing .landing-handle-band input {
+  padding-left: 0.5em;
+  font-size: 6.7vw;
+}
+
+.landing .landing-handle-band label {
+  padding-left: 4.5vw;
+  padding-top: 2vh;
+  font-style: italic;
+}
+
+.landing .landing-auto-completion-area {
+  grid-row: 4;
+}
+
+.landing .landing-bottom-bar {
+  grid-row: 5;
+  padding: 0.2em;
+}
