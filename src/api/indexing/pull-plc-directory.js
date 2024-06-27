@@ -32,10 +32,6 @@ export async function pullPLCDirectoryCompact() {
   let firstLoaded = true;
   for await (const progress of run) {
     const reportProgress = { registrations: 0 };
-    if (progress.stores) {
-      for (const sto of progress.stores)
-        reportProgress.registrations += sto.size;
-    }
 
     if (progress.affectedStores) reportProgress.affectedStores = progress.affectedStores.map(store => store.file);
     if (progress.earliestRegistration) reportProgress.earliestRegistration = new Date(progress.earliestRegistration);
@@ -43,6 +39,11 @@ export async function pullPLCDirectoryCompact() {
     if (progress.latestAction) reportProgress.latestAction = new Date(progress.latestAction);
     if (progress.addedShortDIDs) reportProgress.addedShortDIDs = progress.addedShortDIDs.length;
     if (progress.affectedShortDIDs) reportProgress.affectedShortDIDs = progress.affectedShortDIDs.length;
+
+    if (progress.stores) {
+      for (const sto of progress.stores)
+        reportProgress.registrations += sto.size;
+    }
 
     if (firstLoaded && progress.loadedAllStores) {
       firstLoaded = false;
