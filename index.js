@@ -866,12 +866,12 @@
             if (children == null) {
               return children;
             }
-            var result = [];
+            var result2 = [];
             var count = 0;
-            mapIntoArray(children, result, "", "", function(child) {
+            mapIntoArray(children, result2, "", "", function(child) {
               return func.call(context, child, count++);
             });
-            return result;
+            return result2;
           }
           function countChildren(children) {
             var n2 = 0;
@@ -1825,10 +1825,10 @@
                 ReactCurrentActQueue.current = [];
               }
               var prevIsBatchingLegacy = ReactCurrentActQueue.isBatchingLegacy;
-              var result;
+              var result2;
               try {
                 ReactCurrentActQueue.isBatchingLegacy = true;
-                result = callback();
+                result2 = callback();
                 if (!prevIsBatchingLegacy && ReactCurrentActQueue.didScheduleLegacyUpdate) {
                   var queue = ReactCurrentActQueue.current;
                   if (queue !== null) {
@@ -1842,8 +1842,8 @@
               } finally {
                 ReactCurrentActQueue.isBatchingLegacy = prevIsBatchingLegacy;
               }
-              if (result !== null && typeof result === "object" && typeof result.then === "function") {
-                var thenableResult = result;
+              if (result2 !== null && typeof result2 === "object" && typeof result2.then === "function") {
+                var thenableResult = result2;
                 var wasAwaited = false;
                 var thenable = {
                   then: function(resolve, reject) {
@@ -1874,7 +1874,7 @@
                 }
                 return thenable;
               } else {
-                var returnValue = result;
+                var returnValue = result2;
                 popActScope(prevActScopeDepth);
                 if (actScopeDepth === 0) {
                   var _queue = ReactCurrentActQueue.current;
@@ -33391,9 +33391,9 @@
           return this._cachedPath;
         }
       };
-      var handleResult = (ctx, result) => {
-        if (isValid(result)) {
-          return { success: true, data: result.value };
+      var handleResult = (ctx, result2) => {
+        if (isValid(result2)) {
+          return { success: true, data: result2.value };
         } else {
           if (!ctx.common.issues.length) {
             throw new Error("Validation failed but no issues detected.");
@@ -33487,21 +33487,21 @@
           };
         }
         _parseSync(input) {
-          const result = this._parse(input);
-          if (isAsync(result)) {
+          const result2 = this._parse(input);
+          if (isAsync(result2)) {
             throw new Error("Synchronous parse encountered promise.");
           }
-          return result;
+          return result2;
         }
         _parseAsync(input) {
-          const result = this._parse(input);
-          return Promise.resolve(result);
+          const result2 = this._parse(input);
+          return Promise.resolve(result2);
         }
         parse(data, params2) {
-          const result = this.safeParse(data, params2);
-          if (result.success)
-            return result.data;
-          throw result.error;
+          const result2 = this.safeParse(data, params2);
+          if (result2.success)
+            return result2.data;
+          throw result2.error;
         }
         safeParse(data, params2) {
           var _a2;
@@ -33517,15 +33517,15 @@
             data,
             parsedType: getParsedType(data)
           };
-          const result = this._parseSync({ data, path: ctx.path, parent: ctx });
-          return handleResult(ctx, result);
+          const result2 = this._parseSync({ data, path: ctx.path, parent: ctx });
+          return handleResult(ctx, result2);
         }
         parseAsync(data, params2) {
           return __async(this, null, function* () {
-            const result = yield this.safeParseAsync(data, params2);
-            if (result.success)
-              return result.data;
-            throw result.error;
+            const result2 = yield this.safeParseAsync(data, params2);
+            if (result2.success)
+              return result2.data;
+            throw result2.error;
           });
         }
         safeParseAsync(data, params2) {
@@ -33543,8 +33543,8 @@
               parsedType: getParsedType(data)
             };
             const maybeAsyncResult = this._parse({ data, path: ctx.path, parent: ctx });
-            const result = yield isAsync(maybeAsyncResult) ? maybeAsyncResult : Promise.resolve(maybeAsyncResult);
-            return handleResult(ctx, result);
+            const result2 = yield isAsync(maybeAsyncResult) ? maybeAsyncResult : Promise.resolve(maybeAsyncResult);
+            return handleResult(ctx, result2);
           });
         }
         refine(check, message) {
@@ -33558,12 +33558,12 @@
             }
           };
           return this._refinement((val, ctx) => {
-            const result = check(val);
+            const result2 = check(val);
             const setError = () => ctx.addIssue(__spreadValues({
               code: ZodIssueCode.custom
             }, getIssueProperties(val)));
-            if (typeof Promise !== "undefined" && result instanceof Promise) {
-              return result.then((data) => {
+            if (typeof Promise !== "undefined" && result2 instanceof Promise) {
+              return result2.then((data) => {
                 if (!data) {
                   setError();
                   return false;
@@ -33572,7 +33572,7 @@
                 }
               });
             }
-            if (!result) {
+            if (!result2) {
               setError();
               return false;
             } else {
@@ -34793,14 +34793,14 @@
           if (ctx.common.async) {
             return Promise.all([...ctx.data].map((item, i2) => {
               return def2.type._parseAsync(new ParseInputLazyPath(ctx, item, ctx.path, i2));
-            })).then((result2) => {
-              return ParseStatus.mergeArray(status, result2);
+            })).then((result22) => {
+              return ParseStatus.mergeArray(status, result22);
             });
           }
-          const result = [...ctx.data].map((item, i2) => {
+          const result2 = [...ctx.data].map((item, i2) => {
             return def2.type._parseSync(new ParseInputLazyPath(ctx, item, ctx.path, i2));
           });
-          return ParseStatus.mergeArray(status, result);
+          return ParseStatus.mergeArray(status, result2);
         }
         get element() {
           return this._def.type;
@@ -35097,18 +35097,18 @@
           const { ctx } = this._processInputParams(input);
           const options = this._def.options;
           function handleResults(results) {
-            for (const result of results) {
-              if (result.result.status === "valid") {
-                return result.result;
+            for (const result2 of results) {
+              if (result2.result.status === "valid") {
+                return result2.result;
               }
             }
-            for (const result of results) {
-              if (result.result.status === "dirty") {
-                ctx.common.issues.push(...result.ctx.common.issues);
-                return result.result;
+            for (const result2 of results) {
+              if (result2.result.status === "dirty") {
+                ctx.common.issues.push(...result2.ctx.common.issues);
+                return result2.result;
               }
             }
-            const unionErrors = results.map((result) => new ZodError(result.ctx.common.issues));
+            const unionErrors = results.map((result2) => new ZodError(result2.ctx.common.issues));
             addIssueToContext(ctx, {
               code: ZodIssueCode.invalid_union,
               unionErrors
@@ -35142,15 +35142,15 @@
                 }),
                 parent: null
               });
-              const result = option._parseSync({
+              const result2 = option._parseSync({
                 data: ctx.data,
                 path: ctx.path,
                 parent: childCtx
               });
-              if (result.status === "valid") {
-                return result;
-              } else if (result.status === "dirty" && !dirty) {
-                dirty = { result, ctx: childCtx };
+              if (result2.status === "valid") {
+                return result2;
+              } else if (result2.status === "dirty" && !dirty) {
+                dirty = { result: result2, ctx: childCtx };
               }
               if (childCtx.common.issues.length) {
                 issues.push(childCtx.common.issues);
@@ -35668,9 +35668,9 @@
                 error.addIssue(makeArgsIssue(args, e2));
                 throw error;
               });
-              const result = yield fn(...parsedArgs);
-              const parsedReturns = yield this._def.returns._def.type.parseAsync(result, params2).catch((e2) => {
-                error.addIssue(makeReturnsIssue(result, e2));
+              const result2 = yield fn(...parsedArgs);
+              const parsedReturns = yield this._def.returns._def.type.parseAsync(result2, params2).catch((e2) => {
+                error.addIssue(makeReturnsIssue(result2, e2));
                 throw error;
               });
               return parsedReturns;
@@ -35681,10 +35681,10 @@
               if (!parsedArgs.success) {
                 throw new ZodError([makeArgsIssue(args, parsedArgs.error)]);
               }
-              const result = fn(...parsedArgs.data);
-              const parsedReturns = this._def.returns.safeParse(result, params2);
+              const result2 = fn(...parsedArgs.data);
+              const parsedReturns = this._def.returns.safeParse(result2, params2);
               if (!parsedReturns.success) {
-                throw new ZodError([makeReturnsIssue(result, parsedReturns.error)]);
+                throw new ZodError([makeReturnsIssue(result2, parsedReturns.error)]);
               }
               return parsedReturns.data;
             });
@@ -35930,11 +35930,11 @@
           checkCtx.addIssue = checkCtx.addIssue.bind(checkCtx);
           if (effect.type === "refinement") {
             const executeRefinement = (acc) => {
-              const result = effect.refinement(acc, checkCtx);
+              const result2 = effect.refinement(acc, checkCtx);
               if (ctx.common.async) {
-                return Promise.resolve(result);
+                return Promise.resolve(result2);
               }
-              if (result instanceof Promise) {
+              if (result2 instanceof Promise) {
                 throw new Error("Async refinement encountered during synchronous parse operation. Use .parseAsync instead.");
               }
               return acc;
@@ -35972,16 +35972,16 @@
               });
               if (!isValid(base3))
                 return base3;
-              const result = effect.transform(base3.value, checkCtx);
-              if (result instanceof Promise) {
+              const result2 = effect.transform(base3.value, checkCtx);
+              if (result2 instanceof Promise) {
                 throw new Error(`Asynchronous transform encountered during synchronous parse operation. Use .parseAsync instead.`);
               }
-              return { status: status.value, value: result };
+              return { status: status.value, value: result2 };
             } else {
               return this._def.schema._parseAsync({ data: ctx.data, path: ctx.path, parent: ctx }).then((base3) => {
                 if (!isValid(base3))
                   return base3;
-                return Promise.resolve(effect.transform(base3.value, checkCtx)).then((result) => ({ status: status.value, value: result }));
+                return Promise.resolve(effect.transform(base3.value, checkCtx)).then((result2) => ({ status: status.value, value: result2 }));
               });
             }
           }
@@ -36070,16 +36070,16 @@
               issues: []
             })
           });
-          const result = this._def.innerType._parse({
+          const result2 = this._def.innerType._parse({
             data: newCtx.data,
             path: newCtx.path,
             parent: __spreadValues({}, newCtx)
           });
-          if (isAsync(result)) {
-            return result.then((result2) => {
+          if (isAsync(result2)) {
+            return result2.then((result22) => {
               return {
                 status: "valid",
-                value: result2.status === "valid" ? result2.value : this._def.catchValue({
+                value: result22.status === "valid" ? result22.value : this._def.catchValue({
                   get error() {
                     return new ZodError(newCtx.common.issues);
                   },
@@ -36090,7 +36090,7 @@
           } else {
             return {
               status: "valid",
-              value: result.status === "valid" ? result.value : this._def.catchValue({
+              value: result2.status === "valid" ? result2.value : this._def.catchValue({
                 get error() {
                   return new ZodError(newCtx.common.issues);
                 },
@@ -37383,8 +37383,8 @@ if (cid) {
         }
         digest(input) {
           if (input instanceof Uint8Array) {
-            const result = this.encode(input);
-            return result instanceof Uint8Array ? create(this.code, result) : result.then((digest2) => create(this.code, digest2));
+            const result2 = this.encode(input);
+            return result2 instanceof Uint8Array ? create(this.code, result2) : result2.then((digest2) => create(this.code, digest2));
           } else {
             throw Error("Unknown type, must be binary type");
           }
@@ -38185,11 +38185,11 @@ if (cid) {
           concreteDefs = toConcreteTypes(lexicons2, def2);
         }
         for (const concreteDef of concreteDefs) {
-          const result = mustBeObj ? object(lexicons2, path, concreteDef, value) : validate2(lexicons2, path, concreteDef, value);
-          if (result.success) {
-            return result;
+          const result2 = mustBeObj ? object(lexicons2, path, concreteDef, value) : validate2(lexicons2, path, concreteDef, value);
+          if (result2.success) {
+            return result2;
           }
-          error != null ? error : error = result.error;
+          error != null ? error : error = result2.error;
         }
         if (concreteDefs.length > 1) {
           return {
@@ -52504,9 +52504,9 @@ if (cid) {
         return JSON.parse(JSON.stringify(v));
       }
       var ModerationDecision = class {
-        constructor(cause = void 0, alert = false, blur = false, blurMedia = false, filter = false, noOverride = false, additionalCauses = [], did2 = "") {
+        constructor(cause = void 0, alert2 = false, blur = false, blurMedia = false, filter = false, noOverride = false, additionalCauses = [], did2 = "") {
           this.cause = cause;
-          this.alert = alert;
+          this.alert = alert2;
           this.blur = blur;
           this.blurMedia = blurMedia;
           this.filter = filter;
@@ -54416,12 +54416,12 @@ if (cid) {
         }
         if (kind === "after") {
           hook5 = function(method, options) {
-            var result;
+            var result2;
             return Promise.resolve().then(method.bind(null, options)).then(function(result_) {
-              result = result_;
-              return orig(result, options);
+              result2 = result_;
+              return orig(result2, options);
             }).then(function() {
-              return result;
+              return result2;
             });
           };
         }
@@ -54537,18 +54537,18 @@ if (cid) {
     return typeof Ctor === "function" && Ctor instanceof Ctor && Function.prototype.call(Ctor) === Function.prototype.call(value);
   }
   function mergeDeep(defaults, options) {
-    const result = Object.assign({}, defaults);
+    const result2 = Object.assign({}, defaults);
     Object.keys(options).forEach((key) => {
       if (isPlainObject(options[key])) {
         if (!(key in defaults))
-          Object.assign(result, { [key]: options[key] });
+          Object.assign(result2, { [key]: options[key] });
         else
-          result[key] = mergeDeep(defaults[key], options[key]);
+          result2[key] = mergeDeep(defaults[key], options[key]);
       } else {
-        Object.assign(result, { [key]: options[key] });
+        Object.assign(result2, { [key]: options[key] });
       }
     });
-    return result;
+    return result2;
   }
   function removeUndefinedProperties(obj) {
     for (const key in obj) {
@@ -54604,13 +54604,13 @@ if (cid) {
     return matches.map(removeNonChars).reduce((a2, b) => a2.concat(b), []);
   }
   function omit(object, keysToOmit) {
-    const result = { __proto__: null };
+    const result2 = { __proto__: null };
     for (const key of Object.keys(object)) {
       if (keysToOmit.indexOf(key) === -1) {
-        result[key] = object[key];
+        result2[key] = object[key];
       }
     }
-    return result;
+    return result2;
   }
   function encodeReserved(str) {
     return str.split(/(%[0-9A-Fa-f]{2})/g).map(function(part) {
@@ -54640,28 +54640,28 @@ if (cid) {
     return operator === ";" || operator === "&" || operator === "?";
   }
   function getValues(context, operator, key, modifier) {
-    var value = context[key], result = [];
+    var value = context[key], result2 = [];
     if (isDefined(value) && value !== "") {
       if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
         value = value.toString();
         if (modifier && modifier !== "*") {
           value = value.substring(0, parseInt(modifier, 10));
         }
-        result.push(
+        result2.push(
           encodeValue(operator, value, isKeyOperator(operator) ? key : "")
         );
       } else {
         if (modifier === "*") {
           if (Array.isArray(value)) {
             value.filter(isDefined).forEach(function(value2) {
-              result.push(
+              result2.push(
                 encodeValue(operator, value2, isKeyOperator(operator) ? key : "")
               );
             });
           } else {
             Object.keys(value).forEach(function(k) {
               if (isDefined(value[k])) {
-                result.push(encodeValue(operator, value[k], k));
+                result2.push(encodeValue(operator, value[k], k));
               }
             });
           }
@@ -54680,24 +54680,24 @@ if (cid) {
             });
           }
           if (isKeyOperator(operator)) {
-            result.push(encodeUnreserved(key) + "=" + tmp.join(","));
+            result2.push(encodeUnreserved(key) + "=" + tmp.join(","));
           } else if (tmp.length !== 0) {
-            result.push(tmp.join(","));
+            result2.push(tmp.join(","));
           }
         }
       }
     } else {
       if (operator === ";") {
         if (isDefined(value)) {
-          result.push(encodeUnreserved(key));
+          result2.push(encodeUnreserved(key));
         }
       } else if (value === "" && (operator === "&" || operator === "?")) {
-        result.push(encodeUnreserved(key) + "=");
+        result2.push(encodeUnreserved(key) + "=");
       } else if (value === "") {
-        result.push("");
+        result2.push("");
       }
     }
-    return result;
+    return result2;
   }
   function parseUrl(template) {
     return {
@@ -55265,16 +55265,16 @@ if (cid) {
         const parsedOptions = typeof query === "string" ? Object.assign({ query }, options) : query;
         const requestOptions = Object.keys(
           parsedOptions
-        ).reduce((result, key) => {
+        ).reduce((result2, key) => {
           if (NON_VARIABLE_OPTIONS.includes(key)) {
-            result[key] = parsedOptions[key];
-            return result;
+            result2[key] = parsedOptions[key];
+            return result2;
           }
-          if (!result.variables) {
-            result.variables = {};
+          if (!result2.variables) {
+            result2.variables = {};
           }
-          result.variables[key] = parsedOptions[key];
-          return result;
+          result2.variables[key] = parsedOptions[key];
+          return result2;
         }, {});
         const baseUrl = parsedOptions.baseUrl || request2.endpoint.DEFAULTS.baseUrl;
         if (GHES_V3_SUFFIX_REGEX.test(baseUrl)) {
@@ -56914,7 +56914,7 @@ if (cid) {
   function oauthAuthorizationUrl(options) {
     const clientType = options.clientType || "oauth-app";
     const baseUrl = options.baseUrl || "https://github.com";
-    const result = {
+    const result2 = {
       clientType,
       allowSignup: options.allowSignup === false ? false : true,
       clientId: options.clientId,
@@ -56925,10 +56925,10 @@ if (cid) {
     };
     if (clientType === "oauth-app") {
       const scopes = "scopes" in options ? options.scopes : [];
-      result.scopes = typeof scopes === "string" ? scopes.split(/[,\s]+/).filter(Boolean) : scopes;
+      result2.scopes = typeof scopes === "string" ? scopes.split(/[,\s]+/).filter(Boolean) : scopes;
     }
-    result.url = urlBuilderAuthorize(`${baseUrl}/login/oauth/authorize`, result);
-    return result;
+    result2.url = urlBuilderAuthorize(`${baseUrl}/login/oauth/authorize`, result2);
+    return result2;
   }
   function urlBuilderAuthorize(base, options) {
     const map = {
@@ -59283,8 +59283,8 @@ if (cid) {
       function get2(cache, options) {
         return __async(this, null, function* () {
           const cacheKey = optionsToCacheKey(options);
-          const result = yield cache.get(cacheKey);
-          if (!result) {
+          const result2 = yield cache.get(cacheKey);
+          if (!result2) {
             return;
           }
           const [
@@ -59294,7 +59294,7 @@ if (cid) {
             repositorySelection,
             permissionsString,
             singleFileName
-          ] = result.split("|");
+          ] = result2.split("|");
           const permissions = options.permissions || permissionsString.split(/,/).reduce((permissions2, string) => {
             if (/!$/.test(string)) {
               permissions2[string.slice(0, -1)] = "write";
@@ -59392,11 +59392,11 @@ if (cid) {
             options
           );
           if (!options.refresh) {
-            const result = yield get2(
+            const result2 = yield get2(
               state.cache,
               optionsWithInstallationTokenFromState
             );
-            if (result) {
+            if (result2) {
               const {
                 token: token2,
                 createdAt: createdAt2,
@@ -59406,7 +59406,7 @@ if (cid) {
                 repositoryNames: repositoryNames2,
                 singleFileName: singleFileName2,
                 repositorySelection: repositorySelection2
-              } = result;
+              } = result2;
               return toTokenAuthentication({
                 installationId,
                 token: token2,
@@ -59924,15 +59924,15 @@ if (cid) {
       var OAuthMethods2 = __toESM2(require_dist_node5());
       function checkTokenWithState(state, options) {
         return __async(this, null, function* () {
-          const result = yield OAuthMethods2.checkToken(__spreadValues({
+          const result2 = yield OAuthMethods2.checkToken(__spreadValues({
             // @ts-expect-error not worth the extra code to appease TS
             clientType: state.clientType,
             clientId: state.clientId,
             clientSecret: state.clientSecret,
             request: state.octokit.request
           }, options));
-          Object.assign(result.authentication, { type: "token", tokenType: "oauth" });
-          return result;
+          Object.assign(result2.authentication, { type: "token", tokenType: "oauth" });
+          return result2;
         });
       }
       var OAuthMethods3 = __toESM2(require_dist_node5());
@@ -60244,18 +60244,18 @@ if (cid) {
               if (!code) {
                 throw new Error('[@octokit/oauth-app] "code" parameter is required');
               }
-              const result = yield app.createToken({
+              const result2 = yield app.createToken({
                 code,
                 redirectUrl
               });
-              delete result.authentication.clientSecret;
+              delete result2.authentication.clientSecret;
               return {
                 status: 201,
                 headers: {
                   "content-type": "application/json",
                   "access-control-allow-origin": "*"
                 },
-                text: JSON.stringify(result)
+                text: JSON.stringify(result2)
               };
             }
             if (route === routes.getToken) {
@@ -60265,17 +60265,17 @@ if (cid) {
                   '[@octokit/oauth-app] "Authorization" header is required'
                 );
               }
-              const result = yield app.checkToken({
+              const result2 = yield app.checkToken({
                 token: token2
               });
-              delete result.authentication.clientSecret;
+              delete result2.authentication.clientSecret;
               return {
                 status: 200,
                 headers: {
                   "content-type": "application/json",
                   "access-control-allow-origin": "*"
                 },
-                text: JSON.stringify(result)
+                text: JSON.stringify(result2)
               };
             }
             if (route === routes.patchToken) {
@@ -60285,15 +60285,15 @@ if (cid) {
                   '[@octokit/oauth-app] "Authorization" header is required'
                 );
               }
-              const result = yield app.resetToken({ token: token2 });
-              delete result.authentication.clientSecret;
+              const result2 = yield app.resetToken({ token: token2 });
+              delete result2.authentication.clientSecret;
               return {
                 status: 200,
                 headers: {
                   "content-type": "application/json",
                   "access-control-allow-origin": "*"
                 },
-                text: JSON.stringify(result)
+                text: JSON.stringify(result2)
               };
             }
             if (route === routes.patchRefreshToken) {
@@ -60309,15 +60309,15 @@ if (cid) {
                   "[@octokit/oauth-app] refreshToken must be sent in request body"
                 );
               }
-              const result = yield app.refreshToken({ refreshToken: refreshToken2 });
-              delete result.authentication.clientSecret;
+              const result2 = yield app.refreshToken({ refreshToken: refreshToken2 });
+              delete result2.authentication.clientSecret;
               return {
                 status: 200,
                 headers: {
                   "content-type": "application/json",
                   "access-control-allow-origin": "*"
                 },
-                text: JSON.stringify(result)
+                text: JSON.stringify(result2)
               };
             }
             if (route === routes.scopeToken) {
@@ -60327,17 +60327,17 @@ if (cid) {
                   '[@octokit/oauth-app] "Authorization" header is required'
                 );
               }
-              const result = yield app.scopeToken(__spreadValues({
+              const result2 = yield app.scopeToken(__spreadValues({
                 token: token2
               }, json));
-              delete result.authentication.clientSecret;
+              delete result2.authentication.clientSecret;
               return {
                 status: 200,
                 headers: {
                   "content-type": "application/json",
                   "access-control-allow-origin": "*"
                 },
-                text: JSON.stringify(result)
+                text: JSON.stringify(result2)
               };
             }
             if (route === routes.deleteToken) {
@@ -60653,6 +60653,24 @@ if (cid) {
   // src/api/forAwait.js
   var import_react = __toESM(require_react());
 
+  // src/api/index.js
+  var api_exports = {};
+  __export(api_exports, {
+    breakBskyURL: () => breakBskyURL,
+    breakFeedUri: () => breakFeedUri,
+    getFeedBlobUrl: () => getFeedBlobUrl,
+    getProfileBlobUrl: () => getProfileBlobUrl,
+    isPromise: () => isPromise,
+    likelyDID: () => likelyDID,
+    resolveHandleOrDID: () => resolveHandleOrDID,
+    searchHandle: () => searchHandle,
+    shortenDID: () => shortenDID,
+    shortenHandle: () => shortenHandle,
+    unwrapShortDID: () => unwrapShortDID,
+    unwrapShortHandle: () => unwrapShortHandle,
+    useDerived: () => forAwait
+  });
+
   // src/api/core.js
   var import_api = __toESM(require_dist());
   var oldXrpc = "https://bsky.social/xrpc";
@@ -60678,9 +60696,9 @@ if (cid) {
       throttledCall
     );
     function peek(...args) {
-      const result = cache.get(...args);
-      if (result && !isPromise(result.value))
-        return result.value;
+      const result2 = cache.get(...args);
+      if (result2 && !isPromise(result2.value))
+        return result2.value;
     }
     function prepopulate(value, ...args) {
       cache.set(...args, { value });
@@ -60689,11 +60707,11 @@ if (cid) {
       cache.delete(...args);
     }
     function throttledCall(...args) {
-      let result = cache.get(...args);
-      if (result) {
-        if (isPromise(result.value))
-          result.priority++;
-        return result.value;
+      let result2 = cache.get(...args);
+      if (result2) {
+        if (isPromise(result2.value))
+          result2.priority++;
+        return result2.value;
       }
       let scheduleNow;
       const schedulePromise = new Promise((resolve) => scheduleNow = resolve);
@@ -60712,9 +60730,9 @@ if (cid) {
           waitingRequests.delete(entry);
           outstandingRequests.add(entry);
           try {
-            const result2 = yield call(...args);
-            entry.value = result2;
-            return result2;
+            const result3 = yield call(...args);
+            entry.value = result3;
+            return result3;
           } finally {
             outstandingRequests.delete(entry);
             scheduleAsAppropriate();
@@ -61061,6 +61079,11 @@ if (cid) {
       return void 0;
     return `https://cdn.bsky.app/img/avatar/plain/${unwrapShortDID(did)}/${cid}@jpeg`;
   }
+  function getFeedBlobUrl(did, cid) {
+    if (!did || !cid)
+      return void 0;
+    return `https://cdn.bsky.app/img/feed_thumbnail/plain/${unwrapShortDID(did)}/${cid}@jpeg`;
+  }
   function likelyDID(text) {
     return !!text && (!text.trim().indexOf("did:") || text.trim().length === 24 && !/[^\sa-z0-9]/i.test(text));
   }
@@ -61106,19 +61129,19 @@ if (cid) {
     if (!match)
       return;
     const handleOrDID = match[1];
-    let result;
+    let result2;
     const resolved = resolveHandleOrDID.peek(handleOrDID);
     if (resolved) {
-      result = { handleOrDID, shortDID: resolved.shortDID, shortHandle: resolved.shortHandle };
+      result2 = { handleOrDID, shortDID: resolved.shortDID, shortHandle: resolved.shortHandle };
     } else {
       if (likelyDID(handleOrDID))
-        result = { handleOrDID, shortDID: shortenDID(handleOrDID) };
+        result2 = { handleOrDID, shortDID: shortenDID(handleOrDID) };
       else
-        result = { handleOrDID, shortHandle: shortenHandle(handleOrDID) };
+        result2 = { handleOrDID, shortHandle: shortenHandle(handleOrDID) };
     }
     if (match[2] && match[4])
-      result[match[2]] = match[4];
-    return result;
+      result2[match[2]] = match[4];
+    return result2;
   }
   var _breakBskyURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/([^\/]+)(\/([^\\]+)(\/|$))?/i;
   function breakFeedUri(uri) {
@@ -61274,8 +61297,8 @@ if (cid) {
   }
   function continueWithPromise(continuation, promise) {
     promise.then(
-      (result) => {
-        continuation.alive(() => continueWith(continuation, result));
+      (result2) => {
+        continuation.alive(() => continueWith(continuation, result2));
       },
       (error) => {
         continuation.error(error);
@@ -61442,8 +61465,8 @@ if (cid) {
     );
   }
   function gather(octokit, results, iterator2, mapFn) {
-    return iterator2.next().then((result) => {
-      if (result.done) {
+    return iterator2.next().then((result2) => {
+      if (result2.done) {
         return results;
       }
       let earlyExit = false;
@@ -61451,7 +61474,7 @@ if (cid) {
         earlyExit = true;
       }
       results = results.concat(
-        mapFn ? mapFn(result.value, done) : result.value.data
+        mapFn ? mapFn(result2.value, done) : result2.value.data
       );
       if (earlyExit) {
         return results;
@@ -61521,13 +61544,13 @@ if (cid) {
         return currentPath;
       }
       if (isObject(currentValue)) {
-        const result = deepFindPathToProperty(
+        const result2 = deepFindPathToProperty(
           currentValue,
           searchProp,
           currentPath
         );
-        if (result.length > 0) {
-          return result;
+        if (result2.length > 0) {
+          return result2;
         }
       }
     }
@@ -64759,10 +64782,10 @@ if (cid) {
   function eachInstallation(app, callback) {
     return __async(this, null, function* () {
       const i2 = eachInstallationIterator(app)[Symbol.asyncIterator]();
-      let result = yield i2.next();
-      while (!result.done) {
-        yield callback(result.value);
-        result = yield i2.next();
+      let result2 = yield i2.next();
+      while (!result2.done) {
+        yield callback(result2.value);
+        result2 = yield i2.next();
       }
     });
   }
@@ -64810,14 +64833,14 @@ if (cid) {
         app,
         callback ? queryOrCallback : void 0
       )[Symbol.asyncIterator]();
-      let result = yield i2.next();
-      while (!result.done) {
+      let result2 = yield i2.next();
+      while (!result2.done) {
         if (callback) {
-          yield callback(result.value);
+          yield callback(result2.value);
         } else {
-          yield queryOrCallback(result.value);
+          yield queryOrCallback(result2.value);
         }
-        result = yield i2.next();
+        result2 = yield i2.next();
       }
     });
   }
@@ -65039,6 +65062,18 @@ if (cid) {
   // src/root-layout.js
   window["atproto"] = import_api3.default;
   window["octokit"] = dist_web_exports7;
+  window["require"] = /** @type {*} */
+  emulateRequire;
+  function emulateRequire(moduleName) {
+    switch (moduleName) {
+      case "@atproto/api":
+        return import_api3.default;
+      case "octokit":
+        return dist_web_exports7;
+      case "../api":
+        return api_exports;
+    }
+  }
   function RootLayout({
     title,
     subtitle,
@@ -65069,9 +65104,7 @@ if (cid) {
           e2.preventDefault();
           const commandText = (text || "").trim();
           if (commandText.lastIndexOf("/", 0) === 0) {
-            const commandFn = window[commandText.slice(1)];
-            if (typeof commandFn === "function")
-              commandFn();
+            executeCommand(commandText.slice(1));
           }
         },
         onChange: (e2) => {
@@ -65081,6 +65114,20 @@ if (cid) {
     ), !(matches == null ? void 0 : matches.length) ? void 0 : /* @__PURE__ */ import_react2.default.createElement("div", { className: "autocomplete-list" }, matches.map(
       (m, index) => /* @__PURE__ */ import_react2.default.createElement("div", { key: index, className: "autocomplete-entry" }, unwrapShortHandle(m.shortHandle), m.postID ? /* @__PURE__ */ import_react2.default.createElement("span", { className: "autocomplete-post" }, "post#", m.postID) : void 0)
     )), autocompleteArea))))));
+  }
+  function executeCommand(commandName) {
+    return __async(this, null, function* () {
+      const commandJS = yield fetch("./src/maintain/" + commandName + ".js").then((r2) => r2.text());
+      let result = eval(commandJS);
+      if (typeof window[commandName] === "function")
+        result = /** @type {*} */
+        window[commandName]();
+      if (isPromise(result))
+        result = yield result;
+      alert(
+        typeof result === "undefined" ? commandName + " OK" : commandName + " " + JSON.stringify(result, null, 2)
+      );
+    });
   }
 
   // src/app.js

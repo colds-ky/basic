@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { forAwait } from './api/forAwait';
-import { searchHandle, unwrapShortHandle } from './api';
+import { isPromise, searchHandle, unwrapShortHandle } from './api';
+import * as wholeAPI from './api';
 
 import atproto from '@atproto/api';
 import * as octokit from "octokit";
@@ -11,6 +12,15 @@ import './root-layout.css';
 
 window['atproto'] = atproto;
 window['octokit'] = octokit;
+window['require'] = /** @type {*} */(emulateRequire);
+
+function emulateRequire(moduleName) {
+  switch (moduleName) {
+    case '@atproto/api': return atproto;
+    case 'octokit': return octokit;
+    case '../api': return wholeAPI;
+  }
+}
 
 
 /**
@@ -53,9 +63,7 @@ export function RootLayout({
                     e.preventDefault();
                     const commandText = (text || '').trim();
                     if (commandText.lastIndexOf('/', 0) === 0) {
-                      const commandFn = window[commandText.slice(1)];
-                      if (typeof commandFn === 'function')
-                        commandFn();
+                      executeCommand(commandText.slice(1));
                     }
                   }}
                   onChange={e => {
@@ -86,5 +94,19 @@ export function RootLayout({
         </tr>
       </tbody>
     </table>
+  );
+}
+
+async function executeCommand(commandName) {
+  const commandJS = await fetch('./src/maintain/' + commandName + '.js').then(r => r.text());
+  let result = eval(commandJS);
+  if (typeof window[commandName] === 'function')
+    result = /** @type {*} */(window)[commandName]();
+  if (isPromise(result))
+    result = await result;
+
+  alert(
+    typeof result === 'undefined' ? commandName + ' OK' :
+      commandName + ' ' + JSON.stringify(result, null, 2)
   );
 }
