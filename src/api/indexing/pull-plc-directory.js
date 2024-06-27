@@ -86,7 +86,7 @@ export async function pullPLCDirectoryCompact() {
  */
 async function saveAllDirectoryFiles(directoryPath, wholeDirectory) {
   const shortDIDsRaw = Object.keys(wholeDirectory);
-  const shortDIDsOrdered = shortDIDsRaw.slice().sort((did1, did2) => wholeDirectory[did1][0].timestamp - wholeDirectory[did2][0].timestamp);
+  const shortDIDsOrdered = shortDIDsRaw.slice().sort((shortDID1, shortDID2) => wholeDirectory[shortDID1][0].timestamp - wholeDirectory[shortDID2][0].timestamp);
 
   let bucket = [];
   for (const shortDID of shortDIDsOrdered) {
@@ -143,7 +143,8 @@ function stringifyDIDs(shortDIDs, wholeDirectory, nextShortDID) {
     for (let iEntry = 0; iEntry < history.length; iEntry++) {
       const entry = history[iEntry];
       const prevEntry = !iEntry ? undefined : history[iEntry - 1];
-      if (prevEntry?.shortHandle === entry.shortHandle && prevEntry?.shortPDC === entry.shortPDC) continue;
+      if (iEntry && // always include the first entry
+        prevEntry?.shortHandle === entry.shortHandle && prevEntry?.shortPDC === entry.shortPDC) continue;
 
       if (firstHistoryEntry) {
         firstHistoryEntry = false;
@@ -295,14 +296,14 @@ function readAllDirectoryFiles(directoryPath) {
     process.stdout.write('.');
     let carryTimestamp = 0;
 
-    for (const [did, history] of Object.entries(directoryObj)) {
-      if (did === 'next') {
+    for (const [shortDID, history] of Object.entries(directoryObj)) {
+      if (shortDID === 'next') {
         localPath = history;
         if (localPath?.startsWith('..') && !localPath.startsWith('../')) localPath = '../' + localPath.slice(2);
         continue;
       }
 
-      const historyList = wholeDirectory[did] = [];
+      const historyList = wholeDirectory[shortDID] = [];
 
       let firstHistoryEntry = true;
       let timestamp = carryTimestamp;
@@ -320,7 +321,7 @@ function readAllDirectoryFiles(directoryPath) {
         }
 
         if (timestamp > alertIfRecent.getTime()) {
-          console.log(did, history);
+          console.log(shortDID, history);
           throw new Error('Incorrect timestamp! ' + new Date(timestamp));
         }
 
