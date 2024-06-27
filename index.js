@@ -102205,12 +102205,24 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
 
   // src/widgets/post/post.js
   var import_react15 = __toESM(require_react());
+  function Post({ post }) {
+    return /* @__PURE__ */ import_react15.default.createElement(PostFrame, null, typeof post === "string" ? /* @__PURE__ */ import_react15.default.createElement(LoadingPostInProgress, { post }) : /* @__PURE__ */ import_react15.default.createElement(LoadedPost, { post }));
+  }
+  function PostFrame({ children }) {
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-frame-outer" }, children);
+  }
+  function LoadingPostInProgress({ post }) {
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-loading-in-progress" }, localise("Post is loading...", { uk: "\u0417\u0430\u0447\u0435\u043A\u0430\u0439\u0442\u0435..." }));
+  }
+  function LoadedPost({ post }) {
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-loaded-content" }, /* @__PURE__ */ import_react15.default.createElement(AccountLabel, { className: "post-author", account: post.shortDID }), /* @__PURE__ */ import_react15.default.createElement(PreFormatted, { className: "post-content", text: post.text }), /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-likes" }, /* @__PURE__ */ import_react15.default.createElement(FavoriteBorder_default, null), !(post == null ? void 0 : post.likeCount) ? "" : post.likeCount.toLocaleString()));
+  }
 
   // src/history/timeline.js
   function Timeline({ shortDID }) {
     const db2 = useDB();
     const [retrieved, next2] = useForAwait(shortDID, getTimeline);
-    return /* @__PURE__ */ import_react16.default.createElement(import_react16.default.Fragment, null, !retrieved.timeline ? void 0 : retrieved.timeline.map((thread, i) => /* @__PURE__ */ import_react16.default.createElement(ThreadView, { key: i, thread, shortDID })), /* @__PURE__ */ import_react16.default.createElement(
+    return /* @__PURE__ */ import_react16.default.createElement(import_react16.default.Fragment, null, !(retrieved == null ? void 0 : retrieved.timeline) ? void 0 : retrieved.timeline.map((thread, i) => /* @__PURE__ */ import_react16.default.createElement(ThreadView, { key: i, thread, shortDID })), /* @__PURE__ */ import_react16.default.createElement(
       Visible,
       {
         onVisible: () => next2()
@@ -102224,8 +102236,10 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           try {
             for (var iter = __forAwait(db2.getProfileIncrementally(didOrHandle)), more, temp, error; more = !(temp = yield new __await(iter.next())).done; more = false) {
               const profile = temp.value;
-              if (profile.shortDID)
+              if (profile.shortDID) {
                 shortDID2 = profile.shortDID;
+                break;
+              }
             }
           } catch (temp) {
             error = [temp];
@@ -102238,53 +102252,46 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
             }
           }
           let historicalPostThreads = [];
+          const seenPosts = /* @__PURE__ */ new Set();
           try {
-            for (var iter2 = __forAwait(db2.searchPostsIncrementally(shortDID2, void 0)), more2, temp2, error2; more2 = !(temp2 = yield new __await(iter2.next())).done; more2 = false) {
-              const entries = temp2.value;
+            for (var iter3 = __forAwait(db2.searchPostsIncrementally(shortDID2, void 0)), more3, temp3, error3; more3 = !(temp3 = yield new __await(iter3.next())).done; more3 = false) {
+              const entries = temp3.value;
               if (!(entries == null ? void 0 : entries.length))
                 continue;
-              const threadStarts = [...new Set(entries.map((post) => post.threadStart))];
-              const threads = [];
-              let resolveCount = 0;
-              let allResolved = () => {
-              };
-              let allResolvedPromise = new Promise((resolve) => allResolved = resolve);
-              for (let i = 0; i < threadStarts.length; i++) {
-                const threadIndex = i;
-                (() => __async(this, null, function* () {
-                  try {
-                    for (var iter3 = __forAwait(db2.getPostThreadIncrementally(threadStarts[threadIndex])), more3, temp3, error3; more3 = !(temp3 = yield iter3.next()).done; more3 = false) {
-                      const postThread = temp3.value;
-                      if (postThread)
-                        threads[threadIndex] = postThread;
-                    }
-                  } catch (temp3) {
-                    error3 = [temp3];
-                  } finally {
-                    try {
-                      more3 && (temp3 = iter3.return) && (yield temp3.call(iter3));
-                    } finally {
-                      if (error3)
-                        throw error3[0];
-                    }
+              for (const post of entries) {
+                if (seenPosts.has(post.threadStart || post.uri))
+                  continue;
+                seenPosts.add(post.threadStart || post.uri);
+                let postThreadRetrieved;
+                try {
+                  for (var iter2 = __forAwait(db2.getPostThreadIncrementally(post.uri)), more2, temp2, error2; more2 = !(temp2 = yield new __await(iter2.next())).done; more2 = false) {
+                    const postThread = temp2.value;
+                    postThreadRetrieved = postThread;
                   }
-                  resolveCount++;
-                  if (resolveCount === threadStarts.length)
-                    allResolved();
-                }))();
+                } catch (temp2) {
+                  error2 = [temp2];
+                } finally {
+                  try {
+                    more2 && (temp2 = iter2.return) && (yield new __await(temp2.call(iter2)));
+                  } finally {
+                    if (error2)
+                      throw error2[0];
+                  }
+                }
+                if (!postThreadRetrieved)
+                  continue;
+                historicalPostThreads.push(postThreadRetrieved);
+                yield { timeline: historicalPostThreads };
               }
-              yield new __await(allResolvedPromise);
-              historicalPostThreads = historicalPostThreads.concat(threads);
-              yield { timeline: historicalPostThreads };
             }
-          } catch (temp2) {
-            error2 = [temp2];
+          } catch (temp3) {
+            error3 = [temp3];
           } finally {
             try {
-              more2 && (temp2 = iter2.return) && (yield new __await(temp2.call(iter2)));
+              more3 && (temp3 = iter3.return) && (yield new __await(temp3.call(iter3)));
             } finally {
-              if (error2)
-                throw error2[0];
+              if (error3)
+                throw error3[0];
             }
           }
           console.log("timeline to end...");
@@ -102295,6 +102302,81 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     }
   }
   function ThreadView({ shortDID, thread }) {
+    const root = layoutThread(shortDID, thread);
+    return /* @__PURE__ */ import_react16.default.createElement(SubThread, { shortDID, node: root });
+  }
+  function SubThread({ shortDID, node: node2 }) {
+    return /* @__PURE__ */ import_react16.default.createElement("div", { className: "sub-thread" }, /* @__PURE__ */ import_react16.default.createElement(Post, { post: node2.post }), node2.children.map((child, i) => /* @__PURE__ */ import_react16.default.createElement(CollapsedOrExpandedSubThread, { key: i, shortDID, node: child })));
+  }
+  function CollapsedOrExpandedSubThread({ shortDID, node: node2 }) {
+    let collapsedChunk = [];
+    let nextNode = node2;
+    while (true) {
+      if (nextNode.post.shortDID === shortDID || nextNode.children.length != 1)
+        break;
+      collapsedChunk.push(nextNode.post);
+      nextNode = nextNode.children[0];
+    }
+    if (collapsedChunk.length === 0) {
+      return /* @__PURE__ */ import_react16.default.createElement(SubThread, { shortDID, node: node2 });
+    } else {
+      return /* @__PURE__ */ import_react16.default.createElement(import_react16.default.Fragment, null, /* @__PURE__ */ import_react16.default.createElement(CollapsedThreadPart, { children: collapsedChunk }), /* @__PURE__ */ import_react16.default.createElement(SubThread, { shortDID, node: nextNode }));
+    }
+  }
+  function CollapsedThreadPart({ children }) {
+    return /* @__PURE__ */ import_react16.default.createElement("div", { className: "collapsed-thread-paret" }, children.length === 1 ? "..." : children.length + "...");
+  }
+  function layoutThread(shortDID, thread) {
+    const allPosts = /* @__PURE__ */ new Map();
+    const ownPosts = /* @__PURE__ */ new Map();
+    for (const post of thread.all) {
+      allPosts.set(post.uri, post);
+      if (post.shortDID === shortDID) {
+        ownPosts.set(post.uri, post);
+      }
+    }
+    if (thread.root.shortDID === shortDID) {
+      ownPosts.set(thread.root.uri, thread.root);
+      allPosts.set(thread.root.uri, thread.root);
+    }
+    if (thread.current.shortDID === shortDID) {
+      ownPosts.set(thread.current.uri, thread.current);
+      allPosts.set(thread.current.uri, thread.current);
+    }
+    const ownEearlyFirst = [...ownPosts.values()].sort((p1, p2) => (p2.asOf || 0) - (p1.asOf || 0));
+    let root = {
+      post: thread.root,
+      children: []
+    };
+    const nodeByUri = /* @__PURE__ */ new Map();
+    ownPosts.delete(thread.root.uri);
+    nodeByUri.set(thread.root.uri, root);
+    while (true) {
+      let notPlaced = ownEearlyFirst.find((post) => !nodeByUri.has(post.uri));
+      if (!notPlaced)
+        break;
+      let node2 = {
+        post: notPlaced,
+        children: []
+      };
+      nodeByUri.set(notPlaced.uri, node2);
+      while (true) {
+        const parentNode = nodeByUri.get(node2.post.replyTo || "");
+        if (parentNode) {
+          parentNode.children.push(node2);
+          break;
+        }
+        const parentPost = allPosts.get(node2.post.replyTo || "");
+        if (!parentPost)
+          break;
+        node2 = {
+          post: parentPost,
+          children: [node2]
+        };
+        nodeByUri.set(node2.post.uri, node2);
+      }
+    }
+    return root;
   }
 
   // src/history/history-page-decorations.js

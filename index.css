@@ -202,6 +202,11 @@
   text-shadow: 0 0 14px #0052ff, 0 0 2px black;
 }
 
+/* src/history/timeline.css */
+.sub-thread {
+  padding-left: 1em;
+}
+
 /* src/history/history.css */
 html.account body {
   overflow: auto;

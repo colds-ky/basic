@@ -7,9 +7,11 @@ import { useDB } from '..';
 import { Post } from '../widgets/post';
 import { makeFeedUri } from '../../coldsky/lib';
 
+import './timeline.css';
+
 /**
  * @param {{
- *  shortDID?: string
+ *  shortDID: string
  * }} _
  */
 export function Timeline({ shortDID }) {
@@ -20,7 +22,7 @@ export function Timeline({ shortDID }) {
   return (
     <>
       {
-        !retrieved.timeline ? undefined :
+        !retrieved?.timeline ? undefined :
         
           retrieved.timeline.map((thread, i) => (
             <ThreadView key={i} thread={thread} shortDID={shortDID} />
@@ -44,42 +46,36 @@ export function Timeline({ shortDID }) {
     try {
       let shortDID;
       for await (const profile of db.getProfileIncrementally(didOrHandle)) {
-        if (profile.shortDID) shortDID = profile.shortDID;
+        if (profile.shortDID) {
+          shortDID = profile.shortDID;
+          break;
+        }
       }
 
       /**
        * @type {import('../../coldsky/lib').CompactThreadPostSet[]}
        */
       let historicalPostThreads = [];
+      /** @type {Set<string>} */
+      const seenPosts = new Set();
 
       for await (const entries of db.searchPostsIncrementally(shortDID, undefined)) {
         if (!entries?.length) continue;
-        const threadStarts = [...new Set(entries.map(post => post.threadStart))];
-        const threads = [];
 
-        let resolveCount = 0;
-        let allResolved = () => { };
-        /** @type {Promise<void>} */
-        let allResolvedPromise = new Promise(resolve => allResolved = resolve);
+        for (const post of entries) {
+          if (seenPosts.has(post.threadStart || post.uri)) continue;
+          seenPosts.add(post.threadStart || post.uri);
 
-        for (let i = 0; i < threadStarts.length; i++) {
-          const threadIndex = i;
-          (async () => {
-            for await (const postThread of db.getPostThreadIncrementally(threadStarts[threadIndex])) {
-              if (postThread) threads[threadIndex] = postThread;
-            }
-            resolveCount++;
+          let postThreadRetrieved;
+          for await (const postThread of db.getPostThreadIncrementally(post.uri)) {
+            postThreadRetrieved = postThread;
+          }
 
-            if (resolveCount === threadStarts.length)
-              allResolved();
-          })();
+          if (!postThreadRetrieved) continue;
+
+          historicalPostThreads.push(postThreadRetrieved);
+          yield { timeline: historicalPostThreads };
         }
-
-        await allResolvedPromise;
-
-        historicalPostThreads = historicalPostThreads.concat(threads);
-
-        yield { timeline: historicalPostThreads };
       }
       console.log('timeline to end...');
     } finally {
@@ -90,13 +86,87 @@ export function Timeline({ shortDID }) {
 
 /**
  * @param {{
- *  shortDID?: string,
+ *  shortDID: string,
  *  thread: import('../../coldsky/lib').CompactThreadPostSet,
  * }} _
  */
 export function ThreadView({ shortDID, thread }) {
+  const root = layoutThread(shortDID, thread);
 
+  return (
+    <SubThread shortDID={shortDID} node={root} />
+  );
 }
+
+/**
+ * @typedef {{
+ *  post: import('../../coldsky/lib').CompactPost,
+ *  children: PostNode[]
+ * }} PostNode
+ */
+
+/**
+ * @param {{
+ *  shortDID: string,
+ *  node: PostNode
+ * }} _
+ */
+function SubThread({ shortDID, node }) {
+  return (
+    <div className='sub-thread'>
+      <Post post={node.post} />
+      {
+        node.children.map((child, i) => (
+          <CollapsedOrExpandedSubThread key={i} shortDID={shortDID} node={child} />
+        ))
+      }
+    </div>
+  );
+}
+
+/**
+ * @param {{
+ *  shortDID: string,
+ *  node: PostNode
+ * }} _
+ */
+function CollapsedOrExpandedSubThread({ shortDID, node }) {
+  let collapsedChunk = [];
+  let nextNode = node;
+  while (true) {
+    if (nextNode.post.shortDID === shortDID || nextNode.children.length != 1) break;
+    collapsedChunk.push(nextNode.post);
+    nextNode = nextNode.children[0];
+  }
+
+  if (collapsedChunk.length === 0) {
+    return (
+      <SubThread shortDID={shortDID} node={node} />
+    );
+  } else {
+    return (
+      <>
+        <CollapsedThreadPart children={collapsedChunk} />
+        <SubThread shortDID={shortDID} node={nextNode} />
+      </>
+    );
+  }
+}
+
+/**
+ * @param {{
+ *  children: import('../../coldsky/lib').CompactPost[]
+ * }} _
+ */
+function CollapsedThreadPart({ children }) {
+  return (
+    <div className='collapsed-thread-paret'>
+      {children.length === 1 ? '...' : children.length + '...'}
+    </div>
+  );
+}
+
+
 
 /**
  * @param {string} shortDID
@@ -125,10 +195,7 @@ function layoutThread(shortDID, thread) {
     allPosts.set(thread.current.uri, thread.current);
   }
 
-  const ownPlaced = new Set(ownPosts.values());
-  const ownEearlyFirst = [...ownPlaced].sort((p1, p2) => (p2.asOf || 0) - (p1.asOf || 0));
-
-  /** @typedef {{ post: import('../../coldsky/lib').CompactPost, children: import('../../coldsky/lib').CompactPost[] }} PostNode */
+  const ownEearlyFirst = [...ownPosts.values()].sort((p1, p2) => (p2.asOf || 0) - (p1.asOf || 0));
 
   /** @type {PostNode} */
   let root = {
@@ -138,11 +205,37 @@ function layoutThread(shortDID, thread) {
   /** @type {Map<string, PostNode>} */
   const nodeByUri = new Map();
 
+  ownPosts.delete(thread.root.uri);
+  nodeByUri.set(thread.root.uri, root);
+
   while (true) {
     // find first not placed
-    let notPlaced = ownEearlyFirst.find(post => !ownPlaced.has(post));
+    let notPlaced = ownEearlyFirst.find(post => !nodeByUri.has(post.uri));
     if (!notPlaced) break;
 
+    /** @type {PostNode} */
+    let node = {
+      post: notPlaced,
+      children: []
+    };
+    nodeByUri.set(notPlaced.uri, node);
 
+    while (true) {
+      const parentNode = nodeByUri.get(node.post.replyTo || '');
+      if (parentNode) {
+        parentNode.children.push(node);
+        break;
+      }
+
+      const parentPost = allPosts.get(node.post.replyTo || '');
+      if (!parentPost) break;
+      node = {
+        post: parentPost,
+        children: [node]
+      };
+      nodeByUri.set(node.post.uri, node);
+    }
   }
+
+  return root;
 }
