@@ -71,7 +71,7 @@ export function formatTimeStr(time) {
       return dtBuf.toLocaleString();
   }
 
-  if (diffMsec < 60 * 1000) return localise('a minute ago', { uk: 'хвилину тому' });
+  if (diffMsec < 91 * 1000) return localise('a minute ago', { uk: 'хвилину тому' });
   if (diffMsec < 59 * 60 * 1000) return Math.round(diffMsec / (60 * 60 * 1000)) + ' ' + localise('min ago', { uk: 'хв тому' });
   if (dtBuf.getFullYear() === dtNow.getFullYear() &&
     dtBuf.getMonth() === dtNow.getMonth() &&

@@ -75,13 +75,22 @@ function LoadingPostInProgress({ uri }) {
       <LoadedPost post={post} />
     );
   }
+  const parsedURL = breakFeedUri(uri) || breakPostURL(uri);
 
   return (
-    <div className='post-loading-in-progress'>
+    <Link
+      className='post-loading-in-progress'
+      to={
+        !parsedURL ? '/' + uri :
+          '/' + parsedURL.shortDID + '/' + parsedURL.postID
+      }>
       {
         localise('Post is loading...', { uk: 'Зачекайте...' })
       }
-    </div>
+      <div className='post-loading-in-progress-url'>
+        {uri}
+      </div>
+    </Link>
   );
 }
 
