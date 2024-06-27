@@ -71,6 +71,8 @@ function HistoryCore() {
       </div>
 
       <div
+        className='history-account-avatar-bg' />
+      <div
         className={suffixClassWhenEmpty('history-account-avatar', resolved.avatar, resolved)}
         style={!resolved.avatar ? undefined : { backgroundImage: `url(${resolved.avatar})` }}>
       </div>
