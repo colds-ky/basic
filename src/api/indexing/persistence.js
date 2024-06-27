@@ -141,10 +141,12 @@ export function stringifyRegistrationStore(store) {
   for (const shortDID of store.keys()) {
     const registrationEntry = /** @type {RegistrationHistory} */(store.get(shortDID));
     jsonText += first ?
-      ',\n"' + shortDID + '":' + JSON.stringify(registrationEntry.updates) + '\n' :
-      '"' + shortDID + '":' + JSON.stringify(registrationEntry.updates) + '\n';
+      '"' + shortDID + '":' + JSON.stringify(registrationEntry.updates) :
+      ',\n"' + shortDID + '":' + JSON.stringify(registrationEntry.updates);
+    first = false;
   }
-  if (store.next) jsonText += ',\n"next":' + JSON.stringify(store.next) + '\n';
-  jsonText += '}';
+
+  if (store.next) jsonText += ',\n"next":' + JSON.stringify(store.next);
+  jsonText += '\n}\n';
   return jsonText;
 }

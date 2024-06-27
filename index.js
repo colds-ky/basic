@@ -89,6 +89,231 @@
   };
   var __forAwait = (obj, it, method) => (it = obj[__knownSymbol("asyncIterator")]) ? it.call(obj) : (obj = obj[__knownSymbol("iterator")](), it = {}, method = (key, fn) => (fn = obj[key]) && (it[key] = (arg) => new Promise((yes, no, done) => (arg = fn.call(obj, arg), done = arg.done, Promise.resolve(arg.value).then((value) => yes({ value, done }), no)))), method("next"), method("return"), it);
 
+  // lib/shorten.js
+  function shortenDID(did) {
+    return did && /** @type {T} */
+    (did.replace(_shortenDID_Regex, "").toLowerCase() || void 0);
+  }
+  function shortenHandle(handle) {
+    handle = cheapNormalizeHandle(handle);
+    return handle && /** @type {T} */
+    (handle.replace(_shortenHandle_Regex, "").toLowerCase() || void 0);
+  }
+  function cheapNormalizeHandle(handle) {
+    handle = handle && handle.trim().toLowerCase();
+    if (handle && handle.charCodeAt(0) === 64)
+      handle = handle.slice(1);
+    const urlprefix = "https://bsky.app/";
+    if (handle && handle.lastIndexOf(urlprefix, 0) === 0) {
+      const postURL = breakPostURL(handle);
+      if (postURL && postURL.shortDID)
+        return postURL.shortDID;
+    }
+    if (handle && handle.lastIndexOf("at:", 0) === 0) {
+      const feedUri = breakFeedUri(handle);
+      if (feedUri && feedUri.shortDID)
+        return feedUri.shortDID;
+      if (handle && handle.lastIndexOf("at://", 0) === 0)
+        handle = handle.slice(5);
+      else
+        handle = handle.slice(3);
+    }
+    return handle || void 0;
+  }
+  function shortenPDC(pdc) {
+    if (!pdc)
+      return void 0;
+    pdc = pdc.trim().toLowerCase();
+    if (pdc === "https://bsky.social")
+      return ".s";
+    else if (pdc === "https://bsky.network")
+      return ".n";
+    else if (pdc === "https://bsky.app")
+      return ".a";
+    return pdc.replace(/^https:\/\//, "").replace(/host\.bsky\.network$/, "");
+  }
+  function parseTimestampOffset(dtOffsetStr) {
+    if (!dtOffsetStr)
+      return void 0;
+    let offset = 0;
+    let lead = 0;
+    const plusPos = dtOffsetStr.indexOf("+");
+    if (plusPos >= 0) {
+      offset = Number(dtOffsetStr.substring(0, plusPos)) * 24 * 60 * 60 * 1e3;
+      lead = plusPos + 1;
+    }
+    const secondsColonPos = dtOffsetStr.lastIndexOf(":");
+    if (secondsColonPos < 0) {
+      offset += Number(dtOffsetStr.substring(lead)) * 1e3;
+    } else {
+      offset += Number(dtOffsetStr.substring(secondsColonPos + 1)) * 1e3;
+      const minutesColonPos = dtOffsetStr.lastIndexOf(":", secondsColonPos - 1);
+      if (minutesColonPos < 0) {
+        offset += Number(dtOffsetStr.substring(lead, secondsColonPos)) * 60 * 1e3;
+      } else {
+        offset += Number(dtOffsetStr.substring(minutesColonPos + 1, secondsColonPos)) * 60 * 1e3;
+        offset += Number(dtOffsetStr.substring(lead, minutesColonPos)) * 60 * 60 * 1e3;
+      }
+    }
+    return offset;
+  }
+  function timestampOffsetToString(offset) {
+    offset = Math.floor(offset / 1e3);
+    const seconds = offset % 60;
+    offset = (offset - seconds) / 60;
+    const minutes = offset % 60;
+    offset = (offset - minutes) / 60;
+    const hours = offset % 24;
+    const days = (offset - hours) / 24;
+    let str = (100 + seconds).toString().slice(1);
+    if (days + hours + minutes) {
+      str = (100 + minutes).toString().slice(1) + ":" + str;
+      if (days + hours) {
+        str = hours.toString() + ":" + str;
+        if (days) {
+          str = days + "+" + str;
+        }
+      }
+    }
+    if (str.lastIndexOf("0", 0) === 0)
+      str = str.slice(1);
+    return str;
+  }
+  function breakPostURL(url) {
+    if (!url)
+      return;
+    const match = _breakPostURL_Regex.exec(url);
+    if (!match)
+      return;
+    return { shortDID: match[1], postID: match[2] };
+  }
+  function breakFeedUri(uri) {
+    if (!uri)
+      return;
+    const match = _breakFeedUri_Regex.exec(uri);
+    if (!match || !match[3])
+      return;
+    return { shortDID: match[2], postID: match[3] };
+  }
+  var _shortenDID_Regex, _shortenHandle_Regex, _breakPostURL_Regex, _breakFeedUri_Regex;
+  var init_shorten = __esm({
+    "lib/shorten.js"() {
+      _shortenDID_Regex = /^did\:plc\:/;
+      _shortenHandle_Regex = /\.bsky\.social$/;
+      _breakPostURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/post\/([a-z0-9]+)$/;
+      _breakFeedUri_Regex = /^at\:\/\/(did:plc:)?([a-z0-9]+)\/[a-z\.]+\/?(.*)?$/;
+    }
+  });
+
+  // src/api/indexing/persistence.js
+  function parseRegistrationStore(file, jsonText) {
+    const bucketMap = JSON.parse(jsonText);
+    const store = createEmptyStore(file);
+    let carryTimestamp = 0;
+    for (const shortDID in bucketMap) {
+      if (shortDID === "next")
+        store.next = bucketMap.next;
+      const registrationHistory = bucketMap[shortDID];
+      for (const entry in registrationHistory) {
+        if (!carryTimestamp)
+          carryTimestamp = new Date(entry).getTime();
+        else
+          carryTimestamp += parseTimestampOffset(entry) || 0;
+        break;
+      }
+      const registrationEntry = {
+        created: carryTimestamp,
+        updates: registrationHistory
+      };
+      updateRanges(carryTimestamp, store);
+      updateLatestCreation(carryTimestamp, store);
+      let carryHistoryOffset = 0;
+      let firstHistoryEntry = true;
+      for (const dateOrTimestamp in registrationHistory) {
+        if (firstHistoryEntry) {
+          firstHistoryEntry = false;
+          continue;
+        }
+        carryHistoryOffset += parseTimestampOffset(dateOrTimestamp) || 0;
+        updateRanges(carryTimestamp + carryHistoryOffset, store);
+      }
+      store.set(shortDID, registrationEntry);
+    }
+    return store;
+  }
+  function deriveStoreFilenameFromTimestamp(prevTimestamp, timestamp) {
+    const dt2 = new Date(timestamp);
+    const dtPrev = prevTimestamp ? new Date(prevTimestamp) : void 0;
+    let filename = dt2.getUTCFullYear() + "-" + (101 + dt2.getUTCMonth()).toString().slice(1) + "/" + dt2.getUTCDate();
+    if (dt2.getUTCFullYear() === (dtPrev == null ? void 0 : dtPrev.getUTCFullYear()) && dt2.getUTCMonth() === (dtPrev == null ? void 0 : dtPrev.getUTCMonth()) && dt2.getUTCDate() === (dtPrev == null ? void 0 : dtPrev.getUTCDate())) {
+      filename += "-" + dt2.getUTCHours().toString().slice(1) + (101 + dt2.getUTCMinutes()).toString().slice(1);
+      if (dt2.getUTCHours() === dtPrev.getUTCHours() && dt2.getUTCMinutes() === dtPrev.getUTCMinutes()) {
+        filename += "-" + (101 + dt2.getUTCSeconds()).toString().slice(1);
+        if (dt2.getUTCSeconds() === dtPrev.getUTCSeconds()) {
+          filename += "_" + (1001 + dt2.getUTCMilliseconds()).toString().slice(1);
+          if (dt2.getUTCMilliseconds() === dtPrev.getUTCMilliseconds()) {
+            filename += "-" + Math.random().toString(36).slice(2, 4);
+          }
+        }
+      }
+    }
+    return filename;
+  }
+  function createEmptyStore(file) {
+    const store = (
+      /** @type {RegistrationStore} */
+      new MapExtended()
+    );
+    store.file = file;
+    return store;
+  }
+  function updateRanges(timestamp, store) {
+    if (!timestamp)
+      return;
+    if (!store.earliestRegistration || timestamp < store.earliestRegistration)
+      store.earliestRegistration = timestamp;
+    if (!store.latestAction || timestamp > store.latestAction)
+      store.latestAction = timestamp;
+  }
+  function updateLatestCreation(createdTimestamp, store) {
+    if (!createdTimestamp)
+      return;
+    if (!store.latestRegistration || createdTimestamp > store.latestRegistration)
+      store.latestRegistration = createdTimestamp;
+  }
+  function stringifyRegistrationStore(store) {
+    let jsonText = "{\n";
+    let first = true;
+    for (const shortDID of store.keys()) {
+      const registrationEntry = (
+        /** @type {RegistrationHistory} */
+        store.get(shortDID)
+      );
+      jsonText += first ? '"' + shortDID + '":' + JSON.stringify(registrationEntry.updates) : ',\n"' + shortDID + '":' + JSON.stringify(registrationEntry.updates);
+      first = false;
+    }
+    if (store.next)
+      jsonText += ',\n"next":' + JSON.stringify(store.next);
+    jsonText += "\n}\n";
+    return jsonText;
+  }
+  var MapExtended;
+  var init_persistence = __esm({
+    "src/api/indexing/persistence.js"() {
+      init_shorten();
+      MapExtended = class extends Map {
+        constructor() {
+          super(...arguments);
+          __publicField(this, "file", "");
+          __publicField(this, "next");
+          __publicField(this, "earliestRegistration");
+          __publicField(this, "latestRegistration");
+          __publicField(this, "latestAction");
+        }
+      };
+    }
+  });
+
   // src/api/akpa.js
   function streamBuffer(callback) {
     return __asyncGenerator(this, null, function* () {
@@ -265,122 +490,6 @@
     }
   });
 
-  // lib/shorten.js
-  function shortenDID(did) {
-    return did && /** @type {T} */
-    (did.replace(_shortenDID_Regex, "").toLowerCase() || void 0);
-  }
-  function shortenHandle(handle) {
-    handle = cheapNormalizeHandle(handle);
-    return handle && /** @type {T} */
-    (handle.replace(_shortenHandle_Regex, "").toLowerCase() || void 0);
-  }
-  function cheapNormalizeHandle(handle) {
-    handle = handle && handle.trim().toLowerCase();
-    if (handle && handle.charCodeAt(0) === 64)
-      handle = handle.slice(1);
-    const urlprefix = "https://bsky.app/";
-    if (handle && handle.lastIndexOf(urlprefix, 0) === 0) {
-      const postURL = breakPostURL(handle);
-      if (postURL && postURL.shortDID)
-        return postURL.shortDID;
-    }
-    if (handle && handle.lastIndexOf("at:", 0) === 0) {
-      const feedUri = breakFeedUri(handle);
-      if (feedUri && feedUri.shortDID)
-        return feedUri.shortDID;
-      if (handle && handle.lastIndexOf("at://", 0) === 0)
-        handle = handle.slice(5);
-      else
-        handle = handle.slice(3);
-    }
-    return handle || void 0;
-  }
-  function shortenPDC(pdc) {
-    if (!pdc)
-      return void 0;
-    pdc = pdc.trim().toLowerCase();
-    if (pdc === "https://bsky.social")
-      return ".s";
-    else if (pdc === "https://bsky.network")
-      return ".n";
-    else if (pdc === "https://bsky.app")
-      return ".a";
-    return pdc.replace(/^https:\/\//, "").replace(/host\.bsky\.network$/, "");
-  }
-  function parseTimestampOffset(dtOffsetStr) {
-    if (!dtOffsetStr)
-      return void 0;
-    let offset = 0;
-    let lead = 0;
-    const plusPos = dtOffsetStr.indexOf("+");
-    if (plusPos >= 0) {
-      offset = Number(dtOffsetStr.substring(0, plusPos)) * 24 * 60 * 60 * 1e3;
-      lead = plusPos + 1;
-    }
-    const secondsColonPos = dtOffsetStr.lastIndexOf(":");
-    if (secondsColonPos < 0) {
-      offset += Number(dtOffsetStr.substring(lead)) * 1e3;
-    } else {
-      offset += Number(dtOffsetStr.substring(secondsColonPos + 1)) * 1e3;
-      const minutesColonPos = dtOffsetStr.lastIndexOf(":", secondsColonPos - 1);
-      if (minutesColonPos < 0) {
-        offset += Number(dtOffsetStr.substring(lead, secondsColonPos)) * 60 * 1e3;
-      } else {
-        offset += Number(dtOffsetStr.substring(minutesColonPos + 1, secondsColonPos)) * 60 * 1e3;
-        offset += Number(dtOffsetStr.substring(lead, minutesColonPos)) * 60 * 60 * 1e3;
-      }
-    }
-    return offset;
-  }
-  function timestampOffsetToString(offset) {
-    offset = Math.floor(offset / 1e3);
-    const seconds = offset % 60;
-    offset = (offset - seconds) / 60;
-    const minutes = offset % 60;
-    offset = (offset - minutes) / 60;
-    const hours = offset % 24;
-    const days = (offset - hours) / 24;
-    let str = (100 + seconds).toString().slice(1);
-    if (days + hours + minutes) {
-      str = (100 + minutes).toString().slice(1) + ":" + str;
-      if (days + hours) {
-        str = hours.toString() + ":" + str;
-        if (days) {
-          str = days + "+" + str;
-        }
-      }
-    }
-    if (str.lastIndexOf("0", 0) === 0)
-      str = str.slice(1);
-    return str;
-  }
-  function breakPostURL(url) {
-    if (!url)
-      return;
-    const match = _breakPostURL_Regex.exec(url);
-    if (!match)
-      return;
-    return { shortDID: match[1], postID: match[2] };
-  }
-  function breakFeedUri(uri) {
-    if (!uri)
-      return;
-    const match = _breakFeedUri_Regex.exec(uri);
-    if (!match || !match[3])
-      return;
-    return { shortDID: match[2], postID: match[3] };
-  }
-  var _shortenDID_Regex, _shortenHandle_Regex, _breakPostURL_Regex, _breakFeedUri_Regex;
-  var init_shorten = __esm({
-    "lib/shorten.js"() {
-      _shortenDID_Regex = /^did\:plc\:/;
-      _shortenHandle_Regex = /\.bsky\.social$/;
-      _breakPostURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/post\/([a-z0-9]+)$/;
-      _breakFeedUri_Regex = /^at\:\/\/(did:plc:)?([a-z0-9]+)\/[a-z\.]+\/?(.*)?$/;
-    }
-  });
-
   // lib/plc-directory.js
   function plcDirectory(since, overrides) {
     const useFetch = (overrides == null ? void 0 : overrides.fetch) || fetch;
@@ -503,99 +612,6 @@
       init_shorten();
       FETCH_AHEAD_MSEC_MAX = 1e4;
       FETCH_AHEAD_COUNT_MAX = 1e4;
-    }
-  });
-
-  // src/api/indexing/persistence.js
-  function parseRegistrationStore(file, jsonText) {
-    const bucketMap = JSON.parse(jsonText);
-    const store = createEmptyStore(file);
-    let carryTimestamp = 0;
-    for (const shortDID in bucketMap) {
-      if (shortDID === "next")
-        store.next = bucketMap.next;
-      const registrationHistory = bucketMap[shortDID];
-      for (const entry in registrationHistory) {
-        if (!carryTimestamp)
-          carryTimestamp = new Date(entry).getTime();
-        else
-          carryTimestamp += parseTimestampOffset(entry) || 0;
-        break;
-      }
-      const registrationEntry = {
-        created: carryTimestamp,
-        updates: registrationHistory
-      };
-      updateRanges(carryTimestamp, store);
-      updateLatestCreation(carryTimestamp, store);
-      let carryHistoryOffset = 0;
-      let firstHistoryEntry = true;
-      for (const dateOrTimestamp in registrationHistory) {
-        if (firstHistoryEntry) {
-          firstHistoryEntry = false;
-          continue;
-        }
-        carryHistoryOffset += parseTimestampOffset(dateOrTimestamp) || 0;
-        updateRanges(carryTimestamp + carryHistoryOffset, store);
-      }
-      store.set(shortDID, registrationEntry);
-    }
-    return store;
-  }
-  function deriveStoreFilenameFromTimestamp(prevTimestamp, timestamp) {
-    const dt2 = new Date(timestamp);
-    const dtPrev = prevTimestamp ? new Date(prevTimestamp) : void 0;
-    let filename = dt2.getUTCFullYear() + "-" + (101 + dt2.getUTCMonth()).toString().slice(1) + "/" + dt2.getUTCDate();
-    if (dt2.getUTCFullYear() === (dtPrev == null ? void 0 : dtPrev.getUTCFullYear()) && dt2.getUTCMonth() === (dtPrev == null ? void 0 : dtPrev.getUTCMonth()) && dt2.getUTCDate() === (dtPrev == null ? void 0 : dtPrev.getUTCDate())) {
-      filename += "-" + dt2.getUTCHours().toString().slice(1) + (101 + dt2.getUTCMinutes()).toString().slice(1);
-      if (dt2.getUTCHours() === dtPrev.getUTCHours() && dt2.getUTCMinutes() === dtPrev.getUTCMinutes()) {
-        filename += "-" + (101 + dt2.getUTCSeconds()).toString().slice(1);
-        if (dt2.getUTCSeconds() === dtPrev.getUTCSeconds()) {
-          filename += "_" + (1001 + dt2.getUTCMilliseconds()).toString().slice(1);
-          if (dt2.getUTCMilliseconds() === dtPrev.getUTCMilliseconds()) {
-            filename += "-" + Math.random().toString(36).slice(2, 4);
-          }
-        }
-      }
-    }
-    return filename;
-  }
-  function createEmptyStore(file) {
-    const store = (
-      /** @type {RegistrationStore} */
-      new MapExtended()
-    );
-    store.file = file;
-    return store;
-  }
-  function updateRanges(timestamp, store) {
-    if (!timestamp)
-      return;
-    if (!store.earliestRegistration || timestamp < store.earliestRegistration)
-      store.earliestRegistration = timestamp;
-    if (!store.latestAction || timestamp > store.latestAction)
-      store.latestAction = timestamp;
-  }
-  function updateLatestCreation(createdTimestamp, store) {
-    if (!createdTimestamp)
-      return;
-    if (!store.latestRegistration || createdTimestamp > store.latestRegistration)
-      store.latestRegistration = createdTimestamp;
-  }
-  var MapExtended;
-  var init_persistence = __esm({
-    "src/api/indexing/persistence.js"() {
-      init_shorten();
-      MapExtended = class extends Map {
-        constructor() {
-          super(...arguments);
-          __publicField(this, "file", "");
-          __publicField(this, "next");
-          __publicField(this, "earliestRegistration");
-          __publicField(this, "latestRegistration");
-          __publicField(this, "latestAction");
-        }
-      };
     }
   });
 
@@ -935,13 +951,14 @@
   });
 
   // src/api/indexing/pull-plc-directory.js
+  init_persistence();
   function pullPLCDirectoryCompact() {
     return __async(this, null, function* () {
       const fs = __require("fs");
       const path = __require("path");
       const { indexingRun: indexingRun2 } = (init_indexing_run(), __toCommonJS(indexing_run_exports));
       console.log("PLC directory CACHE");
-      const directoryPath = path.resolve(__dirname, "src/api/indexing/repos/directory");
+      const directoryPath = path.resolve(__dirname, "src/api/indexing/repos");
       const rootPath = path.resolve(directoryPath, "colds-ky-dids-history.github.io");
       const run = indexingRun2({
         read: (localPath) => new Promise((resolve, reject) => {
@@ -975,6 +992,17 @@
           if (progress.affectedShortDIDs)
             reportProgress.affectedShortDIDs = progress.affectedShortDIDs.length;
           console.log(reportProgress);
+          console.log("  WRITE>>");
+          if (progress.affectedStores) {
+            for (const sto of progress.affectedStores) {
+              const filePath = path.resolve(directoryPath, sto.file + ".json");
+              process.stdout.write("  " + filePath);
+              const json = stringifyRegistrationStore(sto);
+              fs.writeFileSync(filePath, json);
+              console.log();
+            }
+          }
+          console.log(" OK");
         }
       } catch (temp) {
         error = [temp];
