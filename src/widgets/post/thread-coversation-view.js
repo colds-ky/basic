@@ -107,6 +107,7 @@ export function ThreadConversationView({
           linkTimestamp={linkTimestamp}
           linkAuthor={linkAuthor}
           suppressAuthor={suppressAuthor}
+          replies={showNext.insignificants}
         />
       );
     } else {

@@ -100,49 +100,49 @@
 }
 .facet-mention:hover {
   text-decoration: underline;
-  .complete-post-content .post-notes-area .post-replies .reply-avatars .reply-avatar-marker.reply-avatar-marker-more {
-    min-width: 2em;
-    text-align: center;
-    color: goldenrod;
-    color: #2f5bab;
-    font-style: italic;
-  }
-  .facet-url {
-    text-decoration: none;
-    color: rgb(6, 76, 197);
-  }
-  .facet-url:visited {
-    color: rgb(136, 0, 178);
-  }
-  .facet-url:hover {
-    text-decoration: underline;
-  }
-  .facet-url .link-text-before-domain {
-    opacity: 0.4;
-  }
-  .facet-url .link-text-after-domain {
-    opacity: 0.6;
-  }
-  .facet-url .unspecified-domain {
-    color: rgb(165, 25, 0);
-  }
-  .facet-url .suspicious-link {
-    color: rgb(255, 77, 92);
-  }
-  .search-match-highly-relevant {
-    background: gold;
-    border-radius: 0.3em;
-    padding: 0 0.1em;
-    margin: 0 -0.1em;
-  }
-  .search-match-relevant {
-    background-image:
-      linear-gradient(
-        to top,
-        #ffcd70,
-        transparent 0.6em);
-    border-radius: 0.2em;
-  }
+}
+.complete-post-content .post-notes-area .post-replies .reply-avatars .reply-avatar-marker.reply-avatar-marker-more {
+  min-width: 2em;
+  text-align: center;
+  color: goldenrod;
+  color: #2f5bab;
+  font-style: italic;
+}
+.facet-url {
+  text-decoration: none;
+  color: rgb(6, 76, 197);
+}
+.facet-url:visited {
+  color: rgb(136, 0, 178);
+}
+.facet-url:hover {
+  text-decoration: underline;
+}
+.facet-url .link-text-before-domain {
+  opacity: 0.4;
+}
+.facet-url .link-text-after-domain {
+  opacity: 0.6;
+}
+.facet-url .unspecified-domain {
+  color: rgb(165, 25, 0);
+}
+.facet-url .suspicious-link {
+  color: rgb(255, 77, 92);
+}
+.search-match-highly-relevant {
+  background: gold;
+  border-radius: 0.3em;
+  padding: 0 0.1em;
+  margin: 0 -0.1em;
+}
+.search-match-relevant {
+  background-image:
+    linear-gradient(
+      to top,
+      #ffcd70,
+      transparent 0.6em);
+  border-radius: 0.2em;
 }
 
 /* src/widgets/account/full-handle.css */
@@ -296,7 +296,7 @@ a.account-label.account-handle {
   min-height: 2.7em;
 }
 .complete-post-content.notes-height-2 {
-  min-height: 5.9em;
+  min-height: 5.1em;
 }
 .complete-post-content.notes-height-3 {
   min-height: 7em;

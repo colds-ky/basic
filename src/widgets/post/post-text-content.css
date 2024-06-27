@@ -11,7 +11,9 @@
 
 .facet-mention:hover {
   text-decoration: underline;
-  .complete-post-content .post-notes-area .post-replies .reply-avatars .reply-avatar-marker.reply-avatar-marker-more {
+}
+
+.complete-post-content .post-notes-area .post-replies .reply-avatars .reply-avatar-marker.reply-avatar-marker-more {
   min-width: 2em;
   text-align: center;
   color: goldenrod;
