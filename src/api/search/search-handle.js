@@ -1,7 +1,8 @@
 // @ts-check
 /// <reference path="../../types.d.ts" />
 
-import { breakFeedUri, breakBskyURL, isPromise, resolveHandleOrDID, shortenDID, shortenHandle } from '..';
+import { breakBskyURL, resolveHandleOrDID } from '..';
+import { breakFeedURIPostOnly, isPromise, shortenDID, shortenHandle } from '../../../lib';
 import { performSearchOverBuckets } from './perform-search-over-buckets';
 
 /**
@@ -29,7 +30,7 @@ export function searchHandle(searchText) {
         return expandResolvedAccountToSearchMatch(word, accountOrPromise, bskyLink.post);
     }
 
-    const feedLink = breakFeedUri(word);
+    const feedLink = breakFeedURIPostOnly(word);
     if (feedLink) {
       let accountOrPromise = resolveHandleOrDID(feedLink.shortDID);
       if (isPromise(accountOrPromise))

@@ -42723,7 +42723,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.44";
+	var version = "0.2.45";
 
 	// @ts-check
 
