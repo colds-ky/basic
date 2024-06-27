@@ -10,9 +10,9 @@
 type RegistrationStore = Map<string, RegistrationHistory> & {
   file: string;
   next?: string;
-  earliestRegistration?: number;
-  latestRegistration?: number;
-  latestAction?: number;
+  earliestRegistration: number;
+  latestRegistration: number;
+  latestAction: number;
 };
 
 interface RegistrationHistory {

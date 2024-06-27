@@ -85,6 +85,11 @@ async function* pullDirectory({ stores, storeByShortDID, startDate, fetch }) {
     let addedShortDIDs = [];
 
     for (const entry of chunk.entries) {
+      if (affectedShortDIDs.has(entry.shortDID) && !storeByShortDID.has(entry.shortDID)) {
+        console.warn('How is it possible for affectedShortDIDs.has(entry.shortDID) but not storeByShortDID.has(entry.shortDID) ', entry.shortDID);
+        console.log();
+      }
+
       affectedShortDIDs.add(entry.shortDID);
 
       /** @type {HistoryChange} */
@@ -113,6 +118,11 @@ async function* pullDirectory({ stores, storeByShortDID, startDate, fetch }) {
         };
 
         addedShortDIDs.push(entry.shortDID);
+        if (addedShortDIDs.length > affectedShortDIDs.size) {
+          console.warn('How is it possible for [', addedShortDIDs.length, ']addedShortDIDs.length > [' + affectedShortDIDs.size + ']affectedShortDIDs.size');
+          console.log();
+        }
+
         if (!earliestRegistration || entry.timestamp < earliestRegistration)
           earliestRegistration = entry.timestamp;
         if (!latestRegistration || entry.timestamp > latestRegistration)
@@ -131,6 +141,9 @@ async function* pullDirectory({ stores, storeByShortDID, startDate, fetch }) {
             // in the middle: recreate the store
             addNewShortDIDToExistingStoreMiddle(store, history, entry);
           }
+
+          storeByShortDID.set(entry.shortDID, store);
+          affectedStores.add(store);
         } else {
           // add a new store
           const { newStore, prevStore } = createNewStoreAddShortDID(stores, insertStoreAt, history, entry);
@@ -276,7 +289,11 @@ function findStoreToAddTimestamp(stores, timestamp) {
   const latestStore = stores[stores.length - 1];
   if (!latestStore.earliestRegistration || timestamp >= latestStore.earliestRegistration ||
     stores.length === 1) {
-    if (latestStore.size < MAX_STORE_SIZE) return { store: latestStore };
+    const canAddToExistingStore =
+      latestStore.size < MAX_STORE_SIZE &&
+      getMonthStart(latestStore.latestRegistration) === getMonthStart(timestamp);
+
+    if (canAddToExistingStore) return { store: latestStore };
     else return { insertStoreAt: stores.length };
   }
 
