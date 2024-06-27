@@ -69,6 +69,7 @@ export function PreFormatted({
         lineBreakCount--;
         paragraphs.push(<UseBreakComponent key={paragraphs.length} />);
       }
+      lineBreakCount = 0;
 
       const currentClassName = typeof charClass === 'function' ? charClass(offset, text, cp) || '' : '';
       if (String(currentClassName) !== String(spanClassName)) {

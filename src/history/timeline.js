@@ -22,24 +22,7 @@ export function Timeline({ shortDID, searchQuery }) {
     shortDID + '\n' + searchQuery,
     () => getTimeline(shortDID, searchQuery));
 
-  let anyPlaceholder = false;
-  for (const postThread of retrieved?.timeline || []) {
-    if (postThread.current.placeholder || postThread.root.placeholder) {
-      anyPlaceholder = true;
-      break;
-    }
-
-    for (const post of postThread.all) {
-      if (post.placeholder) {
-        anyPlaceholder = true;
-        break;
-      }
-    }
-
-    if (anyPlaceholder) break;
-  }
-
-  if (anyPlaceholder || retrieved?.cachedOnly) {
+  if (retrieved?.cachedOnly) {
     setTimeout(next, 300);
   }
 
