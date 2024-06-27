@@ -67,20 +67,20 @@
 }
 
 /* src/widgets/account/full-handle.css */
-.handle-bsky-social-suffix {
+
+/* src/widgets/account/account-label.css */
+.account-label .handle-bsky-social-suffix {
   display: inline-block;
   zoom: 0.7;
   transform: scaleY(1.43) translateY(0.08em);
   transform-origin: bottom;
   opacity: 0.6;
 }
-.handle-bsky-social-suffix-dot {
+.account-label .handle-bsky-social-suffix-dot {
   opacity: 0.6;
   padding-left: 0.05em;
   padding-right: 0.1em;
 }
-
-/* src/widgets/account/account-label.css */
 .account-label .account-avatar {
   background: no-repeat center center;
   background-size: cover;
@@ -198,99 +198,71 @@
 /* src/history/history.css */
 .history-view {
   display: grid;
-  grid-template-rows: 20vh 13vh auto 1fr;
-  grid-template-columns: 1fr 20vh;
+  grid-template-rows: 20vh 7vh 7vh 14vh 1fr;
+  grid-template-columns: 14vh 1fr;
   min-height: 100vh;
 }
 .history-view .history-account-banner-bg {
-  grid-row: 1/3;
-  grid-column: 1/ 3;
-  background: no-repeat center center;
+  grid-row: 1 / 3;
+  grid-column: 1 / 3;
+  background: no-repeat left center;
   background-size: cover;
+  border-bottom: solid 1px silver;
 }
 .history-view .history-account-banner-stripe-below {
-  grid-row: 3;
-  grid-column: 1 / 3;
-  min-height: 0.5em;
-  background:
-    linear-gradient(
-      to right,
-      #001659,
-      #002289);
-  border-top: solid 1px #003595;
-  box-shadow: 0 4px 6px #00000036;
 }
 .history-view .history-account-avatar {
-  grid-row: 1;
-  grid-column: 2;
+  grid-row: 2 / 4;
+  grid-column: 1;
   background: no-repeat center center;
   background-size: cover;
-  margin-top: 1vh;
-  margin-right: 1vh;
   border-radius: 200%;
-  box-shadow:
-    0 0 2px black,
-    -0.4vh 0.5vh 3vh white,
-    inset -1vh -1vh 3vh #00000085,
-    inset 0.5vh 0.5vh 2vh #ffffff73;
+  box-shadow: 0 2px 1px white, inset -0.5vh -0.5vh 1vh #00000026;
   z-index: 3;
+  margin-top: 1vh;
+  margin-left: 1vh;
+  border: solid 0.6vh white;
 }
-.history-view .history-account-handle {
-  align-self: center;
+.history-view .history-account-displayName-and-handle {
   grid-row: 3;
-  grid-column: 1 / 3;
-  padding: 0.25em 0.9vh;
-  color: white;
-}
-.history-view .history-account-displayName {
-  grid-row: 1;
-  grid-column: 1;
-  align-self: center;
+  grid-column: 2;
   justify-self: start;
-  font-size: 6vh;
-  color: #002182;
-  font-weight: bold;
-  padding-left: 1vh;
-  padding-right: 1vh;
-  text-shadow: 0 0 2px white;
   position: relative;
   z-index: 1;
+  padding-top: 0.2em;
+  padding-left: 0.2em;
 }
-.history-view .history-account-displayName::before {
-  content: " ";
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: rgb(255 255 255);
-  border-radius: 2em;
-  filter: blur(20px);
-  transform: scaleX(1.2);
-  z-index: -1;
+.history-view .history-account-displayName {
+  font-size: 3vh;
+  line-height: 1;
+  text-shadow: 0 0.3px 1px black;
+}
+.history-view .history-account-handle {
+  padding-top: 0.5em;
+}
+.history-view .history-account-handle .at-sign {
+  display: inline-block;
+  text-align: center;
+  transform: scale(1.1) translateY(0.05em);
+  padding-right: 0.05em;
+}
+.history-view .history-account-handle .handle-bsky-social-suffix-dot {
+  padding-left: 0.1em;
+  padding-right: 0.05em;
+}
+.history-view .history-account-handle .handle-tld-suffix-dot {
+  padding-left: 0.1em;
+  padding-right: 0.05em;
+}
+.history-view .history-account-handle .handle-bsky-social-suffix {
 }
 .history-view .history-account-description {
-  grid-row: 2;
+  grid-row: 4;
   grid-column: 2;
   align-self: start;
-  justify-self: start;
-  text-shadow: 0 0 2px white;
+  line-height: 1.2;
   z-index: 4;
   position: relative;
   margin-top: 1vh;
-}
-.history-view .history-account-description::before {
-  content: " ";
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: rgb(255 255 255 / 71%);
-  border-radius: 2em;
-  filter: blur(10px);
-  transform: scaleX(1.2);
-  z-index: -2;
-  border: solid 4px cornflowerblue;
 }
 /*# sourceMappingURL=index.css.map */

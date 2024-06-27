@@ -99310,7 +99310,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     const { mainText, tldSuffix, bskySocialSuffix, didPrefix, didBody } = breakHandleParts(shortHandle);
     if (didBody)
       return /* @__PURE__ */ import_react8.default.createElement(FullDID, __spreadValues({ shortDID: shortHandle, Component: Component2 }, rest));
-    return /* @__PURE__ */ import_react8.default.createElement(Component2, __spreadValues({}, rest), /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-main-text" }, mainText), tldSuffix && /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-tld-suffix" }, tldSuffix), bskySocialSuffix && /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-bsky-social-suffix-dot" }, bskySocialSuffix.charAt(0)), /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-bsky-social-suffix" }, bskySocialSuffix.slice(1))));
+    return /* @__PURE__ */ import_react8.default.createElement(Component2, __spreadValues({}, rest), /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-main-text" }, mainText), tldSuffix && /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-tld-suffix-dot" }, tldSuffix.charAt(0)), /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-tld-suffix" }, tldSuffix.slice(1))), bskySocialSuffix && /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-bsky-social-suffix-dot" }, bskySocialSuffix.charAt(0)), /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-bsky-social-suffix" }, bskySocialSuffix.slice(1))));
   }
   function breakHandleParts(shortHandle) {
     if (!shortHandle)
@@ -99325,14 +99325,19 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     ;
     const fullHandle = unwrapShortHandle(shortHandle);
     shortHandle = shortenHandle(shortHandle);
-    const bskySocialSuffix = shortHandle === fullHandle ? void 0 : fullHandle.slice(shortHandle.length);
+    let bskySocialSuffix = shortHandle === fullHandle ? void 0 : fullHandle.slice(shortHandle.length);
     let mainText = shortHandle;
     let tldSuffix = void 0;
     if (!bskySocialSuffix) {
-      const lastDot = shortHandle.lastIndexOf(".");
-      if (lastDot > 0) {
-        mainText = shortHandle.slice(0, lastDot);
-        tldSuffix = shortHandle.slice(lastDot);
+      if (shortHandle.endsWith(".bskysoci.al")) {
+        mainText = shortHandle.slice(0, -".bskysoci.al".length);
+        bskySocialSuffix = ".bskysoci.al";
+      } else {
+        const lastDot = shortHandle.lastIndexOf(".");
+        if (lastDot > 0) {
+          mainText = shortHandle.slice(0, lastDot);
+          tldSuffix = shortHandle.slice(lastDot);
+        }
       }
     }
     return {
@@ -99462,7 +99467,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // package.json
-  var version4 = "0.2.1";
+  var version4 = "0.2.2";
 
   // src/localise.js
   function localise(english, languageMap) {
@@ -99918,13 +99923,13 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         className: suffixClassWhenEmpty("history-account-banner-bg", resolved.banner),
         style: !resolved.banner ? void 0 : { backgroundImage: `url(${resolved.banner})` }
       }
-    ), /* @__PURE__ */ import_react12.default.createElement("div", { className: "history-account-banner-stripe-below" }), /* @__PURE__ */ import_react12.default.createElement(
+    ), /* @__PURE__ */ import_react12.default.createElement(
       "div",
       {
         className: suffixClassWhenEmpty("history-account-avatar", resolved.avatar),
         style: !resolved.avatar ? void 0 : { backgroundImage: `url(${resolved.avatar})` }
       }
-    ), /* @__PURE__ */ import_react12.default.createElement("div", { className: "history-account-handle" }, /* @__PURE__ */ import_react12.default.createElement(FullHandle, { shortHandle: resolved.handle })), /* @__PURE__ */ import_react12.default.createElement("div", { className: suffixClassWhenEmpty("history-account-displayName", resolved.displayName) }, resolved.displayName), /* @__PURE__ */ import_react12.default.createElement("div", { className: suffixClassWhenEmpty("history-account-description", resolved.description) }, resolved.description));
+    ), /* @__PURE__ */ import_react12.default.createElement("div", { className: suffixClassWhenEmpty("history-account-displayName-and-handle", resolved.displayName) }, /* @__PURE__ */ import_react12.default.createElement("span", { className: "history-account-displayName" }, resolved.displayName), /* @__PURE__ */ import_react12.default.createElement("div", { className: "history-account-handle" }, /* @__PURE__ */ import_react12.default.createElement("span", { className: "at-sign" }, "@"), /* @__PURE__ */ import_react12.default.createElement(FullHandle, { shortHandle: resolved.handle }))), /* @__PURE__ */ import_react12.default.createElement("div", { className: suffixClassWhenEmpty("history-account-description", resolved.description) }, resolved.description));
   }
   function suffixClassWhenEmpty(className, value) {
     return value ? className : className + " " + className + "-empty";

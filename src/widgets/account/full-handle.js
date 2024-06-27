@@ -26,12 +26,17 @@ export function FullHandle({ shortHandle, Component, ...rest }) {
       </span>
       {
         tldSuffix &&
-        <span className='handle-tld-suffix'>{tldSuffix}</span>
+        <>
+          <span className='handle-tld-suffix-dot'>
+            {tldSuffix.charAt(0)}
+          </span>
+          <span className='handle-tld-suffix'>{tldSuffix.slice(1)}</span>
+        </>
       }
       {
         bskySocialSuffix &&
         <>
-        <span className='handle-bsky-social-suffix-dot'>
+          <span className='handle-bsky-social-suffix-dot'>
             {bskySocialSuffix.charAt(0)}
           </span>
           <span className='handle-bsky-social-suffix'>{bskySocialSuffix.slice(1)}</span>
@@ -66,15 +71,20 @@ export function breakHandleParts(shortHandle) {
 
   const fullHandle = unwrapShortHandle(shortHandle);
   shortHandle = shortenHandle(shortHandle);
-  const bskySocialSuffix = shortHandle === fullHandle ? undefined : fullHandle.slice(shortHandle.length);
+  let bskySocialSuffix = shortHandle === fullHandle ? undefined : fullHandle.slice(shortHandle.length);
 
   let mainText = shortHandle;
   let tldSuffix = undefined;
   if (!bskySocialSuffix) {
-    const lastDot = shortHandle.lastIndexOf('.');
-    if (lastDot > 0) {
-      mainText = shortHandle.slice(0, lastDot);
-      tldSuffix = shortHandle.slice(lastDot);
+    if (shortHandle.endsWith('.bskysoci.al')) {
+      mainText = shortHandle.slice(0, -'.bskysoci.al'.length);
+      bskySocialSuffix = '.bskysoci.al';
+    } else {
+      const lastDot = shortHandle.lastIndexOf('.');
+      if (lastDot > 0) {
+        mainText = shortHandle.slice(0, lastDot);
+        tldSuffix = shortHandle.slice(lastDot);
+      }
     }
   }
 

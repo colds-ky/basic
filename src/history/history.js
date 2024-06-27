@@ -77,20 +77,20 @@ function HistoryCore() {
         style={!resolved.banner ? undefined : { backgroundImage: `url(${resolved.banner})` }}>
       </div>
 
-      <div className='history-account-banner-stripe-below'>
-      </div>
-
       <div
         className={suffixClassWhenEmpty('history-account-avatar', resolved.avatar)}
         style={!resolved.avatar ? undefined : { backgroundImage: `url(${resolved.avatar})` }}>
       </div>
 
-      <div className='history-account-handle'>
-        <FullHandle shortHandle={resolved.handle} />
-      </div>
 
-      <div className={suffixClassWhenEmpty('history-account-displayName', resolved.displayName)}>
-        {resolved.displayName}
+      <div className={suffixClassWhenEmpty('history-account-displayName-and-handle', resolved.displayName)}>
+        <span className='history-account-displayName'>
+          {resolved.displayName}
+        </span>
+
+        <div className='history-account-handle'>
+          <span className='at-sign'>@</span><FullHandle shortHandle={resolved.handle} />
+        </div>
       </div>
 
       <div className={suffixClassWhenEmpty('history-account-description', resolved.description)}>

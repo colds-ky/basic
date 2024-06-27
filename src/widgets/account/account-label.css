@@ -1,3 +1,18 @@
+.account-label .handle-bsky-social-suffix {
+  display: inline-block;
+  zoom: 0.7;
+  transform: scaleY(1.43) translateY(0.08em);
+  transform-origin: bottom;
+  opacity: 0.6;
+}
+
+.account-label .handle-bsky-social-suffix-dot {
+  opacity: 0.6;
+  padding-left: 0.05em;
+  padding-right: 0.1em;
+}
+
+
 .account-label .account-avatar {
   background: no-repeat center center;
   background-size: cover;
