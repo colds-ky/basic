@@ -223,7 +223,7 @@
 
 @media (min-aspect-ratio: 5.5/5) {
   .history-layout {
-    grid-template-rows: 10rem 5.5rem 5.5rem auto 1fr;
+    grid-template-rows: 10rem 5.5rem 5.5rem auto auto 1fr;
     grid-template-columns: 11rem 1fr;
   }
 
