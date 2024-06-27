@@ -16,7 +16,7 @@ export function Landing() {
   return (
     <div className='landing'>
       <div className='landing-top-bar'>
-        <a href="https://bsky.app/profile/oyin.bo">oyin.bo</a>
+        <a href="https://bsky.app/profile/gist.ing">𝕲𝖎𝖘𝖙</a>
       </div>
 
       <div className='landing-handle-band'>
