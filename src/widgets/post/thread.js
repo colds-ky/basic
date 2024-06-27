@@ -73,7 +73,7 @@ export function ThreadView({
     thread && threadStructure(thread, significantPost),
     [thread, significantPost]);
 
-    if (!threadBranch.significantPostCount) {
+  if (!threadBranch.significantPostCount) {
     return (
       <PostFrame className={className}>
         <CompletePostContent
@@ -244,17 +244,17 @@ function CollapsedManyPosts({ posts }) {
         <AccountChip account={firstAccount} />
       </div>
       <div className='collapsed-many-posts-rest'>
-      {
-        frequentAccounts.map(account => (
-          <span key={account} className='collapsed-many-posts-rest-one'>
-            <AccountChip account={account} />
-          </span>
-        ))
+        {
+          frequentAccounts.map(account => (
+            <span key={account} className='collapsed-many-posts-rest-one'>
+              <AccountChip account={account} />
+            </span>
+          ))
         }
         <span className='collapsed-many-posts-counter'>
           {posts.length.toLocaleString()}
         </span>
-        </div>
+      </div>
     </div>
   );
 }

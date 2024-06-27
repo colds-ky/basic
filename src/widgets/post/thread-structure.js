@@ -254,6 +254,10 @@ function discoverConversations(convoStarter, pressureToFindConversation) {
       totalBranchInterest,
       pressureToFindConversation
     );
+
+    if (!convoStarter.conversationDirection) {
+      convoStarter.insignificants = convoStarter.children;
+    }
   }
 
   if (convoStarter.conversationDirection) {
