@@ -37,7 +37,7 @@ export function Timeline({ shortDID, searchQuery }) {
             <ThreadView
               key={i}
               thread={thread}
-              significantPost={post => !!post.matches?.length}
+              significantPost={post => searchQuery ? !!post.matches?.length : post.shortDID === shortDID}
               linkTimestamp={true}
               linkAuthor={true}
             />
