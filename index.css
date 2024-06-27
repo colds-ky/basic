@@ -288,6 +288,18 @@ a.account-label.account-handle {
   position: relative;
   min-height: 2.7em;
 }
+.complete-post-content.notes-height-2 {
+  min-height: 5.9em;
+}
+.complete-post-content.notes-height-3 {
+  min-height: 7em;
+}
+.complete-post-content.notes-height-4 {
+  min-height: 8.1em;
+}
+.complete-post-content.notes-height-5 {
+  min-height: 9.2em;
+}
 .complete-post-content .post-text-content {
   margin-right: 2em;
 }

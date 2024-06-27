@@ -196,11 +196,11 @@ export function CompletePostContent({
       <div className='post-notes-area'>
         {
           !replies?.length ? null :
-            <div className='post-notes'>
+            <div className='post-replies'>
               <ReplyAvatars shortDIDs={replyAvatars} />
             </div>
         }
-        <div className='post-replies'>
+        <div className='post-likes'>
           <span className='tiny-text-for-copy-paste'>
             {
               !post.likeCount ? undefined :
@@ -212,15 +212,15 @@ export function CompletePostContent({
           </span>
           {
             !post?.likeCount || post.likeCount === 1 ? undefined :
-              (
-                post.embeds?.length ?
-                  <div className='post-like-count'>
-                    {post.likeCount.toLocaleString()}
-                  </div> :
-                  <span className='post-like-count'>
-                    {post.likeCount.toLocaleString()}
-                  </span>
-              )
+                (
+                  post.embeds?.length ?
+                    <div className='post-like-count'>
+                      {post.likeCount.toLocaleString()}
+                    </div> :
+                    <span className='post-like-count'>
+                      {post.likeCount.toLocaleString()}
+                    </span>
+                )
           }
           <FavoriteBorder className={post.likeCount ? 'heart-icon heart-icon-with-likes' : 'heart-icon heart-icon-no-likes'} />
         </div>
