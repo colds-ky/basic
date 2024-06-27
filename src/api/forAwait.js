@@ -193,9 +193,9 @@ class AwaitState {
         return this.continueWithFunction(from, run, derive, completedNaturally);
       if (isPromise(derive))
         return this.continueWithPromise(from, run, derive, completedNaturally);
-      if (Array.isArray(derive))
+      if (Array.isArray(derive) || typeof derive.length === 'number')
         return this.continueWithArray(from, run, derive, completedNaturally);
-      if (isIterable(derive))
+      if (isIterable(derive) && typeof derive !== 'string')
         return this.continueWithIterable(from, run, derive, completedNaturally);
       if (isAsyncIterable(derive))
         return this.continueWithAsyncIterable(from, run, derive, completedNaturally);
@@ -275,8 +275,9 @@ class AwaitState {
  * @param {() => void} completedNaturally
  */
   continueWithArray(from, run, array, completedNaturally) {
-    // treat array like iterable, no optimizations for now
-    this.continueWithIterable(from, run, array, completedNaturally);
+    // array is probably not intended to be iterated
+    this.continueWithScalar(from, run, /** @type {*} */(array));
+    completedNaturally();
   }
 
   /**
