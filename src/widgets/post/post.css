@@ -23,7 +23,28 @@
   white-space: nowrap;
 }
 
+.post-top-line .post-author {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  grid-column: 1; grid-row: 1;
+}
+
+.post-top-line .post-author-right-overlay {
+  grid-column: 1; grid-row: 1;
+  pointer-events: none;
+  justify-self: end;
+  width: 4em;
+  background: linear-gradient(to left, #fffbeb, transparent);
+}
+
+@media (max-width: 540px) {
+  .post-top-line .post-author .account-label-display-name {
+    display: none;
+  }
+}
+
 .post-top-line .post-date {
+  grid-column: 2; grid-row: 1;
   opacity: 0.5;
   color: inherit;
   text-decoration: none;
@@ -97,6 +118,7 @@
 
 .post-embeds-section .post-embed-link-title {
   padding: 0.5em 1em;
+  padding-top: 0.6em;
   font-size: 110%;
   color: #2177bd;
 }
@@ -113,7 +135,7 @@
 
 .post-embeds-section .post-embed-link-url {
   padding-left: 1.2em;
-  padding-bottom: 0.1em;
+  padding-bottom: 0.2em;
   font-size: 90%;
   color: white;
   background: #379ef1;

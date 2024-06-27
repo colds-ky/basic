@@ -147,7 +147,32 @@
   grid-template-columns: 1fr auto;
   white-space: nowrap;
 }
+.post-top-line .post-author {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  grid-column: 1;
+  grid-row: 1;
+}
+.post-top-line .post-author-right-overlay {
+  grid-column: 1;
+  grid-row: 1;
+  pointer-events: none;
+  justify-self: end;
+  width: 4em;
+  background:
+    linear-gradient(
+      to left,
+      #fffbeb,
+      transparent);
+}
+@media (max-width: 540px) {
+  .post-top-line .post-author .account-label-display-name {
+    display: none;
+  }
+}
 .post-top-line .post-date {
+  grid-column: 2;
+  grid-row: 1;
   opacity: 0.5;
   color: inherit;
   text-decoration: none;
@@ -216,6 +241,7 @@
 }
 .post-embeds-section .post-embed-link-title {
   padding: 0.5em 1em;
+  padding-top: 0.6em;
   font-size: 110%;
   color: #2177bd;
 }
@@ -229,7 +255,7 @@
 }
 .post-embeds-section .post-embed-link-url {
   padding-left: 1.2em;
-  padding-bottom: 0.1em;
+  padding-bottom: 0.2em;
   font-size: 90%;
   color: white;
   background: #379ef1;
@@ -537,6 +563,28 @@ html.account body {
   top: 3vmax;
   z-index: 10;
 }
+.history-view .history-account-displayName-and-handle .history-account-displayName {
+  display: block;
+  position: relative;
+  height: 1em;
+  width: 100%;
+}
+.history-view .history-account-displayName-and-handle .history-account-displayName .history-account-displayName-inner {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
+.history-view .history-account-displayName-and-handle .history-account-displayName .history-account-displayName-stroke {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  -webkit-text-stroke: 5px white;
+  color: white;
+  filter: blur(1px);
+  pointer-events: none;
+}
 .history-view .sticky-header-background,
 .history-view .sticky-header-background-cover {
   grid-row: 2 / 4;
@@ -559,6 +607,7 @@ html.account body {
 .history-view .history-account-displayName {
   font-size: 3vmax;
   line-height: 1;
+  overflow-wrap: anywhere;
   text-shadow: 0 0.3px 1px black;
 }
 .history-view .history-account-handle {

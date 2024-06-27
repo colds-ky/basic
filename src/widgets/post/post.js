@@ -114,6 +114,7 @@ function LoadedPost({ post, compact, linkTimestamp, linkAuthor }) {
           withDisplayName={!compact}
           linkToTimeline={linkAuthor}
         />
+        <span className='post-author-right-overlay'></span>
         <PostTimestamp post={post} linkTimestamp={linkTimestamp} />
       </div>
       <PreFormatted className='post-content' text={post.text} />

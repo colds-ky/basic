@@ -60,6 +60,32 @@ html.account body {
   z-index: 10;
 }
 
+.history-view .history-account-displayName-and-handle .history-account-displayName {
+  display: block;
+  position: relative;
+  height: 1em;
+  width: 100%;
+}
+
+.history-view .history-account-displayName-and-handle .history-account-displayName
+    .history-account-displayName-inner {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.history-view .history-account-displayName-and-handle .history-account-displayName .history-account-displayName-stroke {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  -webkit-text-stroke: 5px white;
+  color: white;
+  filter: blur(1px);
+  pointer-events: none;
+}
+
 .history-view .sticky-header-background,
   .history-view .sticky-header-background-cover {
   grid-row: 2 / 4;
@@ -84,6 +110,7 @@ html.account body {
 .history-view .history-account-displayName {
   font-size: 3vmax;
   line-height: 1;
+  overflow-wrap: anywhere;
   text-shadow: 0 0.3px 1px black;
 }
 

@@ -80,7 +80,12 @@ function HistoryCore() {
 
       <div className={suffixClassWhenEmpty('history-account-displayName-and-handle', resolved.displayName, resolved)}>
         <span className={suffixClassWhenEmpty('history-account-displayName', resolved.displayName, resolved)}>
-          {resolved.displayName}
+          <span className='history-account-displayName-stroke'>
+            {resolved.displayName}
+          </span>
+          <span className='history-account-displayName-inner'>
+            {resolved.displayName}
+          </span>
         </span>
 
         <div className='history-account-handle'>
