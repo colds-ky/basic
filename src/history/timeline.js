@@ -1,5 +1,6 @@
 // @ts-check
 
+import SettingsIcon from '@mui/icons-material/Settings';
 import React from 'react';
 
 import { useDB } from '..';
@@ -7,6 +8,7 @@ import { useForAwait } from '../../coldsky/src/api/forAwait';
 import { ThreadView } from '../widgets/post/thread';
 import { Visible } from '../widgets/visible';
 
+import { localise } from '../localise';
 import './timeline.css';
 
 /**
@@ -30,7 +32,7 @@ export function Timeline({ shortDID, searchQuery }) {
     <div className='timeline-container'>
       {
         !retrieved?.timeline ? undefined :
-        
+
           retrieved.timeline.map((thread, i) => (
             <ThreadView
               key={i}
@@ -47,19 +49,76 @@ export function Timeline({ shortDID, searchQuery }) {
         }>
         <div className='timeline-bottom-visibility-spacer'>
           <div className='timeline-bottom-visibility-spacer-inner'>
-            <Visible onVisible={next}>
+            <Visible onVisible={() => {
+              next();
+            }}>
               <div>&nbsp;</div>
             </Visible>
           </div>
         </div>
-        <button onClick={() =>
-          next()
-        }>
-          Search more...
-        </button>
+        <VisibleTimelineFooter
+          cachedOnly={retrieved?.cachedOnly}
+          complete={retrieved?.complete}
+          searchQuery={searchQuery}
+          next={next}
+        />
       </Visible>
     </div>
   );
+
+  /**
+   * @param {{
+   *  cachedOnly?: boolean,
+   *  complete?: boolean,
+   *  searchQuery?: any,
+   *  next?: () => void
+   * }} _
+   */
+  function VisibleTimelineFooter({ cachedOnly, complete, searchQuery, next }) {
+    let footerText = '';
+    let footerClass = 'bottom-more';
+    if (complete) {
+      if (searchQuery) {
+        footerText = localise('Search complete.', { uk: 'Більше нема.' });
+        footerClass = 'timeline-footer timeline-footer-search timeline-footer-search-complete';
+      } else {
+        footerText = localise('Timeline end.', { uk: 'Все. Край стрічки.' });
+        footerClass = 'timeline-footer timeline-footer-complete';
+      }
+    }
+    else if (searchQuery) {
+      if (cachedOnly) {
+        footerText = localise('Loading search results...', { uk: 'Пошук...' });
+        footerClass = 'timeline-footer timeline-footer-search timeline-footer-search-cached';
+      } else {
+        footerText = localise('Loading more search results...', { uk: 'Пошук ще...' });
+        footerClass = 'timeline-footer timeline-footer-search';
+      }
+    } else {
+      if (cachedOnly) {
+        footerText = localise('Loading...', { uk: 'Завантаження...' });
+        footerClass = 'timeline-footer timeline-footer-cached';
+      } else {
+        footerText = localise('Loading more...', { uk: 'Ще...' });
+        footerClass = 'timeline-footer';
+      }
+    }
+
+    return (
+      <div className={footerClass}>
+      <button className='footer-button' onClick={() => {
+        next?.();
+        }}>
+        {
+          <SettingsIcon className='footer-cog-icon' />
+        }
+        {
+          footerText
+        }
+      </button>
+      </div>
+    );
+  }
 
 
   /**
@@ -112,10 +171,12 @@ export function Timeline({ shortDID, searchQuery }) {
           };
 
           historicalPostThreads.push(postThreadRetrieved);
-          yield { timeline: historicalPostThreads, cachedOnly: entries.cachedOnly };
+          yield { timeline: historicalPostThreads, cachedOnly: entries.cachedOnly, complete: false };
         }
       }
       console.log('timeline to end...');
+
+      yield { timeline: historicalPostThreads, cachedOnly: false, complete: true };
     } finally {
       console.log('timeline finally');
     }
