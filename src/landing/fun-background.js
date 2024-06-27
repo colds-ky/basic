@@ -9,7 +9,7 @@ import { forAwait } from '../../coldsky/src/api/forAwait';
 import { AccountLabel } from '../widgets/account';
 
 const POST_DEBOUNCE_MSEC = 1000;
-const POST_MAX_AGE = 1000 * 30;
+const POST_MAX_AGE = 1000 * 40;
 const DESIRED_POST_COUNT = 7;
 
 export function FunBackground() {

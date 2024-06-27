@@ -99214,7 +99214,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
 
   // src/landing/fun-background.js
   var POST_DEBOUNCE_MSEC = 1e3;
-  var POST_MAX_AGE = 1e3 * 30;
+  var POST_MAX_AGE = 1e3 * 40;
   var DESIRED_POST_COUNT = 7;
   function FunBackground() {
     const { bestThreads } = forAwait("now", getFirehoseThreads) || {};
@@ -99304,7 +99304,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // package.json
-  var version4 = "0.1.13";
+  var version4 = "0.1.14";
 
   // src/localise.js
   function localise(english, languageMap) {
