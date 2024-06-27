@@ -99396,7 +99396,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // package.json
-  var version4 = "0.1.18";
+  var version4 = "0.1.19";
 
   // src/localise.js
   function localise(english, languageMap) {
@@ -99494,7 +99494,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         autoComplete: "nickname",
         label: localise(
           "Searching for anything?",
-          { uk: "\u0429\u043E\u0441\u044C \u0448\u0443\u043A\u0430\u0454\u043C\u043E, \u0447\u0438 \u043F\u0440\u043E\u0441\u0442\u043E \u043F\u043E\u0434\u0438\u0432\u0438\u0442\u0438\u0441\u044C?" }
+          { uk: "\u0428\u0443\u043A\u0430\u0454\u043C\u043E \u0449\u043E\u0441\u044C, \u0447\u0438 \u0448\u043E?" }
         ),
         variant: "standard",
         value: searchText,

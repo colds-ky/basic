@@ -66,7 +66,7 @@ export function LandingCore() {
           autoComplete="nickname"
           label={localise(
             'Searching for anything?',
-            { uk: 'Щось шукаємо, чи просто подивитись?' })}
+            { uk: 'Шукаємо щось, чи шо?' })}
           variant='standard'
           value={searchText}
           onChange={(e) => {
