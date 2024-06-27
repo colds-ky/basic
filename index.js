@@ -98335,7 +98335,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // coldsky/package.json
-  var version4 = "0.2.12";
+  var version4 = "0.2.13";
 
   // coldsky/lib/firehose-short-dids.js
   function firehoseShortDIDs(filterShortDIDs) {
@@ -100518,7 +100518,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         const postRecord = yield agent_getRepoRecord_throttled(
           unwrapShortDID(parsedURL.shortDID),
           parsedURL.postID,
-          "app.bsky.actor.post"
+          "app.bsky.feed.post"
         );
         const post = dbStore.captureRecord(
           /** @type {*} */
@@ -100869,11 +100869,12 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // coldsky/lib/data/capture-records/compact-post-embeds.js
-  function extractEmbeds(embed) {
+  function extractEmbeds(shortDID, embed) {
     if (!embed)
       return;
     let embeds = void 0;
     embeds = addEmbedImages(
+      shortDID,
       /** @type {import('@atproto/api').AppBskyEmbedImages.Main} */
       embed.images,
       embeds
@@ -100889,13 +100890,14 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       embeds
     );
     embeds = addEmbedRecordMedia(
+      shortDID,
       /** @type {import('@atproto/api').AppBskyEmbedRecordWithMedia.Main} */
       embed.media,
       embeds
     );
     return embeds;
   }
-  function addEmbedImages(embedImages, embeds) {
+  function addEmbedImages(shortDID, embedImages, embeds) {
     var _a3;
     if (!(embedImages == null ? void 0 : embedImages.length))
       return embeds;
@@ -100906,7 +100908,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         embeds,
         /** @type {import('../..').CompactEmbed} */
         {
-          imgSrc: (_a3 = img.image) == null ? void 0 : _a3.toString(),
+          imgSrc: getFeedBlobUrl(shortDID, String((_a3 = img.image) == null ? void 0 : _a3.ref)),
           description: img.alt,
           aspectRatio: img.aspectRatio
         }
@@ -100940,10 +100942,11 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       }
     );
   }
-  function addEmbedRecordMedia(embedRecordMedia, embeds) {
+  function addEmbedRecordMedia(shortDID, embedRecordMedia, embeds) {
     if (!embedRecordMedia)
       return embeds;
     embeds = addEmbedImages(
+      shortDID,
       /** @type {import('@atproto/api').AppBskyEmbedImages.Main} */
       embedRecordMedia.images,
       embeds
@@ -101035,7 +101038,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     var _a3, _b, _c, _d, _e, _f;
     const shortDID = shortenDID(repo);
     let words = detectWordStartsNormalized(record.text, void 0);
-    const embeds = extractEmbeds(record.embed);
+    const embeds = extractEmbeds(repo, record.embed);
     const facets = extractFacets(record.facets, record.text);
     let quoting;
     if (embeds == null ? void 0 : embeds.length) {
@@ -102120,7 +102123,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // package.json
-  var version5 = "0.2.12";
+  var version5 = "0.2.13";
 
   // src/landing/landing.js
   var uppercase_GIST = localise("\u{1D4D6}\u{1D4D8}\u{1D4E2}\u{1D4E3}", { uk: "\u{1D4F7}\u{1D4EE}\u{1D4F9}\u{1D4EE}\u{1D4EC}\u{1D502}\u{1D4F0}" });
@@ -102318,32 +102321,78 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
   function LoadedPost({ post }) {
     var _a3;
-    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-loaded-content" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-top-line" }, /* @__PURE__ */ import_react15.default.createElement(AccountLabel, { className: "post-author", account: post.shortDID }), post.asOf ? /* @__PURE__ */ import_react15.default.createElement(FormatTime, { className: "post-date", time: post.asOf }) : void 0), /* @__PURE__ */ import_react15.default.createElement(PreFormatted, { className: "post-content", text: post.text }), !((_a3 = post.embeds) == null ? void 0 : _a3.length) ? void 0 : /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-embeds" }, post.embeds.map((embed, idx) => /* @__PURE__ */ import_react15.default.createElement(PostEmbed, { key: idx, embed }))), /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-likes" }, /* @__PURE__ */ import_react15.default.createElement(FavoriteBorder_default, null), !(post == null ? void 0 : post.likeCount) ? "" : post.likeCount.toLocaleString()));
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-loaded-content", onClick: () => {
+      console.log("post clicked ", post);
+    } }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-top-line" }, /* @__PURE__ */ import_react15.default.createElement(AccountLabel, { className: "post-author", account: post.shortDID }), post.asOf ? /* @__PURE__ */ import_react15.default.createElement(FormatTime, { className: "post-date", time: post.asOf }) : void 0), /* @__PURE__ */ import_react15.default.createElement(PreFormatted, { className: "post-content", text: post.text }), !((_a3 = post.embeds) == null ? void 0 : _a3.length) ? void 0 : /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-embeds" }, post.embeds.map((embed, idx) => /* @__PURE__ */ import_react15.default.createElement(PostEmbed, { key: idx, embed }))), /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-likes" }, /* @__PURE__ */ import_react15.default.createElement(FavoriteBorder_default, null), !(post == null ? void 0 : post.likeCount) ? "" : post.likeCount.toLocaleString()));
   }
   function PostEmbed(_a3) {
     var _b = _a3, { className, embed } = _b, rest = __objRest(_b, ["className", "embed"]);
     const parsedPostURL = breakFeedUri(embed.url);
-    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-embed " + (className || "") }, parsedPostURL ? /* @__PURE__ */ import_react15.default.createElement(
+    return /* @__PURE__ */ import_react15.default.createElement("div", __spreadValues({ className: "post-embed " + (className || "") }, rest), parsedPostURL ? /* @__PURE__ */ import_react15.default.createElement(
       PostEmbeddedIntoAnother,
       {
         uri: embed.url
       }
-    ) : /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-embed-url" }, JSON.stringify(embed)));
+    ) : /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-embed-container" }, !embed.imgSrc ? void 0 : /* @__PURE__ */ import_react15.default.createElement(
+      "img",
+      {
+        className: "post-embed-image",
+        src: embed.imgSrc,
+        alt: embed.title || embed.description
+      }
+    ), !embed.title ? void 0 : /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-embed-title" }, embed.title), !embed.description ? void 0 : /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-embed-description" }, embed.description), /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-embed-border" })));
   }
   function PostEmbeddedIntoAnother({ uri }) {
+    const parsedURI = breakFeedUri(uri);
+    const db2 = useDB();
+    const resolveToHandle = forAwait(uri, function() {
+      return __asyncGenerator(this, null, function* () {
+        try {
+          for (var iter = __forAwait(db2.getProfileIncrementally(parsedURI == null ? void 0 : parsedURI.shortDID)), more, temp, error; more = !(temp = yield new __await(iter.next())).done; more = false) {
+            const profile = temp.value;
+            if (profile.handle) {
+              yield profile.handle;
+              yield new __await(new Promise((resolve) => setTimeout(resolve, 10)));
+              break;
+            }
+          }
+        } catch (temp) {
+          error = [temp];
+        } finally {
+          try {
+            more && (temp = iter.return) && (yield new __await(temp.call(iter)));
+          } finally {
+            if (error)
+              throw error[0];
+          }
+        }
+      });
+    });
+    const postURL = "/" + (resolveToHandle || (parsedURI == null ? void 0 : parsedURI.shortDID)) + "/" + (parsedURI == null ? void 0 : parsedURI.postID);
     return /* @__PURE__ */ import_react15.default.createElement(
-      "a",
+      Link,
       {
         className: "post-embed-url",
-        href: uri,
-        target: "_blank",
-        rel: "noreferrer"
+        to: postURL
       },
       /* @__PURE__ */ import_react15.default.createElement(Post, { post: uri })
     );
   }
 
   // src/widgets/post/thread.js
+  function Thread(_a3) {
+    var _b = _a3, { className, uri } = _b, rest = __objRest(_b, ["className", "uri"]);
+    const db2 = useDB();
+    const thread = forAwait(uri, () => db2.getPostThreadIncrementally(uri));
+    return !thread ? /* @__PURE__ */ import_react16.default.createElement("div", __spreadValues({ className: "thread-loading-placeholder" }, rest), localise("Loading thread...", { uk: "\u0417\u0430\u0432\u0430\u043D\u0442\u0430\u0436\u0435\u043D\u043D\u044F \u0434\u0438\u0441\u043A\u0443\u0441\u0456\u0457..." })) : /* @__PURE__ */ import_react16.default.createElement(
+      ThreadView,
+      __spreadValues({
+        className: "thread " + (className || ""),
+        shortDID: thread.current.shortDID,
+        thread
+      }, rest)
+    );
+  }
   function ThreadView(_a3) {
     var _b = _a3, { className, shortDID, thread, underPrevious } = _b, rest = __objRest(_b, ["className", "shortDID", "thread", "underPrevious"]);
     const root = layoutThread(shortDID, thread);
@@ -102542,6 +102591,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       {
         onVisible: () => next2()
       },
+      /* @__PURE__ */ import_react19.default.createElement("div", { className: "timeline-bottom-visibility-spacer" }, /* @__PURE__ */ import_react19.default.createElement("div", { className: "timeline-bottom-visibility-spacer-inner" }, /* @__PURE__ */ import_react19.default.createElement(Visible, { onVisible: next2 }, /* @__PURE__ */ import_react19.default.createElement("div", null, "\xA0")))),
       /* @__PURE__ */ import_react19.default.createElement("button", { onClick: () => next2() }, "Search more...")
     ));
     function getTimeline(didOrHandle) {
@@ -102950,7 +103000,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
   function HistoryCore() {
     const db2 = useDB();
-    let { handle } = useParams();
+    let { handle, post } = useParams();
     const resolved = forAwait(handle, () => db2.getProfileIncrementally(handle)) || {
       did: likelyDID(handle) ? shortenDID(handle) : localise("did/" + handle, { uk: "\u0434\u0456\u0434/" + handle }),
       handle: likelyDID(handle) ? localise("loading....bsky.social", { uk: "\u0445\u0432\u0438\u043B\u0438\u043D\u043E\u0447\u043A\u0443....bsky.social" }) : handle,
@@ -102973,7 +103023,6 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         stop = true;
       };
     }, [resolved == null ? void 0 : resolved.avatar]);
-    console.log("profile ", resolved, resolved.banner);
     return /* @__PURE__ */ import_react21.default.createElement("div", { className: "history-view" }, /* @__PURE__ */ import_react21.default.createElement(
       "div",
       {
@@ -102992,7 +103041,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         text: resolved.description,
         className: suffixClassWhenEmpty("history-account-description", resolved.description, resolved)
       }
-    ), /* @__PURE__ */ import_react21.default.createElement("div", { className: "timeline-container" }, resolved.placeholder ? void 0 : /* @__PURE__ */ import_react21.default.createElement(Timeline, { shortDID: resolved.shortDID })));
+    ), /* @__PURE__ */ import_react21.default.createElement("div", { className: "timeline-container" }, resolved.placeholder ? void 0 : !post ? /* @__PURE__ */ import_react21.default.createElement(Timeline, { shortDID: resolved.shortDID }) : /* @__PURE__ */ import_react21.default.createElement(Thread, { uri: makeFeedUri(resolved.shortDID, post) })));
   }
   function suffixClassWhenEmpty(className, value, hasPlaceholder) {
     const withEmpty = value ? className : className + " " + className + "-empty";
@@ -103018,7 +103067,8 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       [
         { path: "/", element: /* @__PURE__ */ import_react22.default.createElement(Landing, null) },
         { path: "/index.html", element: /* @__PURE__ */ import_react22.default.createElement(Landing, null) },
-        { path: "/:handle", element: /* @__PURE__ */ import_react22.default.createElement(History, null) }
+        { path: "/:handle", element: /* @__PURE__ */ import_react22.default.createElement(History, null) },
+        { path: "/:handle/:post", element: /* @__PURE__ */ import_react22.default.createElement(History, null) }
       ],
       {
         basename

@@ -2,10 +2,38 @@
 
 import React from 'react';
 
+import { useDB } from '../..';
+import { forAwait } from '../../../coldsky/src/api/forAwait';
+import { localise } from '../../localise';
 import { AccountChip } from '../account/account-chip';
 import { Post } from './post';
 
 import './thread.css';
+
+/**
+ * @param {{
+ *  className?: string,
+ *  uri: string
+ * }} _
+ */
+export function Thread({ className, uri, ...rest }) {
+  const db = useDB();
+
+  const thread = forAwait(uri, () => db.getPostThreadIncrementally(uri));
+
+  return (
+    !thread ?
+      <div className='thread-loading-placeholder' {...rest}>
+        {localise('Loading thread...', { uk: 'Завантаження дискусії...' })}
+      </div> :
+    <ThreadView
+      className={'thread ' + (className || '')}
+      shortDID={thread.current.shortDID}
+      thread={thread}
+      {...rest}
+    />
+  );
+}
 
 /**
  * @param {{

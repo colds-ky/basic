@@ -14,9 +14,8 @@ import { useDB } from '..';
 import './history.css';
 import { PreFormatted } from '../widgets/preformatted';
 import { HistoryPageDecorations } from './history-page-decorations';
-import { likelyDID, shortenDID } from '../../coldsky/lib';
-
-const middledot = '\u00B7';
+import { breakFeedUri, likelyDID, makeFeedUri, shortenDID } from '../../coldsky/lib';
+import { Thread, ThreadView } from '../widgets/post/thread';
 
 export function History() {
   return (
@@ -29,7 +28,7 @@ export function History() {
 function HistoryCore() {
 
   const db = useDB();
-  let { handle } = useParams();
+  let { handle, post } = useParams();
 
   /** @type {import('../../coldsky/lib').CompactProfile & { placeholder?: boolean }} */
   const resolved = forAwait(handle, () => db.getProfileIncrementally(handle)) ||
@@ -55,8 +54,7 @@ function HistoryCore() {
       stop = true;
     }
   }, [resolved?.avatar]);
-
-  console.log('profile ', resolved, resolved.banner);
+    
 
   return (
     <div className='history-view'>
@@ -91,7 +89,8 @@ function HistoryCore() {
       <div className='timeline-container'>
         {
           resolved.placeholder ? undefined :
-          <Timeline shortDID={resolved.shortDID} />
+            !post ? <Timeline shortDID={resolved.shortDID} /> :
+              <Thread uri={makeFeedUri(resolved.shortDID, post)} />
         }
       </div>
 

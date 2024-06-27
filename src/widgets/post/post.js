@@ -12,6 +12,7 @@ import { FormatTime } from '../format-time';
 import { breakFeedUri } from '../../../coldsky/lib';
 import { useDB } from '../..';
 import { forAwait } from '../../../coldsky/src/api/forAwait';
+import { Link } from 'react-router-dom';
 
 /**
  * @typedef {import('../../../coldsky/lib').MatchCompactPost} MatchCompactPost
@@ -81,7 +82,9 @@ function LoadingPostInProgress({ uri }) {
  */
 function LoadedPost({ post }) {
   return (
-    <div className='post-loaded-content'>
+    <div className='post-loaded-content' onClick={() => {
+      console.log('post clicked ', post);
+    }}>
       <div className='post-top-line'>
         <AccountLabel className='post-author' account={post.shortDID} />
         {post.asOf ?
@@ -121,13 +124,32 @@ function PostEmbed({ className, embed, ...rest }) {
   const parsedPostURL = breakFeedUri(embed.url);
 
   return (
-    <div className={'post-embed ' + (className || '')}>
+    <div className={'post-embed ' + (className || '')} {...rest}>
       {
         parsedPostURL ?
           <PostEmbeddedIntoAnother
             uri={embed.url} /> :
-          <div className='post-embed-url'>
-            {JSON.stringify(embed)}
+          <div className='post-embed-container'>
+            {
+              !embed.imgSrc ? undefined :
+                <img
+                  className='post-embed-image'
+                  src={embed.imgSrc} alt={embed.title || embed.description} />
+            }
+            {
+              !embed.title ? undefined :
+                <div className='post-embed-title'>
+                  {embed.title}
+                </div>
+            }
+            {
+              !embed.description ? undefined :
+                <div className='post-embed-description'>
+                  {embed.description}
+                </div>
+            }
+            <div className='post-embed-border'>
+            </div>
           </div>
       }
     </div>
@@ -135,13 +157,26 @@ function PostEmbed({ className, embed, ...rest }) {
 }
 
 function PostEmbeddedIntoAnother({ uri }) {
+  const parsedURI = breakFeedUri(uri);
+  const db = useDB();
+  const resolveToHandle = forAwait(uri, async function*() {
+    for await (const profile of db.getProfileIncrementally(parsedURI?.shortDID)) {
+      if (profile.handle) {
+        yield profile.handle;
+        await new Promise(resolve => setTimeout(resolve, 10));
+        break;
+      }
+    }
+  });
+
+  const postURL =
+    '/' + (resolveToHandle || parsedURI?.shortDID) + '/' + parsedURI?.postID;
+
   return (
-    <a
+    <Link
       className='post-embed-url'
-      href={uri}
-      target='_blank'
-      rel='noreferrer'>
+      to={postURL}>
       <Post post={uri} />
-    </a>
+    </Link>
   );
 }

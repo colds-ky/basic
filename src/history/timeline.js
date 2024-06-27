@@ -8,6 +8,7 @@ import { ThreadView } from '../widgets/post/thread';
 import { Visible } from '../widgets/visible';
 
 import './timeline.css';
+import { Visibility } from '@mui/icons-material';
 
 /**
  * @param {{
@@ -52,6 +53,13 @@ export function Timeline({ shortDID }) {
         onVisible={() =>
           next()
         }>
+        <div className='timeline-bottom-visibility-spacer'>
+          <div className='timeline-bottom-visibility-spacer-inner'>
+            <Visible onVisible={next}>
+              <div>&nbsp;</div>
+            </Visible>
+          </div>
+        </div>
         <button onClick={() =>
           next()
         }>

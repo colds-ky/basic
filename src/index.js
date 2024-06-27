@@ -41,11 +41,11 @@ function runApp() {
     [
       { path: '/', element: <Landing /> },
       { path: '/index.html', element: <Landing /> },
-      { path: '/:handle', element: <History /> }
+      { path: '/:handle', element: <History /> },
+      { path: '/:handle/:post', element: <History /> },
     ], {
     basename
   });
-
 
   const root = document.createElement('div');
   root.id = 'root';
