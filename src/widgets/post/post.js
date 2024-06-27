@@ -157,8 +157,16 @@ export function CompletePostContent({
   indicateEmbedding,
   replies
 }) {
+  const replyAvatars = useMemo(() => collectReplyAvatars(replies), [replies]);
+  const notesHeight = (replyAvatars?.length || 0) + (post.likeCount ? 1 : 0);
+
+  let wholeClassName = className ? 'complete-post-content ' + className : 'complete-post-content';
+  if (notesHeight) wholeClassName += ' notes-height-' + notesHeight;
+
   return (
-    <div className={className ? 'complete-post-content ' + className : 'complete-post-content'} onClick={() => {
+    <div
+      className={wholeClassName}
+      onClick={() => {
       console.log('post clicked ', post);
     }}>
       {
@@ -189,10 +197,10 @@ export function CompletePostContent({
         {
           !replies?.length ? null :
             <div className='post-notes'>
-              <ReplyAvatars replies={replies} />
+              <ReplyAvatars shortDIDs={replyAvatars} />
             </div>
         }
-        <div className='post-likes'>
+        <div className='post-replies'>
           <span className='tiny-text-for-copy-paste'>
             {
               !post.likeCount ? undefined :
@@ -223,18 +231,17 @@ export function CompletePostContent({
 
 /**
  * @param {{
- *  replies: (import('../../../coldsky/lib').CompactPost | { post: import('../../../coldsky/lib').CompactPost })[],
+ *  shortDIDs?: string[],
  * }} _
  */
-function ReplyAvatars({ replies }) {
-  const replyAvatars = useMemo(() => collectReplyAvatars(replies), [replies]);
-  if (!replyAvatars?.length) return null;
+function ReplyAvatars({ shortDIDs }) {
+  if (!shortDIDs?.length) return null;
   return (
     <div className='reply-avatars'>
-      {replyAvatars.map((shortDID, index) => (
+      {shortDIDs.map((shortDID, index) => (
         index === MAX_AVATAR_DISPLAY ?
           <div key='reply-avatar-more' className='reply-avatar-marker reply-avatar-marker-more'>
-            {replyAvatars.length.toLocaleString()}
+            {shortDIDs.length.toLocaleString()}
           </div> :
           <AccountChip
             key={'reply-avatar-' + shortDID}
