@@ -10,7 +10,7 @@ import { version } from '../../package.json';
 import './landing.css';
 import { localise } from '../localise';
 import { AccountLabel } from '../widgets/account';
-import { searchAccounts } from '../api/record-cache';
+import { searchAccounts } from '../api';
 
 export function Landing() {
   const [timeout] = React.useState({ timeout: 0, searchText: '' });

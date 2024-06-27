@@ -131,6 +131,61 @@ export function searchAccounts(text) {
   }
 }
 
+const accountsToStoreInCacheByShortDID = new Map();
+let debounceAccountsToStoreInCache = 0;
+let maxDebounceAccountsToStoreInCache = 0;
+
+/**
+ * @param {ProfileView | ProfileViewBasic} account 
+ */
+export function cacheAccount(account) {
+  const shortDID = shortenDID(account.did);
+  const existing = accountsToStoreInCacheByShortDID.get(shortDID);
+  let shouldStore = !existing;
+  if (existing) {
+    const indexed = account.indexedAt && new Date(account.indexedAt).getTime();
+    const existingIndexed = existing.indexedAt && new Date(existing.indexedAt).getTime();
+    if (!existingIndexed && indexed) shouldStore = true;
+    else if (existingIndexed && indexed && indexed > existingIndexed) shouldStore = true;
+  }
+
+  if (!shouldStore) return;
+
+  accountsToStoreInCacheByShortDID.set(shortDID, account);
+
+  if (!maxDebounceAccountsToStoreInCache)
+    maxDebounceAccountsToStoreInCache = setTimeout(cacheAccountsNow, 3100);
+  clearTimeout(debounceAccountsToStoreInCache);
+  debounceAccountsToStoreInCache = setTimeout(cacheAccountsNow, 300);
+}
+
+function cacheAccountsNow() {
+  clearTimeout(maxDebounceAccountsToStoreInCache);
+  maxDebounceAccountsToStoreInCache = 0;
+  clearTimeout(debounceAccountsToStoreInCache);
+  debounceAccountsToStoreInCache = 0;
+
+  const accounts = Array.from(accountsToStoreInCacheByShortDID.values())
+    .map(ac => {
+      const wordLeads = [];
+      for (const w of breakIntoWords(ac.displayName + ' ' + ac.handle + ' ' + ac.description)) {
+        const wLead = w.slice(0, 3).toLowerCase();
+        if (wordLeads.indexOf(wLead) < 0)
+          wordLeads.push(wLead);
+      }
+      ac.w = wordLeads;
+      return ac;
+    });
+
+  accountsToStoreInCacheByShortDID.clear();
+
+  if (accounts.length) {
+    db.accounts.bulkPut(accounts);
+
+    console.log('adding ', accounts.length, ' to cache ', accounts);
+  }
+}
+
 /**
  * @param {string[]} words
  */

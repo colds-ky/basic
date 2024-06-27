@@ -91212,7 +91212,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   var import_react11 = __toESM(require_react());
 
   // src/landing/fun-background.js
-  var import_react7 = __toESM(require_react());
+  var import_react10 = __toESM(require_react());
 
   // node_modules/dexie/import-wrapper.mjs
   var import_dexie = __toESM(require_dexie(), 1);
@@ -97156,639 +97156,6 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     });
   }
 
-  // src/api/firehose-threads.js
-  function firehoseThreads() {
-    return streamBuffer(
-      /**
-       * @param {import('../../coldsky/src/api/akpa').StreamParameters<ThreadViewPost, ThreadViewPost[]>} streaming 
-       */
-      (streaming) => __async(this, null, function* () {
-        const publicAgent2 = new ColdskyAgent({
-          service: BSKY_PUBLIC_URL
-        });
-        const getPostThreadCached = throttledAsyncCache(
-          (uri) => {
-            if (streaming.isEnded)
-              return;
-            return publicAgent2.getPostThread({ uri }).then((res) => {
-              var _a3;
-              return (_a3 = res == null ? void 0 : res.data) == null ? void 0 : _a3.thread;
-            });
-          }
-        );
-        keepMonitoringFirehose();
-        yield streaming.finally;
-        console.log("firehoseThreads ended");
-        function keepMonitoringFirehose() {
-          return __async(this, null, function* () {
-            try {
-              for (var iter = __forAwait(firehose()), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
-                const chunk = temp.value;
-                if (streaming.isEnded)
-                  break;
-                for (const entry of chunk) {
-                  for (const msg of entry.messages) {
-                    switch (msg.$type) {
-                      case "app.bsky.feed.like":
-                        handleLike(msg);
-                        continue;
-                      case "app.bsky.feed.post":
-                        handlePost(msg);
-                        continue;
-                      case "app.bsky.feed.repost":
-                        handleRepost(msg);
-                        continue;
-                    }
-                  }
-                }
-              }
-            } catch (temp) {
-              error = [temp];
-            } finally {
-              try {
-                more && (temp = iter.return) && (yield temp.call(iter));
-              } finally {
-                if (error)
-                  throw error[0];
-              }
-            }
-          });
-        }
-        function yieldThread(thread) {
-          streaming.yield(thread, (buf2) => {
-            if (!buf2)
-              return [thread];
-            buf2.push(thread);
-            return buf2;
-          });
-        }
-        function handleLike(msg) {
-          return __async(this, null, function* () {
-            const thread = yield getPostThreadCached(msg.subject.uri);
-            if (!thread || thread.blocked || thread.notFound)
-              return;
-            yieldThread(thread);
-          });
-        }
-        function handlePost(msg) {
-          return __async(this, null, function* () {
-            const thread = yield getPostThreadCached("at://" + msg.repo + "/" + msg.path);
-            if (!thread || thread.blocked || thread.notFound)
-              return;
-            yieldThread(thread);
-          });
-        }
-        function handleRepost(msg) {
-        }
-      })
-    );
-  }
-
-  // src/api/hash.js
-  function calcHash(value) {
-    if (!value)
-      return 13;
-    return hashString(String(value));
-  }
-  function hashString(str) {
-    let hash2 = 19;
-    for (let i = 0; i < str.length; i++) {
-      let char2 = str.charCodeAt(i);
-      hash2 = (hash2 << 5) - hash2 + char2;
-      hash2 = hash2 & hash2;
-    }
-    return hash2;
-  }
-  function nextRandom(rnd) {
-    if (!rnd)
-      rnd = 251;
-    if (rnd > 1)
-      rnd = Math.abs(rnd + 1 / rnd);
-    if (rnd > 10)
-      rnd = (rnd / 10 - Math.floor(rnd / 10)) * 10;
-    rnd = Math.pow(10, rnd + 0.3498572938623);
-    rnd = rnd - Math.floor(rnd);
-    return rnd;
-  }
-
-  // node_modules/@mui/icons-material/esm/FavoriteBorder.js
-  var import_jsx_runtime45 = __toESM(require_jsx_runtime());
-  var FavoriteBorder_default = createSvgIcon(/* @__PURE__ */ (0, import_jsx_runtime45.jsx)("path", {
-    d: "M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3m-4.4 15.55-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05"
-  }), "FavoriteBorder");
-
-  // coldsky/src/api/forAwait.js
-  var import_react6 = __toESM(require_react());
-  function forAwait(from7, derive) {
-    const [state, setState] = (0, import_react6.useState)(initAwaitState);
-    state.reactSetState = setState;
-    (0, import_react6.useEffect)(state.effectMount, []);
-    return (
-      /** @type {*} */
-      state.hookUse(from7, derive)
-    );
-  }
-  function initAwaitState() {
-    return new AwaitState();
-  }
-  var AwaitState = class _AwaitState {
-    constructor() {
-      /** @type {TRun<TFrom, TTo>} */
-      __publicField(this, "run");
-      /** @type {boolean} */
-      __publicField(this, "withinHook");
-      /** @type {AwaitState | undefined} */
-      __publicField(this, "repalcedWith");
-      /**
-       * @param {TFrom} from
-       * @param {TSourceOf<TFrom, TTo>} derive
-       * @returns {TTo | undefined}
-       */
-      __publicField(this, "hookUse", (from7, derive) => {
-        this.withinHook = true;
-        try {
-          if (this.repalcedWith)
-            return this.repalcedWith.hookUse(from7, derive);
-          if (!this.run || this.run.from !== from7) {
-            if (this.run)
-              this.finishExistingIteration();
-            this.initializeNewValues(from7, derive);
-          } else {
-            this.nudgeContinuationFromHook();
-          }
-          return this.run.current;
-        } finally {
-          this.withinHook = false;
-        }
-      });
-      __publicField(this, "effectMount", () => {
-        if (this.repalcedWith)
-          return this.repalcedWith.effectMount();
-        this.nudgeContinuationFromHook();
-        return this.effectUnmount;
-      });
-      __publicField(this, "effectUnmount", () => {
-        if (this.repalcedWith)
-          return this.repalcedWith.effectUnmount();
-        this.run.finished = true;
-        this.finishExistingIteration();
-      });
-      __publicField(this, "iterationCompletedNaturally", () => {
-        this.finishExistingIteration();
-      });
-    }
-    reactSetState(setState) {
-    }
-    /**
-     * @param {TFrom} from
-     * @param {TSourceOf<TFrom, TTo>} derive
-     */
-    initializeNewValues(from7, derive) {
-      this.run = {
-        from: from7,
-        derive,
-        iterators: /* @__PURE__ */ new Set()
-      };
-      this.continueWithChecked(from7, this.run, derive, this.iterationCompletedNaturally);
-    }
-    finishExistingIteration() {
-      var _a3;
-      const iterators = Array.from(this.run.iterators);
-      this.run.iterators.clear();
-      for (const iter of iterators) {
-        try {
-          (_a3 = iter.return) == null ? void 0 : _a3.call(iter);
-        } catch (error) {
-          console.warn("DEBUG: error while stopping iterator", error);
-        }
-      }
-    }
-    nudgeContinuationFromHook() {
-      var _a3;
-      if (!((_a3 = this.run.nudgeCallbacks) == null ? void 0 : _a3.length))
-        return;
-      const nudge = this.run.nudgeCallbacks.pop();
-      if (typeof nudge === "function")
-        nudge();
-      if (!this.run.nudgeCallbacks.length)
-        this.run.nudgeCallbacks = void 0;
-    }
-    /**
-     * @param {TFrom} from
-     * @param {TRun<TFrom, TTo>} run
-     * @param {TSourceOf<TFrom, any>} derive
-     * @param {() => void} completedNaturally
-     */
-    continueWithChecked(from7, run, derive, completedNaturally) {
-      if (!this.canContinue(run))
-        return;
-      if (derive) {
-        if (typeof derive === "function")
-          return this.continueWithFunction(from7, run, derive, completedNaturally);
-        if (isPromise(derive))
-          return this.continueWithPromise(from7, run, derive, completedNaturally);
-        if (Array.isArray(derive))
-          return this.continueWithArray(from7, run, derive, completedNaturally);
-        if (isIterable(derive))
-          return this.continueWithIterable(from7, run, derive, completedNaturally);
-        if (isAsyncIterable(derive))
-          return this.continueWithAsyncIterable(from7, run, derive, completedNaturally);
-      }
-      this.continueWithScalar(from7, run, derive);
-      completedNaturally();
-    }
-    /**
-     * @param {TFrom} from
-     * @param {TRun<TFrom, TTo>} run
-     * @param {TTo} value
-     */
-    continueWithScalar(from7, run, value) {
-      this.run.current = value;
-      if (!this.withinHook) {
-        this.repalcedWith = new _AwaitState();
-        this.repalcedWith.run = this.run;
-        this.repalcedWith.reactSetState = this.reactSetState;
-        this.reactSetState(this.repalcedWith);
-      }
-    }
-    /**
-     * @param {TFrom} from
-     * @param {TRun<TFrom, TTo>} run
-     * @param {Function} func
-     * @param {() => void} completedNaturally
-     */
-    continueWithFunction(from7, run, func, completedNaturally) {
-      try {
-        const value = func(from7);
-        this.continueWithChecked(from7, run, value, completedNaturally);
-      } catch (error) {
-        this.continueWithError(error);
-      }
-    }
-    /**
-     * @param {Error} error
-     */
-    continueWithError(error) {
-      this.run.error = error;
-      this.run.finished = true;
-      this.finishExistingIteration();
-    }
-    /**
-     * @param {TFrom} from
-     * @param {TRun<TFrom, TTo>} run
-     * @param {Promise<any>} promise
-     * @param {() => void} completedNaturally
-     */
-    continueWithPromise(from7, run, promise, completedNaturally) {
-      promise.then(
-        (result) => {
-          if (!this.canContinue(run))
-            return;
-          this.continueWithChecked(from7, run, result, completedNaturally);
-        },
-        (error) => {
-          if (!this.canContinue(run))
-            return;
-          this.continueWithError(error);
-        }
-      );
-    }
-    /**
-    * @param {TFrom} from
-    * @param {TRun<TFrom, TTo>} run
-    * @param {any[]} array
-    * @param {() => void} completedNaturally
-    */
-    continueWithArray(from7, run, array, completedNaturally) {
-      this.continueWithIterable(from7, run, array, completedNaturally);
-    }
-    /**
-     * @param {TFrom} from
-     * @param {TRun<TFrom, TTo>} run
-     * @param {Iterable<any>} iterable
-     * @param {() => void} completedNaturally
-     */
-    continueWithIterable(from7, run, iterable, completedNaturally) {
-      let iterator;
-      try {
-        iterator = iterable[Symbol.iterator]();
-      } catch (error) {
-        return this.continueWithError(error);
-      }
-      if (!iterator)
-        return completedNaturally();
-      this.run.iterators.add(iterator);
-      this.continueWithIterator(from7, run, iterator, () => {
-        this.run.iterators.delete(iterator);
-        completedNaturally();
-      });
-    }
-    /**
-    * @param {TFrom} from
-    * @param {TRun<TFrom, TTo>} run
-    * @param {Iterator<any>} iterator
-    * @param {() => void} completedNaturally
-    */
-    continueWithIterator(from7, run, iterator, completedNaturally) {
-      try {
-        const iteratorResult = iterator.next();
-        if (iteratorResult.done) {
-          if (iteratorResult.value !== void 0)
-            this.continueWithChecked(from7, run, iteratorResult.value, completedNaturally);
-        } else {
-          this.continueWithChecked(
-            from7,
-            run,
-            iteratorResult.value,
-            () => {
-              this.continueWhenever(() => {
-                this.continueWithIterator(from7, run, iterator, completedNaturally);
-              });
-            }
-          );
-        }
-      } catch (error) {
-        this.continueWithError(error);
-      }
-    }
-    /**
-     * @param {TFrom} from
-     * @param {TRun<TFrom, TTo>} run
-     * @param {AsyncIterable<any>} asyncIterable
-     * @param {() => void} completedNaturally
-     */
-    continueWithAsyncIterable(from7, run, asyncIterable, completedNaturally) {
-      let asyncIterator;
-      try {
-        asyncIterator = asyncIterable[Symbol.asyncIterator]();
-      } catch (error) {
-        return this.continueWithError(error);
-      }
-      if (!asyncIterator)
-        return completedNaturally();
-      this.run.iterators.add(asyncIterator);
-      this.continueWithAsyncIterator(from7, run, asyncIterator, () => {
-        this.run.iterators.delete(asyncIterator);
-        completedNaturally();
-      });
-    }
-    /**
-    * @param {TFrom} from
-    * @param {TRun<TFrom, TTo>} run
-    * @param {AsyncIterator<any>} asyncIterator
-    * @param {() => void} completedNaturally
-    */
-    continueWithAsyncIterator(from7, run, asyncIterator, completedNaturally) {
-      return __async(this, null, function* () {
-        try {
-          const iteratorResult = yield asyncIterator.next();
-          if (iteratorResult.done) {
-            if (iteratorResult.value !== void 0)
-              this.continueWithChecked(from7, run, iteratorResult.value, completedNaturally);
-          } else {
-            this.continueWithChecked(
-              from7,
-              run,
-              iteratorResult.value,
-              () => {
-                this.continueWhenever(() => {
-                  this.continueWithAsyncIterator(from7, run, asyncIterator, completedNaturally);
-                });
-              }
-            );
-          }
-        } catch (error) {
-          this.continueWithError(error);
-        }
-      });
-    }
-    canContinue(run) {
-      if (run !== this.run) {
-        ["DEBUG: activity after stop"].toString();
-        return false;
-      }
-      return true;
-    }
-    continueWhenever(callback) {
-      if (this.withinHook) {
-        try {
-          callback();
-        } catch (error) {
-          this.continueWithError(error);
-        }
-        return;
-      }
-      if (this.run.nudgeCallbacks) {
-        this.run.nudgeCallbacks.push(callback);
-        return;
-      }
-      this.run.nudgeCallbacks = [];
-      try {
-        callback();
-      } catch (error) {
-        this.continueWithError(error);
-      }
-    }
-  };
-  function isIterable(value) {
-    return value && typeof value[Symbol.iterator] === "function";
-  }
-  function isAsyncIterable(value) {
-    return value && typeof value[Symbol.asyncIterator] === "function";
-  }
-
-  // src/landing/fun-background.js
-  var POST_DEBOUNCE_MSEC = 1e3;
-  var POST_MAX_AGE = 1e3 * 30;
-  var DESIRED_POST_COUNT = 7;
-  function FunBackground() {
-    const { bestThreads } = forAwait("now", getFirehoseThreads) || {};
-    return /* @__PURE__ */ import_react7.default.createElement("div", { className: "fun-background" }, /* @__PURE__ */ import_react7.default.createElement("div", { className: "fun-background-scroller" }, bestThreads && bestThreads.map((thread, i) => {
-      var _a3;
-      return /* @__PURE__ */ import_react7.default.createElement(
-        ThreadBubble,
-        {
-          key: ((_a3 = thread == null ? void 0 : thread.post) == null ? void 0 : _a3.uri) || "undefined",
-          thread
-        }
-      );
-    })));
-  }
-  function getFirehoseThreads() {
-    return __asyncGenerator(this, null, function* () {
-      var _a3, _b, _c;
-      const seenPostWhen = /* @__PURE__ */ new Map();
-      let bestCurrentThreads = [];
-      try {
-        for (var iter = __forAwait(firehoseThreads()), more, temp, error; more = !(temp = yield new __await(iter.next())).done; more = false) {
-          const chunk = temp.value;
-          const bestThreads = [];
-          const now = Date.now();
-          const threadTooOld = now - POST_MAX_AGE;
-          for (const oldThread of bestCurrentThreads) {
-            if (seenPostWhen.get(oldThread.post.uri) > threadTooOld) {
-              bestThreads.push(oldThread);
-            }
-          }
-          const newThreads = [];
-          for (const thread of chunk) {
-            if (!((_a3 = thread == null ? void 0 : thread.post) == null ? void 0 : _a3.record.text))
-              continue;
-            if (seenPostWhen.has((_b = thread == null ? void 0 : thread.post) == null ? void 0 : _b.uri))
-              continue;
-            seenPostWhen.set((_c = thread == null ? void 0 : thread.post) == null ? void 0 : _c.uri, now);
-            newThreads.push(thread);
-          }
-          newThreads.sort((t1, t2) => {
-            var _a4, _b2, _c2, _d, _e, _f;
-            const likes1 = (((_a4 = t1.post) == null ? void 0 : _a4.likeCount) || 0) + (((_c2 = (_b2 = t2.parent) == null ? void 0 : _b2.post) == null ? void 0 : _c2.likeCount) || 0);
-            const likes2 = (((_d = t2.post) == null ? void 0 : _d.likeCount) || 0) + (((_f = (_e = t1.parent) == null ? void 0 : _e.post) == null ? void 0 : _f.likeCount) || 0);
-            return likes2 - likes1;
-          });
-          for (let i = 0; i < newThreads.length; i++) {
-            if (!i || bestThreads.length < DESIRED_POST_COUNT) {
-              bestThreads.push(newThreads[i]);
-            }
-          }
-          bestCurrentThreads = bestThreads;
-          yield { bestThreads };
-          yield new __await(new Promise((resolve) => setTimeout(resolve, POST_DEBOUNCE_MSEC)));
-        }
-      } catch (temp) {
-        error = [temp];
-      } finally {
-        try {
-          more && (temp = iter.return) && (yield new __await(temp.call(iter)));
-        } finally {
-          if (error)
-            throw error[0];
-        }
-      }
-    });
-  }
-  function ThreadBubble({ thread }) {
-    var _a3, _b, _c, _d;
-    const hash2 = calcHash((_a3 = thread == null ? void 0 : thread.post) == null ? void 0 : _a3.uri);
-    let rnd = nextRandom(Math.abs(hash2 / 1e3 + hash2));
-    const animationDuration = 20 + rnd * 30;
-    rnd = nextRandom(rnd);
-    const left = rnd * 80 - 2;
-    return /* @__PURE__ */ import_react7.default.createElement(
-      "div",
-      {
-        className: "fun-background-thread",
-        style: {
-          animationDuration: `${animationDuration.toFixed(2)}s`,
-          left: `${left.toFixed(2)}%`
-        }
-      },
-      /* @__PURE__ */ import_react7.default.createElement("div", { className: "fun-background-thread-content" }, (_b = thread == null ? void 0 : thread.post) == null ? void 0 : _b.record.text),
-      /* @__PURE__ */ import_react7.default.createElement("div", { className: "fun-background-thread-likes" }, /* @__PURE__ */ import_react7.default.createElement(FavoriteBorder_default, null), !((_c = thread == null ? void 0 : thread.post) == null ? void 0 : _c.likeCount) ? "" : (_d = thread == null ? void 0 : thread.post) == null ? void 0 : _d.likeCount.toLocaleString())
-    );
-  }
-
-  // package.json
-  var version4 = "0.1.12";
-
-  // src/localise.js
-  function localise(english, languageMap) {
-    if (!(langs == null ? void 0 : langs.length))
-      return english;
-    for (const lang of langs) {
-      if (languageMap[lang])
-        return languageMap[lang];
-    }
-    for (const lang of langs) {
-      if (languageMap[lang])
-        return languageMap[lang];
-    }
-    return english;
-  }
-  var langSubstitutes = {
-    ru: "uk",
-    be: "uk"
-  };
-  var _a2;
-  var langs = extendDashLeads(
-    !navigator ? void 0 : ((_a2 = navigator.languages) == null ? void 0 : _a2.length) ? navigator.languages.map((lang) => lang.toLowerCase()) : navigator.language ? [navigator.language.toLowerCase()] : void 0
-  );
-  function extendDashLeads(langs2) {
-    if (!langs2)
-      return langs2;
-    const result = [];
-    for (const lang of langs2) {
-      result.push(langSubstitutes[lang] || lang);
-    }
-    for (const lang of langs2) {
-      const dashLead = lang.split("-")[0];
-      if (dashLead !== lang)
-        result.push(langSubstitutes[dashLead] || dashLead);
-    }
-    return result;
-  }
-
-  // src/widgets/account/account-label.js
-  var import_react10 = __toESM(require_react());
-
-  // src/widgets/account/full-handle.js
-  var import_react9 = __toESM(require_react());
-
-  // src/widgets/account/full-did.js
-  var import_react8 = __toESM(require_react());
-  function FullDID(_a3) {
-    var _b = _a3, { shortDID, Component: Component2 } = _b, rest = __objRest(_b, ["shortDID", "Component"]);
-    if (!shortDID)
-      return void 0;
-    if (!Component2)
-      Component2 = "span";
-    const fullDID = unwrapShortDID(shortDID);
-    if (shortDID === fullDID)
-      return /* @__PURE__ */ import_react8.default.createElement(Component2, __spreadValues({}, rest), fullDID);
-    else
-      return /* @__PURE__ */ import_react8.default.createElement(Component2, __spreadValues({}, rest), /* @__PURE__ */ import_react8.default.createElement("span", { className: "did-plc-prefix" }, fullDID.slice(0, -shortDID.length)), shortDID);
-  }
-
-  // src/widgets/account/full-handle.js
-  function FullHandle(_a3) {
-    var _b = _a3, { shortHandle, Component: Component2 } = _b, rest = __objRest(_b, ["shortHandle", "Component"]);
-    if (!shortHandle)
-      return void 0;
-    if (!Component2)
-      Component2 = "span";
-    if (likelyDID(shortHandle))
-      return /* @__PURE__ */ import_react9.default.createElement(FullDID, __spreadValues({ shortDID: shortHandle, Component: Component2 }, rest));
-    const fullHandle = unwrapShortHandle(shortHandle);
-    shortHandle = shortenHandle(shortHandle);
-    const bskySocialSuffix = shortHandle === fullHandle ? void 0 : fullHandle.slice(shortHandle.length);
-    let mainText = shortHandle;
-    let tldSuffix = void 0;
-    if (!bskySocialSuffix) {
-      const lastDot = shortHandle.lastIndexOf(".");
-      if (lastDot > 0) {
-        mainText = shortHandle.slice(0, lastDot);
-        tldSuffix = shortHandle.slice(lastDot);
-      }
-    }
-    return /* @__PURE__ */ import_react9.default.createElement(Component2, __spreadValues({}, rest), /* @__PURE__ */ import_react9.default.createElement("span", { className: "handle-main-text" }, mainText), tldSuffix && /* @__PURE__ */ import_react9.default.createElement("span", { className: "handle-tld-suffix" }, tldSuffix), bskySocialSuffix && /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, /* @__PURE__ */ import_react9.default.createElement("span", { className: "handle-bsky-social-suffix-dot" }, bskySocialSuffix.charAt(0)), /* @__PURE__ */ import_react9.default.createElement("span", { className: "handle-bsky-social-suffix" }, bskySocialSuffix.slice(1))));
-  }
-
-  // src/widgets/account/account-label.js
-  function AccountLabel(_a3) {
-    var _b = _a3, { account, withDisplayName, className, Component: Component2 } = _b, rest = __objRest(_b, ["account", "withDisplayName", "className", "Component"]);
-    if (!Component2)
-      Component2 = "span";
-    return /* @__PURE__ */ import_react10.default.createElement(Component2, __spreadValues({ className: "account-label " + (className || "") }, rest), /* @__PURE__ */ import_react10.default.createElement("span", { className: "account-handle" }, /* @__PURE__ */ import_react10.default.createElement(
-      "span",
-      {
-        className: "account-avatar",
-        style: !account.avatar ? void 0 : {
-          backgroundImage: `url(${account.avatar})`
-        }
-      },
-      "@"
-    ), /* @__PURE__ */ import_react10.default.createElement(FullHandle, { shortHandle: account.shortHandle || account.handle }), !withDisplayName || !account.displayName ? void 0 : /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, null, " ", /* @__PURE__ */ import_react10.default.createElement("span", { className: "account-label-display-name" }, account.displayName))));
-  }
-
   // node_modules/fuse.js/dist/fuse.esm.js
   function isArray(value) {
     return !Array.isArray ? getTag(value) === "[object Array]" : Array.isArray(value);
@@ -99103,7 +98470,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   var publicAgent = new ColdskyAgent({
     service: BSKY_PUBLIC_URL
   });
-  function searchAccounts2(text) {
+  function searchAccounts(text) {
     const normalizedText = (text == null ? void 0 : text.trim()) || "";
     if (!normalizedText)
       return function nothing() {
@@ -99183,6 +98550,50 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       });
       storeNewAccountsByShortDID.clear();
       db.accounts.bulkPut(accounts);
+    }
+  }
+  var accountsToStoreInCacheByShortDID = /* @__PURE__ */ new Map();
+  var debounceAccountsToStoreInCache = 0;
+  var maxDebounceAccountsToStoreInCache = 0;
+  function cacheAccount(account) {
+    const shortDID = shortenDID(account.did);
+    const existing = accountsToStoreInCacheByShortDID.get(shortDID);
+    let shouldStore = !existing;
+    if (existing) {
+      const indexed = account.indexedAt && new Date(account.indexedAt).getTime();
+      const existingIndexed = existing.indexedAt && new Date(existing.indexedAt).getTime();
+      if (!existingIndexed && indexed)
+        shouldStore = true;
+      else if (existingIndexed && indexed && indexed > existingIndexed)
+        shouldStore = true;
+    }
+    if (!shouldStore)
+      return;
+    accountsToStoreInCacheByShortDID.set(shortDID, account);
+    if (!maxDebounceAccountsToStoreInCache)
+      maxDebounceAccountsToStoreInCache = setTimeout(cacheAccountsNow, 3100);
+    clearTimeout(debounceAccountsToStoreInCache);
+    debounceAccountsToStoreInCache = setTimeout(cacheAccountsNow, 300);
+  }
+  function cacheAccountsNow() {
+    clearTimeout(maxDebounceAccountsToStoreInCache);
+    maxDebounceAccountsToStoreInCache = 0;
+    clearTimeout(debounceAccountsToStoreInCache);
+    debounceAccountsToStoreInCache = 0;
+    const accounts = Array.from(accountsToStoreInCacheByShortDID.values()).map((ac) => {
+      const wordLeads = [];
+      for (const w of breakIntoWords(ac.displayName + " " + ac.handle + " " + ac.description)) {
+        const wLead = w.slice(0, 3).toLowerCase();
+        if (wordLeads.indexOf(wLead) < 0)
+          wordLeads.push(wLead);
+      }
+      ac.w = wordLeads;
+      return ac;
+    });
+    accountsToStoreInCacheByShortDID.clear();
+    if (accounts.length) {
+      db.accounts.bulkPut(accounts);
+      console.log("adding ", accounts.length, " to cache ", accounts);
     }
   }
   function searchAccountsFromCache(words) {
@@ -99279,6 +98690,659 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     });
   }
 
+  // src/api/firehose-threads.js
+  function firehoseThreads() {
+    return streamBuffer(
+      /**
+       * @param {import('../../coldsky/src/api/akpa').StreamParameters<ThreadViewPost, ThreadViewPost[]>} streaming 
+       */
+      (streaming) => __async(this, null, function* () {
+        const publicAgent2 = new ColdskyAgent({
+          service: BSKY_PUBLIC_URL
+        });
+        const getPostThreadCached = throttledAsyncCache(
+          (uri) => {
+            if (streaming.isEnded)
+              return;
+            return publicAgent2.getPostThread({ uri }).then((res) => {
+              var _a3;
+              return (_a3 = res == null ? void 0 : res.data) == null ? void 0 : _a3.thread;
+            });
+          }
+        );
+        keepMonitoringFirehose();
+        yield streaming.finally;
+        console.log("firehoseThreads ended");
+        function keepMonitoringFirehose() {
+          return __async(this, null, function* () {
+            try {
+              for (var iter = __forAwait(firehose()), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
+                const chunk = temp.value;
+                if (streaming.isEnded)
+                  break;
+                for (const entry of chunk) {
+                  for (const msg of entry.messages) {
+                    switch (msg.$type) {
+                      case "app.bsky.feed.like":
+                        handleLike(msg);
+                        continue;
+                      case "app.bsky.feed.post":
+                        handlePost(msg);
+                        continue;
+                      case "app.bsky.feed.repost":
+                        handleRepost(msg);
+                        continue;
+                    }
+                  }
+                }
+              }
+            } catch (temp) {
+              error = [temp];
+            } finally {
+              try {
+                more && (temp = iter.return) && (yield temp.call(iter));
+              } finally {
+                if (error)
+                  throw error[0];
+              }
+            }
+          });
+        }
+        function yieldThread(thread) {
+          cacheAllMentionedAccounts(thread);
+          streaming.yield(thread, (buf2) => {
+            if (!buf2)
+              return [thread];
+            buf2.push(thread);
+            return buf2;
+          });
+        }
+        function cacheAllMentionedAccounts(thread) {
+          const seenPosts = /* @__PURE__ */ new Set();
+          walkThread(thread);
+          function walkThread(thread2) {
+            var _a3;
+            if (!(thread2 == null ? void 0 : thread2.post) || seenPosts.has((_a3 = thread2 == null ? void 0 : thread2.post) == null ? void 0 : _a3.uri))
+              return;
+            cacheAccount(thread2.post.author);
+            if (thread2.replies) {
+              for (const reply of thread2.replies) {
+                walkThread(reply);
+              }
+            }
+            if (thread2.parent) {
+              walkThread(thread2.parent);
+            }
+          }
+        }
+        function handleLike(msg) {
+          return __async(this, null, function* () {
+            const thread = yield getPostThreadCached(msg.subject.uri);
+            if (!thread || thread.blocked || thread.notFound)
+              return;
+            yieldThread(thread);
+          });
+        }
+        function handlePost(msg) {
+          return __async(this, null, function* () {
+            const thread = yield getPostThreadCached("at://" + msg.repo + "/" + msg.path);
+            if (!thread || thread.blocked || thread.notFound)
+              return;
+            yieldThread(thread);
+          });
+        }
+        function handleRepost(msg) {
+        }
+      })
+    );
+  }
+
+  // src/api/hash.js
+  function calcHash(value) {
+    if (!value)
+      return 13;
+    return hashString(String(value));
+  }
+  function hashString(str) {
+    let hash2 = 19;
+    for (let i = 0; i < str.length; i++) {
+      let char2 = str.charCodeAt(i);
+      hash2 = (hash2 << 5) - hash2 + char2;
+      hash2 = hash2 & hash2;
+    }
+    return hash2;
+  }
+  function nextRandom(rnd) {
+    if (!rnd)
+      rnd = 251;
+    if (rnd > 1)
+      rnd = Math.abs(rnd + 1 / rnd);
+    if (rnd > 10)
+      rnd = (rnd / 10 - Math.floor(rnd / 10)) * 10;
+    rnd = Math.pow(10, rnd + 0.3498572938623);
+    rnd = rnd - Math.floor(rnd);
+    return rnd;
+  }
+
+  // node_modules/@mui/icons-material/esm/FavoriteBorder.js
+  var import_jsx_runtime45 = __toESM(require_jsx_runtime());
+  var FavoriteBorder_default = createSvgIcon(/* @__PURE__ */ (0, import_jsx_runtime45.jsx)("path", {
+    d: "M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3m-4.4 15.55-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05"
+  }), "FavoriteBorder");
+
+  // coldsky/src/api/forAwait.js
+  var import_react6 = __toESM(require_react());
+  function forAwait(from7, derive) {
+    const [state, setState] = (0, import_react6.useState)(initAwaitState);
+    state.reactSetState = setState;
+    (0, import_react6.useEffect)(state.effectMount, []);
+    return (
+      /** @type {*} */
+      state.hookUse(from7, derive)
+    );
+  }
+  function initAwaitState() {
+    return new AwaitState();
+  }
+  var AwaitState = class _AwaitState {
+    constructor() {
+      /** @type {TRun<TFrom, TTo>} */
+      __publicField(this, "run");
+      /** @type {boolean} */
+      __publicField(this, "withinHook");
+      /** @type {AwaitState | undefined} */
+      __publicField(this, "repalcedWith");
+      /**
+       * @param {TFrom} from
+       * @param {TSourceOf<TFrom, TTo>} derive
+       * @returns {TTo | undefined}
+       */
+      __publicField(this, "hookUse", (from7, derive) => {
+        this.withinHook = true;
+        try {
+          if (this.repalcedWith)
+            return this.repalcedWith.hookUse(from7, derive);
+          if (!this.run || this.run.from !== from7) {
+            if (this.run)
+              this.finishExistingIteration();
+            this.initializeNewValues(from7, derive);
+          } else {
+            this.nudgeContinuationFromHook();
+          }
+          return this.run.current;
+        } finally {
+          this.withinHook = false;
+        }
+      });
+      __publicField(this, "effectMount", () => {
+        if (this.repalcedWith)
+          return this.repalcedWith.effectMount();
+        this.nudgeContinuationFromHook();
+        return this.effectUnmount;
+      });
+      __publicField(this, "effectUnmount", () => {
+        if (this.repalcedWith)
+          return this.repalcedWith.effectUnmount();
+        this.run.finished = true;
+        this.finishExistingIteration();
+      });
+      __publicField(this, "iterationCompletedNaturally", () => {
+        this.finishExistingIteration();
+      });
+    }
+    reactSetState(setState) {
+    }
+    /**
+     * @param {TFrom} from
+     * @param {TSourceOf<TFrom, TTo>} derive
+     */
+    initializeNewValues(from7, derive) {
+      this.run = {
+        from: from7,
+        derive,
+        iterators: /* @__PURE__ */ new Set()
+      };
+      this.continueWithChecked(from7, this.run, derive, this.iterationCompletedNaturally);
+    }
+    finishExistingIteration() {
+      var _a3;
+      const iterators = Array.from(this.run.iterators);
+      this.run.iterators.clear();
+      for (const iter of iterators) {
+        try {
+          (_a3 = iter.return) == null ? void 0 : _a3.call(iter);
+        } catch (error) {
+          console.warn("DEBUG: error while stopping iterator", error);
+        }
+      }
+    }
+    nudgeContinuationFromHook() {
+      var _a3;
+      if (!((_a3 = this.run.nudgeCallbacks) == null ? void 0 : _a3.length))
+        return;
+      const nudge = this.run.nudgeCallbacks.pop();
+      if (typeof nudge === "function")
+        nudge();
+      if (!this.run.nudgeCallbacks.length)
+        this.run.nudgeCallbacks = void 0;
+    }
+    /**
+     * @param {TFrom} from
+     * @param {TRun<TFrom, TTo>} run
+     * @param {TSourceOf<TFrom, any>} derive
+     * @param {() => void} completedNaturally
+     */
+    continueWithChecked(from7, run, derive, completedNaturally) {
+      if (!this.canContinue(run))
+        return;
+      if (derive) {
+        if (typeof derive === "function")
+          return this.continueWithFunction(from7, run, derive, completedNaturally);
+        if (isPromise(derive))
+          return this.continueWithPromise(from7, run, derive, completedNaturally);
+        if (Array.isArray(derive))
+          return this.continueWithArray(from7, run, derive, completedNaturally);
+        if (isIterable(derive))
+          return this.continueWithIterable(from7, run, derive, completedNaturally);
+        if (isAsyncIterable(derive))
+          return this.continueWithAsyncIterable(from7, run, derive, completedNaturally);
+      }
+      this.continueWithScalar(from7, run, derive);
+      completedNaturally();
+    }
+    /**
+     * @param {TFrom} from
+     * @param {TRun<TFrom, TTo>} run
+     * @param {TTo} value
+     */
+    continueWithScalar(from7, run, value) {
+      this.run.current = value;
+      if (!this.withinHook) {
+        this.repalcedWith = new _AwaitState();
+        this.repalcedWith.run = this.run;
+        this.repalcedWith.reactSetState = this.reactSetState;
+        this.reactSetState(this.repalcedWith);
+      }
+    }
+    /**
+     * @param {TFrom} from
+     * @param {TRun<TFrom, TTo>} run
+     * @param {Function} func
+     * @param {() => void} completedNaturally
+     */
+    continueWithFunction(from7, run, func, completedNaturally) {
+      try {
+        const value = func(from7);
+        this.continueWithChecked(from7, run, value, completedNaturally);
+      } catch (error) {
+        this.continueWithError(error);
+      }
+    }
+    /**
+     * @param {Error} error
+     */
+    continueWithError(error) {
+      this.run.error = error;
+      this.run.finished = true;
+      this.finishExistingIteration();
+    }
+    /**
+     * @param {TFrom} from
+     * @param {TRun<TFrom, TTo>} run
+     * @param {Promise<any>} promise
+     * @param {() => void} completedNaturally
+     */
+    continueWithPromise(from7, run, promise, completedNaturally) {
+      promise.then(
+        (result) => {
+          if (!this.canContinue(run))
+            return;
+          this.continueWithChecked(from7, run, result, completedNaturally);
+        },
+        (error) => {
+          if (!this.canContinue(run))
+            return;
+          this.continueWithError(error);
+        }
+      );
+    }
+    /**
+    * @param {TFrom} from
+    * @param {TRun<TFrom, TTo>} run
+    * @param {any[]} array
+    * @param {() => void} completedNaturally
+    */
+    continueWithArray(from7, run, array, completedNaturally) {
+      this.continueWithIterable(from7, run, array, completedNaturally);
+    }
+    /**
+     * @param {TFrom} from
+     * @param {TRun<TFrom, TTo>} run
+     * @param {Iterable<any>} iterable
+     * @param {() => void} completedNaturally
+     */
+    continueWithIterable(from7, run, iterable, completedNaturally) {
+      let iterator;
+      try {
+        iterator = iterable[Symbol.iterator]();
+      } catch (error) {
+        return this.continueWithError(error);
+      }
+      if (!iterator)
+        return completedNaturally();
+      this.run.iterators.add(iterator);
+      this.continueWithIterator(from7, run, iterator, () => {
+        this.run.iterators.delete(iterator);
+        completedNaturally();
+      });
+    }
+    /**
+    * @param {TFrom} from
+    * @param {TRun<TFrom, TTo>} run
+    * @param {Iterator<any>} iterator
+    * @param {() => void} completedNaturally
+    */
+    continueWithIterator(from7, run, iterator, completedNaturally) {
+      try {
+        const iteratorResult = iterator.next();
+        if (iteratorResult.done) {
+          if (iteratorResult.value !== void 0)
+            this.continueWithChecked(from7, run, iteratorResult.value, completedNaturally);
+        } else {
+          this.continueWithChecked(
+            from7,
+            run,
+            iteratorResult.value,
+            () => {
+              this.continueWhenever(() => {
+                this.continueWithIterator(from7, run, iterator, completedNaturally);
+              });
+            }
+          );
+        }
+      } catch (error) {
+        this.continueWithError(error);
+      }
+    }
+    /**
+     * @param {TFrom} from
+     * @param {TRun<TFrom, TTo>} run
+     * @param {AsyncIterable<any>} asyncIterable
+     * @param {() => void} completedNaturally
+     */
+    continueWithAsyncIterable(from7, run, asyncIterable, completedNaturally) {
+      let asyncIterator;
+      try {
+        asyncIterator = asyncIterable[Symbol.asyncIterator]();
+      } catch (error) {
+        return this.continueWithError(error);
+      }
+      if (!asyncIterator)
+        return completedNaturally();
+      this.run.iterators.add(asyncIterator);
+      this.continueWithAsyncIterator(from7, run, asyncIterator, () => {
+        this.run.iterators.delete(asyncIterator);
+        completedNaturally();
+      });
+    }
+    /**
+    * @param {TFrom} from
+    * @param {TRun<TFrom, TTo>} run
+    * @param {AsyncIterator<any>} asyncIterator
+    * @param {() => void} completedNaturally
+    */
+    continueWithAsyncIterator(from7, run, asyncIterator, completedNaturally) {
+      return __async(this, null, function* () {
+        try {
+          const iteratorResult = yield asyncIterator.next();
+          if (iteratorResult.done) {
+            if (iteratorResult.value !== void 0)
+              this.continueWithChecked(from7, run, iteratorResult.value, completedNaturally);
+          } else {
+            this.continueWithChecked(
+              from7,
+              run,
+              iteratorResult.value,
+              () => {
+                this.continueWhenever(() => {
+                  this.continueWithAsyncIterator(from7, run, asyncIterator, completedNaturally);
+                });
+              }
+            );
+          }
+        } catch (error) {
+          this.continueWithError(error);
+        }
+      });
+    }
+    canContinue(run) {
+      if (run !== this.run) {
+        ["DEBUG: activity after stop"].toString();
+        return false;
+      }
+      return true;
+    }
+    continueWhenever(callback) {
+      if (this.withinHook) {
+        try {
+          callback();
+        } catch (error) {
+          this.continueWithError(error);
+        }
+        return;
+      }
+      if (this.run.nudgeCallbacks) {
+        this.run.nudgeCallbacks.push(callback);
+        return;
+      }
+      this.run.nudgeCallbacks = [];
+      try {
+        callback();
+      } catch (error) {
+        this.continueWithError(error);
+      }
+    }
+  };
+  function isIterable(value) {
+    return value && typeof value[Symbol.iterator] === "function";
+  }
+  function isAsyncIterable(value) {
+    return value && typeof value[Symbol.asyncIterator] === "function";
+  }
+
+  // src/widgets/account/account-label.js
+  var import_react9 = __toESM(require_react());
+
+  // src/widgets/account/full-handle.js
+  var import_react8 = __toESM(require_react());
+
+  // src/widgets/account/full-did.js
+  var import_react7 = __toESM(require_react());
+  function FullDID(_a3) {
+    var _b = _a3, { shortDID, Component: Component2 } = _b, rest = __objRest(_b, ["shortDID", "Component"]);
+    if (!shortDID)
+      return void 0;
+    if (!Component2)
+      Component2 = "span";
+    const fullDID = unwrapShortDID(shortDID);
+    if (shortDID === fullDID)
+      return /* @__PURE__ */ import_react7.default.createElement(Component2, __spreadValues({}, rest), fullDID);
+    else
+      return /* @__PURE__ */ import_react7.default.createElement(Component2, __spreadValues({}, rest), /* @__PURE__ */ import_react7.default.createElement("span", { className: "did-plc-prefix" }, fullDID.slice(0, -shortDID.length)), shortDID);
+  }
+
+  // src/widgets/account/full-handle.js
+  function FullHandle(_a3) {
+    var _b = _a3, { shortHandle, Component: Component2 } = _b, rest = __objRest(_b, ["shortHandle", "Component"]);
+    if (!shortHandle)
+      return void 0;
+    if (!Component2)
+      Component2 = "span";
+    if (likelyDID(shortHandle))
+      return /* @__PURE__ */ import_react8.default.createElement(FullDID, __spreadValues({ shortDID: shortHandle, Component: Component2 }, rest));
+    const fullHandle = unwrapShortHandle(shortHandle);
+    shortHandle = shortenHandle(shortHandle);
+    const bskySocialSuffix = shortHandle === fullHandle ? void 0 : fullHandle.slice(shortHandle.length);
+    let mainText = shortHandle;
+    let tldSuffix = void 0;
+    if (!bskySocialSuffix) {
+      const lastDot = shortHandle.lastIndexOf(".");
+      if (lastDot > 0) {
+        mainText = shortHandle.slice(0, lastDot);
+        tldSuffix = shortHandle.slice(lastDot);
+      }
+    }
+    return /* @__PURE__ */ import_react8.default.createElement(Component2, __spreadValues({}, rest), /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-main-text" }, mainText), tldSuffix && /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-tld-suffix" }, tldSuffix), bskySocialSuffix && /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-bsky-social-suffix-dot" }, bskySocialSuffix.charAt(0)), /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-bsky-social-suffix" }, bskySocialSuffix.slice(1))));
+  }
+
+  // src/widgets/account/account-label.js
+  function AccountLabel(_a3) {
+    var _b = _a3, { account, withDisplayName, className, Component: Component2 } = _b, rest = __objRest(_b, ["account", "withDisplayName", "className", "Component"]);
+    if (!Component2)
+      Component2 = "span";
+    return /* @__PURE__ */ import_react9.default.createElement(Component2, __spreadValues({ className: "account-label " + (className || "") }, rest), /* @__PURE__ */ import_react9.default.createElement("span", { className: "account-handle" }, /* @__PURE__ */ import_react9.default.createElement(
+      "span",
+      {
+        className: "account-avatar",
+        style: !account.avatar ? void 0 : {
+          backgroundImage: `url(${account.avatar})`
+        }
+      },
+      "@"
+    ), /* @__PURE__ */ import_react9.default.createElement(FullHandle, { shortHandle: account.shortHandle || account.handle }), !withDisplayName || !account.displayName ? void 0 : /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, " ", /* @__PURE__ */ import_react9.default.createElement("span", { className: "account-label-display-name" }, account.displayName))));
+  }
+
+  // src/landing/fun-background.js
+  var POST_DEBOUNCE_MSEC = 1e3;
+  var POST_MAX_AGE = 1e3 * 30;
+  var DESIRED_POST_COUNT = 7;
+  function FunBackground() {
+    const { bestThreads } = forAwait("now", getFirehoseThreads) || {};
+    return /* @__PURE__ */ import_react10.default.createElement("div", { className: "fun-background" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "fun-background-scroller" }, bestThreads && bestThreads.map((thread, i) => {
+      var _a3;
+      return /* @__PURE__ */ import_react10.default.createElement(
+        ThreadBubble,
+        {
+          key: ((_a3 = thread == null ? void 0 : thread.post) == null ? void 0 : _a3.uri) || "undefined",
+          thread
+        }
+      );
+    })));
+  }
+  function getFirehoseThreads() {
+    return __asyncGenerator(this, null, function* () {
+      var _a3, _b, _c;
+      const seenPostWhen = /* @__PURE__ */ new Map();
+      let bestCurrentThreads = [];
+      try {
+        for (var iter = __forAwait(firehoseThreads()), more, temp, error; more = !(temp = yield new __await(iter.next())).done; more = false) {
+          const chunk = temp.value;
+          const bestThreads = [];
+          const now = Date.now();
+          const threadTooOld = now - POST_MAX_AGE;
+          for (const oldThread of bestCurrentThreads) {
+            if (seenPostWhen.get(oldThread.post.uri) > threadTooOld) {
+              bestThreads.push(oldThread);
+            }
+          }
+          const newThreads = [];
+          for (const thread of chunk) {
+            if (!((_a3 = thread == null ? void 0 : thread.post) == null ? void 0 : _a3.record.text))
+              continue;
+            if (seenPostWhen.has((_b = thread == null ? void 0 : thread.post) == null ? void 0 : _b.uri))
+              continue;
+            seenPostWhen.set((_c = thread == null ? void 0 : thread.post) == null ? void 0 : _c.uri, now);
+            newThreads.push(thread);
+          }
+          newThreads.sort((t1, t2) => {
+            var _a4, _b2, _c2, _d, _e, _f;
+            const likes1 = (((_a4 = t1.post) == null ? void 0 : _a4.likeCount) || 0) + (((_c2 = (_b2 = t2.parent) == null ? void 0 : _b2.post) == null ? void 0 : _c2.likeCount) || 0);
+            const likes2 = (((_d = t2.post) == null ? void 0 : _d.likeCount) || 0) + (((_f = (_e = t1.parent) == null ? void 0 : _e.post) == null ? void 0 : _f.likeCount) || 0);
+            return likes2 - likes1;
+          });
+          for (let i = 0; i < newThreads.length; i++) {
+            if (!i || bestThreads.length < DESIRED_POST_COUNT) {
+              bestThreads.push(newThreads[i]);
+            }
+          }
+          bestCurrentThreads = bestThreads;
+          yield { bestThreads };
+          yield new __await(new Promise((resolve) => setTimeout(resolve, POST_DEBOUNCE_MSEC)));
+        }
+      } catch (temp) {
+        error = [temp];
+      } finally {
+        try {
+          more && (temp = iter.return) && (yield new __await(temp.call(iter)));
+        } finally {
+          if (error)
+            throw error[0];
+        }
+      }
+    });
+  }
+  function ThreadBubble({ thread }) {
+    var _a3, _b, _c, _d, _e;
+    const hash2 = calcHash((_a3 = thread == null ? void 0 : thread.post) == null ? void 0 : _a3.uri);
+    let rnd = nextRandom(Math.abs(hash2 / 1e3 + hash2));
+    const animationDuration = 20 + rnd * 30;
+    rnd = nextRandom(rnd);
+    const left = rnd * 80 - 2;
+    return /* @__PURE__ */ import_react10.default.createElement(
+      "div",
+      {
+        className: "fun-background-thread",
+        style: {
+          animationDuration: `${animationDuration.toFixed(2)}s`,
+          left: `${left.toFixed(2)}%`
+        }
+      },
+      /* @__PURE__ */ import_react10.default.createElement(AccountLabel, { account: (_b = thread == null ? void 0 : thread.post) == null ? void 0 : _b.author }),
+      /* @__PURE__ */ import_react10.default.createElement("div", { className: "fun-background-thread-content" }, (_c = thread == null ? void 0 : thread.post) == null ? void 0 : _c.record.text),
+      /* @__PURE__ */ import_react10.default.createElement("div", { className: "fun-background-thread-likes" }, /* @__PURE__ */ import_react10.default.createElement(FavoriteBorder_default, null), !((_d = thread == null ? void 0 : thread.post) == null ? void 0 : _d.likeCount) ? "" : (_e = thread == null ? void 0 : thread.post) == null ? void 0 : _e.likeCount.toLocaleString())
+    );
+  }
+
+  // package.json
+  var version4 = "0.1.13";
+
+  // src/localise.js
+  function localise(english, languageMap) {
+    if (!(langs == null ? void 0 : langs.length))
+      return english;
+    for (const lang of langs) {
+      if (languageMap[lang])
+        return languageMap[lang];
+    }
+    for (const lang of langs) {
+      if (languageMap[lang])
+        return languageMap[lang];
+    }
+    return english;
+  }
+  var langSubstitutes = {
+    ru: "uk",
+    be: "uk"
+  };
+  var _a2;
+  var langs = extendDashLeads(
+    !navigator ? void 0 : ((_a2 = navigator.languages) == null ? void 0 : _a2.length) ? navigator.languages.map((lang) => lang.toLowerCase()) : navigator.language ? [navigator.language.toLowerCase()] : void 0
+  );
+  function extendDashLeads(langs2) {
+    if (!langs2)
+      return langs2;
+    const result = [];
+    for (const lang of langs2) {
+      result.push(langSubstitutes[lang] || lang);
+    }
+    for (const lang of langs2) {
+      const dashLead = lang.split("-")[0];
+      if (dashLead !== lang)
+        result.push(langSubstitutes[dashLead] || dashLead);
+    }
+    return result;
+  }
+
   // src/landing/landing.js
   function Landing() {
     const [timeout2] = import_react11.default.useState({ timeout: 0, searchText: "" });
@@ -99299,7 +99363,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       timeout2.timeout = setTimeout(() => __async(this, null, function* () {
         setSearchParams({ q: searchText });
         try {
-          for (var iter = __forAwait(searchAccounts2(searchText)), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
+          for (var iter = __forAwait(searchAccounts(searchText)), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
             const searchResults2 = temp.value;
             if (timeout2.searchText !== searchText)
               return;

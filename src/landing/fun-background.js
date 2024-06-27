@@ -6,6 +6,7 @@ import './fun-background.css';
 import { calcHash, firehoseThreads, nextRandom } from '../api';
 import { FavoriteBorder } from '@mui/icons-material';
 import { forAwait } from '../../coldsky/src/api/forAwait';
+import { AccountLabel } from '../widgets/account';
 
 const POST_DEBOUNCE_MSEC = 1000;
 const POST_MAX_AGE = 1000 * 30;
@@ -106,6 +107,7 @@ function ThreadBubble({ thread }) {
         animationDuration: `${animationDuration.toFixed(2)}s`,
         left: `${left.toFixed(2)}%`
       }}>
+      <AccountLabel account={thread?.post?.author} />
       <div className='fun-background-thread-content'>
         {
           thread?.post?.record.text

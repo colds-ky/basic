@@ -6,6 +6,7 @@ import { firehose, ColdskyAgent } from '../../coldsky/lib';
 import { throttledAsyncCache } from '../../coldsky/lib/throttled-async-cache';
 import { streamBuffer } from '../../coldsky/src/api/akpa';
 import { BSKY_PUBLIC_URL } from '../../coldsky/lib/coldsky-agent';
+import { cacheAccount } from './record-cache';
 
 /**
  * @typedef {import('@atproto/api/dist/client/types/app/bsky/feed/defs').ThreadViewPost} ThreadViewPost
@@ -51,11 +52,37 @@ export function firehoseThreads() {
       }
       
       function yieldThread(thread) {
+        cacheAllMentionedAccounts(thread);
         streaming.yield(thread, buf => {
           if (!buf) return [thread];
           buf.push(thread);
           return buf;
         });
+      }
+
+      /**
+       * @param {ThreadViewPost} thread
+       */
+      function cacheAllMentionedAccounts(thread) {
+        const seenPosts = new Set();
+        walkThread(thread);
+
+        /**
+         * @param {ThreadViewPost} [thread]
+         */
+        function walkThread(thread) {
+          if (!thread?.post || seenPosts.has(thread?.post?.uri)) return;
+
+          cacheAccount(thread.post.author);
+          if (thread.replies) {
+            for (const reply of thread.replies) {
+              walkThread(reply);
+            }
+          }
+          if (thread.parent) {
+            walkThread(thread.parent);
+          }
+        }
       }
 
       /**
