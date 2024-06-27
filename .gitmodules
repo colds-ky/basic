@@ -1,0 +1,3 @@
+[submodule "dids"]
+	path = dids
+	url = https://github.com/colds-ky/dids
