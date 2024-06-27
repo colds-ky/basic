@@ -10531,78 +10531,72 @@ if (cid) {
 
 	var dist$1 = {};
 
-	var hasRequiredDist;
-	function requireDist() {
-	  if (hasRequiredDist) return dist$1;
-	  hasRequiredDist = 1;
-	  (function (exports) {
-	    (() => {
+	(function (exports) {
+	  (() => {
 
-	      var e = {
-	          d: (t, r) => {
-	            for (var n in r) e.o(r, n) && !e.o(t, n) && Object.defineProperty(t, n, {
-	              enumerable: !0,
-	              get: r[n]
-	            });
-	          },
-	          o: (e, t) => Object.prototype.hasOwnProperty.call(e, t),
-	          r: e => {
-	            "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {
-	              value: "Module"
-	            }), Object.defineProperty(e, "__esModule", {
-	              value: !0
-	            });
-	          }
+	    var e = {
+	        d: (t, r) => {
+	          for (var n in r) e.o(r, n) && !e.o(t, n) && Object.defineProperty(t, n, {
+	            enumerable: !0,
+	            get: r[n]
+	          });
 	        },
-	        t = {};
-	      function r(e, t) {
-	        return void 0 === t && (t = "-"), new RegExp("^(?!0{4}" + t + "0{2}" + t + "0{2})((?=[0-9]{4}" + t + "(((0[^2])|1[0-2])|02(?=" + t + "(([0-1][0-9])|2[0-8])))" + t + "[0-9]{2})|(?=((([13579][26])|([2468][048])|(0[48]))0{2})|([0-9]{2}((((0|[2468])[48])|[2468][048])|([13579][26])))" + t + "02" + t + "29))([0-9]{4})" + t + "(?!((0[469])|11)" + t + "31)((0[1,3-9]|1[0-2])|(02(?!" + t + "3)))" + t + "(0[1-9]|[1-2][0-9]|3[0-1])$").test(e);
-	      }
-	      function n(e) {
-	        var t = /\D/.exec(e);
-	        return t ? t[0] : "";
-	      }
-	      function i(e, t, r) {
-	        void 0 === t && (t = ":"), void 0 === r && (r = !1);
-	        var i = new RegExp("^([0-1]|2(?=([0-3])|4" + t + "00))[0-9]" + t + "[0-5][0-9](" + t + "([0-5]|6(?=0))[0-9])?(.[0-9]{1,9})?$");
-	        if (!r || !/[Z+\-]/.test(e)) return i.test(e);
-	        if (/Z$/.test(e)) return i.test(e.replace("Z", ""));
-	        var o = e.includes("+"),
-	          a = e.split(/[+-]/),
-	          u = a[0],
-	          d = a[1];
-	        return i.test(u) && function (e, t, r) {
-	          return void 0 === r && (r = ":"), new RegExp(t ? "^(0(?!(2" + r + "4)|0" + r + "3)|1(?=([0-1]|2(?=" + r + "[04])|[34](?=" + r + "0))))([03469](?=" + r + "[03])|[17](?=" + r + "0)|2(?=" + r + "[04])|5(?=" + r + "[034])|8(?=" + r + "[04]))" + r + "([03](?=0)|4(?=5))[05]$" : "^(0(?=[^0])|1(?=[0-2]))([39](?=" + r + "[03])|[0-24-8](?=" + r + "00))" + r + "[03]0$").test(e);
-	        }(d, o, n(d));
-	      }
-	      function o(e) {
-	        var t = e.split("T"),
-	          o = t[0],
-	          a = t[1],
-	          u = r(o, n(o));
-	        if (!a) return !1;
-	        var d,
-	          s = (d = a.match(/([^Z+\-\d])(?=\d+\1)/), Array.isArray(d) ? d[0] : "");
-	        return u && i(a, s, !0);
-	      }
-	      function a(e, t) {
-	        return void 0 === t && (t = "-"), new RegExp("^[0-9]{4}" + t + "(0(?=[^0])|1(?=[0-2]))[0-9]$").test(e);
-	      }
-	      e.r(t), e.d(t, {
-	        isValidDate: () => r,
-	        isValidISODateString: () => o,
-	        isValidTime: () => i,
-	        isValidYearMonth: () => a
-	      });
-	      var u = exports;
-	      for (var d in t) u[d] = t[d];
-	      t.__esModule && Object.defineProperty(u, "__esModule", {
-	        value: !0
-	      });
-	    })();
-	  })(dist$1);
-	  return dist$1;
-	}
+	        o: (e, t) => Object.prototype.hasOwnProperty.call(e, t),
+	        r: e => {
+	          "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {
+	            value: "Module"
+	          }), Object.defineProperty(e, "__esModule", {
+	            value: !0
+	          });
+	        }
+	      },
+	      t = {};
+	    function r(e, t) {
+	      return void 0 === t && (t = "-"), new RegExp("^(?!0{4}" + t + "0{2}" + t + "0{2})((?=[0-9]{4}" + t + "(((0[^2])|1[0-2])|02(?=" + t + "(([0-1][0-9])|2[0-8])))" + t + "[0-9]{2})|(?=((([13579][26])|([2468][048])|(0[48]))0{2})|([0-9]{2}((((0|[2468])[48])|[2468][048])|([13579][26])))" + t + "02" + t + "29))([0-9]{4})" + t + "(?!((0[469])|11)" + t + "31)((0[1,3-9]|1[0-2])|(02(?!" + t + "3)))" + t + "(0[1-9]|[1-2][0-9]|3[0-1])$").test(e);
+	    }
+	    function n(e) {
+	      var t = /\D/.exec(e);
+	      return t ? t[0] : "";
+	    }
+	    function i(e, t, r) {
+	      void 0 === t && (t = ":"), void 0 === r && (r = !1);
+	      var i = new RegExp("^([0-1]|2(?=([0-3])|4" + t + "00))[0-9]" + t + "[0-5][0-9](" + t + "([0-5]|6(?=0))[0-9])?(.[0-9]{1,9})?$");
+	      if (!r || !/[Z+\-]/.test(e)) return i.test(e);
+	      if (/Z$/.test(e)) return i.test(e.replace("Z", ""));
+	      var o = e.includes("+"),
+	        a = e.split(/[+-]/),
+	        u = a[0],
+	        d = a[1];
+	      return i.test(u) && function (e, t, r) {
+	        return void 0 === r && (r = ":"), new RegExp(t ? "^(0(?!(2" + r + "4)|0" + r + "3)|1(?=([0-1]|2(?=" + r + "[04])|[34](?=" + r + "0))))([03469](?=" + r + "[03])|[17](?=" + r + "0)|2(?=" + r + "[04])|5(?=" + r + "[034])|8(?=" + r + "[04]))" + r + "([03](?=0)|4(?=5))[05]$" : "^(0(?=[^0])|1(?=[0-2]))([39](?=" + r + "[03])|[0-24-8](?=" + r + "00))" + r + "[03]0$").test(e);
+	      }(d, o, n(d));
+	    }
+	    function o(e) {
+	      var t = e.split("T"),
+	        o = t[0],
+	        a = t[1],
+	        u = r(o, n(o));
+	      if (!a) return !1;
+	      var d,
+	        s = (d = a.match(/([^Z+\-\d])(?=\d+\1)/), Array.isArray(d) ? d[0] : "");
+	      return u && i(a, s, !0);
+	    }
+	    function a(e, t) {
+	      return void 0 === t && (t = "-"), new RegExp("^[0-9]{4}" + t + "(0(?=[^0])|1(?=[0-2]))[0-9]$").test(e);
+	    }
+	    e.r(t), e.d(t, {
+	      isValidDate: () => r,
+	      isValidISODateString: () => o,
+	      isValidTime: () => i,
+	      isValidYearMonth: () => a
+	    });
+	    var u = exports;
+	    for (var d in t) u[d] = t[d];
+	    t.__esModule && Object.defineProperty(u, "__esModule", {
+	      value: !0
+	    });
+	  })();
+	})(dist$1);
 
 	var hasRequiredFormats;
 	function requireFormats() {
@@ -10612,7 +10606,7 @@ if (cid) {
 	    value: true
 	  });
 	  formats.language = formats.cid = formats.nsid = formats.atIdentifier = formats.handle = formats.did = formats.atUri = formats.uri = formats.datetime = void 0;
-	  const iso_datestring_validator_1 = requireDist();
+	  const iso_datestring_validator_1 = dist$1;
 	  const cid_1 = require$$1;
 	  const types_1 = requireTypes();
 	  const syntax_1 = dist$4;
@@ -32933,6 +32927,9 @@ if (cid) {
 	  };
 	}
 	const _breakPostURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/post\/([a-z0-9]+)$/;
+	function makeFeedUri(shortDID, postID) {
+	  return 'at://' + unwrapShortDID(shortDID) + '/' + postID;
+	}
 
 	/**
 	* @param {string | null | undefined} uri
@@ -32947,6 +32944,14 @@ if (cid) {
 	  };
 	}
 	const _breakFeedUri_Regex = /^at\:\/\/(did:plc:)?([a-z0-9]+)\/[a-z\.]+\/?(.*)?$/;
+	function getProfileBlobUrl(did, cid) {
+	  if (!did || !cid) return undefined;
+	  return `https://cdn.bsky.app/img/avatar/plain/${unwrapShortDID(did)}/${cid}@jpeg`;
+	}
+	function getFeedBlobUrl(did, cid) {
+	  if (!did || !cid) return undefined;
+	  return `https://cdn.bsky.app/img/feed_thumbnail/plain/${unwrapShortDID(did)}/${cid}@jpeg`;
+	}
 
 	/**
 	 * @param {any} x
@@ -39593,6 +39598,7 @@ if (cid) {
 	 *  'app.bsky.graph.list': import('@atproto/api').AppBskyGraphList.Record,
 	 *  'app.bsky.graph.listitem': import('@atproto/api').AppBskyGraphListitem.Record,
 	 *  'app.bsky.actor.profile': import('@atproto/api').AppBskyActorProfile.Record
+	 *  'app.bsky.feed.generator': import('@atproto/api').AppBskyFeedGenerator.Record
 	 * }} RepoRecord$Typed
 	 */
 
@@ -39612,11 +39618,13 @@ if (cid) {
 	 * FirehoseRecord$Typed<'app.bsky.graph.block'> |
 	 * FirehoseRecord$Typed<'app.bsky.graph.list'> |
 	 * FirehoseRecord$Typed<'app.bsky.graph.listitem'> |
-	 * FirehoseRecord$Typed<'app.bsky.actor.profile'>
+	 * FirehoseRecord$Typed<'app.bsky.actor.profile'> |
+	 * FirehoseRecord$Typed<'app.bsky.feed.generator'>
 	 * } FirehoseRecord
 	 */
 
-	const knownTypes = ['app.bsky.feed.like', 'app.bsky.feed.post', 'app.bsky.feed.repost', 'app.bsky.feed.threadgate', 'app.bsky.graph.follow', 'app.bsky.graph.block', 'app.bsky.graph.list', 'app.bsky.graph.listitem', 'app.bsky.actor.profile'];
+	const known$Types = ['app.bsky.feed.like', 'app.bsky.feed.post', 'app.bsky.feed.repost', 'app.bsky.feed.threadgate', 'app.bsky.graph.follow', 'app.bsky.graph.block', 'app.bsky.graph.list', 'app.bsky.graph.listitem', 'app.bsky.actor.profile', 'app.bsky.feed.generator'];
+	firehose.knownTypes = known$Types;
 	let cbor_x_extended = false;
 
 	/**
@@ -39697,7 +39705,7 @@ if (cid) {
 	      record.cid = op.cid && String(op.cid);
 	      record.path = op.path;
 	      record.action = op.action;
-	      let unexpected = op.action !== 'create' && op.action !== 'update' && op.action !== 'delete' || knownTypes.indexOf(record.$type) < 0;
+	      let unexpected = op.action !== 'create' && op.action !== 'update' && op.action !== 'delete' || known$Types.indexOf(record.$type) < 0;
 	      if (unexpected) {
 	        if (!blockEntry.unexpected) blockEntry.unexpected = [];
 	        blockEntry.unexpected.push(record);
@@ -39750,7 +39758,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.0";
+	var version = "0.2.2";
 
 	// @ts-check
 
@@ -39850,7 +39858,7 @@ if (cid) {
 	  function addShortDID(did, ratio) {
 	    if (!did) return;
 	    const shortDID = shortenDID(did);
-	    let increment = (typeof filterShortDIDs === 'function' ? filterShortDIDs(did) : 1) * (ratio || 1);
+	    let increment = (typeof filterShortDIDs === 'function' ? filterShortDIDs(did) : 1) * (1);
 	    if (!increment) return;
 	    shortDIDs[shortDID] = (shortDIDs[shortDID] || 0) + increment;
 	    addedAny = true;
@@ -40134,6 +40142,100 @@ if (cid) {
 	  }
 	}
 
+	// @ts-check
+
+
+	/**
+	 * @param {string} repo
+	 * @param {import('..').RepoRecord$Typed['app.bsky.feed.like']} likeRecord
+	 * @param {Map<string, import('./store-data').RepositoryData>} store
+	 */
+	function captureLikeRecord(repo, likeRecord, store) {
+	  const shortDID = shortenDID(repo);
+	  const uri = breakFeedUri(likeRecord.subject?.uri);
+	  if (!uri?.shortDID || !uri.postID) return;
+	  let repoData = store.get(shortDID);
+	  if (!repoData) {
+	    repoData = {
+	      shortDID,
+	      profile: undefined,
+	      posts: new Map(),
+	      postLastAccesses: new Map(),
+	      lastAccesses: []
+	    };
+	    store.set(shortDID, repoData);
+	  }
+	  repoData.posts.get(uri.postID);
+	}
+
+	// @ts-check
+
+
+	/** @typedef {import('../firehose').RepoRecord$Typed} RepoRecord$Typed */
+
+	/**
+	 * @param {string} repo
+	 * @param {RepoRecord$Typed[keyof RepoRecord$Typed]} rec
+	 * @param {Map<string, import('./store-data').RepositoryData>} store
+	 */
+	function captureAllRecords(repo, rec, store) {
+	  switch (rec['@type']) {
+	    case 'app.bsky.feed.like':
+	      captureLikeRecord(repo, /** @type {RepoRecord$Typed['app.bsky.feed.like']} */rec, store);
+	      return;
+	  }
+	}
+
+	// @ts-check
+
+	/**
+	 * @typedef {{
+	 *  shortDID: string,
+	 *  profile: import('.').CompactProfile | undefined,
+	 *  posts: Map<string, import('.').CompactPost>,
+	 *  postLastAccesses: Map<string, number[]>,
+	 *  lastAccesses: number[]
+	 * }} RepositoryData
+	 */
+
+	function storeData() {
+	  /**
+	   * @type {Map<string, RepositoryData>}
+	   */
+	  const repos = new Map();
+	  return {
+	    repos
+	  };
+	}
+
+	// @ts-check
+
+	function defineStore() {
+	  const store = storeData();
+	  return {
+	    captureRecord,
+	    captureThreadView,
+	    captureProfileView
+	  };
+
+	  /**
+	   * @param {import('../firehose').FirehoseRecord} record
+	   */
+	  function captureRecord(record) {
+	    captureAllRecords(record.repo, record, store.repos);
+	  }
+
+	  /**
+	   * @param {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost} threadView
+	   */
+	  function captureThreadView(threadView) {}
+
+	  /**
+	   * @param {import('@atproto/api').AppBskyActorDefs.ProfileViewDetailed} profileView
+	   */
+	  function captureProfileView(profileView) {}
+	}
+
 	const atproto = atproto_api_import;
 
 	// checkApplyGlobal();
@@ -40162,10 +40264,14 @@ if (cid) {
 	exports.atproto = atproto;
 	exports.breakFeedUri = breakFeedUri;
 	exports.breakPostURL = breakPostURL;
+	exports.defineStore = defineStore;
 	exports.firehose = firehose;
 	exports.firehoseShortDIDs = firehoseShortDIDs;
+	exports.getFeedBlobUrl = getFeedBlobUrl;
+	exports.getProfileBlobUrl = getProfileBlobUrl;
 	exports.isPromise = isPromise;
 	exports.likelyDID = likelyDID;
+	exports.makeFeedUri = makeFeedUri;
 	exports.parseTimestampOffset = parseTimestampOffset;
 	exports.plcDirectory = plcDirectory;
 	exports.plcDirectoryCompact = plcDirectoryCompact;
