@@ -110,17 +110,20 @@ class AwaitState {
 
     if (this.replacedWith) return this.replacedWith.next();
 
-    this.nudgeContinuationFromHook();
+    const nudged = this.nudgeContinuationFromHook();
 
-    this.replacedWith = new AwaitState();
-    this.replacedWith.run = this.run;
-    this.replacedWith.reactSetState = this.reactSetState;
+    if (nudged) {
 
-    this.reactSetState(oldState => {
-      if (oldState !== this && oldState !== this.replacedWith)
-        oldState.replacedWith = this.replacedWith;
-      return this.replacedWith;
-    });
+      this.replacedWith = new AwaitState();
+      this.replacedWith.run = this.run;
+      this.replacedWith.reactSetState = this.reactSetState;
+
+      this.reactSetState(oldState => {
+        if (oldState !== this && oldState !== this.replacedWith)
+          oldState.replacedWith = this.replacedWith;
+        return this.replacedWith;
+      });
+    }
 
     return this.run.current;
   };
@@ -172,11 +175,13 @@ class AwaitState {
     if (!this.run.nudgeCallbacks?.length) return;
 
     const nudge = this.run.nudgeCallbacks.pop();
-    if (typeof nudge === 'function')
-      nudge();
-
     if (!this.run.nudgeCallbacks.length)
       this.run.nudgeCallbacks = undefined;
+
+    if (typeof nudge === 'function') {
+      nudge();
+      return true;
+    }
   }
 
   /**
