@@ -35082,8 +35082,8 @@ if (cid) {
 	    postID: matchGisting[3]?.toString().toLowerCase()
 	  };
 	}
-	const _breakBskyPostURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/post\/([a-z0-9]+)(\/|$)/i;
-	const _breakGistingPostURL_Regex = /^http[s]?\:\/\/(gist\.ing|gisti\.ng|gist\.ink)\/([a-z0-9\.\:]+)\/([a-z0-9]+)(\/|$)/i;
+	const _breakBskyPostURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:\-]+)\/post\/([a-z0-9]+)(\/|$)/i;
+	const _breakGistingPostURL_Regex = /^http[s]?\:\/\/(gist\.ing|gisti\.ng|gist\.ink)\/([a-z0-9\.\:\-]+)\/([a-z0-9]+)(\/|$)/i;
 
 	/**
 	* @param {string | null | undefined} url
@@ -35099,10 +35099,10 @@ if (cid) {
 	  const matchClearSky = _detectClearSkyProfileURL_Regex.exec(url);
 	  if (matchClearSky) return shortenDID(matchClearSky[2]);
 	}
-	const _detectBskyProfileURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)(\/|$)/i;
-	const _detectGistingProfileURL_Regex = /^http[s]?\:\/\/(gist\.ing|gisti\.ng|gist\.ink)\/([a-z0-9\.\:]+)(\/|$)/i;
-	const _detectOyinboReceiptsURL_Regex = /^http[s]?\:\/\/oyin\.bo\/receipts\/?\?handle\=([a-z0-9\.\:]+)(\/|$)/i;
-	const _detectClearSkyProfileURL_Regex = /^http[s]?\:\/\/(clearsky\.app|bsky\.thieflord\.dev)\/([a-z0-9\.\:]+)(\/|$)/i;
+	const _detectBskyProfileURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:\-]+)(\/|$)/i;
+	const _detectGistingProfileURL_Regex = /^http[s]?\:\/\/(gist\.ing|gisti\.ng|gist\.ink)\/([a-z0-9\.\:\-]+)(\/|$)/i;
+	const _detectOyinboReceiptsURL_Regex = /^http[s]?\:\/\/oyin\.bo\/receipts\/?\?handle\=([a-z0-9\.\:\-]+)(\/|$)/i;
+	const _detectClearSkyProfileURL_Regex = /^http[s]?\:\/\/(clearsky\.app|bsky\.thieflord\.dev)\/([a-z0-9\.\:\-]+)(\/|$)/i;
 	function makeFeedUri(shortDID, postID) {
 	  return 'at://' + unwrapShortDID(shortDID) + '/app.bsky.feed.post/' + postID;
 	}
@@ -41882,7 +41882,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.29";
+	var version = "0.2.30";
 
 	// @ts-check
 
