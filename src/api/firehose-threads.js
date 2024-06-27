@@ -1,21 +1,20 @@
 // @ts-check
 
-import Dexie from 'dexie';
-
-import { firehose, ColdskyAgent } from '../../coldsky/lib';
+import { firehose, ColdskyAgent, defineCacheIndexedDBStore } from '../../coldsky/lib';
 import { throttledAsyncCache } from '../../coldsky/lib/throttled-async-cache';
 import { streamBuffer } from '../../coldsky/src/api/akpa';
 import { BSKY_PUBLIC_URL } from '../../coldsky/lib/coldsky-agent';
-import { storeAccountToCache, storeLikeToCache, storePostIndexToCache, storeRepostToCache } from './record-cache';
 
 /**
  * @typedef {import('@atproto/api/dist/client/types/app/bsky/feed/defs').ThreadViewPost} ThreadViewPost
  */
 
+
 /**
+ * @param {ReturnType<typeof defineCacheIndexedDBStore>} db
  * @returns {AsyncIterable<ThreadViewPost[]>}
  */
-export function firehoseThreads() {
+export function firehoseThreads(db) {
   return streamBuffer(
     /**
      * @param {import('../../coldsky/src/api/akpa').StreamParameters<ThreadViewPost, ThreadViewPost[]>} streaming 
@@ -28,7 +27,13 @@ export function firehoseThreads() {
       const getPostThreadCached = throttledAsyncCache(
         (uri) => {
           if (streaming.isEnded) return;
-          return publicAgent.getPostThread({ uri }).then(res => res?.data?.thread);
+          return publicAgent.getPostThread({ uri }).then(res => {
+            const threadView = res?.data?.thread;
+            if (threadView.post) db.captureThreadView(
+              /** @type {ThreadViewPost} */(threadView),
+              Date.now());
+            return threadView;
+          });
         });
 
       keepMonitoringFirehose();
@@ -41,6 +46,7 @@ export function firehoseThreads() {
           if (streaming.isEnded) break;
           for (const entry of chunk) {
             for (const msg of entry.messages) {
+              db.captureRecord(msg, entry.receiveTimestamp);
               switch (msg.$type) {
                 case 'app.bsky.feed.like': handleLike(msg); continue;
                 case 'app.bsky.feed.post': handlePost(msg); continue;
@@ -64,35 +70,13 @@ export function firehoseThreads() {
        * @param {ThreadViewPost} thread
        */
       function cacheAllMentionedAccounts(thread) {
-        const seenPosts = new Set();
-        walkThread(thread);
-
-        /**
-         * @param {ThreadViewPost} [thread]
-         */
-        function walkThread(thread) {
-          if (!thread?.post || seenPosts.has(thread?.post?.uri)) return;
-
-          storeAccountToCache(thread.post.author);
-          storePostIndexToCache(thread.post);
-
-          if (thread.replies) {
-            for (const reply of thread.replies) {
-              walkThread(reply);
-            }
-          }
-          if (thread.parent) {
-            walkThread(thread.parent);
-          }
-        }
+        db.captureThreadView(thread, Date.now());
       }
 
       /**
        * @param {import('../../coldsky/lib/firehose').FirehoseMessageOfType<'app.bsky.feed.like'>} msg 
        */
       async function handleLike(msg) {
-        storeLikeToCache(msg.repo, msg.subject?.uri, new Date(msg.createdAt).getTime());
-
         const thread = await getPostThreadCached(msg.subject.uri);
         if (!thread || thread.blocked || thread.notFound) return;
         yieldThread(thread);
@@ -111,8 +95,6 @@ export function firehoseThreads() {
        * @param {import('../../coldsky/lib/firehose').FirehoseMessageOfType<'app.bsky.feed.repost'>} msg 
        */
       async function handleRepost(msg) {
-        storeRepostToCache(msg.repo, msg.subject?.uri, new Date(msg.createdAt).getTime());
-
         const thread = await getPostThreadCached(msg.subject.uri);
         if (!thread || thread.blocked || thread.notFound) return;
         yieldThread(thread);

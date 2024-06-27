@@ -8,13 +8,15 @@ import { FavoriteBorder } from '@mui/icons-material';
 import { forAwait } from '../../coldsky/src/api/forAwait';
 import { AccountLabel } from '../widgets/account';
 import { useNavigate } from 'react-router-dom';
+import { useDB } from '..';
 
 const POST_DEBOUNCE_MSEC = 5000;
 const POST_MAX_AGE = 1000 * 40;
 const DESIRED_POST_COUNT = 4;
 
 export function FunBackground() {
-  const { bestThreads } = forAwait('now', getFirehoseThreads) || {};
+  const db = useDB();
+  const { bestThreads } = forAwait('now', () => getFirehoseThreads(db)) || {};
 
   return (
     <div className='fun-background'>
@@ -33,7 +35,10 @@ export function FunBackground() {
   );
 }
 
-async function* getFirehoseThreads() {
+/**
+ * @param {ReturnType<typeof import('../../coldsky').defineCacheIndexedDBStore>} db
+ */
+async function* getFirehoseThreads(db) {
 
   /** @type {Map<string, number>} */
   const seenPostWhen = new Map();
@@ -43,7 +48,7 @@ async function* getFirehoseThreads() {
    */
   let bestCurrentThreads = [];
 
-  for await (const chunk of firehoseThreads()) {
+  for await (const chunk of firehoseThreads(db)) {
     const bestThreads = [];
     const now = Date.now();
 

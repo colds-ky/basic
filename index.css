@@ -281,10 +281,12 @@ html.account body {
   position: relative;
   padding-left: 0.4em;
   margin-top: 1vmax;
+  overflow-wrap: anywhere;
 }
 .history-view .timeline-container {
   grid-row: 5;
   grid-column: 1 / 3;
+  overflow-wrap: anywhere;
 }
 @media (min-aspect-ratio: 5.5/5) {
   .history-view {

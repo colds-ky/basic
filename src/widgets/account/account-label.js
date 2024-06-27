@@ -9,7 +9,6 @@ import './account-label.css';
  * @param {{
  *  account: {
  *    handle?: string;
- *    shortHandle?: string;
  *    displayName?: string;
  *    did?: string;
  *    shortDID?: string;
@@ -31,7 +30,7 @@ export function AccountLabel({ account, withDisplayName, className, Component, .
             {
               backgroundImage: `url(${account.avatar})`
             }}>@</span>
-        <FullHandle shortHandle={account.shortHandle || account.handle} />
+        <FullHandle shortHandle={account.handle} />
         {
           !withDisplayName || !account.displayName ? undefined :
             <>

@@ -12,8 +12,22 @@ import {
 import { createTheme, ThemeProvider } from '@mui/material';
 import { Landing } from './landing';
 import { History } from './history';
+import { defineCacheIndexedDBStore } from '../coldsky/lib';
+
+/** @typedef {ReturnType<typeof defineCacheIndexedDBStore>} DBAccess */
+var db;
+const DB_NAME = 'gisting-cache';
+
+const DBContext = React.createContext(/** @type {DBAccess} */(/** @type {*} */(null)));
+
+export const useDB = () => React.useContext(DBContext);
+
 
 function runApp() {
+
+  if (!db) {
+    db = defineCacheIndexedDBStore(DB_NAME);
+  }
 
   const basename =
     /file/i.test(location.protocol) ? undefined :
@@ -62,9 +76,9 @@ function runApp() {
 
   createRoot(root).render(
     <ThemeProvider theme={theme}>
-      <>
+      <DBContext.Provider value={db}>
         <RouterProvider router={router} />
-      </>
+      </DBContext.Provider>
     </ThemeProvider>
   );
 }

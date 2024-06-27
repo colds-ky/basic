@@ -10,7 +10,8 @@ import { version } from '../../package.json';
 import './landing.css';
 import { localise } from '../localise';
 import { AccountLabel } from '../widgets/account';
-import { searchAccounts } from '../api';
+import { searchAccounts } from '../api/search';
+import { useDB } from '..';
 
 export const uppercase_GIST = localise('𝓖𝓘𝓢𝓣', { uk: '𝓷𝓮𝓹𝓮𝓬𝔂𝓰' });
 
@@ -26,11 +27,12 @@ export function Landing() {
 }
 
 export function LandingCore() {
+  const db = useDB();
   const [timeout] = React.useState({ timeout: 0, searchText: '' });
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchText, setSearchText] = React.useState(searchParams.get('q') || '');
   const [searchResults, setSearchResults] = React.useState(
-    /** @type {import('@atproto/api/dist/client/types/app/bsky/actor/defs').ProfileViewBasic[]} */([]));
+    /** @type {{complete?: boolean} & import('../api/search').MatchCompactProfile[]} */([]));
   
   if (searchText !== timeout.searchText) {
     clearTimeout(timeout.timeout);
@@ -43,7 +45,7 @@ export function LandingCore() {
 
     timeout.timeout = setTimeout(async () => {
       setSearchParams({ q: searchText });
-      for await (const searchResults of searchAccounts(searchText)) {
+      for await (const searchResults of searchAccounts({ text: searchText, db })) {
         if (timeout.searchText !== searchText) return;
         setSearchResults(searchResults);
       }
@@ -82,7 +84,7 @@ export function LandingCore() {
         !searchResults.length ? undefined :
           <div className='landing-auto-completion-area'>
             {(searchResults.length < 10 ? searchResults : searchResults.slice(0,10)).map(profile => (
-              <Link key={profile.did} to={`/${profile.handle}`} className='landing-auto-complete-entry'>
+              <Link key={profile.shortDID} to={`/${profile.handle}`} className='landing-auto-complete-entry'>
                 <AccountLabel account={profile} Component='div' withDisplayName />
               </Link>
             ))}
