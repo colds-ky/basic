@@ -28362,7 +28362,7 @@ if (cid) {
 	});
 	unicode.UnicodeString = void 0;
 	const common_web_1 = dist$2;
-	const encoder = new TextEncoder();
+	const encoder$1 = new TextEncoder();
 	const decoder$1 = new TextDecoder();
 	class UnicodeString {
 	  constructor(utf16) {
@@ -28385,7 +28385,7 @@ if (cid) {
 	      value: void 0
 	    });
 	    this.utf16 = utf16;
-	    this.utf8 = encoder.encode(utf16);
+	    this.utf8 = encoder$1.encode(utf16);
 	  }
 	  get length() {
 	    return this.utf8.byteLength;
@@ -28400,7 +28400,7 @@ if (cid) {
 	    return decoder$1.decode(this.utf8.slice(start, end));
 	  }
 	  utf16IndexToUtf8Index(i) {
-	    return encoder.encode(this.utf16.slice(0, i)).byteLength;
+	    return encoder$1.encode(this.utf16.slice(0, i)).byteLength;
 	  }
 	  toString() {
 	    return this.utf16;
@@ -39758,7 +39758,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.2";
+	var version = "0.2.3";
 
 	// @ts-check
 
@@ -40144,16 +40144,344 @@ if (cid) {
 
 	// @ts-check
 
+	/** @param {string} shortDID */
+	function createRepoData(shortDID) {
+	  const repoData = {
+	    shortDID,
+	    profile: undefined,
+	    posts: new Map(),
+	    postLastAccesses: new Map(),
+	    lastAccesses: []
+	  };
+	  return repoData;
+	}
+
+	// @ts-check
+
+	/**
+	 * @param {string} shortDID
+	 * @param {string} cid
+	 */
+	function createSpeculativePost(shortDID, cid) {
+	  /** @type {import('../..').CompactPost} */
+	  const speculativePost = {
+	    shortDID,
+	    cid,
+	    text: undefined,
+	    facets: undefined,
+	    embeds: undefined,
+	    threadStart: undefined,
+	    replyTo: undefined,
+	    words: undefined,
+	    repostCount: undefined,
+	    quoting: undefined,
+	    likeCount: undefined,
+	    placeholder: true,
+	    asOf: undefined
+	  };
+	  return speculativePost;
+	}
+
+	// @ts-check
+
 
 	/**
 	 * @param {string} repo
-	 * @param {import('..').RepoRecord$Typed['app.bsky.feed.like']} likeRecord
-	 * @param {Map<string, import('./store-data').RepositoryData>} store
+	 * @param {import('../..').RepoRecord$Typed['app.bsky.feed.like']} likeRecord
+	 * @param {Map<string, import('../store-data').RepositoryData>} store
 	 */
 	function captureLikeRecord(repo, likeRecord, store) {
 	  const shortDID = shortenDID(repo);
 	  const uri = breakFeedUri(likeRecord.subject?.uri);
 	  if (!uri?.shortDID || !uri.postID) return;
+	  let repoData = store.get(shortDID);
+	  if (!repoData) store.set(shortDID, repoData = createRepoData(shortDID));
+	  const existingPost = repoData.posts.get(uri.postID);
+	  if (existingPost) {
+	    existingPost.likeCount = (existingPost.likeCount || 0) + 1;
+	    return existingPost;
+	  } else {
+	    const speculativePost = createSpeculativePost(uri.shortDID, uri.postID);
+	    speculativePost.likeCount = 1;
+	    repoData.posts.set(uri.postID, speculativePost);
+	    return speculativePost;
+	  }
+	}
+
+	// @ts-check
+
+
+	/**
+	 * @param {import('../../firehose').RepoRecord$Typed['app.bsky.feed.post']['embed'] | undefined} embed
+	 */
+	function extractEmbeds(embed) {
+	  if (!embed) return;
+
+	  /** @type {import('../..').CompactEmbed[] | undefined} */
+	  let embeds = undefined;
+	  embeds = addEmbedImages( /** @type {import('@atproto/api').AppBskyEmbedImages.Main} */embed.images, embeds);
+	  embeds = addEmbedExternal( /** @type {import('@atproto/api').AppBskyEmbedExternal.Main} */embed.external, embeds);
+	  embeds = addEmbedRecord( /** @type {import('@atproto/api').AppBskyEmbedRecord.Main} */embed.record, embeds);
+	  embeds = addEmbedRecordMedia( /** @type {import('@atproto/api').AppBskyEmbedRecordWithMedia.Main} */embed.media, embeds);
+	  return embeds;
+	}
+
+	/**
+	 * @param {import('@atproto/api').AppBskyEmbedImages.Main['images'] | undefined} embedImages 
+	 * @param {import('../..').CompactEmbed[] | undefined} embeds 
+	 */
+	function addEmbedImages(embedImages, embeds) {
+	  if (!embedImages?.length) return embeds;
+	  for (const img of embedImages) {
+	    if (!img) continue;
+	    embeds = addToArray(embeds, /** @type {import('../..').CompactEmbed} */{
+	      imgSrc: img.image?.toString(),
+	      description: img.alt,
+	      aspectRatio: img.aspectRatio
+	    });
+	  }
+	  return embeds;
+	}
+
+	/**
+	 * @param {import('@atproto/api').AppBskyEmbedExternal.Main['external'] | undefined} embedExternal
+	 * @param {import('../..').CompactEmbed[] | undefined} embeds 
+	 */
+	function addEmbedExternal(embedExternal, embeds) {
+	  if (!embedExternal) return embeds;
+	  return addToArray(embeds, /** @type {import('../..').CompactEmbed} */{
+	    url: embedExternal.url,
+	    title: embedExternal.title,
+	    description: embedExternal.description,
+	    imgSrc: embedExternal.thumb?.toString()
+	  });
+	}
+
+	/**
+	 * @param {import('@atproto/api').AppBskyEmbedRecord.Main['record'] | undefined} embedRecord
+	 * @param {import('../..').CompactEmbed[] | undefined} embeds 
+	 */
+	function addEmbedRecord(embedRecord, embeds) {
+	  if (!embedRecord) return embeds;
+	  return addToArray(embeds, /** @type {import('../..').CompactEmbed} */{
+	    url: embedRecord.uri
+	  });
+	}
+
+	/**
+	 * @param {import('@atproto/api').AppBskyEmbedRecordWithMedia.Main['media'] | undefined} embedRecordMedia
+	 * @param {import('../..').CompactEmbed[] | undefined} embeds 
+	 */
+	function addEmbedRecordMedia(embedRecordMedia, embeds) {
+	  if (!embedRecordMedia) return embeds;
+	  embeds = addEmbedImages( /** @type {import('@atproto/api').AppBskyEmbedImages.Main} */embedRecordMedia.images, embeds);
+	  embeds = addEmbedExternal( /** @type {import('@atproto/api').AppBskyEmbedExternal.Main} */embedRecordMedia.external, embeds);
+	  return embeds;
+	}
+
+	// @ts-check
+
+	const encoder = new TextEncoder();
+
+	/**
+	 * @param {import('@atproto/api').AppBskyRichtextFacet.Main[] | undefined} facets
+	 * @param {string} text
+	 */
+	function extractFacets(facets, text) {
+	  if (!facets) return undefined;
+	  const codePoints = [...text];
+	  const utf8Lengths = codePoints.map(c => encoder.encode(c).length);
+	  /**
+	   * @type {import('../..').CompactFacet[]}
+	   */
+	  const compactFacets = [];
+	  for (const facet of facets) {
+	    let start = text.length;
+	    let length = 0;
+	    if (facet.index) {
+	      let facetByteStart = facet.index.byteStart;
+	      let facetByteEnd = facet.index.byteEnd;
+	      if (facetByteEnd > facetByteStart) {
+	        facetByteStart = facet.index.byteEnd;
+	        facetByteEnd = facet.index.byteStart;
+	      }
+	      let bytePos = 0;
+	      let charPos = 0;
+	      for (let i = 0; i < codePoints.length; i++) {
+	        const nextBytePos = bytePos + utf8Lengths[i];
+	        const nextCharPos = charPos + codePoints[i].length;
+	        if (facetByteStart >= bytePos && facetByteStart < nextBytePos) {
+	          start = charPos;
+	          length = text.length - start;
+	        }
+	        if (facetByteEnd <= nextBytePos) {
+	          length = nextCharPos - start;
+	          break;
+	        }
+	        bytePos = nextBytePos;
+	        charPos = nextCharPos;
+	      }
+	    }
+	    if (!facet.features?.length) {
+	      compactFacets.push({
+	        start,
+	        length
+	      });
+	      continue;
+	    }
+	    for (const feat of facet.features) {
+	      const facetMention = /** @type {import('@atproto/api/dist/client/types/app/bsky/richtext/facet').Mention} */feat;
+	      if (facetMention.did) compactFacets.push({
+	        start,
+	        length,
+	        mention: shortenDID(facetMention.did)
+	      });
+	      const facetLink = /** @type {import('@atproto/api/dist/client/types/app/bsky/richtext/facet').Link} */feat;
+	      if (facetLink.uri) compactFacets.push({
+	        start,
+	        length,
+	        url: facetLink.uri
+	      });
+	      const facetTag = /** @type {import('@atproto/api/dist/client/types/app/bsky/richtext/facet').Tag} */feat;
+	      if (facetTag.tag) compactFacets.push({
+	        start,
+	        length,
+	        tag: facetTag.tag
+	      });
+	    }
+	  }
+	  return compactFacets.length ? compactFacets : undefined;
+	}
+
+	// @ts-check
+
+
+	/**
+	 * @param {string | null | undefined} url
+	 * @param {string[] | undefined} quotes
+	 */
+	function detectQuoting(url, quotes) {
+	  const feedUri = breakFeedUri(url);
+	  if (feedUri?.shortDID && feedUri.postID && quotes) return addToArrayUnique(quotes, makeFeedUri(feedUri.shortDID, feedUri.postID));
+	  const postUri = breakPostURL(url);
+	  if (postUri?.shortDID && postUri.postID && quotes) return addToArrayUnique(quotes, makeFeedUri(postUri.shortDID, postUri.postID));
+	}
+
+	// @ts-check
+
+	const NOT_WORD_CHARACTERS_REGEX = /[^\w\d]+/g;
+
+	/**
+	 * @param {string | null | undefined} text
+	 * @param {string[] | undefined} result
+	 */
+	function detectWordStartsNormalized(text, result) {
+	  if (!text) return result;
+	  const words = text.split(NOT_WORD_CHARACTERS_REGEX);
+	  for (const word of words) {
+	    if (word.length >= 3 && word !== text) {
+	      // TODO: normalize - remove accent marks etc.
+	      const wordStart = word.slice(0, 3).toLowerCase();
+	      if (!result) result = [wordStart];
+	      if (result.indexOf(wordStart) < 0) result.push(wordStart);
+	    }
+	  }
+	  return result;
+	}
+
+	// @ts-check
+
+
+	/**
+	 * @param {string} repo
+	 * @param {string} cid
+	 * @param {import('../firehose').RepoRecord$Typed['app.bsky.feed.post']} record
+	 * @param {number} asOf
+	 */
+	function makeCompactPost(repo, cid, record, asOf) {
+	  const shortDID = shortenDID(repo);
+
+	  /** @type {string[] | undefined} */
+	  let words = detectWordStartsNormalized(record.text, undefined);
+	  const embeds = extractEmbeds(record.embed);
+	  const facets = extractFacets(record.facets, record.text);
+
+	  /** @type {string[] | undefined} */
+	  let quoting;
+	  if (embeds?.length) {
+	    for (const embed of embeds) {
+	      quoting = detectQuoting(embed.url, quoting);
+	      words = detectWordStartsNormalized(embed.title, words);
+	      words = detectWordStartsNormalized(embed.description, words);
+	      words = detectWordStartsNormalized(embed.url, words);
+	    }
+	  }
+	  if (facets?.length) {
+	    for (const facet of facets) {
+	      quoting = detectQuoting(facet.mention, quoting);
+	      quoting = detectQuoting(facet.url, quoting);
+	      words = detectWordStartsNormalized(facet.tag, words);
+	      words = detectWordStartsNormalized(facet.url, words);
+	    }
+	  }
+
+	  /** @type {import('..').CompactPost} */
+	  const compact = {
+	    shortDID,
+	    cid,
+	    text: record.text,
+	    facets,
+	    embeds,
+	    threadStart: record.reply?.root?.cid === cid ? undefined : record.reply?.root?.uri,
+	    replyTo: record.reply?.parent?.uri,
+	    words,
+	    likeCount: undefined,
+	    repostCount: undefined,
+	    quoting,
+	    asOf
+	  };
+	  return compact;
+	}
+
+	/**
+	 * @template T
+	 * @param {T[] | undefined} array
+	 * @param {T | undefined} element
+	 * @returns T[] | undefined
+	 */
+	function addToArray(array, element) {
+	  if (!element) return array;
+	  if (!array) return [element];
+	  array.push(element);
+	  return array;
+	}
+
+	/**
+	 * @template T
+	 * @param {T[] | undefined} array
+	 * @param {T | undefined} element
+	 * @returns T[] | undefined
+	 */
+	function addToArrayUnique(array, element) {
+	  if (!element) return array;
+	  if (!array) return [element];
+	  if (array.indexOf(element) >= 0) return array;
+	  array.push(element);
+	  return array;
+	}
+
+	// @ts-check
+
+
+	/**
+	 * @param {string} repo
+	 * @param {string} cid
+	 * @param {import('../..').RepoRecord$Typed['app.bsky.feed.post']} postRecord
+	 * @param {Map<string, import('../store-data').RepositoryData>} store
+	 * @param {number} asOf
+	 */
+	function capturePostRecord(repo, cid, postRecord, store, asOf) {
+	  const shortDID = shortenDID(repo);
 	  let repoData = store.get(shortDID);
 	  if (!repoData) {
 	    repoData = {
@@ -40165,25 +40493,151 @@ if (cid) {
 	    };
 	    store.set(shortDID, repoData);
 	  }
-	  repoData.posts.get(uri.postID);
+	  const existingPost = repoData.posts.get(cid);
+	  if (existingPost && typeof existingPost.asOf === 'number' && existingPost.asOf > asOf) return existingPost;
+	  const createdPost = makeCompactPost(repo, cid, postRecord, asOf);
+	  if (existingPost) {
+	    createdPost.likeCount = existingPost.likeCount;
+	    createdPost.repostCount = existingPost.repostCount;
+	  }
+	  repoData.posts.set(cid, createdPost);
+	  return createdPost;
 	}
 
 	// @ts-check
 
 
-	/** @typedef {import('../firehose').RepoRecord$Typed} RepoRecord$Typed */
+	/**
+	 * @param {string} repo
+	 * @param {import('../..').RepoRecord$Typed['app.bsky.feed.repost']} repostRecord
+	 * @param {Map<string, import('../store-data').RepositoryData>} store
+	 */
+	function captureRepostRecord(repo, repostRecord, store) {
+	  const shortDID = shortenDID(repo);
+	  const uri = breakFeedUri(repostRecord.subject?.uri);
+	  if (!uri?.shortDID || !uri.postID) return;
+	  let repoData = store.get(shortDID);
+	  if (!repoData) store.set(shortDID, repoData = createRepoData(shortDID));
+	  const existingPost = repoData.posts.get(uri.postID);
+	  if (existingPost) {
+	    existingPost.repostCount = (existingPost.repostCount || 0) + 1;
+	    return existingPost;
+	  } else {
+	    const speculativePost = createSpeculativePost(uri.shortDID, uri.postID);
+	    speculativePost.repostCount = 1;
+	    repoData.posts.set(uri.postID, speculativePost);
+	    return speculativePost;
+	  }
+	}
+
+	// @ts-check
+
+
+	/** @typedef {import('../../firehose').RepoRecord$Typed} RepoRecord$Typed */
 
 	/**
 	 * @param {string} repo
+	 * @param {string} cid
 	 * @param {RepoRecord$Typed[keyof RepoRecord$Typed]} rec
-	 * @param {Map<string, import('./store-data').RepositoryData>} store
+	 * @param {Map<string, import('../store-data').RepositoryData>} store
+	 * @param {number} asOf
 	 */
-	function captureAllRecords(repo, rec, store) {
+	function captureAllRecords(repo, cid, rec, store, asOf) {
 	  switch (rec['@type']) {
 	    case 'app.bsky.feed.like':
-	      captureLikeRecord(repo, /** @type {RepoRecord$Typed['app.bsky.feed.like']} */rec, store);
-	      return;
+	      return captureLikeRecord(repo, /** @type {RepoRecord$Typed['app.bsky.feed.like']} */rec, store);
+	    case 'app.bsky.feed.repost':
+	      return captureRepostRecord(repo, /** @type {RepoRecord$Typed['app.bsky.feed.repost']} */rec, store);
+	    case 'app.bsky.feed.post':
+	      return capturePostRecord(repo, cid, /** @type {RepoRecord$Typed['app.bsky.feed.post']} */rec, store, asOf);
 	  }
+	}
+
+	// @ts-check
+
+
+	/**
+	 * @param {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost} threadView
+	 * @param {Map<string, import('./store-data').RepositoryData>} store
+	 * @param {number} now
+	 */
+	function captureThread(threadView, store, now) {
+	  /** @type {Set<string>} */
+	  const visitedCIDs = new Set();
+	  return captureThreadViewPostOrVariants(visitedCIDs, threadView, undefined, store, now);
+	}
+
+	/**
+	 * @param {Set<string>} visitedCIDs
+	 * @param {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost | 
+	 *  import('@atproto/api').AppBskyFeedDefs.NotFoundPost |
+	 *  import('@atproto/api').AppBskyFeedDefs.BlockedPost | Record<string, unknown>} threadViewPostOrVariants
+	 * @param {{ threadStart?: string, replyTo?: string } | undefined} parentPostHint
+	 * @param {Map<string, import('./store-data').RepositoryData>} store
+	 * @param {number} now
+	 */
+	function captureThreadViewPostOrVariants(visitedCIDs, threadViewPostOrVariants, parentPostHint, store, now) {
+	  const threadViewPost = /** @type {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost} */
+	  threadViewPostOrVariants;
+	  if (threadViewPost?.post) return captureThreadViewPost(visitedCIDs, threadViewPost, store, now);
+	  const lostURI = /** @type {import('@atproto/api').AppBskyFeedDefs.NotFoundPost} */threadViewPostOrVariants.uri;
+	  const lostPost = getPostOrPlaceholder(lostURI, store);
+	  if (lostPost && parentPostHint) {
+	    lostPost.replyTo = parentPostHint.replyTo || parentPostHint.threadStart;
+	    lostPost.threadStart = parentPostHint.threadStart || parentPostHint.replyTo;
+	  }
+	  return lostPost;
+	}
+
+	/**
+	 * @param {Set<string>} visitedCIDs
+	 * @param {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost} threadViewPost
+	 * @param {Map<string, import('./store-data').RepositoryData>} store
+	 * @param {number} now
+	 */
+	function captureThreadViewPost(visitedCIDs, threadViewPost, store, now) {
+	  const compactPost = capturePostView(visitedCIDs, threadViewPost.post, store, now);
+	  if (threadViewPost.parent) captureThreadViewPostOrVariants(visitedCIDs, threadViewPost.parent, {
+	    threadStart: compactPost?.threadStart
+	  }, store, now);
+	  if (threadViewPost.replies?.length) {
+	    for (const reply of threadViewPost.replies) captureThreadViewPostOrVariants(visitedCIDs, reply, compactPost, store, now);
+	  }
+	  return compactPost;
+	}
+
+	/**
+	 * @param {Set<string>} visitedCIDs
+	 * @param {import('@atproto/api').AppBskyFeedDefs.PostView | undefined} postView
+	 * @param {Map<string, import('./store-data').RepositoryData>} store
+	 * @param {number} now
+	 */
+	function capturePostView(visitedCIDs, postView, store, now) {
+	  if (!postView || visitedCIDs.has(postView.cid)) return;
+
+	  // TODO: capture profile
+
+	  const compactPost = capturePostRecord(postView.author.did, postView.cid, /** @type {*} */postView.record, store, now);
+	  compactPost.likeCount = postView.likeCount;
+	  compactPost.repostCount = postView.repostCount;
+	  return compactPost;
+	}
+
+	/**
+	 * @param {string | null | undefined} postURI
+	 * @param {Map<string, import('./store-data').RepositoryData>} store
+	 */
+	function getPostOrPlaceholder(postURI, store) {
+	  if (!postURI) return;
+	  const uri = breakFeedUri(postURI);
+	  if (!uri?.shortDID || !uri.postID) return;
+	  let repoData = store.get(uri.shortDID);
+	  if (!repoData) store.set(uri.shortDID, repoData = createRepoData(uri.shortDID));
+	  const existingPost = repoData.posts.get(uri.postID);
+	  if (existingPost) return existingPost;
+	  const speculativePost = createSpeculativePost(uri.shortDID, uri.postID);
+	  repoData.posts.set(uri.postID, speculativePost);
+	  return speculativePost;
 	}
 
 	// @ts-check
@@ -40220,15 +40674,19 @@ if (cid) {
 
 	  /**
 	   * @param {import('../firehose').FirehoseRecord} record
+	   * @param {number} now
 	   */
-	  function captureRecord(record) {
-	    captureAllRecords(record.repo, record, store.repos);
+	  function captureRecord(record, now) {
+	    return captureAllRecords(record.repo, record.cid, record, store.repos, now);
 	  }
 
 	  /**
 	   * @param {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost} threadView
+	   * @param {number} now
 	   */
-	  function captureThreadView(threadView) {}
+	  function captureThreadView(threadView, now) {
+	    return captureThread(threadView, store.repos, now);
+	  }
 
 	  /**
 	   * @param {import('@atproto/api').AppBskyActorDefs.ProfileViewDetailed} profileView
