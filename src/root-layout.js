@@ -4,6 +4,13 @@ import React, { useState } from 'react';
 import { useDerived } from './api/derive';
 import { searchHandle } from './api';
 
+import atproto from '@atproto/api';
+import * as octokit from "octokit";
+
+window['atproto'] = atproto;
+window['octokit'] = octokit;
+
+
 /**
  * @param {{
  *  title?: string,
