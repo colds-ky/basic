@@ -58,6 +58,44 @@ span.at {
   padding-left: 1.2em;
 }
 
+.top-table {
+  position: fixed; left: 0; top: 0; width: 100%; height: 100%;
+}
+
+td.td-main {
+  text-align: center;
+}
+
+.div-outer {
+  width: 90%; max-width: 749px; height: 90%; max-height: 585px;
+  display: inline-block;
+}
+
+.div-inner {
+  text-align: left; display: inline-block;
+}
+
+.div-inner h1.title {
+  color: white;
+  font-size: 500%;
+  text-shadow: 0 0 3px #0060a8, 0 0 2px #0060a8, 0 0 2px #0060a8;
+  margin-bottom: 0;
+}
+
+.div-inner .subtitle {
+  margin-top: -0.7em;margin-left: 0.5em;color: white;
+  text-shadow: 0 0 4px #0060a8, 0 0 3px #0060a8, 0 0 2px #0060a8, 0 0 2px #0060a8;
+  padding-bottom: 0.5em
+}
+
+.div-inner #searchINPUT {
+  width: 100%;
+  box-shadow: 0 1px 10px 3px #3278a8;
+  border-radius: 0.3em;
+  border: solid 1.5px #4878c1;
+  padding: 0.2em 0.6em;
+}
+
 </style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -66,26 +104,16 @@ span.at {
 <link rel="apple-touch-icon" href="src/coldsky-icon.png" type="image/png">
 </head>
 <body>
-<table style="position: fixed; left: 0; top: 0; width: 100%; height: 100%;">
+<table class=top-table>
   <tbody>
     <tr>
-      <td valign="center" style="text-align: center">
-        <div style="
-      width: 90%; max-width: 749px; height: 90%; max-height: 585px;
-      display: inline-block;">
-          <div style="text-align: left; display: inline-block;">
-            <h1 style="
-          color: white;
-          font-size: 500%;
-          text-shadow: 0 0 3px #0060a8, 0 0 2px #0060a8, 0 0 2px #0060a8;
-          margin-bottom: 0;
-        ">Cold Sky</h1>
-            <div
-              style="margin-top: -0.7em;margin-left: 0.5em;color: white;text-shadow: 0 0 4px #0060a8, 0 0 3px #0060a8, 0 0 2px #0060a8, 0 0 2px #0060a8; padding-bottom: 0.5em">
-              social media up there</div>
-              <input id=searchINPUT autocomplete=off
-                placeholder="Demo search text"
-                style="width: 100%; box-shadow: 0 1px 10px 3px #3278a8; border-radius: 0.3em; border: solid 1.5px #4878c1; padding: 0.2em 0.6em;">
+      <td valign="center" class=td-main>
+        <div class=div-outer>
+          <div class=div-inner>
+            <h1 class=title>Cold Sky</h1>
+            <div class="subtitle">social media up there</div>
+            <input id=searchINPUT autocomplete=off
+              placeholder="Demo search text">
           </div>
 
         </div>

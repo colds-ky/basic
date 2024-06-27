@@ -1,0 +1,40 @@
+{
+  "name": "colds.ky",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Social media out there: the Website",
+  "scripts": {
+    "start": "esbuild src/app.js --target=es6 --bundle --sourcemap --outfile=index.js --loader:.js=jsx --format=iife --watch",
+    "build": "esbuild src/app.js --target=es6 --bundle --sourcemap --outfile=index.js --loader:.js=jsx --format=iife",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/colds-ky/colds.ky.git"
+  },
+  "keywords": [
+    "javascript",
+    "social-media",
+    "bluesky",
+    "atproto"
+  ],
+  "author": "Oleg Mihailik",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/colds-ky/colds.ky/issues"
+  },
+  "homepage": "https://github.com/colds-ky/colds.ky#readme",
+  "dependencies": {
+    "@atproto/api": "^0.7.4",
+    "@atproto/repo": "^0.3.6",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.0",
+    "@mui/material": "^5.15.0",
+    "@mui/styles": "^5.15.0",
+    "esbuild": "^0.19.9",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.21.0"
+  }
+}
