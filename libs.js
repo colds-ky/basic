@@ -31141,7 +31141,7 @@ if (cid) {
         if (!entry)
           return false;
       }
-      return entry.delete[keys[keys.length - 1]];
+      return entry.delete(keys[keys.length - 1]);
     }
     function has(...keys) {
       let entry = storeMap;

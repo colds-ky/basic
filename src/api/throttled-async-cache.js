@@ -137,7 +137,7 @@ function multikeyMap() {
       entry = entry.get(key);
       if (!entry) return false;
     }
-    return entry.delete[keys[keys.length - 1]];
+    return entry.delete(keys[keys.length - 1]);
   }
 
   function has(...keys) {
