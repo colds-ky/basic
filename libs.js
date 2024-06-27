@@ -165,6 +165,8 @@
     (handle.replace(_shortenHandle_Regex, "").toLowerCase() || void 0);
   }
   function unwrapShortHandle(shortHandle) {
+    if (likelyDID(shortHandle))
+      return unwrapShortDID(shortHandle);
     shortHandle = cheapNormalizeHandle(shortHandle);
     return !shortHandle ? void 0 : shortHandle.indexOf(".") < 0 ? shortHandle.toLowerCase() + ".bsky.social" : shortHandle.toLowerCase();
   }
@@ -45476,7 +45478,7 @@ if (cid) {
   var version4;
   var init_package = __esm({
     "package.json"() {
-      version4 = "0.1.9";
+      version4 = "0.1.10";
     }
   });
 
