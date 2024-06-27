@@ -18,9 +18,29 @@ export function Timeline({ shortDID }) {
   const db = useDB();
 
   const [retrieved, next] = useForAwait(shortDID, getTimeline);
+  let anyPlaceholder = false;
+  for (const postThread of retrieved?.timeline || []) {
+    if (postThread.current.placeholder || postThread.root.placeholder) {
+      anyPlaceholder = true;
+      break;
+    }
+
+    for (const post of postThread.all) {
+      if (post.placeholder) {
+        anyPlaceholder = true;
+        break;
+      }
+    }
+
+    if (anyPlaceholder) break;
+  }
+
+  if (anyPlaceholder) {
+    setTimeout(next, 300);
+  }
 
   return (
-    <>
+    <div className='timeline-container'>
       {
         !retrieved?.timeline ? undefined :
         
@@ -38,7 +58,7 @@ export function Timeline({ shortDID }) {
           Search more...
         </button>
       </Visible>
-    </>
+    </div>
   );
 
 
@@ -90,13 +110,14 @@ export function Timeline({ shortDID }) {
  * @param {{
  *  shortDID: string,
  *  thread: import('../../coldsky/lib').CompactThreadPostSet,
+ *  underPrevious?: boolean
  * }} _
  */
-export function ThreadView({ shortDID, thread }) {
+export function ThreadView({ shortDID, thread, underPrevious }) {
   const root = layoutThread(shortDID, thread);
 
   return (
-    <SubThread shortDID={shortDID} node={root} />
+    <SubThread shortDID={shortDID} node={root} underPrevious={underPrevious} />
   );
 }
 
@@ -110,16 +131,24 @@ export function ThreadView({ shortDID, thread }) {
 /**
  * @param {{
  *  shortDID: string,
- *  node: PostNode
+ *  node: PostNode,
+ *  underPrevious?: boolean
  * }} _
  */
-function SubThread({ shortDID, node }) {
+function SubThread({ shortDID, node, underPrevious }) {
   return (
     <div className='sub-thread'>
-      <Post post={node.post} />
+      <Post
+        className={underPrevious ? 'thread-reply-post' : undefined}
+        post={node.post} />
       {
         node.children.map((child, i) => (
-          <CollapsedOrExpandedSubThread key={i} shortDID={shortDID} node={child} />
+          <CollapsedOrExpandedSubThread
+            key={i}
+            shortDID={shortDID}
+            node={child}
+            underPrevious={!i}
+          />
         ))
       }
     </div>
@@ -129,10 +158,11 @@ function SubThread({ shortDID, node }) {
 /**
  * @param {{
  *  shortDID: string,
- *  node: PostNode
+ *  node: PostNode,
+ *  underPrevious?: boolean
  * }} _
  */
-function CollapsedOrExpandedSubThread({ shortDID, node }) {
+function CollapsedOrExpandedSubThread({ shortDID, node, underPrevious }) {
   let collapsedChunk = [];
   let nextNode = node;
   while (true) {
@@ -143,7 +173,7 @@ function CollapsedOrExpandedSubThread({ shortDID, node }) {
 
   if (collapsedChunk.length === 0) {
     return (
-      <SubThread shortDID={shortDID} node={node} />
+      <SubThread shortDID={shortDID} node={node} underPrevious={underPrevious} />
     );
   } else {
     return (

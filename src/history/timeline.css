@@ -1,3 +1,15 @@
+.timeline-container {
+  margin-right: 0.4em;
+}
+
+.timeline-container .thread-reply-post {
+  margin-top: -0.3em;
+}
+
+.timeline-container > .sub-thread {
+  margin-top: 1em;
+}
+
 .sub-thread {
   padding-left: 1em;
 }

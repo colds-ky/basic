@@ -1,10 +1,13 @@
 // @ts-check
 
+import { FavoriteBorder } from '@mui/icons-material';
 import React from 'react';
-import { PreFormatted } from '../preformatted';
+
 import { localise } from '../../localise';
 import { AccountLabel } from '../account';
-import { FavoriteBorder } from '@mui/icons-material';
+import { PreFormatted } from '../preformatted';
+
+import './post.css';
 
 /**
  * @typedef {import('../../../coldsky/lib').MatchCompactPost} MatchCompactPost
@@ -12,12 +15,13 @@ import { FavoriteBorder } from '@mui/icons-material';
 
 /**
  * @param {{
+ *  className?: string,
  *  post: string | MatchCompactPost
  * }} _
  */
-export function Post({ post }) {
+export function Post({ className, post }) {
   return (
-    <PostFrame>
+    <PostFrame className={className}>
       {
         typeof post === 'string' ?
           <LoadingPostInProgress post={post} /> :
@@ -29,12 +33,13 @@ export function Post({ post }) {
 
 /**
  * @param {{
+ *  className?: string,
  *  children?: import('react').ReactNode
  * }} _
  */
-function PostFrame({ children }) {
+function PostFrame({ className, children }) {
   return (
-    <div className='post-frame-outer'>
+    <div className={className ? 'post-frame-outer ' + className : 'post-frame-outer'}>
       {children}
     </div>
   );

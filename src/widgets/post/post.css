@@ -1,0 +1,13 @@
+.post-frame-outer {
+  padding: 1em;
+  border: solid 1px #e9da8a;
+  background: #fffbeb;
+  box-shadow: 2px 4px 9px #0000002b;
+  border-radius: 0.5em;
+}
+
+.post-likes {
+  text-align: right;
+  opacity: 0.4;
+  margin-top: 0.2em;
+}

@@ -98335,7 +98335,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // coldsky/package.json
-  var version4 = "0.2.11";
+  var version4 = "0.2.12";
 
   // coldsky/lib/firehose-short-dids.js
   function firehoseShortDIDs(filterShortDIDs) {
@@ -100269,7 +100269,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           ...outstandingPostUpdatesByURI.values(),
           ...outstandingPostUpdatesInProgressByURI.values()
         ].filter(
-          (p) => p.uri === (veryPost == null ? void 0 : veryPost.uri) || threadStart && p.threadStart === threadStart
+          (p) => p.uri === (veryPost == null ? void 0 : veryPost.uri) || threadStart && p.threadStart === threadStart || p.uri === threadStart
         );
         const postsByUri = new Map(dbPosts.concat(uncachedPostsForThread).map((p) => [p.uri, p]));
         const all = [...postsByUri.values()];
@@ -100300,10 +100300,10 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           (w) => words.includes(w)
         );
         const map = /* @__PURE__ */ new Map();
-        const dbPost = !shortDID ? yield db2.posts.where("words").anyOf(words || []).toArray() : !(words == null ? void 0 : words.length) ? yield db2.posts.where("shortDID").equals(shortDID).toArray() : yield db2.posts.where("shortDID").equals(shortDID).and(
+        const dbPosts = !shortDID ? yield db2.posts.where("words").anyOf(words || []).toArray() : !(words == null ? void 0 : words.length) ? yield db2.posts.where("shortDID").equals(shortDID).toArray() : yield db2.posts.where("shortDID").equals(shortDID).and(
           (post) => !!post.words && post.words.some(wordMatcher)
         ).toArray();
-        for (const post of dbPost) {
+        for (const post of dbPosts) {
           map.set(post.uri, post);
         }
         for (const uncachedPost of outstandingPostUpdatesInProgressByURI.values()) {
@@ -100317,8 +100317,10 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           }
         }
         const allPosts = [...map.values()];
-        if (!text)
+        if (!text) {
+          allPosts == null ? void 0 : allPosts.sort((a1, a2) => (a2.asOf || 0) - (a1.asOf || 0));
           return allPosts;
+        }
         const fuse = new Fuse(allPosts, {
           includeScore: true,
           keys: ["text"],
@@ -100585,10 +100587,12 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       return __asyncGenerator(this, null, function* () {
         var _a3, _b, _c, _d;
         let REPORT_UPDATES_FREQUENCY_MSEC = 700;
+        const cachedMatchesPromise = dbStore.searchPosts(shortDID, text);
+        const allCachedHistoryPromise = !text ? cachedMatchesPromise : dbStore.searchPosts(shortDID, text);
         const plcDirHistoryPromise = plcDirectoryHistoryRaw(shortDID);
         let lastSearchReport = 0;
         let anyUpdates = false;
-        let lastMatches;
+        let lastMatches = yield new __await(cachedMatchesPromise);
         if (lastMatches == null ? void 0 : lastMatches.length) {
           lastSearchReport = Date.now();
           yield lastMatches;
@@ -100610,7 +100614,8 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
             limit: Math.random() * 10 + 88
           }));
           if (!knownHistoryUri) {
-            knownHistoryUri = /* @__PURE__ */ new Set();
+            const allHistory = yield new __await(allCachedHistoryPromise);
+            knownHistoryUri = new Set((allHistory || []).map((rec) => rec.uri));
           }
           if ((_c = (_b = moreData == null ? void 0 : moreData.data) == null ? void 0 : _b.records) == null ? void 0 : _c.length) {
             for (const rec of moreData.data.records) {
@@ -101101,7 +101106,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       store.set(shortDID, repoData);
     }
     const existingPost = repoData.posts.get(uri);
-    if (existingPost && typeof existingPost.asOf === "number" && existingPost.asOf > asOf)
+    if (existingPost && !existingPost.placeholder && typeof existingPost.asOf === "number" && existingPost.asOf > asOf)
       return existingPost;
     const createdPost = makeCompactPost(repo, uri, postRecord, asOf);
     if (existingPost) {
@@ -102115,7 +102120,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // package.json
-  var version5 = "0.2.11";
+  var version5 = "0.2.12";
 
   // src/landing/landing.js
   var uppercase_GIST = localise("\u{1D4D6}\u{1D4D8}\u{1D4E2}\u{1D4E3}", { uk: "\u{1D4F7}\u{1D4EE}\u{1D4F9}\u{1D4EE}\u{1D4EC}\u{1D502}\u{1D4F0}" });
@@ -102230,11 +102235,11 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
 
   // src/widgets/post/post.js
   var import_react15 = __toESM(require_react());
-  function Post({ post }) {
-    return /* @__PURE__ */ import_react15.default.createElement(PostFrame, null, typeof post === "string" ? /* @__PURE__ */ import_react15.default.createElement(LoadingPostInProgress, { post }) : /* @__PURE__ */ import_react15.default.createElement(LoadedPost, { post }));
+  function Post({ className, post }) {
+    return /* @__PURE__ */ import_react15.default.createElement(PostFrame, { className }, typeof post === "string" ? /* @__PURE__ */ import_react15.default.createElement(LoadingPostInProgress, { post }) : /* @__PURE__ */ import_react15.default.createElement(LoadedPost, { post }));
   }
-  function PostFrame({ children }) {
-    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-frame-outer" }, children);
+  function PostFrame({ className, children }) {
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: className ? "post-frame-outer " + className : "post-frame-outer" }, children);
   }
   function LoadingPostInProgress({ post }) {
     return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-loading-in-progress" }, localise("Post is loading...", { uk: "\u0417\u0430\u0447\u0435\u043A\u0430\u0439\u0442\u0435..." }));
@@ -102247,7 +102252,25 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   function Timeline({ shortDID }) {
     const db2 = useDB();
     const [retrieved, next2] = useForAwait(shortDID, getTimeline);
-    return /* @__PURE__ */ import_react16.default.createElement(import_react16.default.Fragment, null, !(retrieved == null ? void 0 : retrieved.timeline) ? void 0 : retrieved.timeline.map((thread, i) => /* @__PURE__ */ import_react16.default.createElement(ThreadView, { key: i, thread, shortDID })), /* @__PURE__ */ import_react16.default.createElement(
+    let anyPlaceholder = false;
+    for (const postThread of (retrieved == null ? void 0 : retrieved.timeline) || []) {
+      if (postThread.current.placeholder || postThread.root.placeholder) {
+        anyPlaceholder = true;
+        break;
+      }
+      for (const post of postThread.all) {
+        if (post.placeholder) {
+          anyPlaceholder = true;
+          break;
+        }
+      }
+      if (anyPlaceholder)
+        break;
+    }
+    if (anyPlaceholder) {
+      setTimeout(next2, 300);
+    }
+    return /* @__PURE__ */ import_react16.default.createElement("div", { className: "timeline-container" }, !(retrieved == null ? void 0 : retrieved.timeline) ? void 0 : retrieved.timeline.map((thread, i) => /* @__PURE__ */ import_react16.default.createElement(ThreadView, { key: i, thread, shortDID })), /* @__PURE__ */ import_react16.default.createElement(
       Visible,
       {
         onVisible: () => next2()
@@ -102327,14 +102350,28 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       });
     }
   }
-  function ThreadView({ shortDID, thread }) {
+  function ThreadView({ shortDID, thread, underPrevious }) {
     const root = layoutThread(shortDID, thread);
-    return /* @__PURE__ */ import_react16.default.createElement(SubThread, { shortDID, node: root });
+    return /* @__PURE__ */ import_react16.default.createElement(SubThread, { shortDID, node: root, underPrevious });
   }
-  function SubThread({ shortDID, node: node2 }) {
-    return /* @__PURE__ */ import_react16.default.createElement("div", { className: "sub-thread" }, /* @__PURE__ */ import_react16.default.createElement(Post, { post: node2.post }), node2.children.map((child, i) => /* @__PURE__ */ import_react16.default.createElement(CollapsedOrExpandedSubThread, { key: i, shortDID, node: child })));
+  function SubThread({ shortDID, node: node2, underPrevious }) {
+    return /* @__PURE__ */ import_react16.default.createElement("div", { className: "sub-thread" }, /* @__PURE__ */ import_react16.default.createElement(
+      Post,
+      {
+        className: underPrevious ? "thread-reply-post" : void 0,
+        post: node2.post
+      }
+    ), node2.children.map((child, i) => /* @__PURE__ */ import_react16.default.createElement(
+      CollapsedOrExpandedSubThread,
+      {
+        key: i,
+        shortDID,
+        node: child,
+        underPrevious: !i
+      }
+    )));
   }
-  function CollapsedOrExpandedSubThread({ shortDID, node: node2 }) {
+  function CollapsedOrExpandedSubThread({ shortDID, node: node2, underPrevious }) {
     let collapsedChunk = [];
     let nextNode = node2;
     while (true) {
@@ -102344,7 +102381,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       nextNode = nextNode.children[0];
     }
     if (collapsedChunk.length === 0) {
-      return /* @__PURE__ */ import_react16.default.createElement(SubThread, { shortDID, node: node2 });
+      return /* @__PURE__ */ import_react16.default.createElement(SubThread, { shortDID, node: node2, underPrevious });
     } else {
       return /* @__PURE__ */ import_react16.default.createElement(import_react16.default.Fragment, null, /* @__PURE__ */ import_react16.default.createElement(CollapsedThreadPart, { children: collapsedChunk }), /* @__PURE__ */ import_react16.default.createElement(SubThread, { shortDID, node: nextNode }));
     }
