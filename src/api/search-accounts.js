@@ -14,8 +14,11 @@ export async function searchAccounts(searchText) {
   });
 
   const result = (await publicAgent.searchActorsTypeahead({
-    q: searchText
+    q: searchText,
+    limit: 80
   })).data?.actors;
+
+  if (result.length > 10) return result.slice(0, 10);
 
   return result;
 }

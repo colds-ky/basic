@@ -26,6 +26,7 @@
   max-width: 20em;
   animation: 13s linear 1s forwards slidetop;
   font-family: sans-serif;
+  font-size: 1.8vh;
 }
 .fun-background .fun-background-scroller .fun-background-thread .fun-background-thread-likes {
   text-align: right;
@@ -40,16 +41,16 @@
     transform: translateY(0) rotate(-4deg);
   }
   25% {
-    transform: translateY(-35vh) rotate(+5deg);
+    transform: translateY(-40vh) rotate(+5deg);
   }
   50% {
-    transform: translateY(-70vh) rotate(-7deg);
+    transform: translateY(-80vh) rotate(-7deg);
   }
   75% {
-    transform: translateY(-105vh) rotate(+5deg);
+    transform: translateY(-120vh) rotate(+5deg);
   }
   to {
-    transform: translateY(-140vh) rotate(-5deg);
+    transform: translateY(-160vh) rotate(-5deg);
   }
 }
 
@@ -94,16 +95,53 @@
 }
 .landing .landing-handle-band label {
   padding-left: 4.5vh;
-  padding-top: 2vh;
+  padding-top: 1.5vh;
   font-style: italic;
+  font-size: 2.5vh;
 }
 .landing .landing-auto-completion-area {
   grid-row: 4;
+  align-self: start;
+  justify-self: start;
+  background: rgb(255 255 255 / 80%);
+  padding: 0.5em;
+  padding-right: 0.7em;
+  padding-bottom: 0.25em;
+  margin-left: 0.5em;
+  z-index: 1;
+  border: solid 1px #2b2b2b;
+  border-top: none;
+  font-size: 2.5vh;
+  font-family: sans-serif;
+  backdrop-filter: blur(3px) contrast(0.7);
+  box-shadow: 0 8px 20px 5px #00000030;
+}
+.landing .landing-auto-completion-area .landing-auto-complete-entry {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
+  padding: 0.2em 0;
+  text-decoration: none;
+  color: inherit;
 }
 .landing .landing-bottom-bar {
   grid-row: 5;
   padding: 0.2em;
   font-family: sans-serif;
   color: silver;
+}
+
+/* src/widgets/account/account-label.css */
+.account-label .account-avatar {
+  background: no-repeat center center;
+  background-size: cover;
+  color: transparent;
+  border-radius: 200%;
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  margin-right: 0.25em;
+  position: relative;
+  top: -0.15em;
 }
 /*# sourceMappingURL=index.css.map */

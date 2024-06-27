@@ -33,13 +33,37 @@
 }
 
 .landing .landing-handle-band label {
-  padding-left: 4.5vh;
-  padding-top: 2vh;
+padding-left: 4.5vh;
+  padding-top: 1.5vh;
   font-style: italic;
+  font-size: 2.5vh;
 }
 
 .landing .landing-auto-completion-area {
   grid-row: 4;
+  align-self: start;
+  justify-self: start;
+  background: rgb(255 255 255 / 80%);
+  padding: 0.5em;
+  padding-right: 0.7em;
+  padding-bottom: 0.25em;
+  margin-left: 0.5em;
+  z-index: 1;
+  border: solid 1px #2b2b2b;
+  border-top: none;
+  font-size: 2.5vh;
+  font-family: sans-serif;
+  backdrop-filter: blur(3px) contrast(0.7);
+  box-shadow: 0 8px 20px 5px #00000030;
+}
+
+.landing .landing-auto-completion-area .landing-auto-complete-entry {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
+  padding: 0.2em 0;
+  text-decoration: none;
+  color: inherit;
 }
 
 .landing .landing-bottom-bar {

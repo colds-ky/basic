@@ -23,6 +23,7 @@
   max-width: 20em;
   animation: 13s linear 1s forwards slidetop;
   font-family: sans-serif;
+  font-size: 1.8vh;
 }
 
 .fun-background .fun-background-scroller .fun-background-thread .fun-background-thread-likes {
@@ -41,18 +42,18 @@
   }
 
   25% {
-    transform: translateY(-35vh) rotate(+5deg);
+    transform: translateY(-40vh) rotate(+5deg);
   }
 
   50% {
-    transform: translateY(-70vh) rotate(-7deg);
+    transform: translateY(-80vh) rotate(-7deg);
   }
 
   75% {
-    transform: translateY(-105vh) rotate(+5deg);
+    transform: translateY(-120vh) rotate(+5deg);
   }
 
   to {
-    transform: translateY(-140vh) rotate(-5deg);
+    transform: translateY(-160vh) rotate(-5deg);
   }
 }
