@@ -54,7 +54,67 @@ if (typeof require === 'function' && typeof process !== 'undefined' && typeof pr
   //   module.exports = { indexingRun }
   // }
 } else {
-  console.log('browser, see window.pullPLCDirectoryLocal  ');
+  console.log('browser, see window.pullPLCDirectoryLocal / handleFirehoseToStore ');
   window['pullPLCDirectoryLocal'] = pullPLCDirectoryLocal;
+
+  window['handleFirehoseToStore'] = handleFirehoseToStore;
   // pullPLCDirectoryLocal();
+}
+
+async function handleFirehoseToStore() {
+
+  var INTERVAL_FIREHOSE = 2000;
+  console.log('libs...');
+
+  /** @type {import('../lib/index')} */
+  const coldsky = await waitForLib();
+
+  const store = coldsky.defineCacheIndexedDBStore();
+  window['store'] = store;
+
+  console.log('firehose connect...');
+
+  let lastProcess = Date.now();
+  let addedTotal = 0;
+  /** @type {import('../lib/firehose').FirehoseRecord[] | undefined} */
+  let unexpected;
+
+  for await (const blocks of coldsky.firehose()) {
+    for (const block of blocks) {
+      if (block.messages.length) {
+        for (const p of block.messages) {
+          store.captureRecord(p, block.receiveTimestamp);
+          addedTotal++;
+        }
+      }
+      if (block.unexpected?.length) {
+        if (!unexpected) unexpected = block.unexpected;
+        else unexpected = unexpected.concat(block.unexpected);
+      }
+    }
+
+    console.log('processed ', addedTotal, ' into store');
+    if (unexpected)
+      console.log('unexpected ', unexpected);
+
+    addedTotal = 0;
+
+    const waitMore = INTERVAL_FIREHOSE - (Date.now() - lastProcess);
+    if (waitMore > 0) await new Promise((resolve, reject) => setTimeout(resolve, waitMore));
+
+    lastProcess = Date.now();
+  }
+
+  function waitForLib() {
+    if (window['coldsky']) return window['coldsky'];
+
+    return new Promise((resolve, reject) => {
+      let stopInterval = setInterval(() => {
+        if (window['coldsky']) {
+          clearInterval(stopInterval);
+          resolve(window['coldsky']);
+        }
+      }, 300);
+    });
+  }
 }

@@ -7,9 +7,7 @@
   var __getOwnPropSymbols = Object.getOwnPropertySymbols;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
   var __propIsEnum = Object.prototype.propertyIsEnumerable;
-  var __knownSymbol = (name, symbol) => {
-    return (symbol = Symbol[name]) ? symbol : Symbol.for("Symbol." + name);
-  };
+  var __knownSymbol = (name, symbol) => (symbol = Symbol[name]) ? symbol : Symbol.for("Symbol." + name);
   var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
   var __spreadValues = (a, b) => {
     for (var prop in b || (b = {}))
@@ -26,8 +24,7 @@
   var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
     get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
   }) : x)(function(x) {
-    if (typeof require !== "undefined")
-      return require.apply(this, arguments);
+    if (typeof require !== "undefined") return require.apply(this, arguments);
     throw Error('Dynamic require of "' + x + '" is not supported');
   });
   var __esm = (fn, res) => function __init() {
@@ -46,10 +43,7 @@
     return to;
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-  var __publicField = (obj, key, value) => {
-    __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-    return value;
-  };
+  var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
   var __async = (__this, __arguments, generator) => {
     return new Promise((resolve, reject) => {
       var fulfilled = (value) => {
@@ -82,9 +76,7 @@
       } catch (e) {
         no(e);
       }
-    };
-    var method = (k) => it[k] = (x) => new Promise((yes, no) => resume(k, x, yes, no));
-    var it = {};
+    }, method = (k) => it[k] = (x) => new Promise((yes, no) => resume(k, x, yes, no)), it = {};
     return generator = generator.apply(__this, __arguments), it[__knownSymbol("asyncIterator")] = () => it, method("next"), method("throw"), method("return"), it;
   };
   var __forAwait = (obj, it, method) => (it = obj[__knownSymbol("asyncIterator")]) ? it.call(obj) : (obj = obj[__knownSymbol("iterator")](), it = {}, method = (key, fn) => (fn = obj[key]) && (it[key] = (arg) => new Promise((yes, no, done) => (arg = fn.call(obj, arg), done = arg.done, Promise.resolve(arg.value).then((value) => yes({ value, done }), no)))), method("next"), method("return"), it);
@@ -113,28 +105,21 @@
       const feedUri = breakFeedUri(handle);
       if (feedUri && feedUri.shortDID)
         return feedUri.shortDID;
-      if (handle && handle.lastIndexOf("at://", 0) === 0)
-        handle = handle.slice(5);
-      else
-        handle = handle.slice(3);
+      if (handle && handle.lastIndexOf("at://", 0) === 0) handle = handle.slice(5);
+      else handle = handle.slice(3);
     }
     return handle || void 0;
   }
   function shortenPDC(pdc) {
-    if (!pdc)
-      return void 0;
+    if (!pdc) return void 0;
     pdc = pdc.trim().toLowerCase();
-    if (pdc === "https://bsky.social")
-      return ".s";
-    else if (pdc === "https://bsky.network")
-      return ".n";
-    else if (pdc === "https://bsky.app")
-      return ".a";
+    if (pdc === "https://bsky.social") return ".s";
+    else if (pdc === "https://bsky.network") return ".n";
+    else if (pdc === "https://bsky.app") return ".a";
     return pdc.replace(/^https:\/\//, "").replace(/host\.bsky\.network$/, "");
   }
   function parseTimestampOffset(dtOffsetStr) {
-    if (!dtOffsetStr)
-      return void 0;
+    if (!dtOffsetStr) return void 0;
     let offset = 0;
     let lead = 0;
     const plusPos = dtOffsetStr.indexOf("+");
@@ -182,24 +167,19 @@
         }
       }
     }
-    if (str.lastIndexOf("0", 0) === 0)
-      str = str.slice(1);
+    if (str.lastIndexOf("0", 0) === 0) str = str.slice(1);
     return str;
   }
   function breakPostURL(url) {
-    if (!url)
-      return;
+    if (!url) return;
     const match = _breakPostURL_Regex.exec(url);
-    if (!match)
-      return;
+    if (!match) return;
     return { shortDID: match[1], postID: match[2] };
   }
   function breakFeedUri(uri) {
-    if (!uri)
-      return;
+    if (!uri) return;
     const match = _breakFeedUri_Regex.exec(uri);
-    if (!match || !match[3])
-      return;
+    if (!match || !match[3]) return;
     return { shortDID: match[2], postID: match[3] };
   }
   var _shortenDID_Regex, _shortenHandle_Regex, offsetTooLarge, _breakPostURL_Regex, _breakFeedUri_Regex;
@@ -225,10 +205,8 @@
       }
       const registrationHistory = bucketMap[shortDID];
       for (const entry of registrationHistory) {
-        if (!carryTimestamp)
-          carryTimestamp = new Date(entry.t).getTime();
-        else
-          carryTimestamp += parseTimestampOffset(entry.t) || 0;
+        if (!carryTimestamp) carryTimestamp = new Date(entry.t).getTime();
+        else carryTimestamp += parseTimestampOffset(entry.t) || 0;
         break;
       }
       const registrationEntry = {
@@ -278,18 +256,13 @@
     return store;
   }
   function updateRanges(timestamp, store) {
-    if (!timestamp)
-      return;
-    if (!store.earliestRegistration || timestamp < store.earliestRegistration)
-      store.earliestRegistration = timestamp;
-    if (!store.latestAction || timestamp > store.latestAction)
-      store.latestAction = timestamp;
+    if (!timestamp) return;
+    if (!store.earliestRegistration || timestamp < store.earliestRegistration) store.earliestRegistration = timestamp;
+    if (!store.latestAction || timestamp > store.latestAction) store.latestAction = timestamp;
   }
   function updateLatestCreation(createdTimestamp, store) {
-    if (!createdTimestamp)
-      return;
-    if (!store.latestRegistration || createdTimestamp > store.latestRegistration)
-      store.latestRegistration = createdTimestamp;
+    if (!createdTimestamp) return;
+    if (!store.latestRegistration || createdTimestamp > store.latestRegistration) store.latestRegistration = createdTimestamp;
   }
   function stringifyRegistrationStore(store) {
     let jsonText = "{\n";
@@ -302,10 +275,8 @@
       jsonText += first ? '"' + shortDID + '":' + JSON.stringify(registrationEntry.updates) : ',\n"' + shortDID + '":' + JSON.stringify(registrationEntry.updates);
       first = false;
     }
-    if (store.has("next"))
-      throw new Error("How come store has NEXT?");
-    if (store.next)
-      jsonText += ',\n"next":' + JSON.stringify(store.next);
+    if (store.has("next")) throw new Error("How come store has NEXT?");
+    if (store.next) jsonText += ',\n"next":' + JSON.stringify(store.next);
     jsonText += "\n}\n";
     return jsonText;
   }
@@ -363,8 +334,7 @@
             yield new __await(continuePromise);
             if (rejectError)
               throw rejectError.error;
-            if (stop)
-              return;
+            if (stop) return;
             continuePromise = new Promise((resolve) => continueTrigger = function continueTriggerSubsequentlySet() {
               resolve();
             });
@@ -400,9 +370,8 @@
       if (typeof combine === "function") {
         buffer = combine(buffer, item);
       } else {
-        if (!buffer)
-          buffer = /** @type {TBuffer} */
-          [];
+        if (!buffer) buffer = /** @type {TBuffer} */
+        [];
         buffer.push(item);
       }
       continueTrigger();
@@ -435,8 +404,7 @@
   function retryFetch(req, init, ...rest) {
     return __async(this, null, function* () {
       let corsproxyMightBeNeeded = !(init == null ? void 0 : init.method) || ((init == null ? void 0 : init.method) || "").toUpperCase() === "get";
-      if (req.nocorsproxy || (init == null ? void 0 : init.nocorsproxy))
-        corsproxyMightBeNeeded = false;
+      if (req.nocorsproxy || (init == null ? void 0 : init.nocorsproxy)) corsproxyMightBeNeeded = false;
       const started = Date.now();
       let tryCount = 0;
       while (true) {
@@ -447,8 +415,7 @@
             fetch(req, init, ...rest)
           );
           if (re.status >= 200 && re.status < 400 || re.status === 404) {
-            if (!useCors)
-              corsproxyMightBeNeeded = false;
+            if (!useCors) corsproxyMightBeNeeded = false;
             return re;
           }
           retry(new Error("HTTP" + re.status + " " + re.statusText));
@@ -537,8 +504,7 @@
         const nextChunkRe = yield useFetch(
           EXPORT_URL + (sinceTime ? "?after=" + sinceTime : "")
         );
-        if (stream.isEnded)
-          return;
+        if (stream.isEnded) return;
         const nextChunkText = yield nextChunkRe.text();
         const chunkLines = nextChunkText.split("\n");
         let overlap = 0;
@@ -548,8 +514,7 @@
             overlap++;
             continue;
           }
-          if (!line)
-            continue;
+          if (!line) continue;
           nextChunkEnitres.push(JSON.parse(line));
         }
         if (nextChunkEnitres.length) {
@@ -562,20 +527,17 @@
         const waitForConsumption = stream.yield(
           { entries: nextChunkEnitres, overlap },
           (buffer, item) => {
-            if (!buffer)
-              return item;
+            if (!buffer) return item;
             buffer.entries = buffer.entries.concat(item.entries);
             buffer.overlap += item.overlap;
             return buffer;
           }
         );
-        if (stream.isEnded)
-          return;
+        if (stream.isEnded) return;
         const shouldWaitForConsumption = collectedEntriesSinceLastWaitedForConsumption > FETCH_AHEAD_COUNT_MAX || Date.now() - lastWaitedForConsumptionAt > FETCH_AHEAD_MSEC_MAX || !nextChunkEnitres.length;
         if (shouldWaitForConsumption) {
           yield waitForConsumption;
-          if (stream.isEnded)
-            return;
+          if (stream.isEnded) return;
         }
         let nextSinceTime;
         for (let i = 0; i < nextChunkEnitres.length; i++) {
@@ -673,8 +635,7 @@
             throw error[0];
         }
       }
-      if (!useFetch)
-        useFetch = (req, opts) => retryFetch(req, __spreadProps(__spreadValues({}, opts), { nocorsproxy: true }));
+      if (!useFetch) useFetch = (req, opts) => retryFetch(req, __spreadProps(__spreadValues({}, opts), { nocorsproxy: true }));
       console.log(
         "\n\n\nSTARTING TO PULL DIRECTORY",
         new Date(maxDate).toISOString()
@@ -723,17 +684,13 @@
       yield { date: store.latestRegistration, source: "latestRegistration" };
       let carryTimestamp = 0;
       for (const shortDID of store.keys()) {
-        if (shortDID === "next")
-          throw new Error("next should not be a shortDID key");
+        if (shortDID === "next") throw new Error("next should not be a shortDID key");
         const history = store.get(shortDID);
-        if (!history)
-          throw new Error("No history for shortDID " + shortDID);
+        if (!history) throw new Error("No history for shortDID " + shortDID);
         yield { date: history.created, source: "history[" + shortDID + "].created" };
         const update = history.updates[0];
-        if (!carryTimestamp)
-          carryTimestamp = new Date(update.t).getTime();
-        else
-          carryTimestamp += parseTimestampOffset(update.t) || 0;
+        if (!carryTimestamp) carryTimestamp = new Date(update.t).getTime();
+        else carryTimestamp += parseTimestampOffset(update.t) || 0;
         if (Math.abs(carryTimestamp - history.created) > 1001)
           throw new Error(
             store.file + " " + shortDID + " carryTimestamp !== history.created " + (history.created - carryTimestamp) + "ms " + new Date(carryTimestamp).toISOString() + " !== " + new Date(history.created).toISOString() + " " + shortDID + " " + store.file + " " + JSON.stringify(update)
@@ -807,8 +764,7 @@
                 storeByShortDID.set(entry.shortDID, newStore);
                 stores.push(newStore);
                 affectedStores.add(newStore);
-                if (prevStore)
-                  affectedStores.add(prevStore);
+                if (prevStore) affectedStores.add(prevStore);
               }
             }
           }
@@ -847,8 +803,7 @@
       const existingUpdate = history.updates[i];
       const dateOrTimestamp = existingUpdate.t;
       let carryTimestampNext = firstHistoryEntry ? carryTimestamp : carryTimestamp += parseTimestampOffset(dateOrTimestamp) || 0;
-      if (firstHistoryEntry)
-        firstHistoryEntry = false;
+      if (firstHistoryEntry) firstHistoryEntry = false;
       if (carryTimestampNext > entry.timestamp) {
         console.warn(
           "Past history update? ",
@@ -860,8 +815,7 @@
           }
         );
         const updateRequired2 = checkUpdateRequired(clampedShortHandle, defaultedPDC, carryClampedShortHandle, carryPDC);
-        if (!updateRequired2)
-          return false;
+        if (!updateRequired2) return false;
         history.updates.splice(i, 0, {
           t: timestampOffsetToString(entry.timestamp - carryTimestamp),
           h: clampedShortHandle === carryClampedShortHandle ? void 0 : clampedShortHandle,
@@ -870,14 +824,11 @@
         return true;
       }
       carryTimestamp = carryTimestampNext;
-      if (existingUpdate.h)
-        carryClampedShortHandle = existingUpdate.h;
-      if (existingUpdate.p)
-        carryPDC = existingUpdate.p;
+      if (existingUpdate.h) carryClampedShortHandle = existingUpdate.h;
+      if (existingUpdate.p) carryPDC = existingUpdate.p;
     }
     const updateRequired = checkUpdateRequired(clampedShortHandle, defaultedPDC, carryClampedShortHandle, carryPDC);
-    if (!updateRequired)
-      return false;
+    if (!updateRequired) return false;
     history.updates.push({
       t: timestampOffsetToString(entry.timestamp - carryTimestamp),
       h: clampedShortHandle === carryClampedShortHandle ? void 0 : clampedShortHandle,
@@ -891,8 +842,7 @@
   }
   function addNewShortDIDToExistingStoreEnd(store, history, entry) {
     store.set(entry.shortDID, history);
-    if (!store.earliestRegistration)
-      store.earliestRegistration = entry.timestamp;
+    if (!store.earliestRegistration) store.earliestRegistration = entry.timestamp;
     if (store.latestRegistration) {
       history.updates[0].t = timestampOffsetToString(entry.timestamp - store.latestRegistration);
     }
@@ -942,37 +892,29 @@
     );
     const newStore = createEmptyStore(file);
     newStore.next = prevStore == null ? void 0 : prevStore.next;
-    if (prevStore)
-      prevStore.next = file;
+    if (prevStore) prevStore.next = file;
     newStore.latestAction = newStore.latestRegistration = newStore.earliestRegistration = entry.timestamp;
     newStore.set(entry.shortDID, history);
     return { newStore, prevStore };
   }
   function findStoreToAddTimestamp(stores, timestamp) {
-    if (!(stores == null ? void 0 : stores.length))
-      return { insertStoreAt: 0 };
+    if (!(stores == null ? void 0 : stores.length)) return { insertStoreAt: 0 };
     const latestStore = stores[stores.length - 1];
     if (!latestStore.earliestRegistration || timestamp >= latestStore.earliestRegistration || stores.length === 1) {
       const canAddToExistingStore = latestStore.size < MAX_STORE_SIZE && getMonthStart(latestStore.latestRegistration) === getMonthStart(timestamp);
-      if (canAddToExistingStore)
-        return { store: latestStore };
-      else
-        return { insertStoreAt: stores.length };
+      if (canAddToExistingStore) return { store: latestStore };
+      else return { insertStoreAt: stores.length };
     }
     const monthStartTimestamp = getMonthStart(timestamp);
     for (let storeIndex = stores.length - 1; storeIndex > 0; storeIndex--) {
       const tryStore = stores[storeIndex];
-      if (timestamp < (tryStore.earliestRegistration || 0))
-        continue;
-      if (timestamp < (tryStore.latestAction || 0))
-        return { store: tryStore };
+      if (timestamp < (tryStore.earliestRegistration || 0)) continue;
+      if (timestamp < (tryStore.latestAction || 0)) return { store: tryStore };
       const nextStore = stores[storeIndex + 1];
       const monthStartNext = getMonthStart(nextStore.earliestRegistration || 0);
       if (monthStartTimestamp === monthStartNext) {
-        if (nextStore.size < MAX_STORE_SIZE * 1.2)
-          return { store: nextStore };
-        else
-          return { insertStoreAt: storeIndex + 1 };
+        if (nextStore.size < MAX_STORE_SIZE * 1.2) return { store: nextStore };
+        else return { insertStoreAt: storeIndex + 1 };
       } else {
         return { insertStoreAt: storeIndex + 1 };
       }
@@ -998,16 +940,14 @@
     return __asyncGenerator(this, arguments, function* ({ read }) {
       const inceptionText = yield new __await(read("inception.json"));
       let next = inceptionText ? JSON.parse(inceptionText).next : void 0;
-      if (!next)
-        return yield { stores: [], loadedAllStores: true };
+      if (!next) return yield { stores: [], loadedAllStores: true };
       const stores = [];
       let earliestRegistration;
       let latestRegistration;
       let latestAction;
       while (next) {
         const storeText = yield new __await(read(next + ".json"));
-        if (!storeText)
-          break;
+        if (!storeText) break;
         const store = parseRegistrationStore(next, storeText);
         const affectedShortDIDs = Array.from(store.keys());
         if (!earliestRegistration || store.earliestRegistration && store.earliestRegistration < earliestRegistration)
@@ -1085,10 +1025,8 @@
           );
           fs.readFile(filePath, "utf8", (err, data) => {
             console.log("  READ>>", filePath, err ? "ERROR" : "OK");
-            if (err)
-              resolve(void 0);
-            else
-              resolve(data);
+            if (err) resolve(void 0);
+            else resolve(data);
           });
         })
       });
@@ -1097,18 +1035,12 @@
         for (var iter = __forAwait(run), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
           const progress = temp.value;
           const reportProgress = {};
-          if (progress.affectedStores)
-            reportProgress.affectedStores = progress.affectedStores.map((store) => store.file);
-          if (progress.earliestRegistration)
-            reportProgress.earliestRegistration = new Date(progress.earliestRegistration);
-          if (progress.latestRegistration)
-            reportProgress.latestRegistration = new Date(progress.latestRegistration);
-          if (progress.latestAction)
-            reportProgress.latestAction = new Date(progress.latestAction);
-          if (progress.addedShortDIDs)
-            reportProgress.addedShortDIDs = progress.addedShortDIDs.length;
-          if (progress.affectedShortDIDs)
-            reportProgress.affectedShortDIDs = progress.affectedShortDIDs.length;
+          if (progress.affectedStores) reportProgress.affectedStores = progress.affectedStores.map((store) => store.file);
+          if (progress.earliestRegistration) reportProgress.earliestRegistration = new Date(progress.earliestRegistration);
+          if (progress.latestRegistration) reportProgress.latestRegistration = new Date(progress.latestRegistration);
+          if (progress.latestAction) reportProgress.latestAction = new Date(progress.latestAction);
+          if (progress.addedShortDIDs) reportProgress.addedShortDIDs = progress.addedShortDIDs.length;
+          if (progress.affectedShortDIDs) reportProgress.affectedShortDIDs = progress.affectedShortDIDs.length;
           if (progress.stores) {
             reportProgress.registrations = 0;
             for (const sto of progress.stores)
@@ -1119,8 +1051,7 @@
             console.log("\n\n");
           }
           console.log(reportProgress);
-          if (!progress.loadedAllStores)
-            continue;
+          if (!progress.loadedAllStores) continue;
           console.log("  WRITE>>");
           if (progress.affectedStores) {
             const storesInWritingOrder = progress.affectedStores.slice().sort((a, b) => a.latestRegistration - b.latestRegistration);
@@ -1130,10 +1061,8 @@
               const json = stringifyRegistrationStore(sto);
               yield new Promise((resolve, reject) => {
                 fs.writeFile(filePath, json, (error2) => {
-                  if (error2)
-                    reject(error2);
-                  else
-                    resolve(void 0);
+                  if (error2) reject(error2);
+                  else resolve(void 0);
                 });
               });
               console.log();
@@ -1181,8 +1110,7 @@
             const re = yield fetch(
               location.protocol + "//history.dids.colds.ky/" + localPath.replace(/^\//, "")
             );
-            if (re.status !== 200)
-              return;
+            if (re.status !== 200) return;
             const text = yield re.text();
             return text;
           } catch (fetchError) {
@@ -1223,8 +1151,67 @@
     console.log("node");
     pullPLCDirectoryCompact();
   } else {
-    console.log("browser, see window.pullPLCDirectoryLocal  ");
+    console.log("browser, see window.pullPLCDirectoryLocal / handleFirehoseToStore ");
     window["pullPLCDirectoryLocal"] = pullPLCDirectoryLocal;
+    window["handleFirehoseToStore"] = handleFirehoseToStore;
+  }
+  function handleFirehoseToStore() {
+    return __async(this, null, function* () {
+      var _a;
+      var INTERVAL_FIREHOSE = 2e3;
+      console.log("libs...");
+      const coldsky = yield waitForLib();
+      const store = coldsky.defineCacheIndexedDBStore();
+      window["store"] = store;
+      console.log("firehose connect...");
+      let lastProcess = Date.now();
+      let addedTotal = 0;
+      let unexpected;
+      try {
+        for (var iter = __forAwait(coldsky.firehose()), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
+          const blocks = temp.value;
+          for (const block of blocks) {
+            if (block.messages.length) {
+              for (const p of block.messages) {
+                store.captureRecord(p, block.receiveTimestamp);
+                addedTotal++;
+              }
+            }
+            if ((_a = block.unexpected) == null ? void 0 : _a.length) {
+              if (!unexpected) unexpected = block.unexpected;
+              else unexpected = unexpected.concat(block.unexpected);
+            }
+          }
+          console.log("processed ", addedTotal, " into store");
+          if (unexpected)
+            console.log("unexpected ", unexpected);
+          addedTotal = 0;
+          const waitMore = INTERVAL_FIREHOSE - (Date.now() - lastProcess);
+          if (waitMore > 0) yield new Promise((resolve, reject) => setTimeout(resolve, waitMore));
+          lastProcess = Date.now();
+        }
+      } catch (temp) {
+        error = [temp];
+      } finally {
+        try {
+          more && (temp = iter.return) && (yield temp.call(iter));
+        } finally {
+          if (error)
+            throw error[0];
+        }
+      }
+      function waitForLib() {
+        if (window["coldsky"]) return window["coldsky"];
+        return new Promise((resolve, reject) => {
+          let stopInterval = setInterval(() => {
+            if (window["coldsky"]) {
+              clearInterval(stopInterval);
+              resolve(window["coldsky"]);
+            }
+          }, 300);
+        });
+      }
+    });
   }
 })();
 //# sourceMappingURL=index.js.map
