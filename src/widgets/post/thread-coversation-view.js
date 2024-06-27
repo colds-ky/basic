@@ -58,7 +58,7 @@ export function ThreadConversationView({
         showNext.post.shortDID === prevConvo.post.shortDID &&
         !asides?.length; // if same author, and no visual interjection - no need to repeat the author's name
 
-      let addedSpacing = false;
+      let naturallySpaced = false;
       if (intermediateInsignificants?.length) {
         conversationSegments.push(
           <InsignificantMarkers
@@ -67,7 +67,7 @@ export function ThreadConversationView({
           />
         );
         intermediateInsignificants = undefined;
-        addedSpacing = true;
+        naturallySpaced = true;
       }
 
       if (asides?.length) {
@@ -78,21 +78,27 @@ export function ThreadConversationView({
           />
         );
         asides = undefined;
-        addedSpacing = true;
+        naturallySpaced = true;
       }
 
+      if (prevConvo.post.embeds?.length)
+        naturallySpaced = true;
+
+      let showNextClassName = 'conversation';
       if (suppressAuthor &&
-        !addedSpacing &&
-        !intermediateInsignificants?.length && !asides?.length && !prevConvo.post.embeds?.length) {
+        !naturallySpaced) {
         conversationSegments.push(
           <hr className='conversation-divider' key={'conversation-divider:' + prevConvo.post.uri} />
         );
+        showNextClassName = 'conversation conversation-after-divider';
+      } else if (!naturallySpaced) {
+        showNextClassName = 'conversation conversation-after-tight-post';
       }
 
       conversationSegments.push(
         <CompletePostContent
           key={'conversation:' + showNext.post.uri}
-          className='conversation'
+          className={showNextClassName}
           post={showNext.post}
           incrementTimestampSince={prevConvo.post.asOf}
           linkTimestamp={linkTimestamp}

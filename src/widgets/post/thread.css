@@ -54,8 +54,10 @@
 
 .thread-conversation-view .post-date.post-timestamp-small-note {
   float: right;
-  opacity: 0.5;
-  color: inherit;
+  font-weight: 100;
+  zoom: 0.9;
+  transform: scaleY(1.1);
+  color: #d3bc5c;
   text-decoration: none;
 }
 
@@ -78,4 +80,8 @@
   background: linear-gradient(to right, transparent, currentColor, currentColor, transparent);
   height: 1px;
   border: none;
+}
+
+.thread-conversation-view .conversation-after-tight-post {
+  margin-top: 0.8em;
 }
