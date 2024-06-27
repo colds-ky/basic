@@ -1,7 +1,7 @@
 // @ts-check
 
 import { FavoriteBorder } from '@mui/icons-material';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useDB } from '../..';
@@ -138,7 +138,7 @@ function LoadingPostInProgress({ uri, ...rest }) {
  *  suppressAuthor?: boolean,
  *  allowEmbedDepth?: number
  *  indicateEmbedding?: boolean,
- *  notesArea?: import('react').ReactNode
+ *  replies?: (import('../../../coldsky/lib').CompactPost | { post: import('../../../coldsky/lib').CompactPost })[]
  * }} _
  */
 export function CompletePostContent({
@@ -150,10 +150,10 @@ export function CompletePostContent({
   suppressAuthor,
   allowEmbedDepth,
   indicateEmbedding,
-  notesArea
+  replies
 }) {
   return (
-    <div className={className ? 'post-loaded-content ' + className : 'post-loaded-content'} onClick={() => {
+    <div className={className ? 'complete-post-content ' + className : 'complete-post-content'} onClick={() => {
       console.log('post clicked ', post);
     }}>
       {
@@ -172,24 +172,84 @@ export function CompletePostContent({
         allowEmbedDepth={allowEmbedDepth}
         matches={post.matches}
       />
-      <div className='post-likes'>
-        <FavoriteBorder className={post.likeCount ? 'heart-icon heart-icon-with-likes' : 'heart-icon heart-icon-no-likes'} />
-        <span className='tiny-text-for-copy-paste'>
-          {
-            !post.likeCount ? undefined :
-            localise(
-              'likes: ',
-              { uk: 'вподобайки: ' }
-            )
-          }
-        </span>
+
+      <div className='post-notes-area'>
         {
-          !post?.likeCount ? undefined :
-            <span className='post-like-count'>
-              {post.likeCount.toLocaleString()}
-            </span>
+          !replies?.length ? null :
+            <div className='post-notes'>
+              <ReplyAvatars replies={replies} />
+            </div>
         }
+        <div className='post-likes'>
+          <span className='tiny-text-for-copy-paste'>
+            {
+              !post.likeCount ? undefined :
+                localise(
+                  'likes: ',
+                  { uk: 'вподобайки: ' }
+                )
+            }
+          </span>
+          {
+            !post?.likeCount || post.likeCount === 1 ? undefined :
+              (
+                post.embeds?.length ?
+                  <div className='post-like-count'>
+                    {post.likeCount.toLocaleString()}
+                  </div> :
+                  <span className='post-like-count'>
+                    {post.likeCount.toLocaleString()}
+                  </span>
+              )
+          }
+          <FavoriteBorder className={post.likeCount ? 'heart-icon heart-icon-with-likes' : 'heart-icon heart-icon-no-likes'} />
+        </div>
       </div>
     </div>
   );
+}
+
+/**
+ * @param {{
+ *  replies: (import('../../../coldsky/lib').CompactPost | { post: import('../../../coldsky/lib').CompactPost })[],
+ * }} _
+ */
+function ReplyAvatars({ replies }) {
+  const replyAvatars = useMemo(() => collectReplyAvatars(replies), [replies]);
+  if (!replyAvatars?.length) return null;
+  return (
+    <div className='reply-avatars'>
+      {replyAvatars.map((shortDID, index) => (
+        index === MAX_AVATAR_DISPLAY ?
+          <div key='reply-avatar-more' className='reply-avatar-marker reply-avatar-marker-more'>
+            {replyAvatars.length.toLocaleString()}
+          </div> :
+          <AccountChip
+            key={'reply-avatar-' + shortDID}
+            className='reply-avatar-marker'
+            account={shortDID} />
+      ))}
+    </div>
+  );
+}
+
+const MAX_AVATAR_DISPLAY = 3;
+
+/**
+ * @param {(import('../../../coldsky/lib').CompactPost | { post: import('../../../coldsky/lib').CompactPost })[] | undefined} posts
+ * @param {string[]} [shortDIDs]
+ */
+function collectReplyAvatars(posts, shortDIDs) {
+
+  if (!posts) return shortDIDs;
+  if (!shortDIDs) shortDIDs = [];
+  for (const p of posts) {
+    /** @type {import('../../../coldsky/lib').CompactPost} */
+    const post = /** @type {*} */(p).post || p;
+    if (shortDIDs.indexOf(post.shortDID) < 0)
+      shortDIDs.push(post.shortDID);
+    if (shortDIDs.length > MAX_AVATAR_DISPLAY)
+      break;
+  }
+  return shortDIDs;
 }

@@ -29,17 +29,17 @@ export function ThreadConversationView({
      post={conversationDirection.post}
      linkTimestamp={linkTimestamp}
      linkAuthor={linkAuthor}
+     replies={conversationDirection.insignificants}
    />
  );
 
  /** @type {import('./thread-structure').ThreadBranch | undefined} */
  let prevConvo = conversationDirection;
  /** @type {import('./thread-structure').ThreadBranch[] | undefined} */
- let insignificants;
+ let intermediateInsignificants;
  /** @type {import('./thread-structure').ThreadBranch[] | undefined} */
  let asides;
  while (prevConvo) {
-   insignificants = concatArraysSlim(insignificants, prevConvo.insignificants);
    asides = concatArraysSlim(asides, prevConvo.asides);
    const showNext =
      prevConvo.conversationDirection &&
@@ -51,14 +51,14 @@ export function ThreadConversationView({
        prevConvo.conversationDirection?.post.shortDID === prevPost.shortDID &&
        !asides?.length; // if same author, and no visual interjection - no need to repeat the author's name
 
-     if (insignificants?.length) {
+     if (intermediateInsignificants?.length) {
        conversationSegments.push(
          <InsignificantMarkers
            key={'insignificants:' + prevConvo.post.uri}
-           branches={insignificants}
+           branches={intermediateInsignificants}
          />
        );
-       insignificants = undefined;
+       intermediateInsignificants = undefined;
      }
 
      if (asides?.length) {
@@ -69,6 +69,12 @@ export function ThreadConversationView({
          />
        );
        asides = undefined;
+     }
+
+     if (!intermediateInsignificants?.length && !asides?.length && !prevConvo.post.embeds?.length) {
+      conversationSegments.push(
+        <hr className='conversation-divider' key={'conversation-divider:' + prevConvo.post.uri} />
+      );
      }
 
      if (prevConvo.isSignificant && prevConvo.significantPostCount && prevConvo.conversationDirection) {
@@ -82,6 +88,9 @@ export function ThreadConversationView({
            suppressAuthor={suppressAuthor}
          />
        );
+     } else {
+      if (!intermediateInsignificants) intermediateInsignificants = [prevConvo];
+      else intermediateInsignificants.push(prevConvo);
      }
    }
 

@@ -199,6 +199,8 @@
   background: #fffbeb;
   box-shadow: 2px 4px 10px #0000002b;
   border-radius: 0.5em;
+  z-index: 1;
+  position: relative;
 }
 .post-loading-in-progress {
   color: inherit;
@@ -245,18 +247,18 @@
   color: inherit;
   text-decoration: none;
 }
-.post-content p {
+.post-text-content p {
   margin: 0.7em 0;
 }
-.post-content p:first-child {
+.post-text-content p:first-child {
   margin-top: 0.5em;
 }
-.post-content p:last-child {
+.post-text-content p:last-child {
   margin-bottom: 0.3em;
 }
 .post-embeds-section {
   margin: 0.7em 0;
-  margin-bottom: -0.2em;
+  margin-right: 3em;
 }
 .post-embeds-section .embed-frame-outer {
   margin-bottom: 0.6em;
@@ -264,19 +266,37 @@
 .post-embeds-section.post-embeds-section-compact {
   zoom: 65%;
 }
-.post-loaded-content .post-likes {
+.complete-post-content {
+  position: relative;
+  min-height: 2.7em;
+}
+.complete-post-content .post-text-content {
+  margin-right: 2em;
+}
+.complete-post-content .post-notes-area {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+.complete-post-content .post-after-notes {
+  clear: both;
+}
+.complete-post-content .post-likes {
   text-align: right;
   opacity: 0.4;
   margin-top: 0.2em;
 }
-.post-loaded-content .post-likes .tiny-text-for-copy-paste {
+.complete-post-content .post-likes .tiny-text-for-copy-paste {
   font-size: 0.1px;
 }
-.post-loaded-content .post-likes .heart-icon {
+.complete-post-content .post-likes .heart-icon {
   position: relative;
   top: 0.26em;
 }
-.post-loaded-content .post-likes .post-like-count {
+.complete-post-content .post-likes .heart-icon-no-likes {
+  color: white;
+}
+.complete-post-content .post-likes .post-like-count {
   margin-left: 0.2em;
 }
 .sub-thread {
@@ -638,6 +658,22 @@
 .thread-conversation-view .insignificant-expandable-markers {
   text-align: center;
   font-size: 80%;
+}
+.thread-conversation-view .complete-post-content .post-notes .insignificant-expandable-markers .account-avatar {
+  display: block;
+  text-align: right;
+}
+.thread-conversation-view hr.conversation-divider {
+  color: #deb40f;
+  background:
+    linear-gradient(
+      to right,
+      transparent,
+      currentColor,
+      currentColor,
+      transparent);
+  height: 1px;
+  border: none;
 }
 
 /* src/history/history-layout.css */

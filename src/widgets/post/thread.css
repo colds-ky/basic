@@ -67,3 +67,15 @@
   text-align:center;
   font-size: 80%;
 }
+
+.thread-conversation-view .complete-post-content .post-notes .insignificant-expandable-markers .account-avatar {
+  display: block;
+  text-align: right;
+}
+
+.thread-conversation-view hr.conversation-divider {
+  color: #deb40f;
+  background: linear-gradient(to right, transparent, currentColor, currentColor, transparent);
+  height: 1px;
+  border: none;
+}

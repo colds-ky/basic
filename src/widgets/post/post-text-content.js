@@ -26,7 +26,7 @@ export function PostTextContent({ post }) {
 
   return (
     <PreFormatted
-      className="post-content"
+      className="post-text-content"
       text={post.text}
       InlineComponent={PostTextSpan}
       charClass={(offset, wholeString, ch) => {
