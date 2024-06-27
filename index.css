@@ -622,7 +622,7 @@
 }
 .history-layout .sticky-header-background {
   position: sticky;
-  top: 0;
+  top: -1px;
   background:
     linear-gradient(
       to top,
@@ -640,7 +640,7 @@
   text-shadow: 0 0.3px 1px black;
 }
 .history-layout .history-account-handle {
-  padding-top: 0.5em;
+  padding-top: 0.3em;
 }
 .history-layout .history-account-handle .at-sign {
   display: inline-block;
@@ -714,22 +714,21 @@
   grid-template-columns: 1fr auto;
 }
 .history-layout .history-search-bar .history-search-icon {
-  color: white;
-  stroke: #25602dbf;
-  stroke-width: 0.7px;
-  font-size: 250%;
+  color: #a07c22;
+  font-size: 185%;
   cursor: pointer;
-  background: #ffffffde;
+  background: #ffe992;
   border-radius: 3em;
-  padding: 0.1em;
-  border: solid 1px #bebebe;
-  box-shadow: 0.05em 0.07em 0.15em #00000030;
+  padding: 0.09em;
+  border: solid 1px #e7ddb5;
+  box-shadow: 0.05em 0.07em 0.15em #0000001a;
 }
 .history-layout .history-search-bar-expanded .history-search-icon {
   background: transparent;
+  color: white;
   box-shadow: none;
   border: none;
-  filter: drop-shadow(2px 3px 2px #ae8300de);
+  filter: drop-shadow(1px 2px 2px #a77d00);
 }
 .history-layout .history-search-bar #history-search-input {
   border: none;
@@ -738,6 +737,7 @@
   background: transparent;
   padding-left: 1em;
   padding-right: 0.5em;
+  color: #725600;
 }
 @media (min-aspect-ratio: 5.5/5) {
   .history-layout {
