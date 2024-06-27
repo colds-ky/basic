@@ -5,6 +5,8 @@ import { updateDIDs } from '../updateDIDs';
 import { createShellAPIs } from './shell-api';
 import { forAwait } from '../../api/forAwait';
 
+import './maintain-panel.css';
+
 /** @type {ReturnType<typeof updateDIDs> | undefined} */
 let maintainStarted;
 
