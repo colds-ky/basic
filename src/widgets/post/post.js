@@ -16,6 +16,8 @@ import { PostEmbedsSection } from './embedded';
 import { PostTextContent } from './post-text-content';
 
 import './post.css';
+import { PostTimestamp } from './post-timestamp';
+import { PostTopLine } from './post-top-line';
 
 /**
  * @typedef {import('../../../coldsky/lib').MatchCompactPost} MatchCompactPost
@@ -135,7 +137,8 @@ function LoadingPostInProgress({ uri, ...rest }) {
  *  linkAuthor?: boolean,
  *  suppressAuthor?: boolean,
  *  allowEmbedDepth?: number
- *  indicateEmbedding?: boolean
+ *  indicateEmbedding?: boolean,
+ *  notesArea?: import('react').ReactNode
  * }} _
  */
 export function CompletePostContent({
@@ -146,7 +149,8 @@ export function CompletePostContent({
   linkAuthor,
   suppressAuthor,
   allowEmbedDepth,
-  indicateEmbedding
+  indicateEmbedding,
+  notesArea
 }) {
   return (
     <div className={className ? 'post-loaded-content ' + className : 'post-loaded-content'} onClick={() => {
@@ -155,25 +159,11 @@ export function CompletePostContent({
       {
         suppressAuthor ?
           <PostTimestamp className='post-timestamp-small-note' post={post} linkTimestamp={linkTimestamp} /> :
-          <div className='post-top-line'>
-            {
-              !indicateEmbedding ? undefined :
-                <span className='tiny-text-for-copy-paste'>
-                  {localise(
-                    'quoted post by: ',
-                    { uk: 'процитовано від:' }
-                  )}
-                </span>
-            }
-            <AccountLabel
-              className='post-author'
-              account={post.shortDID}
-              withDisplayName={!compact}
-              linkToTimeline={linkAuthor}
-            />
-            <span className='post-author-right-overlay'></span>
-            <PostTimestamp post={post} linkTimestamp={linkTimestamp} />
-          </div>
+          <PostTopLine
+            post={post}
+            compact={compact}
+            allowLinks={linkAuthor || linkTimestamp}
+            indicateEmbedding={indicateEmbedding} />
       }
       <PostTextContent post={post} />
       <PostEmbedsSection
@@ -183,7 +173,7 @@ export function CompletePostContent({
         matches={post.matches}
       />
       <div className='post-likes'>
-        <FavoriteBorder className='heart-icon' />
+        <FavoriteBorder className={post.likeCount ? 'heart-icon heart-icon-with-likes' : 'heart-icon heart-icon-no-likes'} />
         <span className='tiny-text-for-copy-paste'>
           {
             !post.likeCount ? undefined :
@@ -201,33 +191,5 @@ export function CompletePostContent({
         }
       </div>
     </div>
-  );
-}
-
-/**
- * @param {{
- *  className?: string,
- *  post: MatchCompactPost,
- *  linkTimestamp?: boolean
- * }} _
- */
-function PostTimestamp({ className, post, linkTimestamp }) {
-  if (!post.asOf) return null;
-
-  if (!linkTimestamp) return <FormatTime className='post-date' time={post.asOf} />;
-
-  const db = useDB();
-  const profile = forAwait(post.shortDID, () => db.getProfileIncrementally(post.shortDID));
-
-  const parsedURI = breakFeedUri(post.uri);
-
-  return (
-    <Link
-      className={className ? 'post-date ' + className : 'post-date'}
-      to={
-        '/' + (profile?.handle || parsedURI?.shortDID) +
-        '/' + parsedURI?.postID}>
-      <FormatTime time={post.asOf} />
-    </Link>
   );
 }

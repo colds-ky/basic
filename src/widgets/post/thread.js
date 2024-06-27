@@ -10,6 +10,8 @@ import { CompletePostContent, Post, PostFrame } from './post';
 import { threadStructure } from './thread-structure';
 
 import './thread.css';
+import { ThreadConversationView } from './thread-coversation-view';
+import { ThreadForumView } from './thread-forum-view';
 
 /**
  * @param {{
@@ -64,7 +66,7 @@ export function ThreadView({ className, significantPost, thread, underPrevious, 
           linkTimestamp={linkTimestamp}
           linkAuthor={linkAuthor}
         />
-        <InsignificantExpandableMarkers branches={threadBranch?.insignificants || []} />
+        <InsignificantMarkers branches={threadBranch?.insignificants || []} />
       </PostFrame>
     );
   } else if (threadBranch.conversationDirection) {
@@ -86,128 +88,14 @@ export function ThreadView({ className, significantPost, thread, underPrevious, 
       />
     );
   }
-
-
-  return (
-    <SubThread
-      className={'thread-view ' + (className || '')}
-      significantPost={significantPost || (post => post.shortDID === thread.current.shortDID)}
-      node={root}
-      underPrevious={underPrevious}
-      linkTimestamp={linkTimestamp}
-      linkAuthor={linkAuthor}
-      {...rest}
-    />
-  );
-}
-
-/**
- * @param {{
- *  className?: string,
- *  conversationDirection: import('./thread-structure').ThreadBranch,
- *  linkTimestamp?: boolean,
- *  linkAuthor?: boolean
- * }} _
- */
-export function ThreadConversationView({
-  className,
-  conversationDirection,
-  linkTimestamp,
-  linkAuthor
-}) {
-  const conversationSegments = [];
-  let prevPost = conversationDirection.post;
-  conversationSegments.push(
-    <CompletePostContent
-      key={'conversation-starter:' + conversationDirection.post.uri}
-      className='conversation-starter'
-      post={conversationDirection.post}
-      linkTimestamp={linkTimestamp}
-      linkAuthor={linkAuthor}
-    />
-  );
-
-  /** @type {import('./thread-structure').ThreadBranch | undefined} */
-  let prevConvo = conversationDirection;
-  /** @type {import('./thread-structure').ThreadBranch[] | undefined} */
-  let insignificants;
-  /** @type {import('./thread-structure').ThreadBranch[] | undefined} */
-  let asides;
-  while (prevConvo) {
-    insignificants = concatArraysSlim(insignificants, prevConvo.insignificants);
-    asides = concatArraysSlim(asides, prevConvo.asides);
-    const showNext =
-      prevConvo.conversationDirection &&
-      (prevConvo.conversationDirection.isSignificant || prevConvo.conversationDirection.isParentOfSignificant);
-
-    if (showNext) {
-
-      const suppressAuthor =
-        prevConvo.conversationDirection?.post.shortDID === prevPost.shortDID &&
-        !asides?.length; // if same author, and no visual interjection - no need to repeat the author's name
-
-      if (insignificants?.length) {
-        conversationSegments.push(
-          <InsignificantExpandableMarkers
-            key={'insignificants:' + prevConvo.post.uri}
-            branches={insignificants}
-          />
-        );
-        insignificants = undefined;
-      }
-
-      if (asides?.length) {
-        conversationSegments.push(
-          <AsidesInterjection
-            key={'asides:' + prevConvo.post.uri}
-            branches={asides}
-          />
-        );
-        asides = undefined;
-      }
-
-      if (prevConvo.isSignificant && prevConvo.significantPostCount && prevConvo.conversationDirection) {
-        conversationSegments.push(
-          <CompletePostContent
-            key={'conversation:' + prevConvo.conversationDirection.post.uri}
-            className='conversation'
-            post={prevConvo.conversationDirection.post}
-            linkTimestamp={linkTimestamp}
-            linkAuthor={linkAuthor}
-            suppressAuthor={suppressAuthor}
-          />
-        );
-      }
-    }
-
-    prevConvo = prevConvo.conversationDirection;
-  }
-
-  return (
-    <PostFrame className={'thread-conversation-view ' + (className || '')}>
-      {conversationSegments}
-    </PostFrame>
-  );
-}
-
-export function ThreadForumView({
-  className,
-  parent,
-  linkTimestamp,
-  linkAuthor
-}) {
-  return (
-    <AsidesInterjection
-      branches={parent.asides || parent.children} />
-  );
 }
 
 /**
  * @param {{
  *  branches: import('./thread-structure').ThreadBranch[]
- * }}
+ * }} _
  */
-function InsignificantExpandableMarkers({ branches }) {
+export function InsignificantMarkers({ branches }) {
   const replyAvatars = useMemo(() => collectReplyAvatars(branches), [branches]);
   if (!replyAvatars?.length) return null;
   return (
@@ -223,57 +111,6 @@ function InsignificantExpandableMarkers({ branches }) {
 }
 
 /**
- * @param {{
- *  branches: import('./thread-structure').ThreadBranch[]
- * }}
- */
-function AsidesInterjection({ branches }) {
-  const asideSegments = [];
-  /** @type {import('./thread-structure').ThreadBranch[] | undefined} */
-  let bendyLineInsignificants;
-  collectAsides(branches);
-
-  if (!asideSegments.length) return null;
-
-  return (
-    <div className='aside-interjection-section'>
-      {asideSegments}
-    </div>
-  );
-
-  /** @param {import('./thread-structure').ThreadBranch[] | undefined} branches */
-  function collectAsides(branches) {
-    if (!branches?.length) return;
-    for (const br of branches) {
-      if (br.isSignificant) {
-        asideSegments.push(
-          <AsidePost
-            key={br.post.uri}
-            leading={bendyLineInsignificants}
-            branch={br}
-          />
-        );
-        bendyLineInsignificants = undefined;
-      } else {
-        if (!bendyLineInsignificants) bendyLineInsignificants = [br];
-        else bendyLineInsignificants.push(br);
-      }
-    }
-  }
-}
-
-function AsidePost({ leading, branch }) {
-  return (
-    <div className='aside-post-dummy-work-in-progress'>
-      <PostFrame>
-        <CompletePostContent
-          post={branch.post} />
-      </PostFrame>
-    </div>
-  );
-}
-
-/** 
  * @param {import('./thread-structure').ThreadBranch[] | undefined} branches
  * @param {string[]} [shortDIDs]
  */
@@ -311,96 +148,6 @@ function concatArraysSlim(array1, array2) {
  *  children: PostNode[]
  * }} PostNode
  */
-
-/**
- * @param {{
- *  className?: string,
- *  significantPost?: (post: import('./post-text-content').MatchCompactPost) => boolean | null | undefined,
- *  node: PostNode,
- *  underPrevious?: boolean,
- *  linkTimestamp?: boolean,
- *  linkAuthor?: boolean
- * }} _
- */
-function SubThread({
-  className,
-  significantPost,
-  node,
-  underPrevious,
-  linkTimestamp,
-  linkAuthor,
-  ...rest
-}) {
-  return (
-    <div
-      className={'sub-thread ' + (className || '')}
-      {...rest}>
-      <Post
-        className={underPrevious ? 'thread-reply-post' : undefined}
-        post={node.post}
-        linkTimestamp={linkTimestamp}
-        linkAuthor={linkAuthor}
-      />
-      {
-        node.children.map((child, i) => (
-          <CollapsedOrExpandedSubThread
-            key={i}
-            significantPost={significantPost}
-            node={child}
-            underPrevious={!i}
-            linkTimestamp={linkTimestamp}
-            linkAuthor={linkAuthor}
-          />
-        ))
-      }
-    </div>
-  );
-}
-
-/**
- * @param {{
- *  significantPost?: (post: import('./post-text-content').MatchCompactPost) => boolean | null | undefined,
- *  node: PostNode,
- *  underPrevious?: boolean,
- *  linkTimestamp?: boolean,
- *  linkAuthor?: boolean
- * }} _
- */
-function CollapsedOrExpandedSubThread({ significantPost, node, underPrevious, linkTimestamp, linkAuthor }) {
-  let collapsedChunk = [];
-  let nextNode = node;
-  while (true) {
-    if (significantPost?.(nextNode.post) || nextNode.children.length != 1) break;
-    collapsedChunk.push(nextNode.post);
-    nextNode = nextNode.children[0];
-  }
-
-  if (collapsedChunk.length === 0) {
-    return (
-      <SubThread
-        significantPost={significantPost}
-        node={node}
-        underPrevious={underPrevious}
-        linkTimestamp={linkTimestamp}
-        linkAuthor={linkAuthor}
-      />
-    );
-  } else {
-    return (
-      <>
-        <CollapsedThreadPart
-          children={collapsedChunk}
-        />
-        <SubThread
-          significantPost={significantPost}
-          node={nextNode}
-          linkTimestamp={linkTimestamp}
-          linkAuthor={linkAuthor}
-        />
-      </>
-    );
-  }
-}
 
 /**
  * @param {{
