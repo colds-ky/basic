@@ -32,5 +32,13 @@
     "multiformats": "*",
     "rollup": "*",
     "ws": "*"
+  },
+  "leave_aside_overrides": {
+    "@atproto/api": { "multiformats": "$multiformats" },
+    "@atproto/common-web": { "multiformats": "$multiformats" },
+    "@atproto/lexicon": { "multiformats": "$multiformats" },
+    "@ipld/car": { "multiformats": "$multiformats" },
+    "@ipld/dag-cbor": { "multiformats": "$multiformats" },
+    "uint8arrays": { "multiformats": "$multiformats" }
   }
 }
