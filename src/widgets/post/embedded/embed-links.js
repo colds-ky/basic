@@ -46,8 +46,10 @@ export function EmbedLinks({ className, post, links, ...rest }) {
                       <div className={alternateSideNext ?
                         'post-embed-link-image-and-description post-embed-link-image-and-description-alternate' :
                         'post-embed-link-image-and-description'}>
-                        <span className='post-embed-link-description'>
-                          {link.description}
+                        <span className='post-embed-link-description-wrapper'>
+                          <span className='post-embed-link-description'>
+                            {link.description}
+                          </span>
                         </span>
                         <span className='post-embed-link-image-wrapper'
                           style={{ backgroundImage: 'url(' + link.url + ')' }}>

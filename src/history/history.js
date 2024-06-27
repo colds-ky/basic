@@ -42,19 +42,25 @@ function HistoryCore() {
 
   useEffect(() => {
     var stop = false;
-    const avatar = resolved.avatar;
-    if (avatar) {
-      (async () => {
-        const avatarIcon = await overlayAvatar(avatar).catch(() => { });
-        if (!stop) replaceIcon(avatarIcon || undefined);
-      })();
-    }
+    (async () => {
+      let appliedAvatar = '';
+      for await (const profile of db.getProfileIncrementally(handle)) {
+        if (stop) return;
+        if (profile.avatar && profile.avatar !== appliedAvatar) {
+          appliedAvatar = profile.avatar;
+          const avatarIcon = await overlayAvatar(profile.avatar).catch(() => { });
+          if (stop) return;
+          replaceIcon(avatarIcon || undefined);
+        }
+      }
+    })();
 
     return () => {
       stop = true;
     }
-  }, [resolved?.avatar]);
-    
+  }, [handle]);
+
+  console.log('profile ', resolved, resolved.banner);
 
   return (
     <div className='history-view'>

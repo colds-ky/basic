@@ -1,3 +1,7 @@
+.account-label .account-handle {
+  display: flex;
+}
+
 .account-label .handle-bsky-social-suffix {
   display: inline-block;
   zoom: 0.7;
@@ -23,14 +27,14 @@
   height: 1.5em;
   margin-right: 0.25em;
   position: relative;
-  top: -0.15em;
 }
 
 .account-label .account-avatar.account-avatar-at-sign {
-  color: cornflowerblue;
-  display: grid;
+  color: #7fa9f4;
+  display: inline-grid;
   align-items: center;
   justify-items: center;
+  transform: scale(1.2);
 }
 
 .account-label .handle-main-text {
