@@ -153,16 +153,25 @@
 }
 .facet-url {
   text-decoration: none;
-  filter: contrast(2) saturate(1.5);
+  color: rgb(6, 76, 197);
+}
+.facet-url:visited {
+  color: rgb(136, 0, 178);
 }
 .facet-url:hover {
   text-decoration: underline;
 }
 .facet-url .link-text-before-domain {
-  opacity: 0.5;
+  opacity: 0.4;
 }
 .facet-url .link-text-after-domain {
-  opacity: 0.75;
+  opacity: 0.6;
+}
+.facet-url .unspecified-domain {
+  color: rgb(165, 25, 0);
+}
+.facet-url .suspicious-link {
+  color: rgb(255, 77, 92);
 }
 .search-match-highly-relevant {
   background: gold;
@@ -327,6 +336,12 @@
   font-size: 90%;
   color: white;
   background: #379ef1;
+}
+.post-embeds-section .post-embed-link-url .post-embed-link-url-lead {
+  opacity: 0.5;
+}
+.post-embeds-section .post-embed-link-url .post-embed-link-url-trail {
+  opacity: 0.7;
 }
 .post-embeds-section .post-embed-link-url a {
   color: inherit;

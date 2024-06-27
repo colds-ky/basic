@@ -30,7 +30,7 @@ export function EmbedLinks({ className, post, links, ...rest }) {
               }
               <div className='post-embed-link-url'>
                 <a href={link.url} target="_blank" rel="noopener noreferrer">
-                  {link.url}
+                  <LinkURL url={link.url} />
                 </a>
               </div>
               {
@@ -70,5 +70,25 @@ export function EmbedLinks({ className, post, links, ...rest }) {
         })}
       </div>
     </EmbedFrame>
+  );
+}
+
+/**
+ * @param {{
+ *  url: string
+ * }} _
+ */
+function LinkURL({ url }) {
+  const parsed = new URL(url);
+  const hostnamePos = url.indexOf(parsed.hostname);
+  if (!hostnamePos) return <span>{url}</span>;
+  const lead = url.slice(0, hostnamePos);
+  const trail = url.slice(hostnamePos + parsed.hostname.length);
+  return (
+    <>
+      {!lead ? undefined : <span className='post-embed-link-url-lead'>{lead}</span>}
+      <span className='post-embed-link-url-hostname'>{parsed.hostname}</span>
+      {!trail ? undefined : <span className='post-embed-link-url-trail'>{trail}</span>}
+    </>
   );
 }
