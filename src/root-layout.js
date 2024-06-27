@@ -1,6 +1,8 @@
 // @ts-check
 
-import React from 'react';
+import React, { useState } from 'react';
+import { useDerived } from './api/derive';
+import { searchHandle } from './api';
 
 /**
  * @param {{
@@ -17,6 +19,11 @@ export function RootLayout({
   inputClassName,
   inputPlaceholderText,
   autocompleteArea }) {
+  const [text, setText] = useState('');
+  const matches = useDerived(
+    text,
+    (text) => searchHandle(text),
+    (error, text) => [{ shortDID: text, shortHandle: text, rank: 1, error }]);
   return (
     <table className="top-table">
       <tbody>
@@ -28,7 +35,18 @@ export function RootLayout({
                 <div className="subtitle">{subtitle ?? 'social media up there'}</div>
                 <input id="searchINPUT" className={inputClassName}
                   autoComplete="off"
-                  placeholder={inputPlaceholderText ?? 'Demo search text'} />
+                  placeholder={inputPlaceholderText ?? 'Demo search text'}
+                  value={text}
+                  onChange={e => {
+                    setText(e.target.value);
+                  }}
+                />
+                {
+                  !matches ? undefined :
+                    matches.map((m, index) =>
+                      <div key={index}>{m.shortHandle}</div>
+                    )
+                }
                 {autocompleteArea}
               </div>
             </div>

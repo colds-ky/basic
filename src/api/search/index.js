@@ -1,0 +1,1 @@
+export { searchHandle } from './search-handle.js';
