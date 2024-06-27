@@ -30,6 +30,9 @@
 .landing .landing-handle-band input {
   padding-left: 0.5em;
   font-size: 6.7vh;
+
+  /* disable autocomplete shading */
+  -webkit-background-clip: text;
 }
 
 .landing .landing-handle-band label {
