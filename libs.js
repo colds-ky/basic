@@ -41834,7 +41834,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.20";
+	var version = "0.2.21";
 
 	// @ts-check
 
@@ -50019,7 +50019,10 @@ if (cid) {
 	      if (!post) return;
 
 	      // cache in memory now
-	      if (!repo) repo = createRepoData(parsedURL.repo);
+	      if (!repo) {
+	        repo = createRepoData(parsedURL.repo);
+	        memStore.repos.set(parsedURL.repo, repo);
+	      }
 	      repo.posts.set(post.uri, post);
 	      return post;
 	    });
@@ -50137,7 +50140,10 @@ if (cid) {
 	        if (!profile) return;
 
 	        // cache in memory now
-	        if (!repo) repo = createRepoData(shortDID);
+	        if (!repo) {
+	          repo = createRepoData(shortDID);
+	          memStore.repos.set(shortDID, repo);
+	        }
 	        repo.profile = profile;
 	        return profile;
 	      });
@@ -50312,8 +50318,8 @@ if (cid) {
 	  function getPostOnly(uri) {
 	    if (!uri) return;
 	    const dbPost = dbStore.getPostOnly(uri);
-	    if (dbPost && !isPromise(dbPost)) return dbPost;
-	    if (!dbPost) return getPostOnlyAsync(uri);else return dbPost.then(post => post || getPostOnlyAsync(uri));
+	    if (dbPost && !isPromise(dbPost) && !dbPost.placeholder) return dbPost;
+	    if (!dbPost || !isPromise(dbPost)) return getPostOnlyAsync(uri);else return dbPost.then(post => post && !post.placeholder ? post : getPostOnlyAsync(uri));
 	  }
 
 	  /**
