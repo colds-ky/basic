@@ -4,6 +4,8 @@ import React from 'react';
 import { likelyDID, shortenHandle, unwrapShortHandle } from '../../../coldsky/lib';
 import { FullDID } from './full-did';
 
+import './full-handle.css';
+
 /**
  * @param {{
  *  shortHandle: string | null | undefined,
@@ -17,10 +19,36 @@ export function FullHandle({ shortHandle, Component, ...rest }) {
   if (likelyDID(shortHandle)) return <FullDID shortDID={shortHandle} Component={Component} {...rest} />;
   const fullHandle = unwrapShortHandle(shortHandle);
   shortHandle = shortenHandle(shortHandle);
-  if (shortHandle === fullHandle) return <span {...rest}>{shortHandle}</span>;
-  else return (
+  const bskySocialSuffix = shortHandle === fullHandle ? undefined : fullHandle.slice(shortHandle.length);
+
+  let mainText = shortHandle;
+  let tldSuffix = undefined;
+  if (!bskySocialSuffix) {
+    const lastDot = shortHandle.lastIndexOf('.');
+    if (lastDot > 0) {
+      mainText = shortHandle.slice(0, lastDot);
+      tldSuffix = shortHandle.slice(lastDot);
+    }
+  }
+
+  return (
     <Component {...rest}>
-      {shortHandle}
-      <span className='handle-bsky-social-suffix'>{fullHandle.slice(shortHandle.length)}</span>
-    </Component>);
+      <span className='handle-main-text'>
+        {mainText}
+      </span>
+      {
+        tldSuffix &&
+        <span className='handle-tld-suffix'>{tldSuffix}</span>
+      }
+      {
+        bskySocialSuffix &&
+        <>
+        <span className='handle-bsky-social-suffix-dot'>
+            {bskySocialSuffix.charAt(0)}
+          </span>
+          <span className='handle-bsky-social-suffix'>{bskySocialSuffix.slice(1)}</span>
+        </>
+      }
+    </Component>
+  );
 }

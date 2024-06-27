@@ -10,3 +10,24 @@
   position: relative;
   top: -0.15em;
 }
+
+.account-label .handle-main-text {
+  color: #365ca1;
+}
+
+.account-label .handle-tld-suffix {
+  color: #123a82;
+  text-shadow: 0 0 1px #00389d;
+}
+
+.account-label .handle-bsky-social-suffix {
+  color: #365ca1;
+}
+
+.account-label .handle-bsky-social-suffix-dot {
+  color: #365ca1;
+}
+
+.account-label .account-label-display-name {
+  padding-left: 0.15em;
+}

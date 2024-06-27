@@ -132,6 +132,20 @@
   color: silver;
 }
 
+/* src/widgets/account/full-handle.css */
+.handle-bsky-social-suffix {
+  display: inline-block;
+  zoom: 0.7;
+  transform: scaleY(1.43) translateY(0.08em);
+  transform-origin: bottom;
+  opacity: 0.6;
+}
+.handle-bsky-social-suffix-dot {
+  opacity: 0.6;
+  padding-left: 0.05em;
+  padding-right: 0.1em;
+}
+
 /* src/widgets/account/account-label.css */
 .account-label .account-avatar {
   background: no-repeat center center;
@@ -144,5 +158,21 @@
   margin-right: 0.25em;
   position: relative;
   top: -0.15em;
+}
+.account-label .handle-main-text {
+  color: #365ca1;
+}
+.account-label .handle-tld-suffix {
+  color: #123a82;
+  text-shadow: 0 0 1px #00389d;
+}
+.account-label .handle-bsky-social-suffix {
+  color: #365ca1;
+}
+.account-label .handle-bsky-social-suffix-dot {
+  color: #365ca1;
+}
+.account-label .account-label-display-name {
+  padding-left: 0.15em;
 }
 /*# sourceMappingURL=index.css.map */

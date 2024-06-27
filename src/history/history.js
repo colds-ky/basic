@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { useNavigate, useParams } from 'react-router-dom';
-import { unwrapShortHandle } from 'coldsky';
+import { unwrapShortHandle } from '../../coldsky/lib';
 
 export function History() {
 

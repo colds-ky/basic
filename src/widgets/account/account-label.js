@@ -35,7 +35,7 @@ export function AccountLabel({ account, withDisplayName, className, Component, .
         {
           !withDisplayName || !account.displayName ? undefined :
             <>
-              {' '}<span className='account-short-entry-display-name'>
+              {' '}<span className='account-label-display-name'>
                 {account.displayName}
               </span>
             </>

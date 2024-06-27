@@ -1,6 +1,6 @@
 {
   "name": "gist.ing",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Gisting on the Ski",
   "main": "index.js",
   "private": true,
@@ -23,7 +23,6 @@
     "@rollup/plugin-node-resolve": "^15.2.2",
     "ag-grid-community": "^31.2.0",
     "ag-grid-react": "^31.2.0",
-    "coldsky": "^0.1.14",
     "dexie": "^4.0.1",
     "esbuild": "^0.20.2",
     "fuse.js": "^6.6.2",

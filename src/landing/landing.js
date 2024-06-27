@@ -8,9 +8,9 @@ import { FunBackground } from './fun-background';
 import { version } from '../../package.json';
 
 import './landing.css';
-import { searchAccounts } from '../api';
 import { localise } from '../localise';
 import { AccountLabel } from '../widgets/account';
+import { searchAccounts } from '../api/record-cache';
 
 export function Landing() {
   const [timeout] = React.useState({ timeout: 0, searchText: '' });
@@ -30,9 +30,17 @@ export function Landing() {
 
     timeout.timeout = setTimeout(async () => {
       setSearchParams({ q: searchText });
-      const searchResults = await searchAccounts(searchText);
-      if (timeout.searchText !== searchText) return;
-      setSearchResults(searchResults);
+      for await (const searchResults of searchAccounts(searchText)) {
+        if (timeout.searchText !== searchText) return;
+        setSearchResults(searchResults);
+      }
+      if (timeout.searchText === searchText) {
+        setSearchResults(r => {
+          r = r.slice();
+          r.complete = true;
+          return r;
+        });
+      }
     }, 500);
   }
 
@@ -60,11 +68,17 @@ export function Landing() {
       {
         !searchResults.length ? undefined :
           <div className='landing-auto-completion-area'>
-            {searchResults.map(profile => (
+            {(searchResults.length < 10 ? searchResults : searchResults.slice(0,10)).map(profile => (
               <Link key={profile.did} to={`/${profile.handle}`} className='landing-auto-complete-entry'>
                 <AccountLabel account={profile} Component='div' withDisplayName />
               </Link>
             ))}
+            {
+              searchResults.complete ? undefined :
+                <div className='landing-auto-completion-progress'>
+                  ...
+                </div>
+            }
           </div>
       }
       <div className='landing-bottom-bar'>
