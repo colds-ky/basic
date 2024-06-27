@@ -65190,13 +65190,14 @@ if (cid) {
           }
           function fetchMore() {
             return __async(this, null, function* () {
+              var _a2;
               const response = yield atClient2.com.atproto.sync.listRepos({
                 cursor: populatedDIDs.currentCursor,
                 limit: 995
               });
               if (!response.data)
                 return;
-              if (response.data.repos.length) {
+              if ((_a2 = response.data.repos) == null ? void 0 : _a2.length) {
                 for (const repo of response.data.repos) {
                   const shortDID = shortenDID(repo.did);
                   populatedDIDs.shortDIDs.push(shortDID);

@@ -111,7 +111,7 @@ export async function updateDIDs({
       });
       if (!response.data) return;
 
-      if (response.data.repos.length) {
+      if (response.data.repos?.length) {
         for (const repo of response.data.repos) {
           const shortDID = shortenDID(repo.did);
           populatedDIDs.shortDIDs.push(shortDID);
