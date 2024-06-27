@@ -1219,7 +1219,7 @@
             var dispatcher = resolveDispatcher();
             return dispatcher.useRef(initialValue);
           }
-          function useEffect13(create5, deps) {
+          function useEffect15(create5, deps) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useEffect(create5, deps);
           }
@@ -2001,7 +2001,7 @@
           exports.useContext = useContext11;
           exports.useDebugValue = useDebugValue3;
           exports.useDeferredValue = useDeferredValue;
-          exports.useEffect = useEffect13;
+          exports.useEffect = useEffect15;
           exports.useId = useId2;
           exports.useImperativeHandle = useImperativeHandle4;
           exports.useInsertionEffect = useInsertionEffect3;
@@ -99396,7 +99396,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // package.json
-  var version4 = "0.1.17";
+  var version4 = "0.1.18";
 
   // src/localise.js
   function localise(english, languageMap) {
@@ -99437,6 +99437,12 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
 
   // src/landing/landing.js
   function Landing() {
+    (0, import_react11.useEffect)(() => {
+      document.documentElement.classList.remove("account");
+    });
+    return /* @__PURE__ */ import_react11.default.createElement(LandingCore, null);
+  }
+  function LandingCore() {
     const [timeout2] = import_react11.default.useState({ timeout: 0, searchText: "" });
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchText, setSearchText] = import_react11.default.useState(searchParams.get("q") || "");
@@ -99503,6 +99509,12 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   // src/history/history.js
   var import_react12 = __toESM(require_react());
   function History() {
+    (0, import_react12.useEffect)(() => {
+      document.documentElement.classList.add("account");
+    });
+    return /* @__PURE__ */ import_react12.default.createElement(HistoryCore, null);
+  }
+  function HistoryCore() {
     let { handle } = useParams();
     if (handle) {
       console.log({

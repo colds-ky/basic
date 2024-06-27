@@ -73,7 +73,7 @@ padding-left: 4.5vh;
 
 .landing .landing-bottom-bar {
   grid-row: 5;
-  padding: 0.2em;
+  padding: 0.2em 0.4em;
   font-family: sans-serif;
   color: #bdd4fc;
   text-shadow: 0 0 14px #0052ff, 0 0 2px black;

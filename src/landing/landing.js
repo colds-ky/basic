@@ -1,7 +1,7 @@
 // @ts-check
 
 import { Input, TextField } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 
 import { FunBackground } from './fun-background';
@@ -13,6 +13,16 @@ import { AccountLabel } from '../widgets/account';
 import { searchAccounts } from '../api';
 
 export function Landing() {
+  useEffect(() => {
+    document.documentElement.classList.remove('account');
+  });
+
+  return (
+    <LandingCore />
+  );
+}
+
+export function LandingCore() {
   const [timeout] = React.useState({ timeout: 0, searchText: '' });
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchText, setSearchText] = React.useState(searchParams.get('q') || '');
