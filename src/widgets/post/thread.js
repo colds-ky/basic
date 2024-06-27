@@ -35,6 +35,7 @@ export function Thread({ className, uri, ...rest }) {
     <ThreadView
       className={'thread ' + (className || '')}
       thread={thread}
+      unrollMainConversation
       {...rest}
     />
   );
@@ -45,20 +46,26 @@ export function Thread({ className, uri, ...rest }) {
  *  className?: string,
  *  significantPost?: (post: import('./post-text-content').MatchCompactPost) => boolean | null | undefined,
  *  thread: import('../../../coldsky/lib').CompactThreadPostSet,
- *  underPrevious?: boolean,
+ *  unrollMainConversation?: boolean,
  *  linkTimestamp?: boolean,
  *  linkAuthor?: boolean
  * }} _
  */
-export function ThreadView({ className, significantPost, thread, underPrevious, linkTimestamp, linkAuthor, ...rest }) {
-  const root = layoutThread(thread, significantPost);
+export function ThreadView({
+  className,
+  significantPost,
+  unrollMainConversation,
+  thread,
+  linkTimestamp,
+  linkAuthor,
+  ...rest
+}) {
 
   const threadBranch = useMemo(() =>
     thread && threadStructure(thread, significantPost),
     [thread, significantPost]);
 
-  console.log('thread structure ', thread.root.uri, thread.root.text, threadBranch, ' layout ', root);
-  if (!threadBranch.significantPostCount) {
+    if (!threadBranch.significantPostCount) {
     return (
       <PostFrame className={className}>
         <CompletePostContent
@@ -74,6 +81,7 @@ export function ThreadView({ className, significantPost, thread, underPrevious, 
       <ThreadConversationView
         className={className}
         conversationDirection={threadBranch}
+        unrollMainConversation={unrollMainConversation}
         linkTimestamp={linkTimestamp}
         linkAuthor={linkAuthor}
       />

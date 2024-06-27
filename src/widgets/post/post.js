@@ -133,6 +133,7 @@ function LoadingPostInProgress({ uri, ...rest }) {
  *  className?: string,
  *  post: MatchCompactPost,
  *  compact?: boolean,
+ *  incrementTimestampSince?: number,
  *  linkTimestamp?: boolean,
  *  linkAuthor?: boolean,
  *  suppressAuthor?: boolean,
@@ -145,6 +146,7 @@ export function CompletePostContent({
   className,
   post,
   compact,
+  incrementTimestampSince,
   linkTimestamp,
   linkAuthor,
   suppressAuthor,
@@ -158,9 +160,14 @@ export function CompletePostContent({
     }}>
       {
         suppressAuthor ?
-          <PostTimestamp className='post-timestamp-small-note' post={post} linkTimestamp={linkTimestamp} /> :
+          <PostTimestamp
+            className='post-timestamp-small-note'
+            post={post}
+            since={incrementTimestampSince}
+            linkTimestamp={linkTimestamp} /> :
           <PostTopLine
             post={post}
+            since={incrementTimestampSince}
             compact={compact}
             allowLinks={linkAuthor || linkTimestamp}
             indicateEmbedding={indicateEmbedding} />

@@ -8,15 +8,17 @@ import { ThreadNestedChildren } from './thread-nested-children';
 
 /**
  * @param {{
-*  className?: string,
-*  conversationDirection: import('./thread-structure').ThreadBranch,
-*  linkTimestamp?: boolean,
-*  linkAuthor?: boolean
-* }} _
-*/
+ *  className?: string,
+ *  conversationDirection: import('./thread-structure').ThreadBranch,
+ *  unrollMainConversation?: boolean,
+ *  linkTimestamp?: boolean,
+ *  linkAuthor?: boolean
+ * }} _
+ */
 export function ThreadConversationView({
  className,
  conversationDirection,
+ unrollMainConversation,
  linkTimestamp,
  linkAuthor
 }) {
@@ -43,7 +45,11 @@ export function ThreadConversationView({
    asides = concatArraysSlim(asides, prevConvo.asides);
    const showNext =
      prevConvo.conversationDirection &&
-     (prevConvo.conversationDirection.isSignificant || prevConvo.conversationDirection.isParentOfSignificant);
+     (
+      unrollMainConversation && prevConvo.isLeadingToTargetPost ||
+      prevConvo.conversationDirection.isSignificant ||
+      prevConvo.conversationDirection.isParentOfSignificant
+    );
 
    if (showNext) {
 
@@ -77,12 +83,16 @@ export function ThreadConversationView({
       );
      }
 
-     if (prevConvo.isSignificant && prevConvo.significantPostCount && prevConvo.conversationDirection) {
+     if (prevConvo.conversationDirection && (
+      unrollMainConversation && prevConvo.conversationDirection.isLeadingToTargetPost ||
+      prevConvo.isSignificant && prevConvo.significantPostCount
+     )) {
        conversationSegments.push(
          <CompletePostContent
            key={'conversation:' + prevConvo.conversationDirection.post.uri}
            className='conversation'
            post={prevConvo.conversationDirection.post}
+           incrementTimestampSince={prevConvo.post.asOf}
            linkTimestamp={linkTimestamp}
            linkAuthor={linkAuthor}
            suppressAuthor={suppressAuthor}

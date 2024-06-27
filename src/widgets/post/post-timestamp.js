@@ -10,12 +10,13 @@ import { breakFeedUri } from '../../../coldsky/lib';
 
 /**
  * @param {{
-*  className?: string,
-*  post: import('../../../coldsky/lib').MatchCompactPost,
-*  linkTimestamp?: boolean
-* }} _
-*/
-export function PostTimestamp({ className, post, linkTimestamp }) {
+ *  className?: string,
+ *  post: import('../../../coldsky/lib').MatchCompactPost,
+ *  since?: number,
+ *  linkTimestamp?: boolean
+ * }} _
+ */
+export function PostTimestamp({ className, post, since, linkTimestamp }) {
  if (!post.asOf) return null;
 
  if (!linkTimestamp) return <FormatTime className='post-date' time={post.asOf} />;
@@ -31,7 +32,7 @@ export function PostTimestamp({ className, post, linkTimestamp }) {
      to={
        '/' + (profile?.handle || parsedURI?.shortDID) +
        '/' + parsedURI?.postID}>
-     <FormatTime time={post.asOf} />
+     <FormatTime since={since} time={post.asOf} />
    </Link>
  );
 }

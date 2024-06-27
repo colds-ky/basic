@@ -11,6 +11,7 @@ import { PostTimestamp } from './post-timestamp';
  * @param {{
  *  className?: string,
  *  post: import("../../../coldsky/lib").MatchCompactPost,
+ *  since?: number,
  *  compact?: boolean,
  *  allowLinks?: boolean,
  *  indicateEmbedding?: boolean
@@ -19,6 +20,7 @@ import { PostTimestamp } from './post-timestamp';
 export function PostTopLine({
   className,
   post,
+  since,
   compact,
   allowLinks,
   indicateEmbedding
@@ -41,7 +43,7 @@ export function PostTopLine({
       linkToTimeline={allowLinks}
     />
     <span className='post-author-right-overlay'></span>
-    <PostTimestamp post={post} linkTimestamp={allowLinks} />
+    <PostTimestamp post={post} since={since} linkTimestamp={allowLinks} />
   </div>
   );
 }
