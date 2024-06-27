@@ -734,7 +734,8 @@ a.account-label.account-handle {
 .thread-conversation-view .conversation-after-tight-post {
   margin-top: 0.8em;
 }
-.thread-conversation-view .aside-interjection-section {
+.thread-conversation-view .aside-interjection-section,
+.thread-forum-view .aside-interjection-section {
   padding: 1.5em;
   margin: 1.5em 0;
   margin-left: 1.5em;

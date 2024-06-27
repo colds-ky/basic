@@ -28,7 +28,11 @@ export function ThreadForumView({
       />
       <InsignificantMarkers branches={parent?.insignificants || []} />
       <ThreadNestedChildren
-        branches={parent.asides || parent.children || []} />
+        className='thread-forum-children'
+        branches={parent.asides || parent.children || []}
+        linkTimestamp={linkTimestamp}
+        linkAuthor={linkAuthor}
+      />
     </PostFrame>
   );
 }
