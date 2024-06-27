@@ -1,3 +1,33 @@
+.facet-mention {
+  text-decoration: none;
+}
+
+.facet-mention .account-avatar-chip {
+  margin-right: 0;
+  transform: scale(0.9);
+}
+
+.facet-mention:hover {
+  text-decoration: underline;
+}
+
+.facet-url {
+  text-decoration: none;
+  filter: contrast(2) saturate(1.5);
+}
+
+.facet-url:hover {
+  text-decoration: underline;
+}
+
+.facet-url .link-text-before-domain {
+  opacity: 0.5;
+}
+
+.facet-url .link-text-after-domain {
+  opacity: 0.75;
+}
+
 .search-match-highly-relevant {
   background: gold;
   border-radius: 0.3em;

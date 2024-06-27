@@ -141,6 +141,29 @@
 }
 
 /* src/widgets/post/post-text-content.css */
+.facet-mention {
+  text-decoration: none;
+}
+.facet-mention .account-avatar-chip {
+  margin-right: 0;
+  transform: scale(0.9);
+}
+.facet-mention:hover {
+  text-decoration: underline;
+}
+.facet-url {
+  text-decoration: none;
+  filter: contrast(2) saturate(1.5);
+}
+.facet-url:hover {
+  text-decoration: underline;
+}
+.facet-url .link-text-before-domain {
+  opacity: 0.5;
+}
+.facet-url .link-text-after-domain {
+  opacity: 0.75;
+}
 .search-match-highly-relevant {
   background: gold;
   border-radius: 0.3em;
@@ -246,7 +269,8 @@
   position: relative;
 }
 .post-embeds-section .post-frame-outer {
-  transform: rotate(-1deg) translate(0.4em, 0px);
+  transform: rotate(-1deg) translate(5.4%, 0px);
+  transform-origin: bottom right;
   zoom: 0.95;
   background:
     linear-gradient(
@@ -256,6 +280,11 @@
   border-top-color: #e4bb73;
   border-left-color: #e39200;
   box-shadow: 1px 2px 10px #0000002b;
+  z-index: 1;
+  position: relative;
+}
+.post-embeds-section .post-frame-outer .post-frame-outer {
+  zoom: 0.6;
 }
 .post-embeds-section .embed-frame-outer {
   background: white;
