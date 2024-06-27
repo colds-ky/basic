@@ -417,6 +417,7 @@
             maxDate = entry.timestamp;
         }
       }
+      let lastSave = Date.now();
       console.log("Pulling PLC directory...");
       let lastChunkEntry;
       try {
@@ -445,9 +446,12 @@
             else
               dirEntry.push(historyEntry);
           }
-          console.log("saving...");
-          saveAllDirectoryFiles(directoryPath, wholeDirectory);
-          console.log("OK.\n\n");
+          if (Date.now() > lastSave + 4e4) {
+            console.log("saving...");
+            saveAllDirectoryFiles(directoryPath, wholeDirectory);
+            console.log("OK.\n\n");
+            lastSave = Date.now();
+          }
         }
       } catch (temp) {
         error = [temp];
