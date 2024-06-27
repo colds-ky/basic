@@ -77,6 +77,7 @@ function HistoryCore() {
               searchQuery={searchQuery} /> :
             <Thread
               uri={makeFeedUri(resolved.shortDID, post)}
+              significantPost={post => post.shortDID === resolved.shortDID}
               linkAuthor
               linkTimestamp
             />
