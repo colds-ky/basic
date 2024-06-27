@@ -73,9 +73,11 @@ export function SearchArea({ handleBandClassName, autoCompletionAreaClassName })
                 ))
             }
             {
-              searchProfileResults.complete ? undefined :
-                <div className='landing-auto-completion-progress'>
-                  ...
+              searchProfileResults.complete && searchPostResults.complete ? undefined :
+                <div className={
+                  'landing-auto-completion-progress' +
+                  (searchProfileResults.complete ? '' : ' landing-auto-completion-progress-profile') +
+                  (searchPostResults.complete ? '' : ' landing-auto-completion-progress-post')}>
                 </div>
             }
           </div>

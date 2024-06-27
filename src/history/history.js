@@ -1,5 +1,6 @@
 // @ts-check
 
+import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -7,15 +8,16 @@ import { forAwait } from '../../coldsky/src/api/forAwait';
 import { localise } from '../localise';
 import { FullHandle } from '../widgets/account/full-handle';
 
-import { Timeline } from './timeline';
-import { overlayAvatar, replaceIcon } from '../icon-inject';
 import { useDB } from '..';
-
-import './history.css';
+import { breakFeedUri, likelyDID, makeFeedUri, shortenDID } from '../../coldsky/lib';
+import { overlayAvatar, replaceIcon } from '../icon-inject';
+import { Thread, ThreadView } from '../widgets/post/thread';
 import { PreFormatted } from '../widgets/preformatted';
 import { HistoryPageDecorations } from './history-page-decorations';
-import { breakFeedUri, likelyDID, makeFeedUri, shortenDID } from '../../coldsky/lib';
-import { Thread, ThreadView } from '../widgets/post/thread';
+import { Timeline } from './timeline';
+
+
+import './history.css';
 
 export function History() {
   return (
@@ -29,6 +31,9 @@ function HistoryCore() {
 
   const db = useDB();
   let { handle, post } = useParams();
+
+  const [searchText, setSearchText] = React.useState('');
+  const [forceShowSearch, setForceShowSearch] = React.useState(false);
 
   /** @type {import('../../coldsky/lib').CompactProfile & { placeholder?: boolean }} */
   const resolved = forAwait(handle, () => db.getProfileIncrementally(handle)) ||
@@ -95,6 +100,13 @@ function HistoryCore() {
 
       <div className='sticky-header-background'></div>
       <div className='sticky-header-background-cover'></div>
+
+      {
+        post ? undefined :
+          <div className='history-search-bar'>
+            <SearchIcon className='history-search-icon' />
+          </div>
+      }
 
       <PreFormatted
       text={resolved.description}

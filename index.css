@@ -388,6 +388,7 @@
   font-size: 2.5vh;
 }
 .landing .landing-auto-completion-area {
+  position: relative;
   grid-row: 4;
   align-self: start;
   justify-self: start;
@@ -425,9 +426,50 @@
   font-style: italic;
   border: solid 1px cornflowerblue;
   background: #ffffff85;
-  padding: 0 0.3em;
+  padding: 0.2em 0.3em;
   border-radius: 0.2em;
   margin-left: 0.4em;
+  color: #183691a8;
+}
+.landing .landing-auto-completion-area .landing-auto-completion-progress {
+  height: 0.1em;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  bottom: 0;
+  overflow: hidden;
+  transition: color 0.5s;
+}
+.landing .landing-auto-completion-area .landing-auto-completion-progress.landing-auto-completion-progress-profile {
+  color: forestgreen;
+}
+.landing .landing-auto-completion-area .landing-auto-completion-progress.landing-auto-completion-progress-post {
+  color: tomato;
+}
+.landing .landing-auto-completion-area .landing-auto-completion-progress-post.landing-auto-completion-progress.landing-auto-completion-progress-profile {
+  color: cornflowerblue;
+}
+.landing .landing-auto-completion-area .landing-auto-completion-progress:before {
+  content: " ";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(
+      to right,
+      transparent,
+      currentColor 15%,
+      transparent 30%);
+  animation: 2s linear infinite alternate bounce;
+}
+@keyframes bounce {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(70%);
+  }
 }
 .landing .landing-bottom-bar {
   grid-row: 5;
@@ -664,6 +706,15 @@ html.account body {
   grid-row: 5;
   grid-column: 1 / 3;
   overflow-wrap: anywhere;
+}
+.history-view .history-search-bar {
+  position: absolute;
+  top: 14vmax;
+  right: 1em;
+  z-index: 10;
+}
+.history-view .history-search-bar .history-search-icon {
+  color: white;
 }
 @media (min-aspect-ratio: 5.5/5) {
   .history-view {

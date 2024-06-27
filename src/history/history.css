@@ -165,6 +165,17 @@ html.account body {
   overflow-wrap: anywhere;
 }
 
+.history-view .history-search-bar {
+  position: absolute;
+  top: 14vmax;
+  right: 1em;
+  z-index: 10;
+}
+
+.history-view .history-search-bar .history-search-icon {
+  color: white;
+}
+
 @media (min-aspect-ratio: 5.5/5) {
   .history-view {
     grid-template-rows: 10rem 5.5rem 5.5rem auto 1fr;
