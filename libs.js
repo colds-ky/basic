@@ -41834,7 +41834,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.19";
+	var version = "0.2.20";
 
 	// @ts-check
 
@@ -50086,11 +50086,13 @@ if (cid) {
 	      map.set(post.uri, post);
 	    }
 	    for (const uncachedPost of outstandingPostUpdatesInProgressByURI.values()) {
+	      if (shortDID && uncachedPost.shortDID !== shortDID) continue;
 	      if (uncachedPost.words?.some(wordMatcher)) {
 	        map.set(uncachedPost.uri, uncachedPost);
 	      }
 	    }
 	    for (const uncachedPost of outstandingPostUpdatesByURI.values()) {
+	      if (shortDID && uncachedPost.shortDID !== shortDID) continue;
 	      if (uncachedPost.words?.some(wordMatcher)) {
 	        map.set(uncachedPost.uri, uncachedPost);
 	      }
@@ -50360,10 +50362,18 @@ if (cid) {
 	    if (likelyDID(didOrHandle)) {
 	      profileRemotePromise = agent_getProfile_throttled(unwrapShortDID(didOrHandle));
 	    } else {
-	      profileRemotePromise = agent_resolveHandle_throttled(unwrapShortHandle(didOrHandle)).then(rec => {
+	      const resolveHandlePromise = agent_resolveHandle_throttled(unwrapShortHandle(didOrHandle));
+	      if (isPromise(resolveHandlePromise)) {
+	        profileRemotePromise = (async () => {
+	          const rec = await resolveHandlePromise;
+	          const shortDID = shortenDID(rec.data.did);
+	          return agent_getProfile_throttled(unwrapShortDID(shortDID));
+	        })();
+	      } else {
+	        const rec = resolveHandlePromise;
 	        const shortDID = shortenDID(rec.data.did);
-	        return agent_getProfile_throttled(unwrapShortDID(shortDID));
-	      });
+	        profileRemotePromise = agent_getProfile_throttled(unwrapShortDID(shortDID));
+	      }
 	    }
 	    const profileLocal = await dbStore.getProfile(didOrHandle);
 	    if (profileLocal) yield profileLocal;
