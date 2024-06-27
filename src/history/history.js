@@ -1,6 +1,5 @@
 // @ts-check
 
-import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -9,9 +8,7 @@ import { likelyDID, makeFeedUri, shortenDID } from '../../coldsky/lib';
 import { forAwait } from '../../coldsky/src/api/forAwait';
 import { overlayAvatar, replaceIcon } from '../icon-inject';
 import { localise } from '../localise';
-import { FullHandle } from '../widgets/account/full-handle';
 import { Thread } from '../widgets/post/thread';
-import { PreFormatted } from '../widgets/preformatted';
 import { HistoryLayout } from './history-layout';
 import { HistoryPageDecorations } from './history-page-decorations';
 import { Timeline } from './timeline';
