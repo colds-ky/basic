@@ -2,7 +2,7 @@
 /// <reference path="../types.d.ts" />
 
 import React, { useEffect, useState } from 'react';
-import { isPromise } from '../api';
+import { isPromise } from '../../lib';
 
 /**
  * @template {any} TFrom
@@ -88,11 +88,14 @@ class AwaitState {
   effectMount = () => {
     if (this.repalcedWith) return this.repalcedWith.effectMount();
     this.nudgeContinuationFromHook();
+    return this.effectUnmount;
   };
 
   effectUnmount = () => {
     if (this.repalcedWith) return this.repalcedWith.effectUnmount();
     // TODO: freeze any pending continuation
+    this.run.finished = true;
+    this.finishExistingIteration();
   };
 
   /**

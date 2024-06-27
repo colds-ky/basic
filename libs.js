@@ -39518,24 +39518,25 @@ function multikeyMap() {
 var BSKY_SOCIAL_URL = "https://bsky.social/";
 var BSKY_NETWORK_URL = "https://bsky.network/";
 var ColdskyAgent = class extends import_api.BskyAgent {
-  /** @param {Omit<ConstructorParameters<typeof BskyAgent>[0], 'service'>} args */
+  /** @param {ColdskyAgentOptions} args */
   constructor(args) {
     var _a2, _b;
     super(__spreadProps(__spreadValues({}, args), {
       // most of methods work fine on bsky.social
-      service: BSKY_SOCIAL_URL
+      service: args.service ? args.service : BSKY_SOCIAL_URL
     }));
     for (const key in this.com.atproto) {
       const ns = this.com.atproto[key];
       const baseClient = (_b = (_a2 = ns._service) == null ? void 0 : _a2.xrpc) == null ? void 0 : _b.baseClient;
       if (baseClient)
-        this.patchBaseClient(baseClient);
+        this.patchBaseClient(baseClient, !!args.service);
     }
   }
   /**
-   * @param {typeof this.com.atproto.sync._service.xrpc.baseClient} baseClient 
+   * @param {typeof this.com.atproto.sync._service.xrpc.baseClient} baseClient
+   * @param {boolean} [serviceDefined] 
    */
-  patchBaseClient(baseClient) {
+  patchBaseClient(baseClient, serviceDefined) {
     baseClient.lex.assertValidXrpcOutput = function(lexUri, value, ...rest) {
       return true;
     };
@@ -39544,17 +39545,17 @@ var ColdskyAgent = class extends import_api.BskyAgent {
       baseClient.fetch._patchedFetch
     )
       return;
-    baseClient.fetch = overrideFetch(baseClient.fetch.bind(baseClient));
+    baseClient.fetch = overrideFetch(baseClient.fetch.bind(baseClient), serviceDefined);
   }
 };
 var typedCaches = {};
-function overrideFetch(baseFetch) {
+function overrideFetch(baseFetch, serviceDefined) {
   if (baseFetch._patchedFetch)
     return baseFetch;
   fetchOverride._patchedFetch = true;
   return fetchOverride;
   function fetchOverride(httpUri, httpMethod, httpHeaders, httpReqBody) {
-    const useBskyNetwork = httpUri.indexOf("com.atproto.sync.listRepos") >= 0;
+    const useBskyNetwork = !serviceDefined && httpUri.indexOf("com.atproto.sync.listRepos") >= 0;
     const useHttpUri = useBskyNetwork ? "https://corsproxy.io/?" + httpUri.replace(BSKY_SOCIAL_URL, BSKY_NETWORK_URL) : httpUri;
     const qPos = useHttpUri.indexOf("?");
     const httpUriKey = qPos >= 0 ? useHttpUri.slice(0, qPos) : useHttpUri;
@@ -45150,7 +45151,7 @@ function ensureCborXExtended() {
 }
 
 // package.json
-var version4 = "0.1.14";
+var version4 = "0.1.16";
 
 // lib/firehose-short-dids.js
 function firehoseShortDIDs(filterShortDIDs) {
@@ -45260,12 +45261,15 @@ function firehoseShortDIDs(filterShortDIDs) {
 function streamBuffer(callback) {
   return __asyncGenerator(this, null, function* () {
     let finallyTrigger = () => {
+      args.isEnded = true;
     };
     let stop = false;
     let buffer2;
     let continueTrigger = () => {
     };
-    let continuePromise = new Promise((resolve) => continueTrigger = resolve);
+    let continuePromise = new Promise((resolve) => continueTrigger = function continueTriggerInitiallySet() {
+      resolve();
+    });
     let yieldPassedTrigger = () => {
     };
     let yieldPassedPromise = new Promise((resolve) => yieldPassedTrigger = resolve);
@@ -45275,7 +45279,12 @@ function streamBuffer(callback) {
       reject,
       complete,
       isEnded: false,
-      finally: new Promise((resolve) => finallyTrigger = resolve)
+      finally: new Promise((resolve) => {
+        finallyTrigger = () => {
+          args.isEnded = true;
+          resolve();
+        };
+      })
     };
     callback(args);
     try {
@@ -45285,7 +45294,9 @@ function streamBuffer(callback) {
           throw rejectError.error;
         if (stop)
           return;
-        continuePromise = new Promise((resolve) => continueTrigger = resolve);
+        continuePromise = new Promise((resolve) => continueTrigger = function continueTriggerSubsequentlySet() {
+          resolve();
+        });
         const yieldBuffer = buffer2;
         buffer2 = void 0;
         if (yieldBuffer) {

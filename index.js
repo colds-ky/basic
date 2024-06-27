@@ -330,12 +330,15 @@
   function streamBuffer(callback) {
     return __asyncGenerator(this, null, function* () {
       let finallyTrigger = () => {
+        args.isEnded = true;
       };
       let stop = false;
       let buffer;
       let continueTrigger = () => {
       };
-      let continuePromise = new Promise((resolve) => continueTrigger = resolve);
+      let continuePromise = new Promise((resolve) => continueTrigger = function continueTriggerInitiallySet() {
+        resolve();
+      });
       let yieldPassedTrigger = () => {
       };
       let yieldPassedPromise = new Promise((resolve) => yieldPassedTrigger = resolve);
@@ -345,7 +348,12 @@
         reject,
         complete,
         isEnded: false,
-        finally: new Promise((resolve) => finallyTrigger = resolve)
+        finally: new Promise((resolve) => {
+          finallyTrigger = () => {
+            args.isEnded = true;
+            resolve();
+          };
+        })
       };
       callback(args);
       try {
@@ -355,7 +363,9 @@
             throw rejectError.error;
           if (stop)
             return;
-          continuePromise = new Promise((resolve) => continueTrigger = resolve);
+          continuePromise = new Promise((resolve) => continueTrigger = function continueTriggerSubsequentlySet() {
+            resolve();
+          });
           const yieldBuffer = buffer;
           buffer = void 0;
           if (yieldBuffer) {

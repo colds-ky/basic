@@ -20,7 +20,7 @@
  */
 export async function* streamBuffer(callback) {
 
-  let finallyTrigger = () => { };
+  let finallyTrigger = () => { args.isEnded = true; };
   let stop = false;
 
   /** @type {TBuffer | undefined} */
@@ -43,7 +43,12 @@ export async function* streamBuffer(callback) {
     reject,
     complete,
     isEnded: false,
-    finally: new Promise(resolve => finallyTrigger = resolve)
+    finally: new Promise(resolve => {
+      finallyTrigger = () => {
+        args.isEnded = true;
+        resolve();
+      };
+    })
   };
 
   callback(args);
