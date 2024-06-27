@@ -4,13 +4,9 @@ import React from "react";
 
 import "./fun-background.css";
 import { calcHash, firehoseThreads, nextRandom } from "../api";
-import { FavoriteBorder } from "@mui/icons-material";
 import { forAwait } from "../../coldsky/src/api/forAwait";
-import { AccountLabel } from "../widgets/account";
 import { useNavigate } from "react-router-dom";
 import { useDB } from "..";
-import { makeFeedUri } from "../../coldsky/lib";
-import { PreFormatted } from "../widgets/preformatted";
 import { Post } from "../widgets/post/post";
 
 const POST_DEBOUNCE_MSEC = 5000;
@@ -23,14 +19,16 @@ export function FunBackground() {
 
   return (
     <div className="fun-background">
-      <div className="fun-background-scroller">
-        {bestThreads &&
-          bestThreads.map((thread, i) => (
-            <ThreadBubble
-              key={thread?.current?.uri || "undefined"}
-              thread={thread}
-            />
-          ))}
+      <div className="fun-background-padding">
+        <div className="fun-background-scroller">
+          {bestThreads &&
+            bestThreads.map((thread, i) => (
+              <ThreadBubble
+                key={thread?.current?.uri || "undefined"}
+                thread={thread}
+              />
+            ))}
+        </div>
       </div>
     </div>
   );
@@ -118,8 +116,6 @@ function ThreadBubble({ thread }) {
   rnd = nextRandom(rnd);
 
   const left = rnd * 80 - 2;
-
-  const navigate = useNavigate();
 
   return (
     <div

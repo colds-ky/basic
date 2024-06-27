@@ -3,6 +3,12 @@
   left: 0; top: 0;
   width: 100%; height: 100%;
   z-index: -1;
+  padding-right: 6vh;
+}
+
+.fun-background-padding {
+  position: relative;
+  height: 100%;
 }
 
 .fun-background .fun-background-scroller {

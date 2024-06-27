@@ -6,6 +6,11 @@
   width: 100%;
   height: 100%;
   z-index: -1;
+  padding-right: 6vh;
+}
+.fun-background-padding {
+  position: relative;
+  height: 100%;
 }
 .fun-background .fun-background-scroller {
   position: absolute;
@@ -67,66 +72,6 @@
   to {
     transform: rotate(-8deg);
   }
-}
-
-/* src/widgets/account/full-handle.css */
-
-/* src/widgets/account/account-label.css */
-a.account-label.account-handle {
-  color: inherit;
-  text-decoration: none;
-}
-.account-label a.account-handle {
-  color: inherit;
-  text-decoration: none;
-}
-.account-label .handle-bsky-social-suffix {
-  display: inline-block;
-  zoom: 0.7;
-  transform: scaleY(1.43) translateY(0.08em);
-  transform-origin: bottom;
-  opacity: 0.6;
-}
-.account-label .handle-bsky-social-suffix-dot {
-  opacity: 0.6;
-  padding-left: 0.05em;
-  padding-right: 0.1em;
-}
-.account-label .account-avatar {
-  background: no-repeat center center;
-  background-size: cover;
-  color: transparent;
-  border-radius: 200%;
-  display: inline-block;
-  width: 1.5em;
-  height: 1.5em;
-  margin-right: 0.25em;
-  top: -0.2em;
-  margin-bottom: -0.25em;
-  position: relative;
-}
-.account-label .account-avatar.account-avatar-at-sign {
-  color: #7fa9f4;
-  display: inline-grid;
-  align-items: center;
-  justify-items: center;
-  transform: scale(1.2);
-}
-.account-label .handle-main-text {
-  color: #365ca1;
-}
-.account-label .handle-tld-suffix {
-  color: #123a82;
-  text-shadow: 0 0 1px #00389d;
-}
-.account-label .handle-bsky-social-suffix {
-  color: #365ca1;
-}
-.account-label .handle-bsky-social-suffix-dot {
-  color: #365ca1;
-}
-.account-label .account-label-display-name {
-  padding-left: 0.3em;
 }
 
 /* src/widgets/account/account-chip.css */
@@ -191,6 +136,66 @@ a.account-label.account-handle {
       #ffcd70,
       transparent 0.6em);
   border-radius: 0.2em;
+}
+
+/* src/widgets/account/full-handle.css */
+
+/* src/widgets/account/account-label.css */
+a.account-label.account-handle {
+  color: inherit;
+  text-decoration: none;
+}
+.account-label a.account-handle {
+  color: inherit;
+  text-decoration: none;
+}
+.account-label .handle-bsky-social-suffix {
+  display: inline-block;
+  zoom: 0.7;
+  transform: scaleY(1.43) translateY(0.08em);
+  transform-origin: bottom;
+  opacity: 0.6;
+}
+.account-label .handle-bsky-social-suffix-dot {
+  opacity: 0.6;
+  padding-left: 0.05em;
+  padding-right: 0.1em;
+}
+.account-label .account-avatar {
+  background: no-repeat center center;
+  background-size: cover;
+  color: transparent;
+  border-radius: 200%;
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  margin-right: 0.25em;
+  top: -0.2em;
+  margin-bottom: -0.25em;
+  position: relative;
+}
+.account-label .account-avatar.account-avatar-at-sign {
+  color: #7fa9f4;
+  display: inline-grid;
+  align-items: center;
+  justify-items: center;
+  transform: scale(1.2);
+}
+.account-label .handle-main-text {
+  color: #365ca1;
+}
+.account-label .handle-tld-suffix {
+  color: #123a82;
+  text-shadow: 0 0 1px #00389d;
+}
+.account-label .handle-bsky-social-suffix {
+  color: #365ca1;
+}
+.account-label .handle-bsky-social-suffix-dot {
+  color: #365ca1;
+}
+.account-label .account-label-display-name {
+  padding-left: 0.3em;
 }
 
 /* src/widgets/post/post.css */
