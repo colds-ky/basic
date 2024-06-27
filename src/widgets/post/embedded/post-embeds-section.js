@@ -12,12 +12,14 @@ import { EmbedQuotePostMultiple } from './embed-quote-post';
 /**
  * @param {{
  *  post: import('../../../../coldsky/lib').CompactPost,
+ *  linkTimestamp?: boolean,
+ *  linkAuthor?: boolean,
  *  compact?: boolean,
  *  matches?: import('../post').MatchCompactPost['matches'],
  *  allowEmbedDepth?: number
  * }} _
  */
-export function PostEmbedsSection({ compact, post, allowEmbedDepth }) {
+export function PostEmbedsSection({ compact, post, linkTimestamp, linkAuthor, allowEmbedDepth }) {
   if (!post.embeds?.length) return null;
 
   const posts = [];
@@ -71,6 +73,8 @@ export function PostEmbedsSection({ compact, post, allowEmbedDepth }) {
               compact={compact}
               parentPost={post}
               posts={/** @type {string[]} */(posts.map(entry => entry.embed?.url).filter(Boolean))}
+              linkTimestamp={linkTimestamp}
+              linkAuthor={linkAuthor}
               allowEmbedDepth={allowEmbedDepth}
             />
       }

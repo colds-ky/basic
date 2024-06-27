@@ -173,6 +173,8 @@ export function CompletePostContent({
       <PostEmbedsSection
         post={post}
         compact={compact}
+        linkTimestamp={linkTimestamp}
+        linkAuthor={linkAuthor}
         allowEmbedDepth={allowEmbedDepth}
         matches={post.matches}
       />

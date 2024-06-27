@@ -9,6 +9,8 @@ import { Post } from '../post';
  *  className?: string,
  *  parentPost: import('../../../../coldsky/lib').CompactPost,
  *  post: import('../../../../coldsky/lib').CompactPost | string,
+ *  linkTimestamp?: boolean,
+ *  linkAuthor?: boolean,
  *  compact?: boolean,
  *  allowEmbedDepth?: number
  * }} _
@@ -31,6 +33,8 @@ export function EmbedQuotePost({ className, parentPost, post, ...rest }) {
  *  className?: string,
  *  parentPost: import('../../../../coldsky/lib').CompactPost,
  *  posts: (import('../../../../coldsky/lib').CompactPost | string)[],
+ *  linkTimestamp?: boolean,
+ *  linkAuthor?: boolean,
  *  compact?: boolean,
  *  allowEmbedDepth?: number
  * }} _

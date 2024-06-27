@@ -6,7 +6,7 @@ import { Link, useNavigate, useMatch, useMatches } from 'react-router-dom';
 import { FormatTime } from '../format-time';
 import { useDB } from '../..';
 import { forAwait } from '../../../coldsky/src/api/forAwait';
-import { breakFeedURIPostOnly, breakPostURL } from '../../../coldsky/lib';
+import { breakFeedURIPostOnly, breakPostURL, makeBskyPostURL, unwrapShortHandle } from '../../../coldsky/lib';
 
 /**
  * @param {{
@@ -21,37 +21,35 @@ export function PostTimestamp({ className, post, since, linkTimestamp }) {
 
  if (!linkTimestamp) return <FormatTime className='post-date' time={post.asOf} />;
 
- const db = useDB();
- const profile = forAwait(post.shortDID, () => db.getProfileIncrementally(post.shortDID));
-
-  const parsedURI = breakFeedURIPostOnly(post.uri);
-  let aggregateClassName = className ? 'post-date ' + className : 'post-date';
+  let combinedClassName = className ? 'post-date ' + className : 'post-date';
   if (post.asOf && since && post.asOf - since >= 0 && post.asOf - since < 1000 * 60 * 20)
-    aggregateClassName += ' post-date-new';
+    combinedClassName += ' post-date-new';
 
  return (
-   <Link
-     className={aggregateClassName}
-     to={
-       '/' + (profile?.handle || parsedURI?.shortDID) +
-       '/' + parsedURI?.postID}>
+   <PostLink
+     className={combinedClassName}
+     postURI={post.uri}>
      <FormatTime since={since} time={post.asOf} />
-   </Link>
+   </PostLink>
  );
 }
 
 /**
  * @param {{
- *  postURI: string | { postID: string, shortDID: string } | null | undefined
+ *  className?: string,
+ *  postURI: string | { postID: string, shortDID: string } | null | undefined,
+ *  children?: React.ReactNode
  * }} _
  */
-export function PostLink({ postURI }) {
+export function PostLink({ className, postURI, children, ...rest }) {
   const navigate = useNavigate();
-
   const parsedURI =
     typeof postURI === 'string' ?
       breakFeedURIPostOnly(postURI) || breakPostURL(postURI) :
       postURI;
+
+  const db = useDB();
+  const profile = forAwait(parsedURI?.shortDID, () => parsedURI && db.getProfileIncrementally(parsedURI?.shortDID));
 
   let localURL;
   let bskyURL;
@@ -59,10 +57,33 @@ export function PostLink({ postURI }) {
   if (parsedURI) {
     // const matches = useMatches();
     // matches[0].
-    localURL = '/' + parsedURI.shortDID + '/' + parsedURI.postID;
-    bskyURL = '/' + parsedURI.shortDID + '/' + parsedURI.postID;
+    localURL = '/' + (unwrapShortHandle(profile?.handle) || parsedURI.shortDID) + '/' + parsedURI.postID;
+    bskyURL = makeBskyPostURL(parsedURI.shortDID, parsedURI.postID);
+  } else {
+    localURL = '';
+    bskyURL = String(postURI);
   }
 
+  const combinedClassName = className ?
+    'post-link ' + className :
+    'post-link';
 
+  return (
+    <a
+      {...rest}
+      className={combinedClassName}
+      href={bskyURL}
+      onClick={handleClick}>
+      {children}
+    </a>
+  );
+
+  /** @param {React.MouseEvent} event */
+  function handleClick(event) {
+    if (localURL) {
+      event.preventDefault();
+      navigate(localURL);
+    }
+  }
 
 }

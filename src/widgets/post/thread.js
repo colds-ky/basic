@@ -12,6 +12,7 @@ import { threadStructure } from './thread-structure';
 import './thread.css';
 import { ThreadConversationView } from './thread-coversation-view';
 import { ThreadForumView } from './thread-forum-view';
+import { useMatches } from 'react-router-dom';
 
 /**
  * @param {{
@@ -60,6 +61,10 @@ export function ThreadView({
   linkAuthor,
   ...rest
 }) {
+
+  const matches = useMatches();
+  console.log('thread ', significantPost, thread, matches);
+
 
   const threadBranch = useMemo(() =>
     thread && threadStructure(thread, significantPost),
