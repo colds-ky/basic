@@ -35,7 +35,7 @@ export function threadStructure(thread, isSignificantPost) {
     isConversationReply: false,
     isSignificant: true,
     isParentOfSignificant: false,
-    significantPostCount: 1,
+    significantPostCount: 0,
     children: undefined,
     conversationDirection: undefined,
     insignificants: undefined,
@@ -96,7 +96,7 @@ export function threadStructure(thread, isSignificantPost) {
       isConversationReply: false,
       isSignificant: isSignificant,
       isParentOfSignificant: allocatedParent.isSignificant,
-      significantPostCount: isSignificant ? 1 : 0,
+      significantPostCount: 0,
       children: undefined,
       conversationDirection: undefined,
       insignificants: undefined,
@@ -125,17 +125,11 @@ export function threadStructure(thread, isSignificantPost) {
     if (!parent.children) parent.children = [child];
     else parent.children.push(child);
 
-    parent.branchPostCount += child.branchPostCount;
-    parent.branchInterestWeight += child.branchInterestWeight;
-    parent.maxBranchDepth = Math.max(
-      parent.maxBranchDepth,
-      child.maxBranchDepth + 1);
-
-    let ancestor = allocatedById.get(parent.post.uri) || root;
-    let descendant = parent;
+    let ancestor = parent;
+    let descendant = child;
     while (ancestor !== descendant) {
-      ancestor.branchPostCount += child.branchPostCount;
-      ancestor.significantPostCount += child.isSignificant ? 1 : 0;
+      ancestor.branchPostCount = 0;
+      ancestor.significantPostCount = 0;
 
       ancestor.maxBranchDepth = Math.max(
         ancestor.maxBranchDepth,
@@ -146,7 +140,11 @@ export function threadStructure(thread, isSignificantPost) {
       ancestor.maxSignificantBranchDepth = 0;
       ancestor.maxDirectSignificantBranchDepth = 0;
       for (const ancestorChild of /** @type {ThreadBranch[]} */(ancestor.children)) {
+        ancestor.branchPostCount += ancestorChild.branchPostCount + 1;
+        ancestor.significantPostCount += ancestorChild.significantPostCount;
+
         if (ancestorChild.isSignificant) {
+          ancestor.significantPostCount++;
           ancestor.isParentOfSignificant = true;
           ancestor.maxDirectSignificantBranchDepth = Math.max(
             ancestor.maxDirectSignificantBranchDepth,
@@ -158,7 +156,7 @@ export function threadStructure(thread, isSignificantPost) {
           ancestor.branchInterestWeight += ancestorChild.branchInterestWeight;
         }
 
-        if (ancestorChild.significantPostCount) {
+        if (ancestorChild.significantPostCount || ancestorChild.isSignificant) {
           ancestor.maxSignificantBranchDepth = Math.max(
             ancestor.maxSignificantBranchDepth,
             ancestorChild.maxSignificantBranchDepth + 1);

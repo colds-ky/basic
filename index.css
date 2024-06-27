@@ -626,6 +626,15 @@
   position: relative;
   margin-right: -0.4em;
 }
+.thread-conversation-view .post-date.post-timestamp-small-note {
+  float: right;
+  opacity: 0.5;
+  color: inherit;
+  text-decoration: none;
+}
+.thread-conversation-view .post-date.post-timestamp-small-note:hover {
+  text-decoration: underline;
+}
 
 /* src/history/history-layout.css */
 .history-layout {
@@ -903,6 +912,10 @@
   margin-bottom: 1.3em;
 }
 .timeline-container > .sub-thread {
+  margin-top: 1.6em;
+}
+.timeline-container > .post-frame-outer {
+  margin-left: 1em;
   margin-top: 1.6em;
 }
 .timeline-container .sub-thread {

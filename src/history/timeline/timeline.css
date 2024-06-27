@@ -7,6 +7,11 @@
   margin-top: 1.6em;
 }
 
+.timeline-container > .post-frame-outer {
+  margin-left: 1em;
+  margin-top: 1.6em;
+}
+
 .timeline-container .sub-thread {
   padding-left: 1em;
 }

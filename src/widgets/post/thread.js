@@ -56,6 +56,36 @@ export function ThreadView({ className, significantPost, thread, underPrevious, 
     [thread, significantPost]);
 
   console.log('thread structure ', thread.root.uri, thread.root.text, threadBranch, ' layout ', root);
+  if (!threadBranch.significantPostCount) {
+    return (
+      <PostFrame className={className}>
+        <CompletePostContent
+          post={thread.root}
+          linkTimestamp={linkTimestamp}
+          linkAuthor={linkAuthor}
+        />
+        <InsignificantExpandableMarkers branches={threadBranch?.insignificants || []} />
+      </PostFrame>
+    );
+  } else if (threadBranch.conversationDirection) {
+    return (
+      <ThreadConversationView
+        className={className}
+        conversationDirection={threadBranch}
+        linkTimestamp={linkTimestamp}
+        linkAuthor={linkAuthor}
+      />
+    );
+  } else {
+    return (
+      <ThreadForumView
+        className={className}
+        parent={threadBranch}
+        linkTimestamp={linkTimestamp}
+        linkAuthor={linkAuthor}
+      />
+    );
+  }
 
 
   return (
@@ -79,7 +109,12 @@ export function ThreadView({ className, significantPost, thread, underPrevious, 
  *  linkAuthor?: boolean
  * }} _
  */
-export function ThreadConversationView({ className, conversationDirection, linkTimestamp, linkAuthor }) {
+export function ThreadConversationView({
+  className,
+  conversationDirection,
+  linkTimestamp,
+  linkAuthor
+}) {
   const conversationSegments = [];
   let prevPost = conversationDirection.post;
   conversationSegments.push(
@@ -134,9 +169,9 @@ export function ThreadConversationView({ className, conversationDirection, linkT
       if (prevConvo.isSignificant && prevConvo.significantPostCount && prevConvo.conversationDirection) {
         conversationSegments.push(
           <CompletePostContent
-            key={'conversation:' + prevConvo.post.uri}
+            key={'conversation:' + prevConvo.conversationDirection.post.uri}
             className='conversation'
-            post={prevConvo.post}
+            post={prevConvo.conversationDirection.post}
             linkTimestamp={linkTimestamp}
             linkAuthor={linkAuthor}
             suppressAuthor={suppressAuthor}
@@ -149,9 +184,21 @@ export function ThreadConversationView({ className, conversationDirection, linkT
   }
 
   return (
-    <PostFrame className={className}>
+    <PostFrame className={'thread-conversation-view ' + (className || '')}>
       {conversationSegments}
     </PostFrame>
+  );
+}
+
+export function ThreadForumView({
+  className,
+  parent,
+  linkTimestamp,
+  linkAuthor
+}) {
+  return (
+    <AsidesInterjection
+      branches={parent.asides || parent.children} />
   );
 }
 
@@ -182,7 +229,11 @@ function InsignificantExpandableMarkers({ branches }) {
  */
 function AsidesInterjection({ branches }) {
   const asideSegments = [];
-  let bendyLineInsignificants = [];
+  /** @type {import('./thread-structure').ThreadBranch[] | undefined} */
+  let bendyLineInsignificants;
+  collectAsides(branches);
+
+  if (!asideSegments.length) return null;
 
   return (
     <div className='aside-interjection-section'>
@@ -190,22 +241,45 @@ function AsidesInterjection({ branches }) {
     </div>
   );
 
+  /** @param {import('./thread-structure').ThreadBranch[] | undefined} branches */
   function collectAsides(branches) {
+    if (!branches?.length) return;
     for (const br of branches) {
       if (br.isSignificant) {
-
+        asideSegments.push(
+          <AsidePost
+            key={br.post.uri}
+            leading={bendyLineInsignificants}
+            branch={br}
+          />
+        );
+        bendyLineInsignificants = undefined;
+      } else {
+        if (!bendyLineInsignificants) bendyLineInsignificants = [br];
+        else bendyLineInsignificants.push(br);
       }
     }
   }
 }
 
-const MAX_AVATAR_DISPLAY = 3;
+function AsidePost({ leading, branch }) {
+  return (
+    <div className='aside-post-dummy-work-in-progress'>
+      <PostFrame>
+        <CompletePostContent
+          post={branch.post} />
+      </PostFrame>
+    </div>
+  );
+}
 
 /** 
  * @param {import('./thread-structure').ThreadBranch[] | undefined} branches
  * @param {string[]} [shortDIDs]
  */
 function collectReplyAvatars(branches, shortDIDs) {
+  const MAX_AVATAR_DISPLAY = 3;
+
   if (!branches) return shortDIDs;
   if (!shortDIDs) shortDIDs = [];
   for (const br of branches) {
