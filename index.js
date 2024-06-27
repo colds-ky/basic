@@ -98463,8 +98463,10 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
 
   // src/api/record-cache.js
   var db = new import_wrapper_default("atproto-cache");
-  db.version(5).stores({
-    records: "uri, did, cid, time, *w",
+  db.version(9).stores({
+    records: "uri, did, cid, time, thread, reply, qt, *w",
+    likes: "did, uri, time",
+    reposts: "did, uri, time",
     accounts: "did, handle, *w"
   });
   var publicAgent = new ColdskyAgent({
@@ -98621,8 +98623,10 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     debounceAccountsToStoreInCache = setTimeout(cacheAccountsNow, 300);
   }
   var postsToStoreInCacheByURI = /* @__PURE__ */ new Map();
-  var debouncePostsToStoreInCache = 0;
-  var maxDebouncePostsToStoreInCache = 0;
+  var likesToStoreInCacheByShortDIDAndURI = /* @__PURE__ */ new Map();
+  var repostsToStoreInCacheByShortDIDAndURI = /* @__PURE__ */ new Map();
+  var debounceStoreTimeout = 0;
+  var maxDebounceStoreTimeout = 0;
   function storePostIndexToCache(post) {
     const existing = postsToStoreInCacheByURI.get(post.uri);
     let shouldStore = !existing;
@@ -98637,35 +98641,92 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     if (!shouldStore)
       return;
     postsToStoreInCacheByURI.set(post.uri, post);
-    if (!maxDebouncePostsToStoreInCache)
-      maxDebouncePostsToStoreInCache = setTimeout(cachePostsNow, 3100);
-    clearTimeout(debouncePostsToStoreInCache);
-    debouncePostsToStoreInCache = setTimeout(cachePostsNow, 300);
+    queueStoreEvent();
   }
-  function cachePostsNow() {
-    clearTimeout(maxDebouncePostsToStoreInCache);
-    maxDebouncePostsToStoreInCache = 0;
-    clearTimeout(debouncePostsToStoreInCache);
-    debouncePostsToStoreInCache = 0;
+  function storeLikeToCache(did, uri, time) {
+    const shortDID = shortenDID(did);
+    let likesByDid = likesToStoreInCacheByShortDIDAndURI.get(shortDID);
+    if (!likesByDid)
+      likesToStoreInCacheByShortDIDAndURI.set(shortDID, likesByDid = /* @__PURE__ */ new Map());
+    likesByDid.set(uri, time);
+    queueStoreEvent();
+  }
+  function storeRepostToCache(did, uri, time) {
+    const shortDID = shortenDID(did);
+    let repostsByDid = repostsToStoreInCacheByShortDIDAndURI.get(shortDID);
+    if (!repostsByDid)
+      repostsToStoreInCacheByShortDIDAndURI.set(shortDID, repostsByDid = /* @__PURE__ */ new Map());
+    repostsByDid.set(uri, time);
+    queueStoreEvent();
+  }
+  function queueStoreEvent() {
+    if (!maxDebounceStoreTimeout)
+      maxDebounceStoreTimeout = /** @type {*} */
+      setTimeout(storeToCacheNow, 3100);
+    clearTimeout(debounceStoreTimeout);
+    debounceStoreTimeout = /** @type {*} */
+    setTimeout(storeToCacheNow, 300);
+  }
+  function storeToCacheNow() {
+    clearTimeout(maxDebounceStoreTimeout);
+    maxDebounceStoreTimeout = 0;
+    clearTimeout(debounceStoreTimeout);
+    debounceStoreTimeout = 0;
     const posts = Array.from(postsToStoreInCacheByURI.values()).map((p) => {
+      var _a3, _b, _c, _d, _e, _f;
+      const rec = (
+        /** @type {import('@atproto/api').AppBskyFeedPost.Record} */
+        p.record
+      );
       const wordLeads = [];
-      const text = collectPostText(p.record, []);
+      const text = collectPostText(rec, []);
       for (const textChunk of text) {
         populateWordLeads(textChunk, wordLeads);
+      }
+      let thread = (_b = (_a3 = rec.reply) == null ? void 0 : _a3.root) == null ? void 0 : _b.uri;
+      let reply = (_d = (_c = rec.reply) == null ? void 0 : _c.parent) == null ? void 0 : _d.uri;
+      let qt;
+      if (((_e = rec.embed) == null ? void 0 : _e.$type) === "app.bsky.embed.record") {
+        qt = /** @type {import('@atproto/api').AppBskyEmbedRecord.Main} */
+        (_f = rec.embed.record) == null ? void 0 : _f.uri;
       }
       return {
         uri: p.uri,
         did: p.author.did,
         cid: p.cid,
-        time: p.record.createdAt && new Date(p.record.createdAt).getTime(),
+        time: rec.createdAt && new Date(rec.createdAt).getTime(),
         text,
+        thread,
+        reply,
+        qt,
         w: wordLeads
       };
     });
+    const [likes, reposts] = [likesToStoreInCacheByShortDIDAndURI, repostsToStoreInCacheByShortDIDAndURI].map((map) => {
+      return Array.from(map.entries()).map(([shortDID, byURI]) => {
+        return Array.from(byURI.entries()).map(([uri, time]) => {
+          return {
+            did: shortDID,
+            uri,
+            time
+          };
+        });
+      }).flat();
+    });
     postsToStoreInCacheByURI.clear();
+    likesToStoreInCacheByShortDIDAndURI.clear();
+    repostsToStoreInCacheByShortDIDAndURI.clear();
     if (posts.length) {
       db.records.bulkPut(posts);
       console.log("adding records ", posts.length, " to cache ", posts);
+    }
+    if (likes.length) {
+      db.likes.bulkPut(likes);
+      console.log("adding likes ", likes.length, " to cache ", likes);
+    }
+    if (reposts.length) {
+      db.reposts.bulkPut(reposts);
+      console.log("adding reposts ", reposts.length, " to cache ", reposts);
     }
   }
   function collectPostText(post, textArray) {
@@ -98905,6 +98966,8 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         }
         function handleLike(msg) {
           return __async(this, null, function* () {
+            var _a3;
+            storeLikeToCache(msg.repo, (_a3 = msg.subject) == null ? void 0 : _a3.uri, new Date(msg.createdAt).getTime());
             const thread = yield getPostThreadCached(msg.subject.uri);
             if (!thread || thread.blocked || thread.notFound)
               return;
@@ -98920,6 +98983,14 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           });
         }
         function handleRepost(msg) {
+          return __async(this, null, function* () {
+            var _a3;
+            storeRepostToCache(msg.repo, (_a3 = msg.subject) == null ? void 0 : _a3.uri, new Date(msg.createdAt).getTime());
+            const thread = yield getPostThreadCached(msg.subject.uri);
+            if (!thread || thread.blocked || thread.notFound)
+              return;
+            yieldThread(thread);
+          });
         }
       })
     );
@@ -99471,7 +99542,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // package.json
-  var version4 = "0.2.5";
+  var version4 = "0.2.6";
 
   // src/localise.js
   function localise(english, languageMap) {

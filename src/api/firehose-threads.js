@@ -6,7 +6,7 @@ import { firehose, ColdskyAgent } from '../../coldsky/lib';
 import { throttledAsyncCache } from '../../coldsky/lib/throttled-async-cache';
 import { streamBuffer } from '../../coldsky/src/api/akpa';
 import { BSKY_PUBLIC_URL } from '../../coldsky/lib/coldsky-agent';
-import { storeAccountToCache, storePostIndexToCache } from './record-cache';
+import { storeAccountToCache, storeLikeToCache, storePostIndexToCache, storeRepostToCache } from './record-cache';
 
 /**
  * @typedef {import('@atproto/api/dist/client/types/app/bsky/feed/defs').ThreadViewPost} ThreadViewPost
@@ -91,6 +91,8 @@ export function firehoseThreads() {
        * @param {import('../../coldsky/lib/firehose').FirehoseMessageOfType<'app.bsky.feed.like'>} msg 
        */
       async function handleLike(msg) {
+        storeLikeToCache(msg.repo, msg.subject?.uri, new Date(msg.createdAt).getTime());
+
         const thread = await getPostThreadCached(msg.subject.uri);
         if (!thread || thread.blocked || thread.notFound) return;
         yieldThread(thread);
@@ -108,8 +110,12 @@ export function firehoseThreads() {
       /**
        * @param {import('../../coldsky/lib/firehose').FirehoseMessageOfType<'app.bsky.feed.repost'>} msg 
        */
-      function handleRepost(msg) {
-        // TODO: store post, queue thread fetching
+      async function handleRepost(msg) {
+        storeRepostToCache(msg.repo, msg.subject?.uri, new Date(msg.createdAt).getTime());
+
+        const thread = await getPostThreadCached(msg.subject.uri);
+        if (!thread || thread.blocked || thread.notFound) return;
+        yieldThread(thread);
       }
 
     });

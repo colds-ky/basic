@@ -7,8 +7,10 @@ import { streamBuffer } from '../../coldsky/src/api/akpa';
 import Fuse from 'fuse.js';
 
 const db = new Dexie("atproto-cache");
-db.version(5).stores({
-  records: 'uri, did, cid, time, *w',
+db.version(9).stores({
+  records: 'uri, did, cid, time, thread, reply, qt, *w',
+  likes: 'did, uri, time',
+  reposts: 'did, uri, time',
   accounts: 'did, handle, *w'
 });
 
@@ -82,16 +84,25 @@ export async function resolveProfileViaRequest(handleOrDID) {
   return profile;
 }
 
+/**
+ * @param {string} handle
+ * @returns {Promise<ProfileViewBasic | ProfileView | undefined>}
+ */
 async function resolveHandleFromCache(handle) {
   const matchByHandle = await db.accounts.where('handle').equals(unwrapShortHandle(handle)).first();
   return matchByHandle;
 }
 
+/**
+ * @param {string} did
+ * @returns {Promise<ProfileViewBasic | ProfileView | undefined>}
+ */
 async function resolveDIDFromCache(did) {
   const matchByDID = await db.accounts.where('did').equals(unwrapShortDID(did)).first();
   return matchByDID;
 }
 
+/** @param {string} did */
 async function resolvePlcDirectly(did) {
 
   /**
@@ -260,8 +271,15 @@ export function storeAccountToCache(account) {
  * @type {Map<string, import('@atproto/api/dist/client/types/app/bsky/feed/defs').PostView>}
  */
 const postsToStoreInCacheByURI = new Map();
-let debouncePostsToStoreInCache = 0;
-let maxDebouncePostsToStoreInCache = 0;
+
+/** @type {Map<string, Map<string, number>>} */
+const likesToStoreInCacheByShortDIDAndURI = new Map();
+
+/** @type {Map<string, Map<string, number>>} */
+const repostsToStoreInCacheByShortDIDAndURI = new Map();
+
+let debounceStoreTimeout = 0;
+let maxDebounceStoreTimeout = 0;
 
 /** @param {import('@atproto/api/dist/client/types/app/bsky/feed/defs').PostView} post */
 export function storePostIndexToCache(post) {
@@ -278,46 +296,115 @@ export function storePostIndexToCache(post) {
 
   postsToStoreInCacheByURI.set(post.uri, post);
 
-  if (!maxDebouncePostsToStoreInCache)
-    maxDebouncePostsToStoreInCache = setTimeout(cachePostsNow, 3100);
-  clearTimeout(debouncePostsToStoreInCache);
-  debouncePostsToStoreInCache = setTimeout(cachePostsNow, 300);
+  queueStoreEvent();
 }
 
-function cachePostsNow() {
-  clearTimeout(maxDebouncePostsToStoreInCache);
-  maxDebouncePostsToStoreInCache = 0;
-  clearTimeout(debouncePostsToStoreInCache);
-  debouncePostsToStoreInCache = 0;
+/**
+ * @param {string} did
+ * @param {string} uri
+ * @param {number} time
+ */
+export function storeLikeToCache(did, uri, time) {
+  const shortDID = shortenDID(did);
+  let likesByDid = likesToStoreInCacheByShortDIDAndURI.get(shortDID);
+  if (!likesByDid)
+    likesToStoreInCacheByShortDIDAndURI.set(shortDID, likesByDid = new Map());
+  likesByDid.set(uri, time);
+
+  queueStoreEvent();
+}
+
+/**
+ * @param {string} did
+ * @param {string} uri
+ * @param {number} time
+ */
+export function storeRepostToCache(did, uri, time) {
+  const shortDID = shortenDID(did);
+  let repostsByDid = repostsToStoreInCacheByShortDIDAndURI.get(shortDID);
+  if (!repostsByDid)
+    repostsToStoreInCacheByShortDIDAndURI.set(shortDID, repostsByDid = new Map());
+  repostsByDid.set(uri, time);
+
+  queueStoreEvent();
+}
+
+function queueStoreEvent() {
+  if (!maxDebounceStoreTimeout)
+    maxDebounceStoreTimeout = /** @type {*} */(setTimeout(storeToCacheNow, 3100));
+  clearTimeout(debounceStoreTimeout);
+  debounceStoreTimeout = /** @type {*} */(setTimeout(storeToCacheNow, 300));
+}
+
+function storeToCacheNow() {
+  clearTimeout(maxDebounceStoreTimeout);
+  maxDebounceStoreTimeout = 0;
+  clearTimeout(debounceStoreTimeout);
+  debounceStoreTimeout = 0;
 
   const posts = Array.from(postsToStoreInCacheByURI.values()).map(p => {
+    const rec = /** @type {import('@atproto/api').AppBskyFeedPost.Record} */(p.record);
     const wordLeads = [];
-    const text = collectPostText(p.record, []);
+    const text = collectPostText(rec, []);
     for (const textChunk of text) {
       populateWordLeads(textChunk, wordLeads);
+    }
+
+    let thread = rec.reply?.root?.uri;
+    let reply = rec.reply?.parent?.uri;
+    let qt;
+    if (rec.embed?.$type === 'app.bsky.embed.record') {
+      qt = /** @type {import('@atproto/api').AppBskyEmbedRecord.Main} */(rec.embed).record?.uri;
     }
 
     return {
       uri: p.uri,
       did: p.author.did,
       cid: p.cid,
-      time: p.record.createdAt && new Date(p.record.createdAt).getTime(),
+      time: rec.createdAt && new Date(rec.createdAt).getTime(),
       text,
+      thread,
+      reply,
+      qt,
       w: wordLeads
     };
   });
 
+  const [likes, reposts] =
+    [likesToStoreInCacheByShortDIDAndURI, repostsToStoreInCacheByShortDIDAndURI].map(map => {
+      return Array.from(map.entries()).map(([shortDID, byURI]) => {
+        return Array.from(byURI.entries()).map(([uri, time]) => {
+          return {
+            did: shortDID,
+            uri,
+            time
+          };
+        });
+      }).flat();
+    });
+
   postsToStoreInCacheByURI.clear();
+  likesToStoreInCacheByShortDIDAndURI.clear();
+  repostsToStoreInCacheByShortDIDAndURI.clear();
+
   if (posts.length) {
     db.records.bulkPut(posts);
-
     console.log('adding records ', posts.length, ' to cache ', posts);
+  }
 
+  if (likes.length) {
+    db.likes.bulkPut(likes);
+    console.log('adding likes ', likes.length, ' to cache ', likes);
+  }
+
+  if (reposts.length) {
+    db.reposts.bulkPut(reposts);
+    console.log('adding reposts ', reposts.length, ' to cache ', reposts);
   }
 }
 
 /**
- * @param {import('../../coldsky/lib/firehose').FirehoseMessageOfType<'app.bsky.feed.post'> | undefined} post
+ * @param {import('@atproto/api').AppBskyFeedPost.Record} post
  * @param {string[]} textArray
  */
 function collectPostText(post, textArray) {
@@ -511,3 +598,53 @@ export function populateWordLeads(text, result) {
 
   return result;
 }
+
+/**
+ * @param {string} handleOrDID
+ * @returns {AsyncIterable<import('../../coldsky/lib/firehose').FirehoseMessage[]>}
+ */
+export async function* getProfileHistory(handleOrDID) {
+  let profile = likelyDID(handleOrDID) ?
+    await resolveDIDFromCache(handleOrDID) :
+    await resolveHandleFromCache(handleOrDID);
+
+  if (!profile) {
+    for await (const pro of resolveHandleOrDIDToProfile(handleOrDID)) {
+      if (pro)
+        profile = pro;
+    }
+  }
+
+  if (!profile) throw new Error('Profile not found: ' + handleOrDID);
+
+  const shortDID = shortenDID(profile.did);
+
+  const recordsPromise = db.records.where('did').equals(shortDID).toArray();
+  const likesPromise = db.likes.where('did').equals(shortDID).toArray();
+  const repostsPromise = db.reposts.where('did').equals(shortDID).toArray();
+
+
+
+}
+
+async function* getProfileHistoryViaListRecords(shortDID) {
+  const pds = await getPDS(shortDID);
+
+  if (!pds) throw new Error('No PDS for DID: ' + shortDID);
+
+  
+}
+
+async function getPDS(shortDID) {
+  const plcEntries = await resolvePlcDirectly(shortDID);
+  for (let i = 0; i < plcEntries.length; i++) {
+    const fromEnd = plcEntries[plcEntries.length - i - 1];
+
+    const pdsEndpoint =
+      fromEnd.operation?.services?.atproto_pds?.endpoint;
+    
+    if (pdsEndpoint) return pdsEndpoint;
+  }
+}
+
+
