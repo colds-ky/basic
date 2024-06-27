@@ -13,7 +13,7 @@ const mode = process.argv.some(arg => /^\-*serve$/i.test(arg)) ? 'serve' :
 rollupBuilder();
 esbuildBuilder();
 
-function rollupBuilder() {
+async function rollupBuilder() {
   const { nodeResolve } = require('@rollup/plugin-node-resolve');
   const json = /** @type {(options?: import('@rollup/plugin-json').RollupJsonOptions) => import('rollup').Plugin} */(/** @type {*} */(
     require('@rollup/plugin-json')));
@@ -44,6 +44,7 @@ function rollupBuilder() {
       name: 'coldsky'
     }
   });
+
   if (watcher.on) {
     watcher.on('event', event => {
       console.log('rollup:' + event.code);
@@ -58,6 +59,15 @@ function rollupBuilder() {
       } else if (event.code === 'ERROR') {
         console.error(event.error);
       }
+    });
+  } else {
+    const bundle = await watcher;
+    await bundle.write({
+      file: 'libs.js',
+      sourcemap: true,
+      format: 'umd',
+      globals: { crypto: 'crypto' },
+      name: 'coldsky'
     });
   }
 }
