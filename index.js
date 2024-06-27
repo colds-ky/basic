@@ -65142,13 +65142,31 @@ if (cid) {
           return true;
         };
       }
+      function patchBskyAgentWithCORSProxy(atClient2) {
+        atClient2.com.atproto.sync._service.xrpc.baseClient.lex.assertValidXrpcOutput = function(lexUri, value, ...rest) {
+          return true;
+        };
+        if (typeof window !== "undefined" && window) {
+          const baseFetch = atClient2.com.atproto.sync._service.xrpc.baseClient.fetch;
+          atClient2.com.atproto.sync._service.xrpc.baseClient.fetch = function(reqUri, ...args) {
+            if (/com.atproto.sync.listRepos/.test(reqUri))
+              reqUri = "https://corsproxy.io/?" + reqUri;
+            return baseFetch.call(
+              atClient2.com.atproto.sync._service.xrpc.baseClient,
+              reqUri,
+              ...args
+            );
+          };
+        }
+      }
       function beginFetchingDIDs() {
         return __async(this, null, function* () {
           const atClient2 = new import_api2.BskyAgent({
             // service: 'https://bsky.social/xrpc'
+            // service: 'https://bsky.network/xrpc'
             service: "https://bsky.network/xrpc"
           });
-          patchBskyAgent2(atClient2);
+          patchBskyAgentWithCORSProxy(atClient2);
           let lastNormal = Date.now();
           while (true) {
             const startTime = Date.now();
