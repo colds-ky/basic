@@ -6,13 +6,9 @@ import { getKeyShortDID } from '../api/core';
 
 /**
  * @param {{
- *  readFile: (path: string) => Promise<{
- *    content: string,
- *    commit: string,
- *    timestamp: number
- *  }>;
- *  provideAuthToken(token: string): Promise;
- *  commitChanges(baseCommitHash: string, files: { path: string, content: string}[]): Promise;
+ *  readFile: (path: string) => Promise<string>;
+ *  provideAuthToken(token: string): Promise<{ commit: string, timestamp: number }>;
+ *  commitChanges(files: { path: string, content: string}[]): Promise;
  * }} _
  */
 export async function updateDIDs({
@@ -20,11 +16,10 @@ export async function updateDIDs({
   provideAuthToken,
   commitChanges
 }) {
-  const startCursorFileEntry = await readFile('/dids/cursors.json');
+  const startCursorContent = await readFile('/dids/cursors.json');
 
   /** @type {import('../../dids/cursors.json')} */
-  const startCursorsJSON = JSON.parse(
-    startCursorFileEntry.content);
+  const startCursorsJSON = JSON.parse(startCursorContent);
   
   let committingStarted = false;
 
@@ -154,16 +149,16 @@ export async function updateDIDs({
             '/dids/web.json' :
             '/dids/' + twoLetter[0] + '/' + twoLetter + '.json';
 
-          const bucketFileEntry = await readFile(bucketPath);
+          const bucketFileContent = await readFile(bucketPath);
 
           /** @type {Set<string>} */
-          const existingBucketShortDIDs = new Set(JSON.parse(bucketFileEntry.content));
+          const existingBucketShortDIDs = new Set(JSON.parse(bucketFileContent));
 
           const newShortDIDs = bucket.filter(shortDID => !existingBucketShortDIDs.has(shortDID));
 
           if (!newShortDIDs.length) return;
           const newContent =
-            bucketFileEntry.content.trim().slice(0, -1) + '\n' +
+            bucketFileContent.trim().slice(0, -1) + ',\n' +
             packDidsJson(newShortDIDs, '');
 
           return {
@@ -171,7 +166,7 @@ export async function updateDIDs({
             bucket,
             newShortDIDs,
             newContent,
-            ...bucketFileEntry
+            oldContent: bucketFileContent
           };
         }));
     
@@ -179,7 +174,7 @@ export async function updateDIDs({
       /** @type {NonNullable<typeof bucketFileEntriesOrNull[0]>[]} */
       (bucketFileEntriesOrNull.filter(Boolean));
 
-    await authPromise;
+    const authDetails = await authPromise;
 
     return {
       bucketData: bucketFileEntries,
@@ -188,7 +183,6 @@ export async function updateDIDs({
 
     function applyChanges() {
       return commitChanges(
-        bucketFileEntries[0].commit,
         bucketFileEntries.map(entry => ({
           path: entry.bucketPath,
           content: entry.newContent

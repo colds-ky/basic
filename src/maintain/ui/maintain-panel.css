@@ -27,3 +27,7 @@
 .maintain-panel .apply-button {
   margin: 0.5em;
 }
+
+.maintain-panel .two-letter {
+  color: rgb(188, 211, 255);
+}

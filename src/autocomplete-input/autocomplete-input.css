@@ -1,3 +1,8 @@
+#searchINPUT {
+  position: relative;
+  z-index: 10;
+}
+
 .autocomplete-list {
   position: absolute;
   background: white;

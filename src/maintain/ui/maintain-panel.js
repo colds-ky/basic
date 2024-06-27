@@ -14,7 +14,7 @@ let maintainStarted;
 export function MaintainPanel() {
   if (!maintainStarted) {
     const apis = createShellAPIs();
-    maintainStarted = updateDIDs(apis);
+    maintainStarted = updateDIDs(apis).catch(error => alert(error.stack || error.message));
   }
 
   const [_, updateBuckets] = useState(0);
@@ -22,13 +22,20 @@ export function MaintainPanel() {
   const maintain = forAwait(undefined, maintainStarted);
 
   useEffect(() => {
+    window.addEventListener('error', showError);
     const interval = setInterval(() => {
       updateBuckets(maintain?.populatedDIDs.shortDIDs.length);
     }, 500);
 
     return () => {
       clearInterval(interval);
+      window.removeEventListener('error', showError);
     };
+
+    function showError(error) {
+      if (error.error) error = error.error;
+      alert(error.stack || error.message);
+    }
   }, [maintain]);
 
   const buckets = maintain?.populatedDIDs.buckets ?
@@ -49,6 +56,8 @@ export function MaintainPanel() {
     (undefined)
   );
 
+  //const [error, setError] = useState();
+
   return (
     <div className='maintain-panel'>
       <div className='maintain-panel-title'>
@@ -60,14 +69,13 @@ export function MaintainPanel() {
               return;
             }
 
-            startApplying();
+            startApplying().catch(error => alert(error.stack || error.message));
           }}>
           <span>
             {
               !authToken ? 'Enter AUTH TOKEN' :
                 applyData ? 'Start applying ' +
-                  applyData.bucketData.length + ' buckets ' +
-                  'to ' + applyData.bucketData[0].commit.slice(0, 7) :
+                  applyData.bucketData.length + ' buckets':
                   'Prepare changes for AUTH TOKEN'
             }
           </span>
@@ -117,7 +125,7 @@ export function MaintainPanel() {
                 leadBuckets.map(
                   ([twoLetter, count], index) =>
                     <div key={index} className='bucket'>
-                      <span className='two-letter'>{twoLetter}</span>
+                      <span className='two-letter'>{twoLetter}</span>{' '}
                       <span className='count'>{count.toLocaleString()}</span>
                     </div>
                 )
@@ -130,7 +138,7 @@ export function MaintainPanel() {
                       trailBuckets.map(
                         ([twoLetter, count], index) =>
                           <div key={index} className='bucket'>
-                            <span className='two-letter'>{twoLetter}</span>
+                            <span className='two-letter'>{twoLetter}</span>{' '}
                             <span className='count'>{count.toLocaleString()}</span>
                           </div>
                       )
