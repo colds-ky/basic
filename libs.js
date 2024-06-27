@@ -41882,7 +41882,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.30";
+	var version = "0.2.31";
 
 	// @ts-check
 
@@ -50861,7 +50861,7 @@ if (cid) {
 	  embeds = addEmbedImages(shortDID, /** @type {import('@atproto/api').AppBskyEmbedImages.Main} */embed.images, embeds);
 	  embeds = addEmbedExternal(shortDID, /** @type {import('@atproto/api').AppBskyEmbedExternal.Main} */embed.external, embeds);
 	  embeds = addEmbedRecord( /** @type {import('@atproto/api').AppBskyEmbedRecord.Main} */embed.record, embeds);
-	  embeds = addEmbedRecordMedia(shortDID, /** @type {import('@atproto/api').AppBskyEmbedRecordWithMedia.Main} */embed.media, embeds);
+	  embeds = addEmbedRecordMedia(shortDID, /** @type {import('@atproto/api').AppBskyEmbedRecordWithMedia.Main} */embed, embeds);
 	  return embeds;
 	}
 
@@ -50911,13 +50911,13 @@ if (cid) {
 
 	/**
 	 * @param {string} shortDID
-	 * @param {import('@atproto/api').AppBskyEmbedRecordWithMedia.Main['media'] | undefined} embedRecordMedia
+	 * @param {import('@atproto/api').AppBskyEmbedRecordWithMedia.Main | undefined} embedRecordMedia
 	 * @param {import('../..').CompactEmbed[] | undefined} embeds 
 	 */
 	function addEmbedRecordMedia(shortDID, embedRecordMedia, embeds) {
-	  if (!embedRecordMedia?.external && !embedRecordMedia?.images) return embeds;
-	  embeds = addEmbedImages(shortDID, /** @type {import('@atproto/api').AppBskyEmbedImages.Main} */embedRecordMedia.images, embeds);
-	  embeds = addEmbedExternal(shortDID, /** @type {import('@atproto/api').AppBskyEmbedExternal.Main} */embedRecordMedia.external, embeds);
+	  embeds = addEmbedImages(shortDID, /** @type {import('@atproto/api').AppBskyEmbedImages.Main} */embedRecordMedia?.media?.images, embeds);
+	  embeds = addEmbedExternal(shortDID, /** @type {import('@atproto/api').AppBskyEmbedExternal.Main} */embedRecordMedia?.media?.external, embeds);
+	  embeds = addEmbedRecord( /** @type {import('@atproto/api').AppBskyEmbedRecord.Main} */embedRecordMedia?.record?.record, embeds);
 	  return embeds;
 	}
 
