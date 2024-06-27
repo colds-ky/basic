@@ -86,7 +86,8 @@ function HistoryCore() {
         </div>
       </div>
 
-      <div className='unmoved-sticky-background'></div>
+      <div className='sticky-header-background'></div>
+      <div className='sticky-header-background-cover'></div>
 
       <PreFormatted
       text={resolved.description}
