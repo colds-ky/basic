@@ -4,9 +4,23 @@ import { BskyAgent } from '@atproto/api';
 import { shortenDID } from '../api';
 import { getKeyShortDID } from '../api/core';
 
-export async function updateDIDs() {
+/**
+ * @param {{
+ *  readFile: (path: string) => Promise<{
+ *    content: string,
+ *    commit: string,
+ *    timestamp: number
+ *  }>
+ * }} _
+ */
+export async function updateDIDs({
+  readFile
+}) {
+  const startCursorFileEntry = await readFile('/dids/cursors.json');
+
   /** @type {import('../../dids/cursors.json')} */
-  const startCursorsJSON = await fetch('./dids/cursors.json').then(r => r.json());
+  const startCursorsJSON = JSON.parse(
+    startCursorFileEntry.content);
 
   const populatedDIDs = {
     /** @type {string[]} */
@@ -22,19 +36,27 @@ export async function updateDIDs() {
     reachedEnd: false
   };
 
+  beginFetchingDIDs();
+
   return {
     ...startCursorsJSON,
-    beginFetchingDIDs,
     populatedDIDs,
     verifyGitHubAuth
   };
 
+  /** @param {import('@atproto/api').BskyAgent} atClient */
+  function patchBskyAgent(atClient) {
+    atClient.com.atproto.sync._service.xrpc.baseClient.lex.assertValidXrpcOutput = function (lexUri, value, ...rest) {
+      return true;
+    };
+  }
   async function beginFetchingDIDs() {
+
     const atClient = new BskyAgent({
       // service: 'https://bsky.social/xrpc'
       service: 'https://bsky.network/xrpc'
     });
-    /** @type {*} */(atClient).baseClient.lex.assertValidXrpcOutput = function () { };
+    patchBskyAgent(atClient);
 
     let lastNormal = Date.now();
     while (true) {

@@ -7,6 +7,7 @@ import * as octokit from "octokit";
 import * as wholeAPI from './api';
 import * as maintain from './maintain';
 import { AutocompleteInput } from './autocomplete-input';
+import { MaintainPanel } from './maintain/ui';
 
 if (typeof window !== 'undefined') {
   window['atproto'] = atproto;
@@ -28,8 +29,9 @@ export function RootLayout({
   title,
   subtitle,
   inputClassName,
-  inputPlaceholderText,
-  autocompleteArea }) {
+  inputPlaceholderText }) {
+  
+  const [showUpdateDIDs, setShowUpdateDIDs] = React.useState(false);
 
   return (
     <table className="top-table">
@@ -44,7 +46,10 @@ export function RootLayout({
                   inputClassName={inputClassName}
                   inputPlaceholderText={inputPlaceholderText}
                   executeCommand={executeCommand} />
-                {autocompleteArea}
+                {
+                  !showUpdateDIDs ? undefined :
+                    <MaintainPanel />
+                }
               </div>
             </div>
           </td>
@@ -52,14 +57,20 @@ export function RootLayout({
       </tbody>
     </table>
   );
-}
 
-async function executeCommand(commandName) {
-  const command = window['coldsky'][commandName];
-  let result = await /** @type {*} */(command)();
 
-  alert(
-    typeof result === 'undefined' ? commandName + ' OK' :
-      commandName + ' ' + JSON.stringify(result, null, 2)
-  );
+  async function executeCommand(commandName) {
+    if (commandName === 'updateDIDs') {
+      setShowUpdateDIDs(true);
+      return;
+    }
+  
+    const command = window['coldsky'][commandName];
+    let result = await /** @type {*} */(command)();
+
+    alert(
+      typeof result === 'undefined' ? commandName + ' OK' :
+        commandName + ' ' + JSON.stringify(result, null, 2)
+    );
+  }
 }
