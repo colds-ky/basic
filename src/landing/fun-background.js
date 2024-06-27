@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDB } from '..';
 import { makeFeedUri } from '../../coldsky/lib';
 import { PreFormatted } from '../widgets/preformatted';
+import { Post } from '../widgets/post/post';
 
 const POST_DEBOUNCE_MSEC = 5000;
 const POST_MAX_AGE = 1000 * 40;
@@ -122,28 +123,15 @@ function ThreadBubble({ thread }) {
         animationDuration: `${slideDuration.toFixed(2)}s`,
         left: `${left.toFixed(2)}%`
       }}
-      onClick={async () => {
-        for await (const profile of db.getProfileIncrementally(thread.current.shortDID)) {
-          if (profile?.handle) {
-            navigate(profile.handle);
-            break;
-          }
-        }
-      }}
     >
       <div className='fun-background-thread'
         style={{
           animationDuration: `${rockDuration.toFixed(2)}s`
         }}>
-        <AccountLabel className='fun-background-thread-author' account={thread.current.shortDID} />
-        <PreFormatted className='fun-background-thread-content' text={thread.current.text}/>
-        <div className='fun-background-thread-likes'>
-          <FavoriteBorder />
-          {
-            !thread?.current?.likeCount ? '' :
-              thread.current.likeCount.toLocaleString()
-          }
-        </div>
+        <Post
+          post={thread.current}
+          linkTimestamp
+        />
       </div>
     </div>
   );

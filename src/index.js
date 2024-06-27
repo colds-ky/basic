@@ -1,18 +1,20 @@
 // @ts-check
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import {
   createBrowserRouter,
   createHashRouter,
   RouterProvider,
+  useNavigate,
+  useParams,
 } from "react-router-dom";
 
 import { createTheme, ThemeProvider } from '@mui/material';
 import { Landing } from './landing';
 import { History } from './history';
-import { defineCachedStore } from '../coldsky/lib';
+import { breakFeedUri, breakPostURL, defineCachedStore } from '../coldsky/lib';
 
 /** @typedef {ReturnType<typeof defineCachedStore>} DBAccess */
 var db;
@@ -36,6 +38,26 @@ function runApp() {
   const useRouter =
     /file/i.test(location.protocol) ?
       createHashRouter : createBrowserRouter;
+  
+  const ParseLink = () => {
+    let path = useParams()['*'];
+    const navigate = useNavigate();
+    const exit = (url) => {
+      useEffect(() => {
+        navigate(url);
+      });
+      return '';
+    };
+
+    if (!path) return exit('/');
+    path = path.replace(/^\/+/g, '').replace(/\/+$/g, '');
+    if (!path) return exit('/');
+
+    const postURL = breakFeedUri(path) || breakPostURL(path);
+    if (postURL) return exit(`/${postURL.shortDID}/${postURL.postID}`);
+    if (path.indexOf('/') < 0) return exit('/' + path);
+    else return exit('/?q=' + path);
+  };
 
   const router = useRouter(
     [
@@ -43,6 +65,7 @@ function runApp() {
       { path: '/index.html', element: <Landing /> },
       { path: '/:handle', element: <History /> },
       { path: '/:handle/:post', element: <History /> },
+      { path: '*', element: <ParseLink /> },
     ], {
     basename
   });

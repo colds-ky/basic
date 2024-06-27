@@ -23,10 +23,6 @@
 }
 
 .fun-background .fun-background-scroller .fun-background-thread {
-  padding: 1em;  border: solid 1px #e9da8a;
-  background: #fffbeb;
-  box-shadow: 5px 9px 19px #0000006e;
-  border-radius: 0.5em;
   animation: 3s ease-in-out infinite alternate rock;
 }
 
