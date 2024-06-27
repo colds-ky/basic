@@ -10,3 +10,69 @@
 [submodule "index/c"]
 	path = index/c
 	url = https://github.com/colds-ky/index-c
+[submodule "index/d"]
+	path = index/d
+	url = https://github.com/colds-ky/index-d
+[submodule "index/e"]
+	path = index/e
+	url = https://github.com/colds-ky/index-e
+[submodule "index/f"]
+	path = index/f
+	url = https://github.com/colds-ky/index-f
+[submodule "index/g"]
+	path = index/g
+	url = https://github.com/colds-ky/index-g
+[submodule "index/h"]
+	path = index/h
+	url = https://github.com/colds-ky/index-h
+[submodule "index/i"]
+	path = index/i
+	url = https://github.com/colds-ky/index-i
+[submodule "index/k"]
+	path = index/k
+	url = https://github.com/colds-ky/index-k
+[submodule "index/l"]
+	path = index/l
+	url = https://github.com/colds-ky/index-l
+[submodule "index/m"]
+	path = index/m
+	url = https://github.com/colds-ky/index-m
+[submodule "index/n"]
+	path = index/n
+	url = https://github.com/colds-ky/index-n
+[submodule "index/o"]
+	path = index/o
+	url = https://github.com/colds-ky/index-o
+[submodule "index/p"]
+	path = index/p
+	url = https://github.com/colds-ky/index-p
+[submodule "index/q"]
+	path = index/q
+	url = https://github.com/colds-ky/index-q
+[submodule "index/r"]
+	path = index/r
+	url = https://github.com/colds-ky/index-r
+[submodule "index/s"]
+	path = index/s
+	url = https://github.com/colds-ky/index-s
+[submodule "index/t"]
+	path = index/t
+	url = https://github.com/colds-ky/index-t
+[submodule "index/u"]
+	path = index/u
+	url = https://github.com/colds-ky/index-u
+[submodule "index/v"]
+	path = index/v
+	url = https://github.com/colds-ky/index-v
+[submodule "index/w"]
+	path = index/w
+	url = https://github.com/colds-ky/index-w
+[submodule "index/x"]
+	path = index/x
+	url = https://github.com/colds-ky/index-x
+[submodule "index/y"]
+	path = index/y
+	url = https://github.com/colds-ky/index-y
+[submodule "index/z"]
+	path = index/z
+	url = https://github.com/colds-ky/index-z
