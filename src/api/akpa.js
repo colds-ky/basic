@@ -138,6 +138,50 @@ export function streamBuffer(callback) {
 /**
  * @template T
  * @template [TProject = T]
+ * @param {AsyncIterable<T>} first
+ * @param {AsyncIterable<T>} second
+ * @returns {AsyncIterable<T>}
+ */
+export function firstUntilSecond(first, second) {
+  return streamEvery(
+    streaming => {
+      let shouldFirstStop = false;
+      let shouldSecondStop = false;
+
+      streaming.finally.then(() => {
+        shouldFirstStop = true;
+        shouldSecondStop = true;
+      });
+
+      iterateFirst();
+      iterateSecond();
+
+      async function iterateFirst() {
+        for await (const entry of first) {
+          if (shouldFirstStop) return;
+          streaming.yield(entry);
+        }
+      }
+
+      async function iterateSecond() {
+        try {
+          for await (const entry of second) {
+            if (shouldSecondStop) return;
+            shouldFirstStop = true;
+            streaming.yield(entry);
+          }
+          streaming.complete();
+        } catch (error) {
+          shouldFirstStop = true;
+          streaming.reject(error);
+        }
+      }
+    });
+}
+
+/**
+ * @template T
+ * @template [TProject = T]
  * @param {AsyncIterable<T>} input
  * @param {(item: T) => TProject} [project]
  */
