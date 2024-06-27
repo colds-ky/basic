@@ -8,6 +8,7 @@ import { forAwait } from '../../../coldsky/src/api/forAwait';
 
 import './account-label.css';
 import { likelyDID } from '../../../coldsky/lib';
+import { Link } from 'react-router-dom';
 
 /**
  * @param {{
@@ -20,10 +21,11 @@ import { likelyDID } from '../../../coldsky/lib';
  *  } | string,
  *  withDisplayName?: boolean,
  *  className?: string,
+ *  linkToTimeline?: boolean,
  *  Component?: any
  * }} _
  */
-export function AccountLabel({ account, withDisplayName, className, Component, ...rest }) {
+export function AccountLabel({ account, withDisplayName, className, linkToTimeline, Component, ...rest }) {
   if (!Component) Component = 'span';
 
   const db = useDB();
@@ -35,26 +37,38 @@ export function AccountLabel({ account, withDisplayName, className, Component, .
     handle: likelyDID(account) ? undefined : account
   } :
     account;
+  
+  const inner = (
+    <>
+      <span
+        className={profile?.avatar ? 'account-avatar' : 'account-avatar account-avatar-at-sign'}
+        style={!profile?.avatar ? undefined :
+          {
+            backgroundImage: `url(${profile?.avatar})`
+          }}>@</span>
+      <FullHandle shortHandle={profile?.handle} />
+      {
+        !withDisplayName || !profile?.displayName ? undefined :
+          <>
+            {' '}<span className='account-label-display-name'>
+              {profile?.displayName}
+            </span>
+          </>
+      }
+    </>
+  );
 
   return (
     <Component className={'account-label ' + (className || '')} {...rest}>
-      <span className='account-handle'>
-        <span
-          className={profile?.avatar ?'account-avatar' : 'account-avatar account-avatar-at-sign'}
-          style={!profile?.avatar ? undefined :
-            {
-              backgroundImage: `url(${profile?.avatar})`
-            }}>@</span>
-        <FullHandle shortHandle={profile?.handle} />
-        {
-          !withDisplayName || !profile?.displayName ? undefined :
-            <>
-              {' '}<span className='account-label-display-name'>
-                {profile?.displayName}
-              </span>
-            </>
-        }
-      </span>
+      {
+        linkToTimeline ?
+          <Link className='account-handle' to={'/' + profile?.handle}>
+            {inner}
+          </Link> :
+          <span className='account-handle'>
+            {inner}
+          </span>
+      }
     </Component>
   );
 }

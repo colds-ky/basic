@@ -13,10 +13,12 @@ import './thread.css';
 /**
  * @param {{
  *  className?: string,
- *  uri: string
+ *  uri: string,
+ *  linkTimestamp?: boolean,
+ *  linkAuthor?: boolean
  * }} _
  */
-export function Thread({ className, uri, ...rest }) {
+export function Thread({ className, uri, linkTimestamp, linkAuthor, ...rest }) {
   const db = useDB();
 
   const thread = forAwait(uri, () => db.getPostThreadIncrementally(uri));
@@ -40,10 +42,12 @@ export function Thread({ className, uri, ...rest }) {
  *  className?: string,
  *  shortDID: string,
  *  thread: import('../../../coldsky/lib').CompactThreadPostSet,
- *  underPrevious?: boolean
+ *  underPrevious?: boolean,
+ *  linkTimestamp?: boolean,
+ *  linkAuthor?: boolean
  * }} _
  */
-export function ThreadView({ className, shortDID, thread, underPrevious, ...rest }) {
+export function ThreadView({ className, shortDID, thread, underPrevious, linkTimestamp, linkAuthor, ...rest }) {
   const root = layoutThread(shortDID, thread);
 
   return (
@@ -52,6 +56,8 @@ export function ThreadView({ className, shortDID, thread, underPrevious, ...rest
       shortDID={shortDID}
       node={root}
       underPrevious={underPrevious}
+      linkTimestamp={linkTimestamp}
+      linkAuthor={linkAuthor}
       {...rest}
     />
   );
@@ -69,7 +75,9 @@ export function ThreadView({ className, shortDID, thread, underPrevious, ...rest
  *  className?: string,
  *  shortDID: string,
  *  node: PostNode,
- *  underPrevious?: boolean
+ *  underPrevious?: boolean,
+ *  linkTimestamp?: boolean,
+ *  linkAuthor?: boolean
  * }} _
  */
 function SubThread({
@@ -77,6 +85,8 @@ function SubThread({
   shortDID,
   node,
   underPrevious,
+  linkTimestamp,
+  linkAuthor,
   ...rest
 }) {
   return (
@@ -85,7 +95,10 @@ function SubThread({
       {...rest}>
       <Post
         className={underPrevious ? 'thread-reply-post' : undefined}
-        post={node.post} />
+        post={node.post}
+        linkTimestamp={linkTimestamp}
+        linkAuthor={linkAuthor}
+      />
       {
         node.children.map((child, i) => (
           <CollapsedOrExpandedSubThread
@@ -93,6 +106,8 @@ function SubThread({
             shortDID={shortDID}
             node={child}
             underPrevious={!i}
+            linkTimestamp={linkTimestamp}
+            linkAuthor={linkAuthor}
           />
         ))
       }
@@ -104,10 +119,12 @@ function SubThread({
  * @param {{
  *  shortDID: string,
  *  node: PostNode,
- *  underPrevious?: boolean
+ *  underPrevious?: boolean,
+ *  linkTimestamp?: boolean,
+ *  linkAuthor?: boolean
  * }} _
  */
-function CollapsedOrExpandedSubThread({ shortDID, node, underPrevious }) {
+function CollapsedOrExpandedSubThread({ shortDID, node, underPrevious, linkTimestamp, linkAuthor }) {
   let collapsedChunk = [];
   let nextNode = node;
   while (true) {
@@ -118,13 +135,26 @@ function CollapsedOrExpandedSubThread({ shortDID, node, underPrevious }) {
 
   if (collapsedChunk.length === 0) {
     return (
-      <SubThread shortDID={shortDID} node={node} underPrevious={underPrevious} />
+      <SubThread
+        shortDID={shortDID}
+        node={node}
+        underPrevious={underPrevious}
+        linkTimestamp={linkTimestamp}
+        linkAuthor={linkAuthor}
+      />
     );
   } else {
     return (
       <>
-        <CollapsedThreadPart children={collapsedChunk} />
-        <SubThread shortDID={shortDID} node={nextNode} />
+        <CollapsedThreadPart
+          children={collapsedChunk}
+        />
+        <SubThread
+          shortDID={shortDID}
+          node={nextNode}
+          linkTimestamp={linkTimestamp}
+          linkAuthor={linkAuthor}
+        />
       </>
     );
   }

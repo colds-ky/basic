@@ -16,6 +16,7 @@ html.account body {
   background-size: cover;
   border-bottom: solid 1px #dbdbdb;
   z-index: 7;
+  background-color: white;
 }
 
 .history-view .history-account-avatar {

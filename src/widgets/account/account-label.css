@@ -2,6 +2,11 @@
   display: flex;
 }
 
+.account-label a.account-handle {
+  color: inherit;
+  text-decoration: none;
+}
+
 .account-label .handle-bsky-social-suffix {
   display: inline-block;
   zoom: 0.7;

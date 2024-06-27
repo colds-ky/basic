@@ -46,7 +46,13 @@ export function Timeline({ shortDID }) {
         !retrieved?.timeline ? undefined :
         
           retrieved.timeline.map((thread, i) => (
-            <ThreadView key={i} thread={thread} shortDID={shortDID} />
+            <ThreadView
+              key={i}
+              thread={thread}
+              shortDID={shortDID}
+              linkTimestamp={true}
+              linkAuthor={true}
+            />
           ))
       }
       <Visible

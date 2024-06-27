@@ -22,16 +22,23 @@ import { PostEmbedsSection } from './embedded';
 /**
  * @param {{
  *  className?: string,
- *  post: string | MatchCompactPost
+ *  post: string | MatchCompactPost,
+ *  linkTimestamp?: boolean,
+ *  linkAuthor?: boolean
  * }} _
  */
-export function Post({ className, post, ...rest }) {
+export function Post({ className, post, linkTimestamp, linkAuthor, ...rest }) {
   return (
     <PostFrame className={className} {...rest}>
       {
         typeof post === 'string' ?
-          <LoadingPostInProgress uri={post} /> :
-          <LoadedPost post={post} />
+          <LoadingPostInProgress
+            uri={post} /> :
+          <LoadedPost
+            post={post}
+            linkTimestamp={linkTimestamp}
+            linkAuthor={linkAuthor}
+          />
       }
     </PostFrame>
   );
@@ -78,20 +85,23 @@ function LoadingPostInProgress({ uri }) {
 
 /**
  * @param {{
- *  post: MatchCompactPost
+ *  post: MatchCompactPost,
+ *  linkTimestamp?: boolean,
+ *  linkAuthor?: boolean
  * }} _
  */
-function LoadedPost({ post }) {
+function LoadedPost({ post, linkTimestamp, linkAuthor }) {
   return (
     <div className='post-loaded-content' onClick={() => {
       console.log('post clicked ', post);
     }}>
       <div className='post-top-line'>
-        <AccountLabel className='post-author' account={post.shortDID} />
-        {post.asOf ?
-          <FormatTime className='post-date' time={post.asOf} />
-          : undefined
-        }
+        <AccountLabel
+          className='post-author'
+          account={post.shortDID}
+          linkToTimeline={linkAuthor}
+        />
+        <PostTimestamp post={post} linkTimestamp={linkTimestamp} />
       </div>
       <PreFormatted className='post-content' text={post.text} />
       <PostEmbedsSection post={post} />
@@ -103,5 +113,32 @@ function LoadedPost({ post }) {
         }
       </div>
     </div>
+  );
+}
+
+/**
+ * @param {{
+ *  post: MatchCompactPost,
+ *  linkTimestamp?: boolean
+ * }} _
+ */
+function PostTimestamp({ post, linkTimestamp }) {
+  if (!post.asOf) return null;
+
+  if (!linkTimestamp) return <FormatTime className='post-date' time={post.asOf} />;
+
+  const db = useDB();
+  const profile = forAwait(post.shortDID, () => db.getProfileIncrementally(post.shortDID));
+
+  const parsedURI = breakFeedUri(post.uri);
+
+  return (
+    <Link
+      className='post-date'
+      to={
+        '/' + (profile?.handle || parsedURI?.shortDID) +
+        '/' + parsedURI?.postID}>
+      <FormatTime time={post.asOf} />
+    </Link>
   );
 }
