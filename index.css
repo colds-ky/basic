@@ -1,10 +1,13 @@
-/* src/root-layout.css */
+/* src/autocomplete-input/autocomplete-input.css */
 .autocomplete-list {
+  position: absolute;
   background: white;
-  position: relative;
   z-index: 10;
   padding: 0.25em 0.5em;
   border: solid 1px black;
+  max-width: 60%;
+  max-height: 60%;
+  overflow: auto;
 }
 span.autocomplete-post {
   float: right;

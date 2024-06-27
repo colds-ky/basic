@@ -1,7 +1,7 @@
 // @ts-check
 
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import { RootLayout } from './root-layout';
 
@@ -12,15 +12,18 @@ class App extends React.Component {
   }
 }
 
+function bootBrowser() {
+  const preloadedTable = document.querySelector('body>table');
 
-const preloadedTable = document.querySelector('body>table');
+  const reactRoot = document.createElement('div');
+  reactRoot.id = 'reactRoot';
+  document.body.appendChild(reactRoot);
 
-const reactRoot = document.createElement('div');
-reactRoot.id = 'reactRoot';
-document.body.appendChild(reactRoot);
+  preloadedTable?.remove();
 
-preloadedTable?.remove();
+  const root = createRoot(reactRoot);
+  root.render(<App />);
+}
 
-ReactDOM.render(
-  <App />,
-  reactRoot);
+if (typeof window !== 'undefined' && window)
+  bootBrowser();

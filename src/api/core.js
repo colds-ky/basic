@@ -2,6 +2,7 @@
 /// <reference path="../types.d.ts" />
 
 import { BskyAgent } from '@atproto/api';
+import { shortenDID, unwrapShortDID } from '.';
 
 const oldXrpc = 'https://bsky.social/xrpc';
 // const newXrpc = 'https://bsky.network/xrpc';
@@ -48,4 +49,13 @@ export function nextRandom(rnd) {
   rnd = Math.pow(10, rnd);
   rnd = rnd - Math.floor(rnd);
   return rnd;
+}
+
+/** @param {string} did */
+export function getKeyShortDID(did) {
+  const shortDID = shortenDID(did);
+  const fullDID = unwrapShortDID(did);
+  if (!shortDID) return undefined;
+  if (shortDID && shortDID === fullDID) return shortDID.slice(0, 2);
+  return 'web';
 }

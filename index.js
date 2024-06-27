@@ -866,12 +866,12 @@
             if (children == null) {
               return children;
             }
-            var result2 = [];
+            var result = [];
             var count = 0;
-            mapIntoArray(children, result2, "", "", function(child) {
+            mapIntoArray(children, result, "", "", function(child) {
               return func.call(context, child, count++);
             });
-            return result2;
+            return result;
           }
           function countChildren(children) {
             var n2 = 0;
@@ -1208,7 +1208,7 @@
             var dispatcher = resolveDispatcher();
             return dispatcher.useRef(initialValue);
           }
-          function useEffect2(create, deps) {
+          function useEffect3(create, deps) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useEffect(create, deps);
           }
@@ -1825,10 +1825,10 @@
                 ReactCurrentActQueue.current = [];
               }
               var prevIsBatchingLegacy = ReactCurrentActQueue.isBatchingLegacy;
-              var result2;
+              var result;
               try {
                 ReactCurrentActQueue.isBatchingLegacy = true;
-                result2 = callback();
+                result = callback();
                 if (!prevIsBatchingLegacy && ReactCurrentActQueue.didScheduleLegacyUpdate) {
                   var queue = ReactCurrentActQueue.current;
                   if (queue !== null) {
@@ -1842,8 +1842,8 @@
               } finally {
                 ReactCurrentActQueue.isBatchingLegacy = prevIsBatchingLegacy;
               }
-              if (result2 !== null && typeof result2 === "object" && typeof result2.then === "function") {
-                var thenableResult = result2;
+              if (result !== null && typeof result === "object" && typeof result.then === "function") {
+                var thenableResult = result;
                 var wasAwaited = false;
                 var thenable = {
                   then: function(resolve, reject) {
@@ -1874,7 +1874,7 @@
                 }
                 return thenable;
               } else {
-                var returnValue = result2;
+                var returnValue = result;
                 popActScope(prevActScopeDepth);
                 if (actScopeDepth === 0) {
                   var _queue = ReactCurrentActQueue.current;
@@ -1990,7 +1990,7 @@
           exports.useContext = useContext;
           exports.useDebugValue = useDebugValue;
           exports.useDeferredValue = useDeferredValue;
-          exports.useEffect = useEffect2;
+          exports.useEffect = useEffect3;
           exports.useId = useId;
           exports.useImperativeHandle = useImperativeHandle;
           exports.useInsertionEffect = useInsertionEffect;
@@ -2494,9 +2494,9 @@
           if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
             __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
           }
-          var React4 = require_react();
+          var React5 = require_react();
           var Scheduler = require_scheduler();
-          var ReactSharedInternals = React4.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+          var ReactSharedInternals = React5.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
           var suppressWarning = false;
           function setSuppressWarning(newSuppressWarning) {
             {
@@ -4101,7 +4101,7 @@
             {
               if (props.value == null) {
                 if (typeof props.children === "object" && props.children !== null) {
-                  React4.Children.forEach(props.children, function(child) {
+                  React5.Children.forEach(props.children, function(child) {
                     if (child == null) {
                       return;
                     }
@@ -12548,7 +12548,7 @@
             }
           }
           var fakeInternalInstance = {};
-          var emptyRefsObject = new React4.Component().refs;
+          var emptyRefsObject = new React5.Component().refs;
           var didWarnAboutStateAssignmentForComponent;
           var didWarnAboutUninitializedState;
           var didWarnAboutGetSnapshotBeforeUpdateWithoutDidUpdate;
@@ -23150,7 +23150,7 @@
               unmarkContainerAsRoot(container);
             }
           };
-          function createRoot(container, options2) {
+          function createRoot2(container, options2) {
             if (!isValidContainer(container)) {
               throw new Error("createRoot(...): Target container is not a DOM element.");
             }
@@ -23521,7 +23521,7 @@
                 error('You are importing createRoot from "react-dom" which is not supported. You should instead import it from "react-dom/client".');
               }
             }
-            return createRoot(container, options2);
+            return createRoot2(container, options2);
           }
           function hydrateRoot$1(container, initialChildren, options2) {
             {
@@ -23585,6 +23585,37 @@
       } else {
         module.exports = require_react_dom_development();
       }
+    }
+  });
+
+  // node_modules/react-dom/client.js
+  var require_client = __commonJS({
+    "node_modules/react-dom/client.js"(exports) {
+      "use strict";
+      var m = require_react_dom();
+      if (false) {
+        exports.createRoot = m.createRoot;
+        exports.hydrateRoot = m.hydrateRoot;
+      } else {
+        i2 = m.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+        exports.createRoot = function(c, o2) {
+          i2.usingClientEntryPoint = true;
+          try {
+            return m.createRoot(c, o2);
+          } finally {
+            i2.usingClientEntryPoint = false;
+          }
+        };
+        exports.hydrateRoot = function(c, h, o2) {
+          i2.usingClientEntryPoint = true;
+          try {
+            return m.hydrateRoot(c, h, o2);
+          } finally {
+            i2.usingClientEntryPoint = false;
+          }
+        };
+      }
+      var i2;
     }
   });
 
@@ -32524,7 +32555,7 @@
         AtprotoNS: () => AtprotoNS,
         BlobRef: () => BlobRef,
         BlockRecord: () => BlockRecord,
-        BskyAgent: () => BskyAgent2,
+        BskyAgent: () => BskyAgent3,
         BskyNS: () => BskyNS,
         COM_ATPROTO_ADMIN: () => COM_ATPROTO_ADMIN,
         COM_ATPROTO_MODERATION: () => COM_ATPROTO_MODERATION,
@@ -33391,9 +33422,9 @@
           return this._cachedPath;
         }
       };
-      var handleResult = (ctx, result2) => {
-        if (isValid(result2)) {
-          return { success: true, data: result2.value };
+      var handleResult = (ctx, result) => {
+        if (isValid(result)) {
+          return { success: true, data: result.value };
         } else {
           if (!ctx.common.issues.length) {
             throw new Error("Validation failed but no issues detected.");
@@ -33487,21 +33518,21 @@
           };
         }
         _parseSync(input) {
-          const result2 = this._parse(input);
-          if (isAsync(result2)) {
+          const result = this._parse(input);
+          if (isAsync(result)) {
             throw new Error("Synchronous parse encountered promise.");
           }
-          return result2;
+          return result;
         }
         _parseAsync(input) {
-          const result2 = this._parse(input);
-          return Promise.resolve(result2);
+          const result = this._parse(input);
+          return Promise.resolve(result);
         }
         parse(data, params2) {
-          const result2 = this.safeParse(data, params2);
-          if (result2.success)
-            return result2.data;
-          throw result2.error;
+          const result = this.safeParse(data, params2);
+          if (result.success)
+            return result.data;
+          throw result.error;
         }
         safeParse(data, params2) {
           var _a2;
@@ -33517,15 +33548,15 @@
             data,
             parsedType: getParsedType(data)
           };
-          const result2 = this._parseSync({ data, path: ctx.path, parent: ctx });
-          return handleResult(ctx, result2);
+          const result = this._parseSync({ data, path: ctx.path, parent: ctx });
+          return handleResult(ctx, result);
         }
         parseAsync(data, params2) {
           return __async(this, null, function* () {
-            const result2 = yield this.safeParseAsync(data, params2);
-            if (result2.success)
-              return result2.data;
-            throw result2.error;
+            const result = yield this.safeParseAsync(data, params2);
+            if (result.success)
+              return result.data;
+            throw result.error;
           });
         }
         safeParseAsync(data, params2) {
@@ -33543,8 +33574,8 @@
               parsedType: getParsedType(data)
             };
             const maybeAsyncResult = this._parse({ data, path: ctx.path, parent: ctx });
-            const result2 = yield isAsync(maybeAsyncResult) ? maybeAsyncResult : Promise.resolve(maybeAsyncResult);
-            return handleResult(ctx, result2);
+            const result = yield isAsync(maybeAsyncResult) ? maybeAsyncResult : Promise.resolve(maybeAsyncResult);
+            return handleResult(ctx, result);
           });
         }
         refine(check, message) {
@@ -33558,12 +33589,12 @@
             }
           };
           return this._refinement((val, ctx) => {
-            const result2 = check(val);
+            const result = check(val);
             const setError = () => ctx.addIssue(__spreadValues({
               code: ZodIssueCode.custom
             }, getIssueProperties(val)));
-            if (typeof Promise !== "undefined" && result2 instanceof Promise) {
-              return result2.then((data) => {
+            if (typeof Promise !== "undefined" && result instanceof Promise) {
+              return result.then((data) => {
                 if (!data) {
                   setError();
                   return false;
@@ -33572,7 +33603,7 @@
                 }
               });
             }
-            if (!result2) {
+            if (!result) {
               setError();
               return false;
             } else {
@@ -34793,14 +34824,14 @@
           if (ctx.common.async) {
             return Promise.all([...ctx.data].map((item, i2) => {
               return def2.type._parseAsync(new ParseInputLazyPath(ctx, item, ctx.path, i2));
-            })).then((result22) => {
-              return ParseStatus.mergeArray(status, result22);
+            })).then((result2) => {
+              return ParseStatus.mergeArray(status, result2);
             });
           }
-          const result2 = [...ctx.data].map((item, i2) => {
+          const result = [...ctx.data].map((item, i2) => {
             return def2.type._parseSync(new ParseInputLazyPath(ctx, item, ctx.path, i2));
           });
-          return ParseStatus.mergeArray(status, result2);
+          return ParseStatus.mergeArray(status, result);
         }
         get element() {
           return this._def.type;
@@ -35097,18 +35128,18 @@
           const { ctx } = this._processInputParams(input);
           const options = this._def.options;
           function handleResults(results) {
-            for (const result2 of results) {
-              if (result2.result.status === "valid") {
-                return result2.result;
+            for (const result of results) {
+              if (result.result.status === "valid") {
+                return result.result;
               }
             }
-            for (const result2 of results) {
-              if (result2.result.status === "dirty") {
-                ctx.common.issues.push(...result2.ctx.common.issues);
-                return result2.result;
+            for (const result of results) {
+              if (result.result.status === "dirty") {
+                ctx.common.issues.push(...result.ctx.common.issues);
+                return result.result;
               }
             }
-            const unionErrors = results.map((result2) => new ZodError(result2.ctx.common.issues));
+            const unionErrors = results.map((result) => new ZodError(result.ctx.common.issues));
             addIssueToContext(ctx, {
               code: ZodIssueCode.invalid_union,
               unionErrors
@@ -35142,15 +35173,15 @@
                 }),
                 parent: null
               });
-              const result2 = option._parseSync({
+              const result = option._parseSync({
                 data: ctx.data,
                 path: ctx.path,
                 parent: childCtx
               });
-              if (result2.status === "valid") {
-                return result2;
-              } else if (result2.status === "dirty" && !dirty) {
-                dirty = { result: result2, ctx: childCtx };
+              if (result.status === "valid") {
+                return result;
+              } else if (result.status === "dirty" && !dirty) {
+                dirty = { result, ctx: childCtx };
               }
               if (childCtx.common.issues.length) {
                 issues.push(childCtx.common.issues);
@@ -35668,9 +35699,9 @@
                 error.addIssue(makeArgsIssue(args, e2));
                 throw error;
               });
-              const result2 = yield fn(...parsedArgs);
-              const parsedReturns = yield this._def.returns._def.type.parseAsync(result2, params2).catch((e2) => {
-                error.addIssue(makeReturnsIssue(result2, e2));
+              const result = yield fn(...parsedArgs);
+              const parsedReturns = yield this._def.returns._def.type.parseAsync(result, params2).catch((e2) => {
+                error.addIssue(makeReturnsIssue(result, e2));
                 throw error;
               });
               return parsedReturns;
@@ -35681,10 +35712,10 @@
               if (!parsedArgs.success) {
                 throw new ZodError([makeArgsIssue(args, parsedArgs.error)]);
               }
-              const result2 = fn(...parsedArgs.data);
-              const parsedReturns = this._def.returns.safeParse(result2, params2);
+              const result = fn(...parsedArgs.data);
+              const parsedReturns = this._def.returns.safeParse(result, params2);
               if (!parsedReturns.success) {
-                throw new ZodError([makeReturnsIssue(result2, parsedReturns.error)]);
+                throw new ZodError([makeReturnsIssue(result, parsedReturns.error)]);
               }
               return parsedReturns.data;
             });
@@ -35930,11 +35961,11 @@
           checkCtx.addIssue = checkCtx.addIssue.bind(checkCtx);
           if (effect.type === "refinement") {
             const executeRefinement = (acc) => {
-              const result2 = effect.refinement(acc, checkCtx);
+              const result = effect.refinement(acc, checkCtx);
               if (ctx.common.async) {
-                return Promise.resolve(result2);
+                return Promise.resolve(result);
               }
-              if (result2 instanceof Promise) {
+              if (result instanceof Promise) {
                 throw new Error("Async refinement encountered during synchronous parse operation. Use .parseAsync instead.");
               }
               return acc;
@@ -35972,16 +36003,16 @@
               });
               if (!isValid(base3))
                 return base3;
-              const result2 = effect.transform(base3.value, checkCtx);
-              if (result2 instanceof Promise) {
+              const result = effect.transform(base3.value, checkCtx);
+              if (result instanceof Promise) {
                 throw new Error(`Asynchronous transform encountered during synchronous parse operation. Use .parseAsync instead.`);
               }
-              return { status: status.value, value: result2 };
+              return { status: status.value, value: result };
             } else {
               return this._def.schema._parseAsync({ data: ctx.data, path: ctx.path, parent: ctx }).then((base3) => {
                 if (!isValid(base3))
                   return base3;
-                return Promise.resolve(effect.transform(base3.value, checkCtx)).then((result2) => ({ status: status.value, value: result2 }));
+                return Promise.resolve(effect.transform(base3.value, checkCtx)).then((result) => ({ status: status.value, value: result }));
               });
             }
           }
@@ -36070,16 +36101,16 @@
               issues: []
             })
           });
-          const result2 = this._def.innerType._parse({
+          const result = this._def.innerType._parse({
             data: newCtx.data,
             path: newCtx.path,
             parent: __spreadValues({}, newCtx)
           });
-          if (isAsync(result2)) {
-            return result2.then((result22) => {
+          if (isAsync(result)) {
+            return result.then((result2) => {
               return {
                 status: "valid",
-                value: result22.status === "valid" ? result22.value : this._def.catchValue({
+                value: result2.status === "valid" ? result2.value : this._def.catchValue({
                   get error() {
                     return new ZodError(newCtx.common.issues);
                   },
@@ -36090,7 +36121,7 @@
           } else {
             return {
               status: "valid",
-              value: result2.status === "valid" ? result2.value : this._def.catchValue({
+              value: result.status === "valid" ? result.value : this._def.catchValue({
                 get error() {
                   return new ZodError(newCtx.common.issues);
                 },
@@ -37383,8 +37414,8 @@ if (cid) {
         }
         digest(input) {
           if (input instanceof Uint8Array) {
-            const result2 = this.encode(input);
-            return result2 instanceof Uint8Array ? create(this.code, result2) : result2.then((digest2) => create(this.code, digest2));
+            const result = this.encode(input);
+            return result instanceof Uint8Array ? create(this.code, result) : result.then((digest2) => create(this.code, digest2));
           } else {
             throw Error("Unknown type, must be binary type");
           }
@@ -38185,11 +38216,11 @@ if (cid) {
           concreteDefs = toConcreteTypes(lexicons2, def2);
         }
         for (const concreteDef of concreteDefs) {
-          const result2 = mustBeObj ? object(lexicons2, path, concreteDef, value) : validate2(lexicons2, path, concreteDef, value);
-          if (result2.success) {
-            return result2;
+          const result = mustBeObj ? object(lexicons2, path, concreteDef, value) : validate2(lexicons2, path, concreteDef, value);
+          if (result.success) {
+            return result;
           }
-          error != null ? error : error = result2.error;
+          error != null ? error : error = result.error;
         }
         if (concreteDefs.length > 1) {
           return {
@@ -53937,7 +53968,7 @@ if (cid) {
         sort: "oldest",
         prioritizeFollowedUsers: true
       };
-      var BskyAgent2 = class extends AtpAgent {
+      var BskyAgent3 = class extends AtpAgent {
         constructor() {
           super(...arguments);
           this.getTimeline = (params2, opts) => this.api.app.bsky.feed.getTimeline(params2, opts);
@@ -54416,12 +54447,12 @@ if (cid) {
         }
         if (kind === "after") {
           hook5 = function(method, options) {
-            var result2;
+            var result;
             return Promise.resolve().then(method.bind(null, options)).then(function(result_) {
-              result2 = result_;
-              return orig(result2, options);
+              result = result_;
+              return orig(result, options);
             }).then(function() {
-              return result2;
+              return result;
             });
           };
         }
@@ -54537,18 +54568,18 @@ if (cid) {
     return typeof Ctor === "function" && Ctor instanceof Ctor && Function.prototype.call(Ctor) === Function.prototype.call(value);
   }
   function mergeDeep(defaults, options) {
-    const result2 = Object.assign({}, defaults);
+    const result = Object.assign({}, defaults);
     Object.keys(options).forEach((key) => {
       if (isPlainObject(options[key])) {
         if (!(key in defaults))
-          Object.assign(result2, { [key]: options[key] });
+          Object.assign(result, { [key]: options[key] });
         else
-          result2[key] = mergeDeep(defaults[key], options[key]);
+          result[key] = mergeDeep(defaults[key], options[key]);
       } else {
-        Object.assign(result2, { [key]: options[key] });
+        Object.assign(result, { [key]: options[key] });
       }
     });
-    return result2;
+    return result;
   }
   function removeUndefinedProperties(obj) {
     for (const key in obj) {
@@ -54604,13 +54635,13 @@ if (cid) {
     return matches.map(removeNonChars).reduce((a2, b) => a2.concat(b), []);
   }
   function omit(object, keysToOmit) {
-    const result2 = { __proto__: null };
+    const result = { __proto__: null };
     for (const key of Object.keys(object)) {
       if (keysToOmit.indexOf(key) === -1) {
-        result2[key] = object[key];
+        result[key] = object[key];
       }
     }
-    return result2;
+    return result;
   }
   function encodeReserved(str) {
     return str.split(/(%[0-9A-Fa-f]{2})/g).map(function(part) {
@@ -54640,28 +54671,28 @@ if (cid) {
     return operator === ";" || operator === "&" || operator === "?";
   }
   function getValues(context, operator, key, modifier) {
-    var value = context[key], result2 = [];
+    var value = context[key], result = [];
     if (isDefined(value) && value !== "") {
       if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
         value = value.toString();
         if (modifier && modifier !== "*") {
           value = value.substring(0, parseInt(modifier, 10));
         }
-        result2.push(
+        result.push(
           encodeValue(operator, value, isKeyOperator(operator) ? key : "")
         );
       } else {
         if (modifier === "*") {
           if (Array.isArray(value)) {
             value.filter(isDefined).forEach(function(value2) {
-              result2.push(
+              result.push(
                 encodeValue(operator, value2, isKeyOperator(operator) ? key : "")
               );
             });
           } else {
             Object.keys(value).forEach(function(k) {
               if (isDefined(value[k])) {
-                result2.push(encodeValue(operator, value[k], k));
+                result.push(encodeValue(operator, value[k], k));
               }
             });
           }
@@ -54680,24 +54711,24 @@ if (cid) {
             });
           }
           if (isKeyOperator(operator)) {
-            result2.push(encodeUnreserved(key) + "=" + tmp.join(","));
+            result.push(encodeUnreserved(key) + "=" + tmp.join(","));
           } else if (tmp.length !== 0) {
-            result2.push(tmp.join(","));
+            result.push(tmp.join(","));
           }
         }
       }
     } else {
       if (operator === ";") {
         if (isDefined(value)) {
-          result2.push(encodeUnreserved(key));
+          result.push(encodeUnreserved(key));
         }
       } else if (value === "" && (operator === "&" || operator === "?")) {
-        result2.push(encodeUnreserved(key) + "=");
+        result.push(encodeUnreserved(key) + "=");
       } else if (value === "") {
-        result2.push("");
+        result.push("");
       }
     }
-    return result2;
+    return result;
   }
   function parseUrl(template) {
     return {
@@ -55265,16 +55296,16 @@ if (cid) {
         const parsedOptions = typeof query === "string" ? Object.assign({ query }, options) : query;
         const requestOptions = Object.keys(
           parsedOptions
-        ).reduce((result2, key) => {
+        ).reduce((result, key) => {
           if (NON_VARIABLE_OPTIONS.includes(key)) {
-            result2[key] = parsedOptions[key];
-            return result2;
+            result[key] = parsedOptions[key];
+            return result;
           }
-          if (!result2.variables) {
-            result2.variables = {};
+          if (!result.variables) {
+            result.variables = {};
           }
-          result2.variables[key] = parsedOptions[key];
-          return result2;
+          result.variables[key] = parsedOptions[key];
+          return result;
         }, {});
         const baseUrl = parsedOptions.baseUrl || request2.endpoint.DEFAULTS.baseUrl;
         if (GHES_V3_SUFFIX_REGEX.test(baseUrl)) {
@@ -56914,7 +56945,7 @@ if (cid) {
   function oauthAuthorizationUrl(options) {
     const clientType = options.clientType || "oauth-app";
     const baseUrl = options.baseUrl || "https://github.com";
-    const result2 = {
+    const result = {
       clientType,
       allowSignup: options.allowSignup === false ? false : true,
       clientId: options.clientId,
@@ -56925,10 +56956,10 @@ if (cid) {
     };
     if (clientType === "oauth-app") {
       const scopes = "scopes" in options ? options.scopes : [];
-      result2.scopes = typeof scopes === "string" ? scopes.split(/[,\s]+/).filter(Boolean) : scopes;
+      result.scopes = typeof scopes === "string" ? scopes.split(/[,\s]+/).filter(Boolean) : scopes;
     }
-    result2.url = urlBuilderAuthorize(`${baseUrl}/login/oauth/authorize`, result2);
-    return result2;
+    result.url = urlBuilderAuthorize(`${baseUrl}/login/oauth/authorize`, result);
+    return result;
   }
   function urlBuilderAuthorize(base, options) {
     const map = {
@@ -59283,8 +59314,8 @@ if (cid) {
       function get2(cache, options) {
         return __async(this, null, function* () {
           const cacheKey = optionsToCacheKey(options);
-          const result2 = yield cache.get(cacheKey);
-          if (!result2) {
+          const result = yield cache.get(cacheKey);
+          if (!result) {
             return;
           }
           const [
@@ -59294,7 +59325,7 @@ if (cid) {
             repositorySelection,
             permissionsString,
             singleFileName
-          ] = result2.split("|");
+          ] = result.split("|");
           const permissions = options.permissions || permissionsString.split(/,/).reduce((permissions2, string) => {
             if (/!$/.test(string)) {
               permissions2[string.slice(0, -1)] = "write";
@@ -59392,11 +59423,11 @@ if (cid) {
             options
           );
           if (!options.refresh) {
-            const result2 = yield get2(
+            const result = yield get2(
               state.cache,
               optionsWithInstallationTokenFromState
             );
-            if (result2) {
+            if (result) {
               const {
                 token: token2,
                 createdAt: createdAt2,
@@ -59406,7 +59437,7 @@ if (cid) {
                 repositoryNames: repositoryNames2,
                 singleFileName: singleFileName2,
                 repositorySelection: repositorySelection2
-              } = result2;
+              } = result;
               return toTokenAuthentication({
                 installationId,
                 token: token2,
@@ -59828,9 +59859,9 @@ if (cid) {
         }
         state.eventHandlers[eventName].push(eventHandler);
       }
-      var import_core4 = require_dist_node4();
+      var import_core5 = require_dist_node4();
       var import_universal_user_agent6 = require_dist_node();
-      var OAuthAppOctokit = import_core4.Octokit.defaults({
+      var OAuthAppOctokit = import_core5.Octokit.defaults({
         userAgent: `octokit-oauth-app.js/${VERSION12} ${(0, import_universal_user_agent6.getUserAgent)()}`
       });
       var import_auth_oauth_user4 = (init_dist_web7(), __toCommonJS(dist_web_exports5));
@@ -59924,15 +59955,15 @@ if (cid) {
       var OAuthMethods2 = __toESM2(require_dist_node5());
       function checkTokenWithState(state, options) {
         return __async(this, null, function* () {
-          const result2 = yield OAuthMethods2.checkToken(__spreadValues({
+          const result = yield OAuthMethods2.checkToken(__spreadValues({
             // @ts-expect-error not worth the extra code to appease TS
             clientType: state.clientType,
             clientId: state.clientId,
             clientSecret: state.clientSecret,
             request: state.octokit.request
           }, options));
-          Object.assign(result2.authentication, { type: "token", tokenType: "oauth" });
-          return result2;
+          Object.assign(result.authentication, { type: "token", tokenType: "oauth" });
+          return result;
         });
       }
       var OAuthMethods3 = __toESM2(require_dist_node5());
@@ -60244,18 +60275,18 @@ if (cid) {
               if (!code) {
                 throw new Error('[@octokit/oauth-app] "code" parameter is required');
               }
-              const result2 = yield app.createToken({
+              const result = yield app.createToken({
                 code,
                 redirectUrl
               });
-              delete result2.authentication.clientSecret;
+              delete result.authentication.clientSecret;
               return {
                 status: 201,
                 headers: {
                   "content-type": "application/json",
                   "access-control-allow-origin": "*"
                 },
-                text: JSON.stringify(result2)
+                text: JSON.stringify(result)
               };
             }
             if (route === routes.getToken) {
@@ -60265,17 +60296,17 @@ if (cid) {
                   '[@octokit/oauth-app] "Authorization" header is required'
                 );
               }
-              const result2 = yield app.checkToken({
+              const result = yield app.checkToken({
                 token: token2
               });
-              delete result2.authentication.clientSecret;
+              delete result.authentication.clientSecret;
               return {
                 status: 200,
                 headers: {
                   "content-type": "application/json",
                   "access-control-allow-origin": "*"
                 },
-                text: JSON.stringify(result2)
+                text: JSON.stringify(result)
               };
             }
             if (route === routes.patchToken) {
@@ -60285,15 +60316,15 @@ if (cid) {
                   '[@octokit/oauth-app] "Authorization" header is required'
                 );
               }
-              const result2 = yield app.resetToken({ token: token2 });
-              delete result2.authentication.clientSecret;
+              const result = yield app.resetToken({ token: token2 });
+              delete result.authentication.clientSecret;
               return {
                 status: 200,
                 headers: {
                   "content-type": "application/json",
                   "access-control-allow-origin": "*"
                 },
-                text: JSON.stringify(result2)
+                text: JSON.stringify(result)
               };
             }
             if (route === routes.patchRefreshToken) {
@@ -60309,15 +60340,15 @@ if (cid) {
                   "[@octokit/oauth-app] refreshToken must be sent in request body"
                 );
               }
-              const result2 = yield app.refreshToken({ refreshToken: refreshToken2 });
-              delete result2.authentication.clientSecret;
+              const result = yield app.refreshToken({ refreshToken: refreshToken2 });
+              delete result.authentication.clientSecret;
               return {
                 status: 200,
                 headers: {
                   "content-type": "application/json",
                   "access-control-allow-origin": "*"
                 },
-                text: JSON.stringify(result2)
+                text: JSON.stringify(result)
               };
             }
             if (route === routes.scopeToken) {
@@ -60327,17 +60358,17 @@ if (cid) {
                   '[@octokit/oauth-app] "Authorization" header is required'
                 );
               }
-              const result2 = yield app.scopeToken(__spreadValues({
+              const result = yield app.scopeToken(__spreadValues({
                 token: token2
               }, json));
-              delete result2.authentication.clientSecret;
+              delete result.authentication.clientSecret;
               return {
                 status: 200,
                 headers: {
                   "content-type": "application/json",
                   "access-control-allow-origin": "*"
                 },
-                text: JSON.stringify(result2)
+                text: JSON.stringify(result)
               };
             }
             if (route === routes.deleteToken) {
@@ -60644,737 +60675,12 @@ if (cid) {
   });
 
   // src/app.js
+  var import_react4 = __toESM(require_react());
+  var import_client = __toESM(require_client());
+
+  // src/root-layout.js
   var import_react3 = __toESM(require_react());
-  var import_react_dom = __toESM(require_react_dom());
-
-  // src/root-layout.js
-  var import_react2 = __toESM(require_react());
-
-  // src/api/forAwait.js
-  var import_react = __toESM(require_react());
-
-  // src/api/index.js
-  var api_exports = {};
-  __export(api_exports, {
-    breakBskyURL: () => breakBskyURL,
-    breakFeedUri: () => breakFeedUri,
-    getFeedBlobUrl: () => getFeedBlobUrl,
-    getProfileBlobUrl: () => getProfileBlobUrl,
-    isPromise: () => isPromise,
-    likelyDID: () => likelyDID,
-    resolveHandleOrDID: () => resolveHandleOrDID,
-    searchHandle: () => searchHandle,
-    shortenDID: () => shortenDID,
-    shortenHandle: () => shortenHandle,
-    unwrapShortDID: () => unwrapShortDID,
-    unwrapShortHandle: () => unwrapShortHandle,
-    useDerived: () => forAwait
-  });
-
-  // src/api/core.js
-  var import_api = __toESM(require_dist());
-  var oldXrpc = "https://bsky.social/xrpc";
-  var atClient = new import_api.BskyAgent({ service: oldXrpc });
-  patchBskyAgent(atClient);
-  function patchBskyAgent(atClient2) {
-    atClient2.com.atproto.sync._service.xrpc.baseClient.lex.assertValidXrpcOutput = function(lexUri, value, ...rest) {
-      return true;
-    };
-  }
-
-  // src/api/throttled-async-cache.js
-  function throttledAsyncCache(call, { maxConcurrency = 3, interval = 100 } = {}) {
-    const cache = multikeyMap();
-    const outstandingRequests = /* @__PURE__ */ new Set();
-    const waitingRequests = /* @__PURE__ */ new Set();
-    var scheduleMoreLaterTimeout;
-    throttledCall.peek = peek;
-    throttledCall.prepopulate = prepopulate;
-    throttledCall.evict = evict;
-    return (
-      /** @type {*} */
-      throttledCall
-    );
-    function peek(...args) {
-      const result2 = cache.get(...args);
-      if (result2 && !isPromise(result2.value))
-        return result2.value;
-    }
-    function prepopulate(value, ...args) {
-      cache.set(...args, { value });
-    }
-    function evict(...args) {
-      cache.delete(...args);
-    }
-    function throttledCall(...args) {
-      let result2 = cache.get(...args);
-      if (result2) {
-        if (isPromise(result2.value))
-          result2.priority++;
-        return result2.value;
-      }
-      let scheduleNow;
-      const schedulePromise = new Promise((resolve) => scheduleNow = resolve);
-      const entry = {
-        priority: 0,
-        value: invokeCall(),
-        scheduleNow
-      };
-      cache.set(...args, entry);
-      waitingRequests.add(entry);
-      scheduleAsAppropriate();
-      return entry.value;
-      function invokeCall() {
-        return __async(this, null, function* () {
-          yield schedulePromise;
-          waitingRequests.delete(entry);
-          outstandingRequests.add(entry);
-          try {
-            const result3 = yield call(...args);
-            entry.value = result3;
-            return result3;
-          } finally {
-            outstandingRequests.delete(entry);
-            scheduleAsAppropriate();
-          }
-        });
-      }
-    }
-    function scheduleAsAppropriate() {
-      return __async(this, null, function* () {
-        if (outstandingRequests.size >= maxConcurrency)
-          return;
-        if (interval) {
-          yield new Promise((resolve) => setTimeout(resolve, interval));
-          if (outstandingRequests.size >= maxConcurrency)
-            return;
-        }
-        const nextRequest = [...waitingRequests].sort((a2, b) => b.priority - a2.priority)[0];
-        if (!nextRequest)
-          return;
-        nextRequest.scheduleNow();
-        if (outstandingRequests.size < maxConcurrency) {
-          clearTimeout(scheduleMoreLaterTimeout);
-          scheduleMoreLaterTimeout = setTimeout(scheduleAsAppropriate, interval || 100);
-        }
-      });
-    }
-  }
-  function multikeyMap() {
-    const storeMap = /* @__PURE__ */ new Map();
-    const resultMap = {
-      get: get2,
-      set: set2,
-      delete: deleteKeys,
-      has,
-      clear
-    };
-    return resultMap;
-    function get2(...keys) {
-      let entry = storeMap;
-      for (const key of keys) {
-        entry = entry.get(key);
-        if (!entry)
-          return;
-      }
-      return entry._value;
-    }
-    function set2(...keys) {
-      let entry = storeMap;
-      for (let i2 = 0; i2 < keys.length - 1; i2++) {
-        const key = keys[i2];
-        entry = entry.get(key) || entry.set(key, /* @__PURE__ */ new Map()).get(key);
-      }
-      entry._value = keys[keys.length - 1];
-      return resultMap;
-    }
-    function deleteKeys(...keys) {
-      let entry = storeMap;
-      for (let i2 = 0; i2 < keys.length - 1; i2++) {
-        const key = keys[i2];
-        entry = entry.get(key);
-        if (!entry)
-          return false;
-      }
-      return entry.delete[keys.length - 1];
-    }
-    function has(...keys) {
-      let entry = storeMap;
-      for (const key of keys) {
-        entry = entry.get(key);
-        if (!entry)
-          return false;
-      }
-      return true;
-    }
-    function clear() {
-      return storeMap.clear();
-    }
-  }
-
-  // src/api/resolve-handle-or-did.js
-  var resolveHandleCache = throttledAsyncCache((handle) => __async(void 0, null, function* () {
-    const resolved = yield atClient.com.atproto.identity.resolveHandle({
-      handle: unwrapShortHandle(handle)
-    });
-    if (!resolved.data.did)
-      throw new Error("Handle did not resolve: " + handle);
-    return shortenDID(resolved.data.did);
-  }));
-  var resolveDIDCache = throttledAsyncCache((did) => __async(void 0, null, function* () {
-    var _a2, _b, _c, _d, _e, _f;
-    const fullDID = unwrapShortDID(did);
-    const shortDID = shortenDID(did);
-    const describePromise = atClient.com.atproto.repo.describeRepo({
-      repo: fullDID
-    });
-    const profilePromise = atClient.com.atproto.repo.listRecords({
-      collection: "app.bsky.actor.profile",
-      repo: fullDID
-    });
-    const [describe, profile] = yield Promise.all([describePromise, profilePromise]);
-    if (!describe.data.handle)
-      throw new Error("DID does not have a handle: " + did);
-    const shortHandle = shortenHandle(describe.data.handle);
-    const profileRec = (_b = (_a2 = profile.data.records) == null ? void 0 : _a2.filter((rec) => rec.value)[0]) == null ? void 0 : _b.value;
-    const avatarUrl = getProfileBlobUrl(fullDID, (_d = (_c = profileRec == null ? void 0 : profileRec.avatar) == null ? void 0 : _c.ref) == null ? void 0 : _d.toString());
-    const bannerUrl = getProfileBlobUrl(fullDID, (_f = (_e = profileRec == null ? void 0 : profileRec.banner) == null ? void 0 : _e.ref) == null ? void 0 : _f.toString());
-    const displayName = profileRec == null ? void 0 : profileRec.displayName;
-    const description = profileRec == null ? void 0 : profileRec.description;
-    const profileDetails = {
-      shortDID,
-      shortHandle,
-      avatarUrl,
-      bannerUrl,
-      displayName,
-      description
-    };
-    resolveHandleCache.prepopulate(shortDID, shortHandle);
-    return profileDetails;
-  }));
-  function resolveHandleOrDID(handleOrDid) {
-    if (likelyDID(handleOrDid))
-      return resolveDIDCache(unwrapShortDID(handleOrDid));
-    const didOrPromise = resolveHandleCache(unwrapShortHandle(handleOrDid));
-    if (isPromise(didOrPromise))
-      return didOrPromise.then(resolveDIDCache);
-    else
-      return resolveDIDCache(didOrPromise);
-  }
-  resolveHandleOrDID.peek = peekHandleOrDID;
-  function peekHandleOrDID(handleOrDID) {
-    if (!handleOrDID)
-      return;
-    if (likelyDID(handleOrDID))
-      return resolveDIDCache.peek(unwrapShortDID(handleOrDID));
-    return resolveHandleCache.peek(unwrapShortHandle(handleOrDID));
-  }
-
-  // src/api/search/perform-search-over-buckets.js
-  function performSearchOverBuckets(searchText, buckets2) {
-    const searchWords = searchText.split(/\s+/g).map(function(w) {
-      return w.trim().toLowerCase();
-    }).filter(function(w) {
-      return !!w;
-    });
-    const combinedSearchUniverse = [];
-    for (const bucket of buckets2) {
-      if (!bucket)
-        continue;
-      for (var shortDID in bucket) {
-        const accountIndexEntry = bucket[shortDID];
-        if (typeof accountIndexEntry === "string")
-          combinedSearchUniverse.push({ shortDID, shortHandle: accountIndexEntry });
-        else if (Array.isArray(accountIndexEntry))
-          combinedSearchUniverse.push({ shortDID, shortHandle: accountIndexEntry[0], displayName: accountIndexEntry[1] });
-      }
-    }
-    const searchResults = [];
-    for (const entry of combinedSearchUniverse) {
-      const shortDID2 = entry.shortDID;
-      const shortHandle = entry.shortHandle || "";
-      const displayName = entry.displayName || "";
-      let rank = 0;
-      let matchShortDID = false;
-      let matchHandle = false;
-      let matchDisplayName = false;
-      for (const searchWord of searchWords) {
-        const shortDIDRank = rankShortDID(searchWord, shortDID2);
-        if (shortDIDRank)
-          matchShortDID = true;
-        const handleRank = rankHandle(searchWord, shortHandle);
-        if (handleRank)
-          matchHandle = true;
-        const displayNameRank = rankDisplayName(searchWord, displayName);
-        if (displayNameRank)
-          matchDisplayName = true;
-        rank += shortDIDRank + handleRank + displayNameRank;
-      }
-      if (rank > 0)
-        searchResults.push({
-          shortDID: shortDID2,
-          shortHandle,
-          displayName: displayName || void 0,
-          rank,
-          matchShortDID,
-          matchHandle,
-          matchDisplayName
-        });
-    }
-    searchResults.sort(function(a2, b) {
-      return b.rank - a2.rank;
-    });
-    return searchResults;
-  }
-  function rankShortDID(searchString, shortDID) {
-    if (!searchString || !shortDID)
-      return 0;
-    if (searchString.endsWith("did:plc:") && ("did:plc:" + shortDID).endsWith(searchString))
-      return 2e3;
-    if (shortDID.startsWith(searchString))
-      return 1e3;
-    return 0;
-  }
-  function rankHandle(searchString, handle) {
-    if (!searchString || !handle)
-      return 0;
-    if (searchString.endsWith(".bsky.social")) {
-      if (handle.indexOf(".") >= 0 && handle + ".bsky.social" === searchString)
-        return 2e3;
-      else
-        rankHandle(searchString.slice(0, -".bsky.social".length), handle) / 2;
-    }
-    let posInHandle = handle.indexOf(searchString);
-    let downRankRatio = 1;
-    if (posInHandle < 0) {
-      posInHandle = handle.replace(/[^a-z0-9]/g, "").indexOf(searchString);
-      if (posInHandle >= 0)
-        downRankRatio = 0.5;
-    }
-    if (posInHandle < 0)
-      return 0;
-    if (posInHandle === 0)
-      return searchString.length * 1.5 * downRankRatio;
-    else
-      return searchString.length * 0.8 * downRankRatio;
-  }
-  function rankDisplayName(searchString, displayName) {
-    if (!searchString || !displayName)
-      return 0;
-    const displayNameLower = displayName.toLowerCase();
-    const posInDisplayName = displayNameLower.indexOf(searchString);
-    if (posInDisplayName < 0)
-      return 0;
-    if (posInDisplayName === 0)
-      return searchString.length * 1.5;
-    if (displayName.charAt(posInDisplayName - 1) === " ")
-      return searchString.length * 0.9;
-    else
-      return searchString.length * 0.5;
-  }
-
-  // src/api/search/search-handle.js
-  var cachedSearches = {};
-  function searchHandle(searchText) {
-    if (cachedSearches[searchText])
-      return cachedSearches[searchText];
-    const directResolvesOrPromises = searchText.split(/\s+/).filter((word) => !!word).map((word) => {
-      const bskyLink = breakBskyURL(word);
-      if (bskyLink) {
-        let accountOrPromise2 = resolveHandleOrDID(bskyLink.handleOrDID);
-        if (isPromise(accountOrPromise2))
-          return accountOrPromise2.catch(() => void 0).then((account) => expandResolvedAccountToSearchMatch(word, account, bskyLink.post));
-        else
-          return expandResolvedAccountToSearchMatch(word, accountOrPromise2, bskyLink.post);
-      }
-      const feedLink = breakFeedUri(word);
-      if (feedLink) {
-        let accountOrPromise2 = resolveHandleOrDID(feedLink.shortDID);
-        if (isPromise(accountOrPromise2))
-          return accountOrPromise2.catch(() => void 0).then((account) => expandResolvedAccountToSearchMatch(word, account, feedLink.postID));
-        else
-          return expandResolvedAccountToSearchMatch(word, accountOrPromise2, feedLink.postID);
-      }
-      let accountOrPromise = resolveHandleOrDID(word);
-      if (isPromise(accountOrPromise))
-        return accountOrPromise.catch(() => void 0).then((account) => expandResolvedAccountToSearchMatch(word, account));
-      else
-        return expandResolvedAccountToSearchMatch(word, accountOrPromise);
-    });
-    const wordStarts = getWordStartsLowerCase(searchText, 3);
-    if (!wordStarts.length)
-      return [];
-    const bucketsOrPromises = wordStarts.map((wordStart) => getBucket(wordStart));
-    const allStaticallyResolved = !directResolvesOrPromises.some((accountOrPromise) => isPromise(accountOrPromise)) && !bucketsOrPromises.some((bucket) => isPromise(bucket));
-    if (allStaticallyResolved) {
-      let searchMatches = performSearchOverBuckets(
-        searchText,
-        /** @type {IndexedBucket[]} */
-        bucketsOrPromises
-      );
-      const exactMatches = (
-        /** @type {(SearchMatch & AccountInfo)[]} */
-        directResolvesOrPromises.filter((account) => !!account && !searchMatches.some((match) => match.shortDID === account.shortDID))
-      );
-      searchMatches = exactMatches.concat(searchMatches);
-      cachedSearches[searchText] = searchMatches;
-      return searchMatches;
-    }
-    return (() => __async(this, null, function* () {
-      const buckets2 = yield Promise.all(bucketsOrPromises);
-      const directResolves = yield Promise.all(directResolvesOrPromises);
-      let searchMatches = performSearchOverBuckets(searchText, buckets2);
-      const exactMatches = (
-        /** @type {(SearchMatch & AccountInfo)[]} */
-        directResolves.filter((account) => !!account && !searchMatches.some((match) => match.shortDID === account.shortDID))
-      );
-      searchMatches = exactMatches.concat(searchMatches);
-      cachedSearches[searchText] = searchMatches;
-      return searchMatches;
-    }))();
-  }
-  var wordStartRegExp = /[A-Z]*[a-z]*/g;
-  function getWordStartsLowerCase(str, count, wordStarts) {
-    if (typeof count !== "number" || !Number.isFinite(count))
-      count = 3;
-    if (!wordStarts)
-      wordStarts = [];
-    str.replace(wordStartRegExp, function(match) {
-      const wordStart = match && match.slice(0, count).toLowerCase();
-      if (wordStart && wordStart.length === count && /** @type {string[]} */
-      wordStarts.indexOf(wordStart) < 0)
-        wordStarts.push(wordStart);
-      return match;
-    });
-    return wordStarts;
-  }
-  var buckets = {};
-  function getBucket(threeLetterPrefix) {
-    if (buckets[threeLetterPrefix])
-      return buckets[threeLetterPrefix];
-    return buckets[threeLetterPrefix] = (() => __async(this, null, function* () {
-      const bucketPath = "https://colds.ky/index/" + threeLetterPrefix[0] + "/" + threeLetterPrefix.slice(0, 2) + "/" + threeLetterPrefix.slice(1) + ".json";
-      const bucket = yield fetch(bucketPath).then((r2) => r2.json()).catch((err) => {
-        console.warn(
-          "Failed to fetch bucket for " + threeLetterPrefix,
-          err
-        );
-      });
-      return bucket;
-    }))();
-  }
-  function expandResolvedAccountToSearchMatch(handleOrDID, account, postID) {
-    return account && __spreadProps(__spreadValues({}, account), {
-      rank: 2e3,
-      matchShortDID: shortenDID(handleOrDID) === account.shortDID,
-      matchHandle: shortenHandle(handleOrDID) === account.shortHandle,
-      matchDisplayName: (account.displayName || "").toLowerCase().indexOf(handleOrDID.toLowerCase()) >= 0,
-      postID
-    });
-  }
-
-  // src/api/index.js
-  function getProfileBlobUrl(did, cid) {
-    if (!did || !cid)
-      return void 0;
-    return `https://cdn.bsky.app/img/avatar/plain/${unwrapShortDID(did)}/${cid}@jpeg`;
-  }
-  function getFeedBlobUrl(did, cid) {
-    if (!did || !cid)
-      return void 0;
-    return `https://cdn.bsky.app/img/feed_thumbnail/plain/${unwrapShortDID(did)}/${cid}@jpeg`;
-  }
-  function likelyDID(text) {
-    return !!text && (!text.trim().indexOf("did:") || text.trim().length === 24 && !/[^\sa-z0-9]/i.test(text));
-  }
-  function shortenDID(did) {
-    return did && /** @type {T} */
-    (did.replace(_shortenDID_Regex, "").toLowerCase() || void 0);
-  }
-  var _shortenDID_Regex = /^did\:plc\:/;
-  function unwrapShortDID(shortDID) {
-    return !shortDID ? void 0 : shortDID.indexOf(":") < 0 ? "did:plc:" + shortDID.toLowerCase() : shortDID.toLowerCase();
-  }
-  function shortenHandle(handle) {
-    handle = cheapNormalizeHandle(handle);
-    return handle && /** @type {T} */
-    (handle.replace(_shortenHandle_Regex, "").toLowerCase() || void 0);
-  }
-  var _shortenHandle_Regex = /\.bsky\.social$/;
-  function unwrapShortHandle(shortHandle) {
-    shortHandle = cheapNormalizeHandle(shortHandle);
-    return !shortHandle ? void 0 : shortHandle.indexOf(".") < 0 ? shortHandle.toLowerCase() + ".bsky.social" : shortHandle.toLowerCase();
-  }
-  function cheapNormalizeHandle(handle) {
-    handle = handle && handle.trim().toLowerCase();
-    if (handle && handle.charCodeAt(0) === 64)
-      handle = handle.slice(1);
-    const urlprefix = "https://bsky.app/";
-    if (handle && handle.lastIndexOf(urlprefix, 0) === 0) {
-      const bskyURL = breakBskyURL(handle);
-      if (bskyURL && bskyURL.shortDID)
-        return bskyURL.shortDID;
-    }
-    if (handle && handle.lastIndexOf("at:", 0) === 0) {
-      const feedUri = breakFeedUri(handle);
-      if (feedUri && feedUri.shortDID)
-        return feedUri.shortDID;
-    }
-    return handle || void 0;
-  }
-  function breakBskyURL(url) {
-    if (!url)
-      return;
-    const match = _breakBskyURL_Regex.exec(url);
-    if (!match)
-      return;
-    const handleOrDID = match[1];
-    let result2;
-    const resolved = resolveHandleOrDID.peek(handleOrDID);
-    if (resolved) {
-      result2 = { handleOrDID, shortDID: resolved.shortDID, shortHandle: resolved.shortHandle };
-    } else {
-      if (likelyDID(handleOrDID))
-        result2 = { handleOrDID, shortDID: shortenDID(handleOrDID) };
-      else
-        result2 = { handleOrDID, shortHandle: shortenHandle(handleOrDID) };
-    }
-    if (match[2] && match[4])
-      result2[match[2]] = match[4];
-    return result2;
-  }
-  var _breakBskyURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/([^\/]+)(\/([^\\]+)(\/|$))?/i;
-  function breakFeedUri(uri) {
-    if (!uri)
-      return;
-    const match = _breakFeedUri_Regex.exec(uri);
-    if (!match || !match[3])
-      return;
-    return { shortDID: match[2], postID: match[3] };
-  }
-  var _breakFeedUri_Regex = /^at\:\/\/(did:plc:)?([a-z0-9]+)\/[a-z\.]+\/?(.*)?$/;
-  function isPromise(x) {
-    if (!x || typeof x !== "object")
-      return false;
-    else
-      return typeof x.then === "function";
-  }
-
-  // src/api/forAwait.js
-  function forAwait(from, derive, catchError) {
-    var _a2;
-    const [state, setState] = (0, import_react.useState)(
-      /** @type {State} */
-      {}
-    );
-    let fromToken;
-    if (!state.from || state.from.value !== from) {
-      fromToken = state.from = { value: from };
-      state.sync = true;
-      state.to = {};
-      const run = (callback) => {
-        if (!callback)
-          return;
-        if (state.sync) {
-          try {
-            callback();
-          } catch (error) {
-            handleError(error);
-          }
-          return;
-        }
-        if (!state.to.continueDerivePromise) {
-          state.to.continueDerivePromise = new Promise((resolve) => state.to.continueDerive = resolve);
-          try {
-            callback();
-          } catch (error) {
-            handleError(error);
-          }
-        } else {
-          state.to.continueDerivePromise = state.to.continueDerivePromise.then(() => {
-            try {
-              callback();
-            } catch (error) {
-              handleError(error);
-            }
-          });
-        }
-      };
-      const runFinalizers = () => {
-        var _a3;
-        const finalizers = (_a3 = state.to) == null ? void 0 : _a3.finalizers;
-        if (finalizers) {
-          state.to.finalizers = void 0;
-          for (const finalizer of finalizers) {
-            if (typeof finalizer === "function") {
-              try {
-                finalizer();
-              } catch (finalizerError) {
-                console.warn("finalizer threw an error", finalizerError);
-              }
-            }
-          }
-        }
-      };
-      state.runFinalizers = runFinalizers;
-      const handleError = (error) => {
-        state.to.failed = true;
-        state.to.continueDerive = void 0;
-        state.to.continueDerivePromise = void 0;
-        state.runFinalizers = void 0;
-        if (typeof catchError === "function") {
-          try {
-            state.to.current = catchError(error, from);
-          } catch (secondaryError) {
-            console.warn("catchError threw an error", { originalError: error, secondaryError });
-          }
-        }
-        runFinalizers();
-      };
-      continueWith({
-        from,
-        alive: function alive(callback) {
-          if (state.from !== fromToken || state.to.failed)
-            return;
-          run(callback);
-        },
-        addFinalizer: (finalizer) => {
-          if (state.from !== fromToken || state.to.failed) {
-            if (typeof finalizer === "function") {
-              try {
-                finalizer();
-              } catch (finalizerError) {
-                console.warn("finalizer threw an error", finalizerError);
-              }
-            }
-            return;
-          }
-          if (!state.to.finalizers)
-            state.to.finalizers = [finalizer];
-          else
-            state.to.finalizers.push(finalizer);
-        },
-        next: function next(value, callback) {
-          if (state.from !== fromToken || state.to.failed)
-            return;
-          state.to.current = value;
-          if (!state.sync)
-            setState({ from: state.from, to: state.to });
-          run(callback);
-        },
-        error: function error(error) {
-          if (state.from !== fromToken || state.to.failed)
-            return;
-          state.to.error = error;
-          state.to.failed = true;
-        }
-      }, derive);
-    } else if (state.to.continueDerive) {
-      state.sync = true;
-      state.to.continueDerive();
-    }
-    state.sync = typeof ((_a2 = state.to) == null ? void 0 : _a2.continueDerive) === "function" ? false : void 0;
-    (0, import_react.useEffect)(() => state.runFinalizers, [state.from]);
-    return state.to.current;
-  }
-  function continueWith(continuation, derive) {
-    if (typeof derive === "function")
-      return continueWithFunction(continuation, derive);
-    if (isPromise(derive))
-      return continueWithPromise(continuation, derive);
-    else if (isIterable(derive))
-      return continueWithIterable(continuation, derive);
-    else if (isAsyncIterable(derive))
-      return continueWithAsyncIterable(continuation, derive);
-    continuation.next(derive);
-  }
-  function continueWithFunction(continuation, func) {
-    try {
-      continueWith(continuation, func(continuation.from));
-    } catch (error) {
-      continuation.error(error);
-    }
-  }
-  function continueWithPromise(continuation, promise) {
-    promise.then(
-      (result2) => {
-        continuation.alive(() => continueWith(continuation, result2));
-      },
-      (error) => {
-        continuation.error(error);
-      }
-    );
-  }
-  function continueWithIterable(continuation, iterable) {
-    try {
-      const iterator2 = iterable[Symbol.iterator]();
-      continuation.addFinalizer(() => {
-        var _a2;
-        return (_a2 = iterator2.return) == null ? void 0 : _a2.call(iterator2);
-      });
-      continueWithIterator(continuation, iterator2);
-    } catch (error) {
-      continuation.error(error);
-    }
-  }
-  function continueWithIterator(continuation, iterator2) {
-    try {
-      const iteratorResult = iterator2.next();
-      if (iteratorResult.done) {
-        if (iteratorResult.value !== void 0)
-          continuation.next(iteratorResult.value);
-      } else {
-        continuation.next(
-          iteratorResult.value,
-          () => continueWithIterator(continuation, iterator2)
-        );
-      }
-    } catch (error) {
-      continuation.error(error);
-    }
-  }
-  function continueWithAsyncIterable(continuation, iterable) {
-    return __async(this, null, function* () {
-      try {
-        const iterator2 = iterable[Symbol.asyncIterator]();
-        continuation.addFinalizer(() => {
-          var _a2;
-          return (_a2 = iterator2.return) == null ? void 0 : _a2.call(iterator2);
-        });
-        continueWithAsyncIterator(continuation, iterator2);
-      } catch (error) {
-        continuation.error(error);
-      }
-    });
-  }
-  function continueWithAsyncIterator(continuation, iterator2) {
-    return __async(this, null, function* () {
-      try {
-        let iteratorPromise = iterator2.next();
-        const iteratorResult = isPromise(iteratorPromise) ? yield iteratorPromise : iteratorPromise;
-        if (iteratorResult.done) {
-          if (iteratorResult.value !== void 0)
-            continuation.next(iteratorResult.value);
-        } else {
-          continuation.next(
-            iteratorResult.value,
-            () => continueWithAsyncIterator(continuation, iterator2)
-          );
-        }
-      } catch (error) {
-        continuation.error(error);
-      }
-    });
-  }
-  function isIterable(value) {
-    return value && typeof value[Symbol.iterator] === "function";
-  }
-  function isAsyncIterable(value) {
-    return value && typeof value[Symbol.asyncIterator] === "function";
-  }
-
-  // src/root-layout.js
-  var import_api3 = __toESM(require_dist());
+  var import_api5 = __toESM(require_dist());
 
   // node_modules/octokit/dist-web/index.js
   var dist_web_exports7 = {};
@@ -61385,7 +60691,7 @@ if (cid) {
     RequestError: () => RequestError,
     createNodeMiddleware: () => createNodeMiddleware2
   });
-  var import_core3 = __toESM(require_dist_node4());
+  var import_core2 = __toESM(require_dist_node4());
 
   // node_modules/@octokit/plugin-paginate-rest/dist-web/index.js
   var VERSION3 = "9.1.5";
@@ -61465,8 +60771,8 @@ if (cid) {
     );
   }
   function gather(octokit, results, iterator2, mapFn) {
-    return iterator2.next().then((result2) => {
-      if (result2.done) {
+    return iterator2.next().then((result) => {
+      if (result.done) {
         return results;
       }
       let earlyExit = false;
@@ -61474,7 +60780,7 @@ if (cid) {
         earlyExit = true;
       }
       results = results.concat(
-        mapFn ? mapFn(result2.value, done) : result2.value.data
+        mapFn ? mapFn(result.value, done) : result.value.data
       );
       if (earlyExit) {
         return results;
@@ -61544,13 +60850,13 @@ if (cid) {
         return currentPath;
       }
       if (isObject(currentValue)) {
-        const result2 = deepFindPathToProperty(
+        const result = deepFindPathToProperty(
           currentValue,
           searchProp,
           currentPath
         );
-        if (result2.length > 0) {
-          return result2;
+        if (result.length > 0) {
+          return result;
         }
       }
     }
@@ -64023,7 +63329,7 @@ if (cid) {
   init_dist_web2();
 
   // node_modules/@octokit/app/dist-web/index.js
-  var import_core2 = __toESM(require_dist_node4());
+  var import_core = __toESM(require_dist_node4());
   var import_auth_app = __toESM(require_dist_node6());
   var import_oauth_app = __toESM(require_dist_node8());
 
@@ -64782,10 +64088,10 @@ if (cid) {
   function eachInstallation(app, callback) {
     return __async(this, null, function* () {
       const i2 = eachInstallationIterator(app)[Symbol.asyncIterator]();
-      let result2 = yield i2.next();
-      while (!result2.done) {
-        yield callback(result2.value);
-        result2 = yield i2.next();
+      let result = yield i2.next();
+      while (!result.done) {
+        yield callback(result.value);
+        result = yield i2.next();
       }
     });
   }
@@ -64833,14 +64139,14 @@ if (cid) {
         app,
         callback ? queryOrCallback : void 0
       )[Symbol.asyncIterator]();
-      let result2 = yield i2.next();
-      while (!result2.done) {
+      let result = yield i2.next();
+      while (!result.done) {
         if (callback) {
-          yield callback(result2.value);
+          yield callback(result.value);
         } else {
-          yield queryOrCallback(result2.value);
+          yield queryOrCallback(result.value);
         }
-        result2 = yield i2.next();
+        result = yield i2.next();
       }
     });
   }
@@ -64959,7 +64265,7 @@ if (cid) {
       return AppWithDefaults;
     }
     constructor(options) {
-      const Octokit5 = options.Octokit || import_core2.Octokit;
+      const Octokit5 = options.Octokit || import_core.Octokit;
       const authOptions = Object.assign(
         {
           appId: options.appId,
@@ -65025,7 +64331,7 @@ if (cid) {
   // node_modules/octokit/dist-web/index.js
   var import_oauth_app3 = __toESM(require_dist_node8());
   var VERSION11 = "3.1.2";
-  var Octokit = import_core3.Octokit.plugin(
+  var Octokit = import_core2.Octokit.plugin(
     restEndpointMethods,
     paginateRest,
     paginateGraphql,
@@ -65059,38 +64365,862 @@ if (cid) {
   var App2 = App.defaults({ Octokit });
   var OAuthApp2 = import_oauth_app3.OAuthApp.defaults({ Octokit });
 
-  // src/root-layout.js
-  window["atproto"] = import_api3.default;
-  window["octokit"] = dist_web_exports7;
-  window["require"] = /** @type {*} */
-  emulateRequire;
-  function emulateRequire(moduleName) {
-    switch (moduleName) {
-      case "@atproto/api":
-        return import_api3.default;
-      case "octokit":
-        return dist_web_exports7;
-      case "../api":
-        return api_exports;
+  // src/api/index.js
+  var api_exports = {};
+  __export(api_exports, {
+    breakBskyURL: () => breakBskyURL,
+    breakFeedUri: () => breakFeedUri,
+    getFeedBlobUrl: () => getFeedBlobUrl,
+    getProfileBlobUrl: () => getProfileBlobUrl,
+    isPromise: () => isPromise,
+    likelyDID: () => likelyDID,
+    resolveHandleOrDID: () => resolveHandleOrDID,
+    searchHandle: () => searchHandle,
+    shortenDID: () => shortenDID,
+    shortenHandle: () => shortenHandle,
+    unwrapShortDID: () => unwrapShortDID,
+    unwrapShortHandle: () => unwrapShortHandle,
+    useDerived: () => forAwait
+  });
+
+  // src/api/core.js
+  var import_api = __toESM(require_dist());
+  var oldXrpc = "https://bsky.social/xrpc";
+  var atClient = new import_api.BskyAgent({ service: oldXrpc });
+  patchBskyAgent(atClient);
+  function patchBskyAgent(atClient2) {
+    atClient2.com.atproto.sync._service.xrpc.baseClient.lex.assertValidXrpcOutput = function(lexUri, value, ...rest) {
+      return true;
+    };
+  }
+  function getKeyShortDID(did) {
+    const shortDID = shortenDID(did);
+    const fullDID = unwrapShortDID(did);
+    if (!shortDID)
+      return void 0;
+    if (shortDID && shortDID === fullDID)
+      return shortDID.slice(0, 2);
+    return "web";
+  }
+
+  // src/api/throttled-async-cache.js
+  function throttledAsyncCache(call, { maxConcurrency = 3, interval = 100 } = {}) {
+    const cache = multikeyMap();
+    const outstandingRequests = /* @__PURE__ */ new Set();
+    const waitingRequests = /* @__PURE__ */ new Set();
+    var scheduleMoreLaterTimeout;
+    throttledCall.peek = peek;
+    throttledCall.prepopulate = prepopulate;
+    throttledCall.evict = evict;
+    return (
+      /** @type {*} */
+      throttledCall
+    );
+    function peek(...args) {
+      const result = cache.get(...args);
+      if (result && !isPromise(result.value))
+        return result.value;
+    }
+    function prepopulate(value, ...args) {
+      cache.set(...args, { value });
+    }
+    function evict(...args) {
+      cache.delete(...args);
+    }
+    function throttledCall(...args) {
+      let result = cache.get(...args);
+      if (result) {
+        if (isPromise(result.value))
+          result.priority++;
+        return result.value;
+      }
+      let scheduleNow;
+      const schedulePromise = new Promise((resolve) => scheduleNow = resolve);
+      const entry = {
+        priority: 0,
+        value: invokeCall(),
+        scheduleNow
+      };
+      cache.set(...args, entry);
+      waitingRequests.add(entry);
+      scheduleAsAppropriate();
+      return entry.value;
+      function invokeCall() {
+        return __async(this, null, function* () {
+          yield schedulePromise;
+          waitingRequests.delete(entry);
+          outstandingRequests.add(entry);
+          try {
+            const result2 = yield call(...args);
+            entry.value = result2;
+            return result2;
+          } finally {
+            outstandingRequests.delete(entry);
+            scheduleAsAppropriate();
+          }
+        });
+      }
+    }
+    function scheduleAsAppropriate() {
+      return __async(this, null, function* () {
+        if (outstandingRequests.size >= maxConcurrency)
+          return;
+        if (interval) {
+          yield new Promise((resolve) => setTimeout(resolve, interval));
+          if (outstandingRequests.size >= maxConcurrency)
+            return;
+        }
+        const nextRequest = [...waitingRequests].sort((a2, b) => b.priority - a2.priority)[0];
+        if (!nextRequest)
+          return;
+        nextRequest.scheduleNow();
+        if (outstandingRequests.size < maxConcurrency) {
+          clearTimeout(scheduleMoreLaterTimeout);
+          scheduleMoreLaterTimeout = setTimeout(scheduleAsAppropriate, interval || 100);
+        }
+      });
     }
   }
-  function RootLayout({
-    title,
-    subtitle,
+  function multikeyMap() {
+    const storeMap = /* @__PURE__ */ new Map();
+    const resultMap = {
+      get: get2,
+      set: set2,
+      delete: deleteKeys,
+      has,
+      clear
+    };
+    return resultMap;
+    function get2(...keys) {
+      let entry = storeMap;
+      for (const key of keys) {
+        entry = entry.get(key);
+        if (!entry)
+          return;
+      }
+      return entry._value;
+    }
+    function set2(...keys) {
+      let entry = storeMap;
+      for (let i2 = 0; i2 < keys.length - 1; i2++) {
+        const key = keys[i2];
+        entry = entry.get(key) || entry.set(key, /* @__PURE__ */ new Map()).get(key);
+      }
+      entry._value = keys[keys.length - 1];
+      return resultMap;
+    }
+    function deleteKeys(...keys) {
+      let entry = storeMap;
+      for (let i2 = 0; i2 < keys.length - 1; i2++) {
+        const key = keys[i2];
+        entry = entry.get(key);
+        if (!entry)
+          return false;
+      }
+      return entry.delete[keys.length - 1];
+    }
+    function has(...keys) {
+      let entry = storeMap;
+      for (const key of keys) {
+        entry = entry.get(key);
+        if (!entry)
+          return false;
+      }
+      return true;
+    }
+    function clear() {
+      return storeMap.clear();
+    }
+  }
+
+  // src/api/resolve-handle-or-did.js
+  var resolveHandleCache = throttledAsyncCache((handle) => __async(void 0, null, function* () {
+    const resolved = yield atClient.com.atproto.identity.resolveHandle({
+      handle: unwrapShortHandle(handle)
+    });
+    if (!resolved.data.did)
+      throw new Error("Handle did not resolve: " + handle);
+    return shortenDID(resolved.data.did);
+  }));
+  var resolveDIDCache = throttledAsyncCache((did) => __async(void 0, null, function* () {
+    var _a2, _b, _c, _d, _e, _f;
+    const fullDID = unwrapShortDID(did);
+    const shortDID = shortenDID(did);
+    const describePromise = atClient.com.atproto.repo.describeRepo({
+      repo: fullDID
+    });
+    const profilePromise = atClient.com.atproto.repo.listRecords({
+      collection: "app.bsky.actor.profile",
+      repo: fullDID
+    });
+    const [describe, profile] = yield Promise.all([describePromise, profilePromise]);
+    if (!describe.data.handle)
+      throw new Error("DID does not have a handle: " + did);
+    const shortHandle = shortenHandle(describe.data.handle);
+    const profileRec = (_b = (_a2 = profile.data.records) == null ? void 0 : _a2.filter((rec) => rec.value)[0]) == null ? void 0 : _b.value;
+    const avatarUrl = getProfileBlobUrl(fullDID, (_d = (_c = profileRec == null ? void 0 : profileRec.avatar) == null ? void 0 : _c.ref) == null ? void 0 : _d.toString());
+    const bannerUrl = getProfileBlobUrl(fullDID, (_f = (_e = profileRec == null ? void 0 : profileRec.banner) == null ? void 0 : _e.ref) == null ? void 0 : _f.toString());
+    const displayName = profileRec == null ? void 0 : profileRec.displayName;
+    const description = profileRec == null ? void 0 : profileRec.description;
+    const profileDetails = {
+      shortDID,
+      shortHandle,
+      avatarUrl,
+      bannerUrl,
+      displayName,
+      description
+    };
+    resolveHandleCache.prepopulate(shortDID, shortHandle);
+    return profileDetails;
+  }));
+  function resolveHandleOrDID(handleOrDid) {
+    if (likelyDID(handleOrDid))
+      return resolveDIDCache(unwrapShortDID(handleOrDid));
+    const didOrPromise = resolveHandleCache(unwrapShortHandle(handleOrDid));
+    if (isPromise(didOrPromise))
+      return didOrPromise.then(resolveDIDCache);
+    else
+      return resolveDIDCache(didOrPromise);
+  }
+  resolveHandleOrDID.peek = peekHandleOrDID;
+  function peekHandleOrDID(handleOrDID) {
+    if (!handleOrDID)
+      return;
+    if (likelyDID(handleOrDID))
+      return resolveDIDCache.peek(unwrapShortDID(handleOrDID));
+    return resolveHandleCache.peek(unwrapShortHandle(handleOrDID));
+  }
+
+  // src/api/search/perform-search-over-buckets.js
+  function performSearchOverBuckets(searchText, buckets2) {
+    const searchWords = searchText.split(/\s+/g).map(function(w) {
+      return w.trim().toLowerCase();
+    }).filter(function(w) {
+      return !!w;
+    });
+    const combinedSearchUniverse = [];
+    for (const bucket of buckets2) {
+      if (!bucket)
+        continue;
+      for (var shortDID in bucket) {
+        const accountIndexEntry = bucket[shortDID];
+        if (typeof accountIndexEntry === "string")
+          combinedSearchUniverse.push({ shortDID, shortHandle: accountIndexEntry });
+        else if (Array.isArray(accountIndexEntry))
+          combinedSearchUniverse.push({ shortDID, shortHandle: accountIndexEntry[0], displayName: accountIndexEntry[1] });
+      }
+    }
+    const searchResults = [];
+    for (const entry of combinedSearchUniverse) {
+      const shortDID2 = entry.shortDID;
+      const shortHandle = entry.shortHandle || "";
+      const displayName = entry.displayName || "";
+      let rank = 0;
+      let matchShortDID = false;
+      let matchHandle = false;
+      let matchDisplayName = false;
+      for (const searchWord of searchWords) {
+        const shortDIDRank = rankShortDID(searchWord, shortDID2);
+        if (shortDIDRank)
+          matchShortDID = true;
+        const handleRank = rankHandle(searchWord, shortHandle);
+        if (handleRank)
+          matchHandle = true;
+        const displayNameRank = rankDisplayName(searchWord, displayName);
+        if (displayNameRank)
+          matchDisplayName = true;
+        rank += shortDIDRank + handleRank + displayNameRank;
+      }
+      if (rank > 0)
+        searchResults.push({
+          shortDID: shortDID2,
+          shortHandle,
+          displayName: displayName || void 0,
+          rank,
+          matchShortDID,
+          matchHandle,
+          matchDisplayName
+        });
+    }
+    searchResults.sort(function(a2, b) {
+      return b.rank - a2.rank;
+    });
+    return searchResults;
+  }
+  function rankShortDID(searchString, shortDID) {
+    if (!searchString || !shortDID)
+      return 0;
+    if (searchString.endsWith("did:plc:") && ("did:plc:" + shortDID).endsWith(searchString))
+      return 2e3;
+    if (shortDID.startsWith(searchString))
+      return 1e3;
+    return 0;
+  }
+  function rankHandle(searchString, handle) {
+    if (!searchString || !handle)
+      return 0;
+    if (searchString.endsWith(".bsky.social")) {
+      if (handle.indexOf(".") >= 0 && handle + ".bsky.social" === searchString)
+        return 2e3;
+      else
+        rankHandle(searchString.slice(0, -".bsky.social".length), handle) / 2;
+    }
+    let posInHandle = handle.indexOf(searchString);
+    let downRankRatio = 1;
+    if (posInHandle < 0) {
+      posInHandle = handle.replace(/[^a-z0-9]/g, "").indexOf(searchString);
+      if (posInHandle >= 0)
+        downRankRatio = 0.5;
+    }
+    if (posInHandle < 0)
+      return 0;
+    if (posInHandle === 0)
+      return searchString.length * 1.5 * downRankRatio;
+    else
+      return searchString.length * 0.8 * downRankRatio;
+  }
+  function rankDisplayName(searchString, displayName) {
+    if (!searchString || !displayName)
+      return 0;
+    const displayNameLower = displayName.toLowerCase();
+    const posInDisplayName = displayNameLower.indexOf(searchString);
+    if (posInDisplayName < 0)
+      return 0;
+    if (posInDisplayName === 0)
+      return searchString.length * 1.5;
+    if (displayName.charAt(posInDisplayName - 1) === " ")
+      return searchString.length * 0.9;
+    else
+      return searchString.length * 0.5;
+  }
+
+  // src/api/search/search-handle.js
+  var cachedSearches = {};
+  function searchHandle(searchText) {
+    if (cachedSearches[searchText])
+      return cachedSearches[searchText];
+    const directResolvesOrPromises = searchText.split(/\s+/).filter((word) => !!word).map((word) => {
+      const bskyLink = breakBskyURL(word);
+      if (bskyLink) {
+        let accountOrPromise2 = resolveHandleOrDID(bskyLink.handleOrDID);
+        if (isPromise(accountOrPromise2))
+          return accountOrPromise2.catch(() => void 0).then((account) => expandResolvedAccountToSearchMatch(word, account, bskyLink.post));
+        else
+          return expandResolvedAccountToSearchMatch(word, accountOrPromise2, bskyLink.post);
+      }
+      const feedLink = breakFeedUri(word);
+      if (feedLink) {
+        let accountOrPromise2 = resolveHandleOrDID(feedLink.shortDID);
+        if (isPromise(accountOrPromise2))
+          return accountOrPromise2.catch(() => void 0).then((account) => expandResolvedAccountToSearchMatch(word, account, feedLink.postID));
+        else
+          return expandResolvedAccountToSearchMatch(word, accountOrPromise2, feedLink.postID);
+      }
+      let accountOrPromise = resolveHandleOrDID(word);
+      if (isPromise(accountOrPromise))
+        return accountOrPromise.catch(() => void 0).then((account) => expandResolvedAccountToSearchMatch(word, account));
+      else
+        return expandResolvedAccountToSearchMatch(word, accountOrPromise);
+    });
+    const wordStarts = getWordStartsLowerCase(searchText, 3);
+    if (!wordStarts.length)
+      return [];
+    const bucketsOrPromises = wordStarts.map((wordStart) => getBucket(wordStart));
+    const allStaticallyResolved = !directResolvesOrPromises.some((accountOrPromise) => isPromise(accountOrPromise)) && !bucketsOrPromises.some((bucket) => isPromise(bucket));
+    if (allStaticallyResolved) {
+      let searchMatches = performSearchOverBuckets(
+        searchText,
+        /** @type {IndexedBucket[]} */
+        bucketsOrPromises
+      );
+      const exactMatches = (
+        /** @type {(SearchMatch & AccountInfo)[]} */
+        directResolvesOrPromises.filter((account) => !!account && !searchMatches.some((match) => match.shortDID === account.shortDID))
+      );
+      searchMatches = exactMatches.concat(searchMatches);
+      cachedSearches[searchText] = searchMatches;
+      return searchMatches;
+    }
+    return (() => __async(this, null, function* () {
+      const buckets2 = yield Promise.all(bucketsOrPromises);
+      const directResolves = yield Promise.all(directResolvesOrPromises);
+      let searchMatches = performSearchOverBuckets(searchText, buckets2);
+      const exactMatches = (
+        /** @type {(SearchMatch & AccountInfo)[]} */
+        directResolves.filter((account) => !!account && !searchMatches.some((match) => match.shortDID === account.shortDID))
+      );
+      searchMatches = exactMatches.concat(searchMatches);
+      cachedSearches[searchText] = searchMatches;
+      return searchMatches;
+    }))();
+  }
+  var wordStartRegExp = /[A-Z]*[a-z]*/g;
+  function getWordStartsLowerCase(str, count, wordStarts) {
+    if (typeof count !== "number" || !Number.isFinite(count))
+      count = 3;
+    if (!wordStarts)
+      wordStarts = [];
+    str.replace(wordStartRegExp, function(match) {
+      const wordStart = match && match.slice(0, count).toLowerCase();
+      if (wordStart && wordStart.length === count && /** @type {string[]} */
+      wordStarts.indexOf(wordStart) < 0)
+        wordStarts.push(wordStart);
+      return match;
+    });
+    return wordStarts;
+  }
+  var buckets = {};
+  function getBucket(threeLetterPrefix) {
+    if (buckets[threeLetterPrefix])
+      return buckets[threeLetterPrefix];
+    return buckets[threeLetterPrefix] = (() => __async(this, null, function* () {
+      const bucketPath = "https://colds.ky/index/" + threeLetterPrefix[0] + "/" + threeLetterPrefix.slice(0, 2) + "/" + threeLetterPrefix.slice(1) + ".json";
+      const bucket = yield fetch(bucketPath).then((r2) => r2.json()).catch((err) => {
+        console.warn(
+          "Failed to fetch bucket for " + threeLetterPrefix,
+          err
+        );
+      });
+      return bucket;
+    }))();
+  }
+  function expandResolvedAccountToSearchMatch(handleOrDID, account, postID) {
+    return account && __spreadProps(__spreadValues({}, account), {
+      rank: 2e3,
+      matchShortDID: shortenDID(handleOrDID) === account.shortDID,
+      matchHandle: shortenHandle(handleOrDID) === account.shortHandle,
+      matchDisplayName: (account.displayName || "").toLowerCase().indexOf(handleOrDID.toLowerCase()) >= 0,
+      postID
+    });
+  }
+
+  // src/api/forAwait.js
+  var import_react = __toESM(require_react());
+  function forAwait(from, derive, catchError) {
+    var _a2;
+    const [state, setState] = (0, import_react.useState)(
+      /** @type {State} */
+      {}
+    );
+    let fromToken;
+    if (!state.from || state.from.value !== from) {
+      fromToken = state.from = { value: from };
+      state.sync = true;
+      state.to = {};
+      const run = (callback) => {
+        if (!callback)
+          return;
+        if (state.sync) {
+          try {
+            callback();
+          } catch (error) {
+            handleError(error);
+          }
+          return;
+        }
+        if (!state.to.continueDerivePromise) {
+          state.to.continueDerivePromise = new Promise((resolve) => state.to.continueDerive = resolve);
+          try {
+            callback();
+          } catch (error) {
+            handleError(error);
+          }
+        } else {
+          state.to.continueDerivePromise = state.to.continueDerivePromise.then(() => {
+            try {
+              callback();
+            } catch (error) {
+              handleError(error);
+            }
+          });
+        }
+      };
+      const runFinalizers = () => {
+        var _a3;
+        const finalizers = (_a3 = state.to) == null ? void 0 : _a3.finalizers;
+        if (finalizers) {
+          state.to.finalizers = void 0;
+          for (const finalizer of finalizers) {
+            if (typeof finalizer === "function") {
+              try {
+                finalizer();
+              } catch (finalizerError) {
+                console.warn("finalizer threw an error", finalizerError);
+              }
+            }
+          }
+        }
+      };
+      state.runFinalizers = runFinalizers;
+      const handleError = (error) => {
+        state.to.failed = true;
+        state.to.continueDerive = void 0;
+        state.to.continueDerivePromise = void 0;
+        state.runFinalizers = void 0;
+        if (typeof catchError === "function") {
+          try {
+            state.to.current = catchError(error, from);
+          } catch (secondaryError) {
+            console.warn("catchError threw an error", { originalError: error, secondaryError });
+          }
+        }
+        runFinalizers();
+      };
+      continueWith({
+        from,
+        alive: function alive(callback) {
+          if (state.from !== fromToken || state.to.failed)
+            return;
+          run(callback);
+        },
+        addFinalizer: (finalizer) => {
+          if (state.from !== fromToken || state.to.failed) {
+            if (typeof finalizer === "function") {
+              try {
+                finalizer();
+              } catch (finalizerError) {
+                console.warn("finalizer threw an error", finalizerError);
+              }
+            }
+            return;
+          }
+          if (!state.to.finalizers)
+            state.to.finalizers = [finalizer];
+          else
+            state.to.finalizers.push(finalizer);
+        },
+        next: function next(value, callback) {
+          if (state.from !== fromToken || state.to.failed)
+            return;
+          state.to.current = value;
+          if (!state.sync)
+            setState({ from: state.from, to: state.to });
+          run(callback);
+        },
+        error: function error(error) {
+          if (state.from !== fromToken || state.to.failed)
+            return;
+          state.to.error = error;
+          state.to.failed = true;
+        }
+      }, derive);
+    } else if (state.to.continueDerive) {
+      state.sync = true;
+      state.to.continueDerive();
+    }
+    state.sync = typeof ((_a2 = state.to) == null ? void 0 : _a2.continueDerive) === "function" ? false : void 0;
+    (0, import_react.useEffect)(() => state.runFinalizers, [state.from]);
+    return state.to.current;
+  }
+  function continueWith(continuation, derive) {
+    if (typeof derive === "function")
+      return continueWithFunction(continuation, derive);
+    if (isPromise(derive))
+      return continueWithPromise(continuation, derive);
+    else if (isIterable(derive))
+      return continueWithIterable(continuation, derive);
+    else if (isAsyncIterable(derive))
+      return continueWithAsyncIterable(continuation, derive);
+    continuation.next(derive);
+  }
+  function continueWithFunction(continuation, func) {
+    try {
+      continueWith(continuation, func(continuation.from));
+    } catch (error) {
+      continuation.error(error);
+    }
+  }
+  function continueWithPromise(continuation, promise) {
+    promise.then(
+      (result) => {
+        continuation.alive(() => continueWith(continuation, result));
+      },
+      (error) => {
+        continuation.error(error);
+      }
+    );
+  }
+  function continueWithIterable(continuation, iterable) {
+    try {
+      const iterator2 = iterable[Symbol.iterator]();
+      continuation.addFinalizer(() => {
+        var _a2;
+        return (_a2 = iterator2.return) == null ? void 0 : _a2.call(iterator2);
+      });
+      continueWithIterator(continuation, iterator2);
+    } catch (error) {
+      continuation.error(error);
+    }
+  }
+  function continueWithIterator(continuation, iterator2) {
+    try {
+      const iteratorResult = iterator2.next();
+      if (iteratorResult.done) {
+        if (iteratorResult.value !== void 0)
+          continuation.next(iteratorResult.value);
+      } else {
+        continuation.next(
+          iteratorResult.value,
+          () => continueWithIterator(continuation, iterator2)
+        );
+      }
+    } catch (error) {
+      continuation.error(error);
+    }
+  }
+  function continueWithAsyncIterable(continuation, iterable) {
+    return __async(this, null, function* () {
+      try {
+        const iterator2 = iterable[Symbol.asyncIterator]();
+        continuation.addFinalizer(() => {
+          var _a2;
+          return (_a2 = iterator2.return) == null ? void 0 : _a2.call(iterator2);
+        });
+        continueWithAsyncIterator(continuation, iterator2);
+      } catch (error) {
+        continuation.error(error);
+      }
+    });
+  }
+  function continueWithAsyncIterator(continuation, iterator2) {
+    return __async(this, null, function* () {
+      try {
+        let iteratorPromise = iterator2.next();
+        const iteratorResult = isPromise(iteratorPromise) ? yield iteratorPromise : iteratorPromise;
+        if (iteratorResult.done) {
+          if (iteratorResult.value !== void 0)
+            continuation.next(iteratorResult.value);
+        } else {
+          continuation.next(
+            iteratorResult.value,
+            () => continueWithAsyncIterator(continuation, iterator2)
+          );
+        }
+      } catch (error) {
+        continuation.error(error);
+      }
+    });
+  }
+  function isIterable(value) {
+    return value && typeof value[Symbol.iterator] === "function";
+  }
+  function isAsyncIterable(value) {
+    return value && typeof value[Symbol.asyncIterator] === "function";
+  }
+
+  // src/api/index.js
+  function getProfileBlobUrl(did, cid) {
+    if (!did || !cid)
+      return void 0;
+    return `https://cdn.bsky.app/img/avatar/plain/${unwrapShortDID(did)}/${cid}@jpeg`;
+  }
+  function getFeedBlobUrl(did, cid) {
+    if (!did || !cid)
+      return void 0;
+    return `https://cdn.bsky.app/img/feed_thumbnail/plain/${unwrapShortDID(did)}/${cid}@jpeg`;
+  }
+  function likelyDID(text) {
+    return !!text && (!text.trim().indexOf("did:") || text.trim().length === 24 && !/[^\sa-z0-9]/i.test(text));
+  }
+  function shortenDID(did) {
+    return did && /** @type {T} */
+    (did.replace(_shortenDID_Regex, "").toLowerCase() || void 0);
+  }
+  var _shortenDID_Regex = /^did\:plc\:/;
+  function unwrapShortDID(shortDID) {
+    return !shortDID ? void 0 : shortDID.indexOf(":") < 0 ? "did:plc:" + shortDID.toLowerCase() : shortDID.toLowerCase();
+  }
+  function shortenHandle(handle) {
+    handle = cheapNormalizeHandle(handle);
+    return handle && /** @type {T} */
+    (handle.replace(_shortenHandle_Regex, "").toLowerCase() || void 0);
+  }
+  var _shortenHandle_Regex = /\.bsky\.social$/;
+  function unwrapShortHandle(shortHandle) {
+    shortHandle = cheapNormalizeHandle(shortHandle);
+    return !shortHandle ? void 0 : shortHandle.indexOf(".") < 0 ? shortHandle.toLowerCase() + ".bsky.social" : shortHandle.toLowerCase();
+  }
+  function cheapNormalizeHandle(handle) {
+    handle = handle && handle.trim().toLowerCase();
+    if (handle && handle.charCodeAt(0) === 64)
+      handle = handle.slice(1);
+    const urlprefix = "https://bsky.app/";
+    if (handle && handle.lastIndexOf(urlprefix, 0) === 0) {
+      const bskyURL = breakBskyURL(handle);
+      if (bskyURL && bskyURL.shortDID)
+        return bskyURL.shortDID;
+    }
+    if (handle && handle.lastIndexOf("at:", 0) === 0) {
+      const feedUri = breakFeedUri(handle);
+      if (feedUri && feedUri.shortDID)
+        return feedUri.shortDID;
+    }
+    return handle || void 0;
+  }
+  function breakBskyURL(url) {
+    if (!url)
+      return;
+    const match = _breakBskyURL_Regex.exec(url);
+    if (!match)
+      return;
+    const handleOrDID = match[1];
+    let result;
+    const resolved = resolveHandleOrDID.peek(handleOrDID);
+    if (resolved) {
+      result = { handleOrDID, shortDID: resolved.shortDID, shortHandle: resolved.shortHandle };
+    } else {
+      if (likelyDID(handleOrDID))
+        result = { handleOrDID, shortDID: shortenDID(handleOrDID) };
+      else
+        result = { handleOrDID, shortHandle: shortenHandle(handleOrDID) };
+    }
+    if (match[2] && match[4])
+      result[match[2]] = match[4];
+    return result;
+  }
+  var _breakBskyURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/([^\/]+)(\/([^\\]+)(\/|$))?/i;
+  function breakFeedUri(uri) {
+    if (!uri)
+      return;
+    const match = _breakFeedUri_Regex.exec(uri);
+    if (!match || !match[3])
+      return;
+    return { shortDID: match[2], postID: match[3] };
+  }
+  var _breakFeedUri_Regex = /^at\:\/\/(did:plc:)?([a-z0-9]+)\/[a-z\.]+\/?(.*)?$/;
+  function isPromise(x) {
+    if (!x || typeof x !== "object")
+      return false;
+    else
+      return typeof x.then === "function";
+  }
+
+  // src/maintain/index.js
+  var maintain_exports = {};
+  __export(maintain_exports, {
+    updateDIDs: () => updateDIDs,
+    updateIndex: () => updateIndex
+  });
+
+  // src/maintain/updateDIDs.js
+  var import_api2 = __toESM(require_dist());
+  function updateDIDs() {
+    return __async(this, null, function* () {
+      const startCursorsJSON = yield fetch("./dids/cursors.json").then((r2) => r2.json());
+      const populatedDIDs = {
+        /** @type {string[]} */
+        shortDIDs: [],
+        /** @type {{ [shortDID: string]: string[] }} */
+        buckets: {},
+        currentCursor: startCursorsJSON.listRepos.cursor,
+        requestCount: 0,
+        requestTime: 0,
+        /** @type {Error | undefined} */
+        currentError: void 0,
+        currentErrorRetryTime: 0,
+        reachedEnd: false
+      };
+      return __spreadProps(__spreadValues({}, startCursorsJSON), {
+        beginFetchingDIDs,
+        populatedDIDs,
+        verifyGitHubAuth
+      });
+      function beginFetchingDIDs() {
+        return __async(this, null, function* () {
+          const atClient2 = new import_api2.BskyAgent({
+            // service: 'https://bsky.social/xrpc'
+            service: "https://bsky.network/xrpc"
+          });
+          atClient2.baseClient.lex.assertValidXrpcOutput = function() {
+          };
+          let lastNormal = Date.now();
+          while (true) {
+            const startTime = Date.now();
+            try {
+              let received = yield fetchMore();
+              populatedDIDs.requestCount++;
+              populatedDIDs.requestTime += Date.now() - startTime;
+              if (received)
+                lastNormal = Date.now();
+            } catch (error) {
+              populatedDIDs.currentError = error;
+              populatedDIDs.currentErrorRetryTime = Date.now() - lastNormal;
+            }
+            const waitMore = Math.min(
+              Date.now() - startTime + 300,
+              1e3 * 45
+            ) * (0.5 + Math.random());
+            yield new Promise((resolve) => setTimeout(resolve, waitMore));
+            if (populatedDIDs.reachedEnd)
+              break;
+          }
+          function fetchMore() {
+            return __async(this, null, function* () {
+              const response = yield atClient2.com.atproto.sync.listRepos({
+                cursor: populatedDIDs.currentCursor,
+                limit: 995
+              });
+              if (!response.data)
+                return;
+              if (response.data.repos.length) {
+                for (const repo of response.data.repos) {
+                  const shortDID = shortenDID(repo.did);
+                  populatedDIDs.shortDIDs.push(shortDID);
+                  const twoLetter = getKeyShortDID(shortDID);
+                  const bucket = populatedDIDs[twoLetter] || (populatedDIDs[twoLetter] = []);
+                  bucket.push(shortDID);
+                }
+              }
+              if (!response.data.cursor) {
+                populatedDIDs.reachedEnd = true;
+              } else {
+                populatedDIDs.currentCursor = response.data.cursor;
+              }
+              return response.data.repos.length;
+            });
+          }
+        });
+      }
+      function verifyGitHubAuth(username, password) {
+        return __async(this, null, function* () {
+        });
+      }
+    });
+  }
+
+  // src/maintain/updateIndex.js
+  function updateIndex() {
+    return __async(this, null, function* () {
+    });
+  }
+
+  // src/autocomplete-input/autocomplete-input.js
+  var import_react2 = __toESM(require_react());
+  function AutocompleteInput({
     inputClassName,
     inputPlaceholderText,
-    autocompleteArea
+    executeCommand: executeCommand2
   }) {
     var _a2;
     const [text, setText] = (0, import_react2.useState)("");
+    const [searchText, setSearchText] = (0, import_react2.useState)("");
+    const [withTimeout] = (0, import_react2.useState)(
+      /** @type {{ timeout: ReturnType<typeof setTimeout> }} */
+      {}
+    );
+    (0, import_react2.useEffect)(() => {
+      return () => {
+        clearTimeout(withTimeout.timeout);
+      };
+    }, [withTimeout]);
     const matches = ((_a2 = forAwait(
-      text,
+      searchText,
       (text2) => __async(this, null, function* () {
         return { result: yield searchHandle(text2) };
       }),
       (error, text2) => ({ result: [{ shortDID: text2, shortHandle: text2, rank: 1, error }] })
     )) == null ? void 0 : _a2.result) || [];
-    return /* @__PURE__ */ import_react2.default.createElement("table", { className: "top-table" }, /* @__PURE__ */ import_react2.default.createElement("tbody", null, /* @__PURE__ */ import_react2.default.createElement("tr", null, /* @__PURE__ */ import_react2.default.createElement("td", { valign: "middle", className: "td-main" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "div-outer" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "div-inner" }, /* @__PURE__ */ import_react2.default.createElement("h1", { className: "title" }, title != null ? title : "Cold Sky"), /* @__PURE__ */ import_react2.default.createElement("div", { className: "subtitle" }, subtitle != null ? subtitle : "social media up there"), /* @__PURE__ */ import_react2.default.createElement(
+    return /* @__PURE__ */ import_react2.default.createElement(import_react2.default.Fragment, null, /* @__PURE__ */ import_react2.default.createElement(
       "input",
       {
         id: "searchINPUT",
@@ -65104,26 +65234,52 @@ if (cid) {
           e2.preventDefault();
           const commandText = (text || "").trim();
           if (commandText.lastIndexOf("/", 0) === 0) {
-            executeCommand(commandText.slice(1));
+            executeCommand2(commandText.slice(1));
           }
         },
         onChange: (e2) => {
           setText(e2.target.value);
+          clearTimeout(withTimeout.timeout);
+          withTimeout.timeout = setTimeout(() => {
+            setSearchText(e2.target.value);
+          }, 400);
         }
       }
     ), !(matches == null ? void 0 : matches.length) ? void 0 : /* @__PURE__ */ import_react2.default.createElement("div", { className: "autocomplete-list" }, matches.map(
       (m, index) => /* @__PURE__ */ import_react2.default.createElement("div", { key: index, className: "autocomplete-entry" }, unwrapShortHandle(m.shortHandle), m.postID ? /* @__PURE__ */ import_react2.default.createElement("span", { className: "autocomplete-post" }, "post#", m.postID) : void 0)
-    )), autocompleteArea))))));
+    )));
+  }
+
+  // src/root-layout.js
+  if (typeof window !== "undefined") {
+    window["atproto"] = import_api5.default;
+    window["octokit"] = dist_web_exports7;
+    window["coldsky"] = api_exports;
+    Object.assign(window["coldsky"], maintain_exports);
+  }
+  function RootLayout({
+    title,
+    subtitle,
+    inputClassName,
+    inputPlaceholderText,
+    autocompleteArea
+  }) {
+    return /* @__PURE__ */ import_react3.default.createElement("table", { className: "top-table" }, /* @__PURE__ */ import_react3.default.createElement("tbody", null, /* @__PURE__ */ import_react3.default.createElement("tr", null, /* @__PURE__ */ import_react3.default.createElement("td", { valign: "middle", className: "td-main" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "div-outer" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "div-inner" }, /* @__PURE__ */ import_react3.default.createElement("h1", { className: "title" }, title != null ? title : "Cold Sky"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "subtitle" }, subtitle != null ? subtitle : "social media up there"), /* @__PURE__ */ import_react3.default.createElement(
+      AutocompleteInput,
+      {
+        inputClassName,
+        inputPlaceholderText,
+        executeCommand
+      }
+    ), autocompleteArea))))));
   }
   function executeCommand(commandName) {
     return __async(this, null, function* () {
-      const commandJS = yield fetch("./src/maintain/" + commandName + ".js").then((r2) => r2.text());
-      let result = eval(commandJS);
-      if (typeof window[commandName] === "function")
-        result = /** @type {*} */
-        window[commandName]();
-      if (isPromise(result))
-        result = yield result;
+      const command = window["coldsky"][commandName];
+      let result = yield (
+        /** @type {*} */
+        command()
+      );
       alert(
         typeof result === "undefined" ? commandName + " OK" : commandName + " " + JSON.stringify(result, null, 2)
       );
@@ -65131,20 +65287,22 @@ if (cid) {
   }
 
   // src/app.js
-  var App3 = class extends import_react3.default.Component {
+  var App3 = class extends import_react4.default.Component {
     render() {
-      return /* @__PURE__ */ import_react3.default.createElement(RootLayout, null);
+      return /* @__PURE__ */ import_react4.default.createElement(RootLayout, null);
     }
   };
-  var preloadedTable = document.querySelector("body>table");
-  var reactRoot = document.createElement("div");
-  reactRoot.id = "reactRoot";
-  document.body.appendChild(reactRoot);
-  preloadedTable == null ? void 0 : preloadedTable.remove();
-  import_react_dom.default.render(
-    /* @__PURE__ */ import_react3.default.createElement(App3, null),
-    reactRoot
-  );
+  function bootBrowser() {
+    const preloadedTable = document.querySelector("body>table");
+    const reactRoot = document.createElement("div");
+    reactRoot.id = "reactRoot";
+    document.body.appendChild(reactRoot);
+    preloadedTable == null ? void 0 : preloadedTable.remove();
+    const root = (0, import_client.createRoot)(reactRoot);
+    root.render(/* @__PURE__ */ import_react4.default.createElement(App3, null));
+  }
+  if (typeof window !== "undefined" && window)
+    bootBrowser();
 })();
 /*! Bundled license information:
 
