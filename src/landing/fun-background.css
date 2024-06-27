@@ -26,6 +26,10 @@
   font-size: 1.8vh;
 }
 
+.fun-background .fun-background-scroller .fun-background-thread .fun-background-thread-author {
+  white-space: nowrap;
+}
+
 .fun-background .fun-background-scroller .fun-background-thread .fun-background-thread-likes {
   text-align: right;
   opacity: 0.5;

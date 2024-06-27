@@ -99378,14 +99378,14 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           left: `${left.toFixed(2)}%`
         }
       },
-      /* @__PURE__ */ import_react10.default.createElement(AccountLabel, { account: (_b = thread == null ? void 0 : thread.post) == null ? void 0 : _b.author }),
+      /* @__PURE__ */ import_react10.default.createElement(AccountLabel, { className: "fun-background-thread-author", account: (_b = thread == null ? void 0 : thread.post) == null ? void 0 : _b.author }),
       /* @__PURE__ */ import_react10.default.createElement("div", { className: "fun-background-thread-content" }, (_c = thread == null ? void 0 : thread.post) == null ? void 0 : _c.record.text),
       /* @__PURE__ */ import_react10.default.createElement("div", { className: "fun-background-thread-likes" }, /* @__PURE__ */ import_react10.default.createElement(FavoriteBorder_default, null), !((_d = thread == null ? void 0 : thread.post) == null ? void 0 : _d.likeCount) ? "" : (_e = thread == null ? void 0 : thread.post) == null ? void 0 : _e.likeCount.toLocaleString())
     );
   }
 
   // package.json
-  var version4 = "0.1.16";
+  var version4 = "0.1.17";
 
   // src/localise.js
   function localise(english, languageMap) {

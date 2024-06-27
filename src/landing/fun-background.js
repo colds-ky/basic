@@ -107,7 +107,7 @@ function ThreadBubble({ thread }) {
         animationDuration: `${animationDuration.toFixed(2)}s`,
         left: `${left.toFixed(2)}%`
       }}>
-      <AccountLabel account={thread?.post?.author} />
+      <AccountLabel className='fun-background-thread-author' account={thread?.post?.author} />
       <div className='fun-background-thread-content'>
         {
           thread?.post?.record.text
