@@ -42737,7 +42737,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.50";
+	var version = "0.2.51";
 
 	// @ts-check
 
@@ -43007,7 +43007,7 @@ if (cid) {
 	 */
 
 	/** @typedef {import('./data/define-store').PLCDirectoryEntry} PLCDirectoryEntry */
-	/** @typedef {import('./data/define-store').PlcDirectoryAuditLogEntry} PlcDirectoryAuditLogEntry */
+	/** @typedef {import('./data/define-store').PLCDirectoryAuditLogEntry} PlcDirectoryAuditLogEntry */
 
 	const FETCH_AHEAD_MSEC_MAX = 10000;
 	const FETCH_AHEAD_COUNT_MAX = 10000;
@@ -52245,7 +52245,7 @@ if (cid) {
 
 
 	/**
-	 * @param {(import('./define-store').PLCDirectoryEntry | import('./define-store').PlcDirectoryAuditLogEntry)[]} recs
+	 * @param {(import('./define-store').PLCDirectoryEntry | import('./define-store').PLCDirectoryAuditLogEntry)[]} recs
 	 * @param {Map<string, import('./store-data').RepositoryData>} store
 	 * @param {import('./define-store').Intercepts} [intercepts]
 	 */
@@ -52783,13 +52783,10 @@ if (cid) {
 	 * @param {import('./define-store').Intercepts} [intercepts]
 	 */
 	function captureThread(threadView, store, now, intercepts) {
-	  /** @type {Set<string>} */
-	  const visitedRevs = new Set();
-	  return captureThreadViewPostOrVariants(visitedRevs, threadView, undefined, store, now, intercepts);
+	  return captureThreadViewPostOrVariants(threadView, undefined, store, now, intercepts);
 	}
 
 	/**
-	 * @param {Set<string>} visitedRevs
 	 * @param {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost |
 	 *  import('@atproto/api').AppBskyFeedDefs.NotFoundPost |
 	 *  import('@atproto/api').AppBskyFeedDefs.BlockedPost | Record<string, unknown>} threadViewPostOrVariants
@@ -52798,10 +52795,10 @@ if (cid) {
 	 * @param {number} now
 	 * @param {import('./define-store').Intercepts} [intercepts]
 	 */
-	function captureThreadViewPostOrVariants(visitedRevs, threadViewPostOrVariants, parentPostHint, store, now, intercepts) {
+	function captureThreadViewPostOrVariants(threadViewPostOrVariants, parentPostHint, store, now, intercepts) {
 	  const threadViewPost = /** @type {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost} */
 	  threadViewPostOrVariants;
-	  if (threadViewPost?.post) return captureThreadViewPost(visitedRevs, threadViewPost, store, now, intercepts);
+	  if (threadViewPost?.post) return captureThreadViewPost(threadViewPost, store, now, intercepts);
 	  const lostURI = /** @type {import('@atproto/api').AppBskyFeedDefs.NotFoundPost} */threadViewPostOrVariants.uri;
 	  const lostPost = getPostOrPlaceholder(lostURI, store);
 	  if (lostPost && parentPostHint) {
@@ -52817,33 +52814,30 @@ if (cid) {
 	}
 
 	/**
-	 * @param {Set<string>} visitedRevs
 	 * @param {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost} threadViewPost
 	 * @param {Map<string, import('./store-data').RepositoryData>} store
 	 * @param {number} now
 	 * @param {import('./define-store').Intercepts} [intercepts]
 	 */
-	function captureThreadViewPost(visitedRevs, threadViewPost, store, now, intercepts) {
-	  const compactPost = capturePostView(visitedRevs, threadViewPost.post, store, now, intercepts);
-	  if (threadViewPost.parent) captureThreadViewPostOrVariants(visitedRevs, threadViewPost.parent, {
+	function captureThreadViewPost(threadViewPost, store, now, intercepts) {
+	  const compactPost = capturePostView(threadViewPost.post, store, now, intercepts);
+	  if (threadViewPost.parent) captureThreadViewPostOrVariants(threadViewPost.parent, {
 	    threadStart: compactPost?.threadStart
 	  }, store, now, intercepts);
 	  if (threadViewPost.replies?.length) {
-	    for (const reply of threadViewPost.replies) captureThreadViewPostOrVariants(visitedRevs, reply, compactPost, store, now, intercepts);
+	    for (const reply of threadViewPost.replies) captureThreadViewPostOrVariants(reply, compactPost, store, now, intercepts);
 	  }
 	  return compactPost;
 	}
 
 	/**
-	 * @param {Set<string>} visitedRevs
 	 * @param {import('@atproto/api').AppBskyFeedDefs.PostView | undefined} postView
 	 * @param {Map<string, import('./store-data').RepositoryData>} store
 	 * @param {number} now
 	 * @param {import('./define-store').Intercepts} [intercepts]
 	 */
-	function capturePostView(visitedRevs, postView, store, now, intercepts) {
-	  if (!postView || visitedRevs.has(postView.cid)) return; // TODO: if visitedRevs is expected, use REV not CID, and update it after
-
+	function capturePostView(postView, store, now, intercepts) {
+	  if (!postView) return;
 	  captureProfile(postView.author, store, now, intercepts);
 	  const compactPost = capturePostRecord(postView.author.did, postView.uri, /** @type {*} */postView.record, store, now, intercepts);
 	  if (!compactPost) return;
@@ -52953,9 +52947,7 @@ if (cid) {
 	   * @param {number} now
 	   */
 	  function capturePostView$1(postView, now) {
-	    /** @type {Set<string>} */
-	    const visitedRevs = new Set();
-	    return capturePostView(visitedRevs, postView, store.repos, now, intercepts);
+	    return capturePostView(postView, store.repos, now, intercepts);
 	  }
 
 	  /**
@@ -52967,7 +52959,7 @@ if (cid) {
 	  }
 
 	  /**
-	   * @param {(PLCDirectoryEntry | PlcDirectoryAuditLogEntry)[]} recs
+	   * @param {(PLCDirectoryEntry | PLCDirectoryAuditLogEntry)[]} recs
 	   */
 	  function capturePLCDirectoryEntries(recs) {
 	    return capturePLCDirectoryEntriesForStore(recs, store.repos, intercepts);
@@ -53018,7 +53010,7 @@ if (cid) {
 	 *  cid: string,
 	 *  nullified: boolean,
 	 *  createdAt: '2023-06-23T10:02:29.289Z' | string
-	 * }} PlcDirectoryAuditLogEntry
+	 * }} PLCDirectoryAuditLogEntry
 	 */
 
 	// @ts-check
