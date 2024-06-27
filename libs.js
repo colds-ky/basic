@@ -14926,6 +14926,10 @@ if (cid) {
 	                name: {
 	                  type: 'string',
 	                  description: 'A short name for the App Password, to help distinguish them.'
+	                },
+	                privileged: {
+	                  type: 'boolean',
+	                  description: "If an app password has 'privileged' access to possibly sensitive account state. Meant for use with trusted clients."
 	                }
 	              }
 	            }
@@ -14954,6 +14958,9 @@ if (cid) {
 	            createdAt: {
 	              type: 'string',
 	              format: 'datetime'
+	            },
+	            privileged: {
+	              type: 'boolean'
 	            }
 	          }
 	        }
@@ -15470,6 +15477,9 @@ if (cid) {
 	            createdAt: {
 	              type: 'string',
 	              format: 'datetime'
+	            },
+	            privileged: {
+	              type: 'boolean'
 	            }
 	          }
 	        }
@@ -30169,9 +30179,18 @@ if (cid) {
 	        'atproto-proxy': this.proxyHeader
 	      };
 	    }
+	    const labelerHeaderName = 'atproto-accept-labelers';
+	    const labelerHeaders = AtpAgent.appLabelers.map(str => `${str};redact`).concat(this.labelersHeader.filter(str => str.startsWith('did:')));
+	    // Besides labelers configured via appLabelers and labelersHeader
+	    // respect any additional labelers configured via the request headers
+	    if (reqHeaders[labelerHeaderName]) {
+	      labelerHeaders.push(
+	      // Allow for headers to be comma-separated with or without spaces in between by trimming after split
+	      ...reqHeaders[labelerHeaderName].split(',').map(str => str.trim()));
+	    }
 	    reqHeaders = {
 	      ...reqHeaders,
-	      'atproto-accept-labelers': AtpAgent.appLabelers.map(str => `${str};redact`).concat(this.labelersHeader.filter(str => str.startsWith('did:'))).slice(0, MAX_LABELERS).join(', ')
+	      [labelerHeaderName]: labelerHeaders.slice(0, MAX_LABELERS).join(', ')
 	    };
 	    return reqHeaders;
 	  }
@@ -41863,7 +41882,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.28";
+	var version = "0.2.29";
 
 	// @ts-check
 
@@ -42267,7 +42286,7 @@ if (cid) {
 	 *
 	 * By David Fahlander, david.fahlander@gmail.com
 	 *
-	 * Version 4.0.4, Wed Apr 10 2024
+	 * Version 4.0.7, Sun May 26 2024
 	 *
 	 * https://dexie.org
 	 *
@@ -43342,7 +43361,7 @@ if (cid) {
 	        });
 	      }
 	    }
-	    var DEXIE_VERSION = '4.0.4';
+	    var DEXIE_VERSION = '4.0.7';
 	    var maxString = String.fromCharCode(65535);
 	    var minKey = -Infinity;
 	    var INVALID_KEY_ARGUMENT = "Invalid key provided. Keys must be of type string, number, Date or Array<string | number | Date>.";
@@ -44027,6 +44046,38 @@ if (cid) {
 	      }
 	      PropModification.prototype.execute = function (value) {
 	        var _a;
+	        if (this.add !== undefined) {
+	          var term = this.add;
+	          if (isArray(term)) {
+	            return __spreadArray(__spreadArray([], isArray(value) ? value : [], true), term).sort();
+	          }
+	          if (typeof term === 'number') return (Number(value) || 0) + term;
+	          if (typeof term === 'bigint') {
+	            try {
+	              return BigInt(value) + term;
+	            } catch (_b) {
+	              return BigInt(0) + term;
+	            }
+	          }
+	          throw new TypeError("Invalid term ".concat(term));
+	        }
+	        if (this.remove !== undefined) {
+	          var subtrahend_1 = this.remove;
+	          if (isArray(subtrahend_1)) {
+	            return isArray(value) ? value.filter(function (item) {
+	              return !subtrahend_1.includes(item);
+	            }).sort() : [];
+	          }
+	          if (typeof subtrahend_1 === 'number') return Number(value) - subtrahend_1;
+	          if (typeof subtrahend_1 === 'bigint') {
+	            try {
+	              return BigInt(value) - subtrahend_1;
+	            } catch (_c) {
+	              return BigInt(0) - subtrahend_1;
+	            }
+	          }
+	          throw new TypeError("Invalid subtrahend ".concat(subtrahend_1));
+	        }
 	        var prefixToReplace = (_a = this.replacePrefix) === null || _a === void 0 ? void 0 : _a[0];
 	        if (prefixToReplace && typeof value === 'string' && value.startsWith(prefixToReplace)) {
 	          return this.replacePrefix[1] + value.substring(prefixToReplace.length);
@@ -44348,6 +44399,10 @@ if (cid) {
 	            }
 	          };
 	          return _this.clone().primaryKeys().then(function (keys) {
+	            var criteria = isPlainKeyRange(ctx) && ctx.limit === Infinity && (typeof changes !== 'function' || changes === deleteCallback) && {
+	              index: ctx.index,
+	              range: ctx.range
+	            };
 	            var nextChunk = function (offset) {
 	              var count = Math.min(limit, keys.length - offset);
 	              return coreTable.getMany({
@@ -44377,10 +44432,6 @@ if (cid) {
 	                    }
 	                  }
 	                }
-	                var criteria = isPlainKeyRange(ctx) && ctx.limit === Infinity && (typeof changes !== 'function' || changes === deleteCallback) && {
-	                  index: ctx.index,
-	                  range: ctx.range
-	                };
 	                return Promise.resolve(addValues.length > 0 && coreTable.mutate({
 	                  trans: trans,
 	                  type: 'add',
@@ -44397,7 +44448,8 @@ if (cid) {
 	                    keys: putKeys,
 	                    values: putValues,
 	                    criteria: criteria,
-	                    changeSpec: typeof changes !== 'function' && changes
+	                    changeSpec: typeof changes !== 'function' && changes,
+	                    isAdditionalChunk: offset > 0
 	                  }).then(function (res) {
 	                    return applyMutateResult(putValues.length, res);
 	                  });
@@ -44406,7 +44458,8 @@ if (cid) {
 	                    trans: trans,
 	                    type: 'delete',
 	                    keys: deleteKeys,
-	                    criteria: criteria
+	                    criteria: criteria,
+	                    isAdditionalChunk: offset > 0
 	                  }).then(function (res) {
 	                    return applyMutateResult(deleteKeys.length, res);
 	                  });
@@ -48149,6 +48202,16 @@ if (cid) {
 	        }
 	      });
 	    }
+	    function add(value) {
+	      return new PropModification({
+	        add: value
+	      });
+	    }
+	    function remove(value) {
+	      return new PropModification({
+	        remove: value
+	      });
+	    }
 	    function replacePrefix(a, b) {
 	      return new PropModification({
 	        replacePrefix: [a, b]
@@ -48165,6 +48228,8 @@ if (cid) {
 	      PropModSymbol: PropModSymbol,
 	      PropModification: PropModification,
 	      replacePrefix: replacePrefix,
+	      add: add,
+	      remove: remove,
 	      'default': Dexie$1,
 	      RangeSet: RangeSet,
 	      mergeRanges: mergeRanges,
