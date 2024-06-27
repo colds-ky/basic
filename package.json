@@ -1,6 +1,6 @@
 {
   "name": "coldsky",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Library for BlueSky",
   "main": "libs.js",
   "scripts": {
@@ -28,7 +28,7 @@
     "cbor-x": "*",
     "dexie": "*",
     "esbuild": "*",
-    "fuse.js": "^7.0.0",
+    "fuse.js": "*",
     "multiformats": "*",
     "rollup": "*",
     "ws": "*"
