@@ -1,12 +1,13 @@
 // @ts-check
 
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { useDB } from '../..';
 import { forAwait } from '../../../coldsky/src/api/forAwait';
 import { localise } from '../../localise';
 import { AccountChip } from '../account/account-chip';
-import { Post } from './post';
+import { CompletePostContent, Post, PostFrame } from './post';
+import { threadStructure } from './thread-structure';
 
 import './thread.css';
 
@@ -50,6 +51,13 @@ export function Thread({ className, uri, ...rest }) {
 export function ThreadView({ className, significantPost, thread, underPrevious, linkTimestamp, linkAuthor, ...rest }) {
   const root = layoutThread(thread, significantPost);
 
+  const threadBranch = useMemo(() =>
+    thread && threadStructure(thread, significantPost),
+    [thread, significantPost]);
+
+  console.log('thread structure ', thread.root.uri, thread.root.text, threadBranch, ' layout ', root);
+
+
   return (
     <SubThread
       className={'thread-view ' + (className || '')}
@@ -61,6 +69,166 @@ export function ThreadView({ className, significantPost, thread, underPrevious, 
       {...rest}
     />
   );
+}
+
+/**
+ * @param {{
+ *  className?: string,
+ *  conversationDirection: import('./thread-structure').ThreadBranch,
+ *  linkTimestamp?: boolean,
+ *  linkAuthor?: boolean
+ * }} _
+ */
+export function ThreadConversationView({ className, conversationDirection, linkTimestamp, linkAuthor }) {
+  const conversationSegments = [];
+  let prevPost = conversationDirection.post;
+  conversationSegments.push(
+    <CompletePostContent
+      key={'conversation-starter:' + conversationDirection.post.uri}
+      className='conversation-starter'
+      post={conversationDirection.post}
+      linkTimestamp={linkTimestamp}
+      linkAuthor={linkAuthor}
+    />
+  );
+
+  /** @type {import('./thread-structure').ThreadBranch | undefined} */
+  let prevConvo = conversationDirection;
+  /** @type {import('./thread-structure').ThreadBranch[] | undefined} */
+  let insignificants;
+  /** @type {import('./thread-structure').ThreadBranch[] | undefined} */
+  let asides;
+  while (prevConvo) {
+    insignificants = concatArraysSlim(insignificants, prevConvo.insignificants);
+    asides = concatArraysSlim(asides, prevConvo.asides);
+    const showNext =
+      prevConvo.conversationDirection &&
+      (prevConvo.conversationDirection.isSignificant || prevConvo.conversationDirection.isParentOfSignificant);
+
+    if (showNext) {
+
+      const suppressAuthor =
+        prevConvo.conversationDirection?.post.shortDID === prevPost.shortDID &&
+        !asides?.length; // if same author, and no visual interjection - no need to repeat the author's name
+
+      if (insignificants?.length) {
+        conversationSegments.push(
+          <InsignificantExpandableMarkers
+            key={'insignificants:' + prevConvo.post.uri}
+            branches={insignificants}
+          />
+        );
+        insignificants = undefined;
+      }
+
+      if (asides?.length) {
+        conversationSegments.push(
+          <AsidesInterjection
+            key={'asides:' + prevConvo.post.uri}
+            branches={asides}
+          />
+        );
+        asides = undefined;
+      }
+
+      if (prevConvo.isSignificant && prevConvo.significantPostCount && prevConvo.conversationDirection) {
+        conversationSegments.push(
+          <CompletePostContent
+            key={'conversation:' + prevConvo.post.uri}
+            className='conversation'
+            post={prevConvo.post}
+            linkTimestamp={linkTimestamp}
+            linkAuthor={linkAuthor}
+            suppressAuthor={suppressAuthor}
+          />
+        );
+      }
+    }
+
+    prevConvo = prevConvo.conversationDirection;
+  }
+
+  return (
+    <PostFrame className={className}>
+      {conversationSegments}
+    </PostFrame>
+  );
+}
+
+/**
+ * @param {{
+ *  branches: import('./thread-structure').ThreadBranch[]
+ * }}
+ */
+function InsignificantExpandableMarkers({ branches }) {
+  const replyAvatars = useMemo(() => collectReplyAvatars(branches), [branches]);
+  if (!replyAvatars?.length) return null;
+  return (
+    <div className='insignificant-expandable-markers'>
+      {replyAvatars.map(shortDID => (
+        <AccountChip
+          key={'insignificant-avatar-' + shortDID}
+          className='insignificant-expandable-avatar-marker'
+          account={shortDID} />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * @param {{
+ *  branches: import('./thread-structure').ThreadBranch[]
+ * }}
+ */
+function AsidesInterjection({ branches }) {
+  const asideSegments = [];
+  let bendyLineInsignificants = [];
+
+  return (
+    <div className='aside-interjection-section'>
+      {asideSegments}
+    </div>
+  );
+
+  function collectAsides(branches) {
+    for (const br of branches) {
+      if (br.isSignificant) {
+
+      }
+    }
+  }
+}
+
+const MAX_AVATAR_DISPLAY = 3;
+
+/** 
+ * @param {import('./thread-structure').ThreadBranch[] | undefined} branches
+ * @param {string[]} [shortDIDs]
+ */
+function collectReplyAvatars(branches, shortDIDs) {
+  if (!branches) return shortDIDs;
+  if (!shortDIDs) shortDIDs = [];
+  for (const br of branches) {
+    if (shortDIDs.indexOf(br.post.shortDID) < 0)
+      shortDIDs.push(br.post.shortDID);
+    if (shortDIDs.length > MAX_AVATAR_DISPLAY)
+      break;
+  }
+  for (const br of branches) {
+    if (shortDIDs.length > MAX_AVATAR_DISPLAY) break;
+    collectReplyAvatars(br.children, shortDIDs);
+  }
+  return shortDIDs;
+}
+
+/**
+ * @template T
+ * @param {T[] | undefined} array1
+ * @param {T[] | undefined} array1
+ * }
+ */
+function concatArraysSlim(array1, array2) {
+  return !array1 ? array2 : !array2 ? array1 : array1.concat(array2);
 }
 
 /**

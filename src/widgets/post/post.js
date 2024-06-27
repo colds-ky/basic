@@ -57,7 +57,7 @@ export function Post({
             allowEmbedDepth={nextAllowEmbedDepth}
             indicateEmbedding={indicateEmbedding}
           /> :
-          <LoadedPost
+          <CompletePostContent
             post={post}
             compact={compact}
             linkTimestamp={linkTimestamp}
@@ -101,7 +101,7 @@ function LoadingPostInProgress({ uri, ...rest }) {
   const post = forAwait(uri, () => db.getPostOnly(uri));
   if (post) {
     return (
-      <LoadedPost
+      <CompletePostContent
         post={post}
         {...rest}
       />
@@ -128,45 +128,53 @@ function LoadingPostInProgress({ uri, ...rest }) {
 
 /**
  * @param {{
+ *  className?: string,
  *  post: MatchCompactPost,
  *  compact?: boolean,
  *  linkTimestamp?: boolean,
  *  linkAuthor?: boolean,
+ *  suppressAuthor?: boolean,
  *  allowEmbedDepth?: number
  *  indicateEmbedding?: boolean
  * }} _
  */
-function LoadedPost({
+export function CompletePostContent({
+  className,
   post,
   compact,
   linkTimestamp,
   linkAuthor,
+  suppressAuthor,
   allowEmbedDepth,
   indicateEmbedding
 }) {
   return (
-    <div className='post-loaded-content' onClick={() => {
+    <div className={className ? 'post-loaded-content ' + className : 'post-loaded-content'} onClick={() => {
       console.log('post clicked ', post);
     }}>
-      <div className='post-top-line'>
-        {
-          !indicateEmbedding ? undefined :
-            <span className='tiny-text-for-copy-paste'>
-              {localise(
-                'quoted post by: ',
-                { uk: 'процитовано від:'}
-              )}
-            </span>
-        }
-        <AccountLabel
-          className='post-author'
-          account={post.shortDID}
-          withDisplayName={!compact}
-          linkToTimeline={linkAuthor}
-        />
-        <span className='post-author-right-overlay'></span>
-        <PostTimestamp post={post} linkTimestamp={linkTimestamp} />
-      </div>
+      {
+        suppressAuthor ?
+          <PostTimestamp className='post-timestamp-small-note' post={post} linkTimestamp={linkTimestamp} /> :
+          <div className='post-top-line'>
+            {
+              !indicateEmbedding ? undefined :
+                <span className='tiny-text-for-copy-paste'>
+                  {localise(
+                    'quoted post by: ',
+                    { uk: 'процитовано від:' }
+                  )}
+                </span>
+            }
+            <AccountLabel
+              className='post-author'
+              account={post.shortDID}
+              withDisplayName={!compact}
+              linkToTimeline={linkAuthor}
+            />
+            <span className='post-author-right-overlay'></span>
+            <PostTimestamp post={post} linkTimestamp={linkTimestamp} />
+          </div>
+      }
       <PostTextContent post={post} />
       <PostEmbedsSection
         post={post}
@@ -198,11 +206,12 @@ function LoadedPost({
 
 /**
  * @param {{
+ *  className?: string,
  *  post: MatchCompactPost,
  *  linkTimestamp?: boolean
  * }} _
  */
-function PostTimestamp({ post, linkTimestamp }) {
+function PostTimestamp({ className, post, linkTimestamp }) {
   if (!post.asOf) return null;
 
   if (!linkTimestamp) return <FormatTime className='post-date' time={post.asOf} />;
@@ -214,7 +223,7 @@ function PostTimestamp({ post, linkTimestamp }) {
 
   return (
     <Link
-      className='post-date'
+      className={className ? 'post-date ' + className : 'post-date'}
       to={
         '/' + (profile?.handle || parsedURI?.shortDID) +
         '/' + parsedURI?.postID}>
