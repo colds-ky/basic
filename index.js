@@ -1210,8 +1210,8 @@
     console.log("node");
     pullPLCDirectoryCompact();
   } else {
-    console.log("browser");
-    pullPLCDirectoryLocal();
+    console.log("browser, see window.pullPLCDirectoryLocal  ");
+    window["pullPLCDirectoryLocal"] = pullPLCDirectoryLocal;
   }
 })();
 //# sourceMappingURL=index.js.map

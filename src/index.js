@@ -54,6 +54,7 @@ if (typeof require === 'function' && typeof process !== 'undefined' && typeof pr
   //   module.exports = { indexingRun }
   // }
 } else {
-  console.log('browser');
-  pullPLCDirectoryLocal();
+  console.log('browser, see window.pullPLCDirectoryLocal  ');
+  window['pullPLCDirectoryLocal'] = pullPLCDirectoryLocal;
+  // pullPLCDirectoryLocal();
 }
