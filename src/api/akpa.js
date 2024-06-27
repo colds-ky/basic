@@ -18,7 +18,7 @@
  * @param {(args: StreamParameters<T, TBuffer>) => void } callback
  * @returns {AsyncGenerator<TBuffer, void, unknown>}
  */
-export async function* streamBuffer(callback) {
+export function streamBuffer(callback) {
 
   let finallyTrigger = () => { args.isEnded = true; };
   let stop = false;
@@ -53,30 +53,38 @@ export async function* streamBuffer(callback) {
 
   callback(args);
 
-  try {
-    while (!stop) {
+  return iterate();
 
-      await continuePromise;
-      if (rejectError)
-        throw rejectError.error;
-      if (stop) return;
+  /**
+   * @returns {AsyncGenerator<TBuffer, void, unknown>}
+   */
+  async function* iterate() {
 
-      continuePromise = new Promise(resolve => continueTrigger = function continueTriggerSubsequentlySet() { resolve() });
-      const yieldBuffer = buffer;
-      buffer = undefined;
+    try {
+      while (!stop) {
 
-      if (yieldBuffer) {
-        yield yieldBuffer;
+        await continuePromise;
+        if (rejectError)
+          throw rejectError.error;
+        if (stop) return;
 
-        const yieldCompleted = yieldPassedTrigger;
-        yieldPassedPromise = new Promise(resolve => yieldPassedTrigger = resolve);
+        continuePromise = new Promise(resolve => continueTrigger = function continueTriggerSubsequentlySet() { resolve() });
+        const yieldBuffer = buffer;
+        buffer = undefined;
 
-        yieldCompleted();
+        if (yieldBuffer) {
+          yield yieldBuffer;
+
+          const yieldCompleted = yieldPassedTrigger;
+          yieldPassedPromise = new Promise(resolve => yieldPassedTrigger = resolve);
+
+          yieldCompleted();
+        }
       }
-    }
 
-  } finally {
-    finallyTrigger();
+    } finally {
+      finallyTrigger();
+    }
   }
 
   /**

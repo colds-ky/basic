@@ -27,6 +27,24 @@ export function forAwait(from, derive) {
   return /** @type {*} */(state.hookUse(from, derive));
 }
 
+/**
+ * @template {any} TFrom
+ * @template {any} TTo
+ * @param {TFrom} from
+ * @param {TSourceOf<TFrom, TTo>} derive
+ * @returns {[ current: Awaited<TTo>, next: () => Awaited<TTo> ]}
+ */
+export function useForAwait(from, derive) {
+  const [state, setState] = useState(initAwaitState);
+  state.reactSetState = setState;
+  useEffect(state.effectMount, []);
+  const current = /** @type {*} */(state.hookUse(from, derive, true));
+  return [current, next];
+  function next() {
+    return /** @type {*} */(state.next());
+  }
+}
+
 function initAwaitState() {
   return new AwaitState();
 }
@@ -58,24 +76,25 @@ class AwaitState {
   withinHook;
 
   /** @type {AwaitState | undefined} */
-  repalcedWith;
+  replacedWith;
 
   reactSetState(setState) { }
 
   /**
    * @param {TFrom} from
    * @param {TSourceOf<TFrom, TTo>} derive
+   * @param {boolean} [firstTimeOnly]
    * @returns {TTo | undefined}
    */
-  hookUse = (from, derive) => {
+  hookUse = (from, derive, firstTimeOnly) => {
     this.withinHook = true;
     try {
-      if (this.repalcedWith) return this.repalcedWith.hookUse(from, derive);
+      if (this.replacedWith) return this.replacedWith.hookUse(from, derive, firstTimeOnly);
 
       if (!this.run || this.run.from !== from) {
         if (this.run) this.finishExistingIteration();
         this.initializeNewValues(from, derive);
-      } else {
+      } else if (!firstTimeOnly) {
         this.nudgeContinuationFromHook();
       }
 
@@ -85,14 +104,35 @@ class AwaitState {
     }
   };
 
+  next = () => {
+    if (this.withinHook)
+      return this.hookUse(this.run.from, this.run.derive);
+
+    if (this.replacedWith) return this.replacedWith.next();
+
+    this.nudgeContinuationFromHook();
+
+    this.replacedWith = new AwaitState();
+    this.replacedWith.run = this.run;
+    this.replacedWith.reactSetState = this.reactSetState;
+
+    this.reactSetState(oldState => {
+      if (oldState !== this && oldState !== this.replacedWith)
+        oldState.replacedWith = this.replacedWith;
+      return this.replacedWith;
+    });
+
+    return this.run.current;
+  };
+
   effectMount = () => {
-    if (this.repalcedWith) return this.repalcedWith.effectMount();
+    if (this.replacedWith) return this.replacedWith.effectMount();
     this.nudgeContinuationFromHook();
     return this.effectUnmount;
   };
 
   effectUnmount = () => {
-    if (this.repalcedWith) return this.repalcedWith.effectUnmount();
+    if (this.replacedWith) return this.replacedWith.effectUnmount();
     // TODO: freeze any pending continuation
     this.run.finished = true;
     this.finishExistingIteration();
@@ -173,11 +213,15 @@ class AwaitState {
   continueWithScalar(from, run, value) {
     this.run.current = value;
     if (!this.withinHook) {
-      this.repalcedWith = new AwaitState();
-      this.repalcedWith.run = this.run;
-      this.repalcedWith.reactSetState = this.reactSetState;
+      this.replacedWith = new AwaitState();
+      this.replacedWith.run = this.run;
+      this.replacedWith.reactSetState = this.reactSetState;
 
-      this.reactSetState(this.repalcedWith);
+      this.reactSetState(oldState => {
+        if (oldState !== this && oldState !== this.replacedWith)
+          oldState.replacedWith = this.replacedWith;
+        return this.replacedWith;
+      });
     }
   }
 
