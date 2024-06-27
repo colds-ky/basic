@@ -28,7 +28,7 @@ export async function* streamBuffer(callback) {
 
   let continueTrigger = () => { };
   /** @type {Promise<void>} */
-  let continuePromise = new Promise(resolve => continueTrigger = resolve);
+  let continuePromise = new Promise(resolve => continueTrigger = function continueTriggerInitiallySet() { resolve() });
 
   let yieldPassedTrigger = () => { };
   /** @type {Promise<void>} */
@@ -56,7 +56,7 @@ export async function* streamBuffer(callback) {
         throw rejectError.error;
       if (stop) return;
 
-      continuePromise = new Promise(resolve => continueTrigger = resolve);
+      continuePromise = new Promise(resolve => continueTrigger = function continueTriggerSubsequentlySet() { resolve() });
       const yieldBuffer = buffer;
       buffer = undefined;
 

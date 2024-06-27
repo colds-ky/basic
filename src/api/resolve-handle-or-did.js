@@ -1,11 +1,15 @@
 // @ts-check
 /// <reference path="../types.d.ts" />
 
+import { BskyAgent } from '@atproto/api';
 import { getProfileBlobUrl, isPromise, likelyDID, shortenDID, shortenHandle, unwrapShortDID, unwrapShortHandle } from '.';
-import { atClient } from './at-client';
 import { throttledAsyncCache } from './throttled-async-cache';
+import { ColdskyAgent, BSKY_SOCIAL_URL } from '../../lib/coldsky-agent';
+
 
 const resolveHandleCache = throttledAsyncCache(async (handle) => {
+  const atClient = new ColdskyAgent({});
+
   const resolved = await atClient.com.atproto.identity.resolveHandle({
     handle: unwrapShortHandle(handle)
   });
