@@ -10,13 +10,14 @@
  */
 
 /**
- * @param {Parameters<typeof fetch>[0] & { onretry?: ({}: RetryArgs) => void }} req
- * @param {Parameters<typeof fetch>[1] & { onretry?: ({}: RetryArgs) => void }} [init]
+ * @param {Parameters<typeof fetch>[0] & { onretry?: ({}: RetryArgs) => void, nocorsproxy?: boolean }} req
+ * @param {Parameters<typeof fetch>[1] & { onretry?: ({}: RetryArgs) => void, nocorsproxy?: boolean }} [init]
  * @returns {ReturnType<typeof fetch>}
  */
 export async function retryFetch(req, init, ...rest) {
   // only allow GET requests to use corsproxy
   let corsproxyMightBeNeeded = (init?.method || '').toUpperCase() === 'get';
+  if (req.nocorsproxy || init?.nocorsproxy) corsproxyMightBeNeeded = false;
 
   const started = Date.now();
   let tryCount = 0;
