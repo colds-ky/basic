@@ -127,8 +127,21 @@
   bottom: 0;
 }
 
+.complete-post-content .post-notes-area .post-replies .reply-avatars {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  margin-right: -0.5em;
+}
+
 .complete-post-content .post-notes-area .post-replies .reply-avatars .reply-avatar-marker {
   display: block;
+}
+
+.complete-post-content .post-notes-area .post-replies .reply-avatars .reply-avatar-marker.reply-avatar-marker-more {
+  min-width: 2em;
+  text-align: center;
+  color: goldenrod;
 }
 
 .complete-post-content .post-after-notes {
