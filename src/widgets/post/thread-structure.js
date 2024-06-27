@@ -3,6 +3,7 @@
 /**
  * @typedef {{
  *  post: import('../../../coldsky/lib').MatchCompactPost,
+ *  depth: number,
  *  branchPostCount: number,
  *  branchInterestWeight: number,
  *  maxBranchDepth: number,
@@ -28,6 +29,7 @@ export function threadStructure(thread, isSignificantPost) {
   /** @type {ThreadBranch} */
   const root = {
     post: thread.root,
+    depth: 0,
     branchPostCount: 1,
     branchInterestWeight: initialInterestWeight(thread.root),
     maxBranchDepth: 1,
@@ -86,6 +88,7 @@ export function threadStructure(thread, isSignificantPost) {
     /** @type {ThreadBranch} */
     const allocatedPost = {
       post,
+      depth: 0,
       branchPostCount: 1,
       branchInterestWeight: initialInterestWeight(post),
       maxBranchDepth: 1,
@@ -117,7 +120,6 @@ export function threadStructure(thread, isSignificantPost) {
    * @param {ThreadBranch} parent 
    */
   function aggregateChildren(parent) {
-
     parent.branchPostCount = 0;
     parent.significantPostCount = 0;
     parent.maxBranchDepth = 0;
@@ -128,6 +130,7 @@ export function threadStructure(thread, isSignificantPost) {
     parent.maxDirectSignificantBranchDepth = 0;
     if (parent.children) {
       for (const ancestorChild of parent.children) {
+        ancestorChild.depth = parent.depth + 1;
         aggregateChildren(ancestorChild);
 
         parent.branchPostCount += ancestorChild.branchPostCount + 1;
