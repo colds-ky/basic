@@ -16,6 +16,9 @@ import { useEffect, useRef, useState } from 'react';
 export function Visible({ Component = 'div', onVisible, onObscured, rootMargin, threshold, children, ...rest }) {
   let [visible, setVisible] = useState(false);
   const ref = useRef(null);
+  const [callbacks] = useState({ onVisible, onObscured });
+  callbacks.onVisible = onVisible;
+  callbacks.onObscured = onObscured;
 
   useEffect(() => {
     if (!ref.current) {
@@ -26,9 +29,9 @@ export function Visible({ Component = 'div', onVisible, onObscured, rootMargin, 
       if (entry.isIntersecting !== visible) {
         setVisible(visible = entry.isIntersecting);
         if (entry.isIntersecting)
-          onVisible?.();
+          callbacks.onVisible?.();
         else
-          onObscured?.();
+          callbacks.onObscured?.();
       }
     }, {
       rootMargin,

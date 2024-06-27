@@ -1,7 +1,7 @@
 // @ts-check
 
 import React from 'react';
-import { localise, localiseNumberSuffix } from '../localise';
+import { localise } from '../localise';
 
 const dtBuf = new Date();
 const dtNow = new Date();
@@ -58,7 +58,7 @@ export function formatTimeStr(time) {
         time.getTime();
 
   const diffMsec = now - tm;
-  if (Math.abs(diffMsec) < 120) {
+  if (Math.abs(diffMsec) < 120 * 1000) {
     return localise('just now', { uk: 'щойно' });
   }
 

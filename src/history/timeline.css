@@ -91,3 +91,11 @@
   animation: none;
   transform: scale(0);
 }
+
+.timeline-container .processing-animation {
+  max-height: 10em;
+}
+
+.timeline-container .processing-animation .flying-post {
+  zoom: 0.5;
+}

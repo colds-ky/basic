@@ -46,20 +46,10 @@ function extendDashLeads(langs) {
 
 
 /**
- * @param {string} word
  * @param {number} num
- */
-export function localiseNumberSuffix(word, num) {
-  return localise(localiseNumberSuffixEnglish(word, num), {
-    uk: localiseNumberSuffixUkrainian(word, num)
-  });
-}
-
-/**
  * @param {string} word
- * @param {number} num
  */
-function localiseNumberSuffixEnglish(word, num) {
+export function localiseNumberSuffixEnglish(num, word) {
   if (num === 1) return word;
   if (enWordPluralisations[word]) return enWordPluralisations[word];
   if (word.endsWith('y')) return word.slice(0, -1) + 'ies';
@@ -74,16 +64,11 @@ const enWordPluralisations = {
 };
 
 /**
- * @param {string} word
  * @param {number} num
+ * @param {{ 1: string, 2: string, 5: string }} wordForms
  */
-function localiseNumberSuffixUkrainian(word, num) {
-  if (num % 10 === 1 && ! (num %100 === 11)) return word;
-  if (ukWordPluralisations[word]) return ukWordPluralisations[word];
-  if (word.endsWith('а') || word.endsWith('я')) return word.slice(0, -1) + 'і';
-  return word + 'и';
+export function localiseNumberSuffixUkrainian(num, wordForms) {
+  if (num % 10 === 1 && !(num % 100 === 11)) return wordForms[1];
+  if (num % 10 >= 2 && num % 10 <= 4 && !(num % 100 >= 12 && num % 100 <= 14)) return wordForms[2];
+  return wordForms[5];
 }
-
-const ukWordPluralisations = {
-  'списку': 'списків',
-};
