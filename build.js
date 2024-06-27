@@ -4,34 +4,40 @@ const esbuild = require('esbuild');
 const fs = require('fs');
 const path = require('path');
 
-async function build(mode) {
+/** @type {Parameters<typeof esbuild.build>[0]} */
+const baseOptions = {
+  //entryPoints: ['lib/index.js'],
+  bundle: true,
+  sourcemap: true,
+  target: 'es6',
+  loader: { '.js': 'jsx' },
+  format: 'iife',
+  logLevel: 'info',
+  external: [
+    'fs', 'path', 'os',
+    'crypto', 'tty', 'tls',
+    'events', 'stream',
+    'zlib',
+    'assert',
+    'net', 'http', 'https', 'http2',
+    'child_process',
+    'module', 'url', 'worker_threads', 'util',
+    'node:constants', 'node:buffer', 'node:querystring', 'node:events', 'node:fs', 'node:path', 'node:os',
+    'node:crypto', 'node:util', 'node:stream', 'node:assert', 'node:tty', 'node:net', 'node:tls', 'node:http',
+    'node:https', 'node:zlib', 'node:http2', 'node:perf_hooks', 'node:child_process', 'node:worker_threads',
+
+    'ws'
+  ],
+  //outfile: 'libs.js'
+};
+
+async function buildLib(mode) {
 
   let debounceWrite;
 
-  /** @type {Parameters<typeof esbuild.build>[0]} */
   const options = {
+    ...baseOptions,
     entryPoints: ['lib/index.js'],
-    bundle: true,
-    sourcemap: true,
-    target: 'es6',
-    loader: { '.js': 'jsx' },
-    format: 'iife',
-    logLevel: 'info',
-    external: [
-      'fs', 'path', 'os',
-      'crypto', 'tty', 'tls',
-      'events', 'stream',
-      'zlib',
-      'assert',
-      'net', 'http', 'https', 'http2',
-      'child_process',
-      'module', 'url', 'worker_threads', 'util',
-      'node:constants', 'node:buffer', 'node:querystring', 'node:events', 'node:fs', 'node:path', 'node:os',
-      'node:crypto', 'node:util', 'node:stream', 'node:assert', 'node:tty', 'node:net', 'node:tls', 'node:http',
-      'node:https', 'node:zlib', 'node:http2', 'node:perf_hooks', 'node:child_process', 'node:worker_threads',
-
-      'ws'
-    ],
     plugins: [
       {
         name: 'post-export',
@@ -56,6 +62,23 @@ async function build(mode) {
     outfile: 'libs.js'
   };
 
+  if (mode === 'serve' || mode === 'watch') {
+    const ctx = await esbuild.context(options);
+    await ctx.watch();
+    console.log('WATCHING LIB...');
+  } else {
+    await esbuild.build(options);
+  }
+}
+
+async function buildSite(mode) {
+
+  const options = {
+    ...baseOptions,
+    entryPoints: ['src/index.js'],
+    outfile: 'index.js'
+  };
+
   if (mode === 'serve') {
     const ctx = await esbuild.context(options);
     const server = await ctx.serve({
@@ -66,13 +89,15 @@ async function build(mode) {
   } else if (mode === 'watch') {
     const ctx = await esbuild.context(options);
     await ctx.watch();
-    console.log('WATCHING...');
+    console.log('WATCHING SITE...');
   } else {
     await esbuild.build(options);
   }
 }
 
-build(
-  process.argv.some(arg => /^\-*serve$/i.test(arg)) ? 'serve' :
-    process.argv.some(arg => /^\-*watch$/i.test(arg)) ? 'watch' :
-      undefined);
+const mode = process.argv.some(arg => /^\-*serve$/i.test(arg)) ? 'serve' :
+  process.argv.some(arg => /^\-*watch$/i.test(arg)) ? 'watch' :
+    undefined;
+
+buildLib(mode);
+buildSite(mode);

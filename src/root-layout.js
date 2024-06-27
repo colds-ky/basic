@@ -2,7 +2,6 @@
 
 import React from 'react';
 import atproto from '@atproto/api';
-import * as octokit from "octokit";
 
 import * as wholeAPI from './api';
 import * as maintain from './maintain';
@@ -11,7 +10,6 @@ import { MaintainPanel } from './maintain/ui';
 
 if (typeof window !== 'undefined') {
   window['atproto'] = atproto;
-  window['octokit'] = octokit;
   window['coldsky'] = wholeAPI;
   Object.assign(window['coldsky'], maintain);
 }

@@ -1,5 +1,6 @@
 /lib
 /build.js
+/src
 /index.*
 /*.jpeg
 /*.jpg
