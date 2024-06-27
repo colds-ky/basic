@@ -1,7 +1,7 @@
 // @ts-check
 
 import React from 'react';
-import { Link, useNavigate, useMatch } from 'react-router-dom';
+import { Link, useNavigate, useMatch, useMatches } from 'react-router-dom';
 
 import { FormatTime } from '../format-time';
 import { useDB } from '../..';
@@ -57,7 +57,8 @@ export function PostLink({ postURI }) {
   let bskyURL;
 
   if (parsedURI) {
-
+    // const matches = useMatches();
+    // matches[0].
     localURL = '/' + parsedURI.shortDID + '/' + parsedURI.postID;
     bskyURL = '/' + parsedURI.shortDID + '/' + parsedURI.postID;
   }
