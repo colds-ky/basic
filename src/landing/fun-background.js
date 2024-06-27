@@ -10,6 +10,7 @@ import { AccountLabel } from '../widgets/account';
 import { useNavigate } from 'react-router-dom';
 import { useDB } from '..';
 import { makeFeedUri } from '../../coldsky/lib';
+import { PreFormatted } from '../widgets/preformatted';
 
 const POST_DEBOUNCE_MSEC = 5000;
 const POST_MAX_AGE = 1000 * 40;
@@ -137,11 +138,7 @@ function ThreadBubble({ thread }) {
           animationDuration: `${rockDuration.toFixed(2)}s`
         }}>
         <AccountLabel className='fun-background-thread-author' account={thread.current.shortDID} />
-        <div className='fun-background-thread-content'>
-          {
-            thread.current.text
-          }
-        </div>
+        <PreFormatted className='fun-background-thread-content' text={thread.current.text}/>
         <div className='fun-background-thread-likes'>
           <FavoriteBorder />
           {

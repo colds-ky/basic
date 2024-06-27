@@ -34,9 +34,19 @@
   white-space: nowrap;
 }
 
+.fun-background .fun-background-scroller .fun-background-thread .fun-background-thread-content > p {
+  margin: 0;
+  margin-top: 0.5em;
+  padding: 0;
+}
+
+.fun-background .fun-background-scroller .fun-background-thread .fun-background-thread-content > p:first-child {
+  margin-top: 0;
+}
+
 .fun-background .fun-background-scroller .fun-background-thread .fun-background-thread-likes {
   text-align: right;
-  opacity: 0.5;
+  opacity: 0.4;
   margin-top: 0.2em;
 }
 

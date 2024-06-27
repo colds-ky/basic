@@ -1220,7 +1220,7 @@
             var dispatcher = resolveDispatcher();
             return dispatcher.useRef(initialValue);
           }
-          function useEffect16(create5, deps) {
+          function useEffect17(create5, deps) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useEffect(create5, deps);
           }
@@ -2003,7 +2003,7 @@
           exports.useContext = useContext11;
           exports.useDebugValue = useDebugValue3;
           exports.useDeferredValue = useDeferredValue;
-          exports.useEffect = useEffect16;
+          exports.useEffect = useEffect17;
           exports.useId = useId2;
           exports.useImperativeHandle = useImperativeHandle4;
           exports.useInsertionEffect = useInsertionEffect3;
@@ -2507,9 +2507,9 @@
           if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
             __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
           }
-          var React69 = require_react();
+          var React72 = require_react();
           var Scheduler = require_scheduler();
-          var ReactSharedInternals = React69.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+          var ReactSharedInternals = React72.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
           var suppressWarning = false;
           function setSuppressWarning(newSuppressWarning) {
             {
@@ -4114,7 +4114,7 @@
             {
               if (props.value == null) {
                 if (typeof props.children === "object" && props.children !== null) {
-                  React69.Children.forEach(props.children, function(child) {
+                  React72.Children.forEach(props.children, function(child) {
                     if (child == null) {
                       return;
                     }
@@ -27057,7 +27057,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
       if (true) {
         (function() {
           "use strict";
-          var React69 = require_react();
+          var React72 = require_react();
           var REACT_ELEMENT_TYPE = Symbol.for("react.element");
           var REACT_PORTAL_TYPE = Symbol.for("react.portal");
           var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
@@ -27083,7 +27083,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
             }
             return null;
           }
-          var ReactSharedInternals = React69.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+          var ReactSharedInternals = React72.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
           function error(format3) {
             {
               {
@@ -27965,7 +27965,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
         value: true
       });
       exports.default = StyledEngineProvider;
-      var React69 = _interopRequireWildcard(require_react());
+      var React72 = _interopRequireWildcard(require_react());
       var _propTypes = _interopRequireDefault(require_prop_types());
       var _react2 = (init_emotion_react_browser_esm(), __toCommonJS(emotion_react_browser_esm_exports));
       var _cache = _interopRequireDefault((init_emotion_cache_browser_esm(), __toCommonJS(emotion_cache_browser_esm_exports)));
@@ -28055,7 +28055,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
         value: true
       });
       exports.default = GlobalStyles3;
-      var React69 = _interopRequireWildcard(require_react());
+      var React72 = _interopRequireWildcard(require_react());
       var _propTypes = _interopRequireDefault(require_prop_types());
       var _react2 = (init_emotion_react_browser_esm(), __toCommonJS(emotion_react_browser_esm_exports));
       var _jsxRuntime = require_jsx_runtime();
@@ -76736,7 +76736,7 @@ if (cid) {
   });
 
   // src/index.js
-  var import_react16 = __toESM(require_react());
+  var import_react19 = __toESM(require_react());
   var import_client = __toESM(require_client());
 
   // node_modules/react-router-dom/dist/index.js
@@ -92300,10 +92300,116 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   var TextField_default = TextField;
 
   // src/landing/landing.js
-  var import_react11 = __toESM(require_react());
+  var import_react12 = __toESM(require_react());
 
-  // src/landing/fun-background.js
-  var import_react10 = __toESM(require_react());
+  // src/icon-inject/overlay-avatar.js
+  function overlayAvatar(avatarURL) {
+    return __async(this, null, function* () {
+      const png = yield fetch("https://corsproxy.io/?" + avatarURL).then((r2) => r2.blob());
+      const dataURI = yield readBlob(png);
+      const img = yield awaitImageOnload(dataURI);
+      const canvas = document.createElement("canvas");
+      canvas.width = 128;
+      canvas.height = 128;
+      canvas.style.cssText = "position: absolute; top: -9999px; left: -9999px; pointer-events: none;";
+      const scratchCtx = canvas.getContext("2d");
+      if (!scratchCtx) {
+        return;
+      }
+      scratchCtx.filter = "grayscale(0.4) contrast(1.5)";
+      scratchCtx.clearRect(0, 0, canvas.width, canvas.height);
+      scratchCtx.globalCompositeOperation = "source-over";
+      scratchCtx.drawImage(img, 8, 8, 116, 116);
+      scratchCtx.fillStyle = "#fff";
+      scratchCtx.globalCompositeOperation = "destination-in";
+      scratchCtx.beginPath();
+      scratchCtx.arc(64, 64, 64, 0, 2 * Math.PI, true);
+      scratchCtx.closePath();
+      scratchCtx.fill();
+      scratchCtx.strokeStyle = "#000";
+      scratchCtx.lineWidth = 8;
+      scratchCtx.globalCompositeOperation = "source-over";
+      scratchCtx.beginPath();
+      scratchCtx.arc(64, 64, 60, 0, 2 * Math.PI, true);
+      scratchCtx.closePath();
+      scratchCtx.stroke();
+      const imgData = canvas.toDataURL();
+      return imgData;
+    });
+  }
+  function awaitImageOnload(src6) {
+    return new Promise((resolve, reject) => {
+      const img = document.createElement("img");
+      img.src = src6;
+      img.onload = () => resolve(img);
+      img.onerror = (event, source, lineno, colno, error) => reject(error || event);
+    });
+  }
+  function readBlob(b) {
+    return new Promise(function(resolve, reject) {
+      const reader = new FileReader();
+      reader.onloadend = function() {
+        resolve(reader.result);
+      };
+      reader.onerror = function() {
+        reject(reader.error);
+      };
+      reader.readAsDataURL(b);
+    });
+  }
+
+  // src/icon-inject/replace-icon.js
+  function replaceIcon(icon) {
+    const allLinks = [...document.getElementsByTagName("link")];
+    for (const lnk of allLinks) {
+      if (/icon/i.test(lnk.rel || "")) {
+        lnk.href = icon || "gist-icon.png";
+      }
+    }
+  }
+
+  // src/localise.js
+  function localise(english, languageMap) {
+    if (!(langs == null ? void 0 : langs.length))
+      return english;
+    for (const lang of langs) {
+      if (languageMap[lang])
+        return languageMap[lang];
+    }
+    for (const lang of langs) {
+      if (languageMap[lang])
+        return languageMap[lang];
+    }
+    return english;
+  }
+  var langSubstitutes = {
+    ru: "uk",
+    be: "uk"
+  };
+  var _a;
+  var langs = extendDashLeads(
+    !navigator ? void 0 : ((_a = navigator.languages) == null ? void 0 : _a.length) ? navigator.languages.map((lang) => lang.toLowerCase()) : navigator.language ? [navigator.language.toLowerCase()] : void 0
+  );
+  function extendDashLeads(langs2) {
+    if (!langs2)
+      return langs2;
+    const result = [];
+    for (const lang of langs2) {
+      result.push(langSubstitutes[lang] || lang);
+    }
+    for (const lang of langs2) {
+      const dashLead = lang.split("-")[0];
+      if (dashLead !== lang)
+        result.push(langSubstitutes[dashLead] || dashLead);
+    }
+    return result;
+  }
+
+  // src/widgets/account/account-label.js
+  var import_react9 = __toESM(require_react());
+
+  // src/widgets/account/full-handle.js
+  var import_react7 = __toESM(require_react());
 
   // coldsky/lib/index.js
   var lib_exports = {};
@@ -92415,6 +92521,8 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       return "https://bsky.network";
     else if (shortPDC === ".a")
       return "https://bsky.app";
+    if (/^http:/i.test(shortPDC) || /^https:/i.test(shortPDC))
+      return shortPDC;
     return "https://" + shortPDC + "host.bsky.network";
   }
   function parseTimestampOffset(dtOffsetStr) {
@@ -92646,7 +92754,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       var _a3, _b;
       super(__spreadProps(__spreadValues({}, args), {
         // most of methods work fine on bsky.social
-        service: (args == null ? void 0 : args.service) ? args.service : BSKY_SOCIAL_URL
+        service: (args == null ? void 0 : args.service) ? unwrapShortPDC(args.service) : BSKY_SOCIAL_URL
       }));
       for (const key in this.com.atproto) {
         const ns = this.com.atproto[key];
@@ -95485,7 +95593,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     }
     return baseCache2;
   }
-  var _a;
+  var _a2;
   var CID4 = class _CID {
     /**
      * @param version - Version of the CID
@@ -95498,7 +95606,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       __publicField(this, "multihash");
       __publicField(this, "bytes");
       __publicField(this, "/");
-      __publicField(this, _a, "CID");
+      __publicField(this, _a2, "CID");
       this.code = code2;
       this.version = version6;
       this.multihash = multihash;
@@ -95574,7 +95682,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       return this;
     }
     // Legacy
-    [(_a = Symbol.toStringTag, Symbol.for("nodejs.util.inspect.custom"))]() {
+    [(_a2 = Symbol.toStringTag, Symbol.for("nodejs.util.inspect.custom"))]() {
       return `CID(${this.toString()})`;
     }
     /**
@@ -98229,7 +98337,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // coldsky/package.json
-  var version4 = "0.2.9";
+  var version4 = "0.2.10";
 
   // coldsky/lib/firehose-short-dids.js
   function firehoseShortDIDs(filterShortDIDs) {
@@ -100158,24 +100266,25 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         return { all, root, current };
       });
     }
-    function searchPosts(text, options) {
+    function searchPosts(did, text) {
       return __async(this, null, function* () {
         var _a3;
-        if (!text)
-          return;
         const words = detectWordStartsNormalized(text, void 0);
-        if (!(words == null ? void 0 : words.length))
+        if (!(words == null ? void 0 : words.length) && !did)
           return;
+        const shortDID = shortenDID(did);
+        const wordMatcher = !words ? () => true : (
+          /** @param {string} w */
+          (w) => words.includes(w)
+        );
         const map = /* @__PURE__ */ new Map();
-        const dbPost = yield db2.posts.where("words").anyOf(words).toArray();
+        const dbPost = !shortDID ? yield db2.posts.where("words").anyOf(words || []).toArray() : !(words == null ? void 0 : words.length) ? yield db2.posts.where("shortDID").equals(shortDID).toArray() : yield db2.posts.where("shortDID").equals(shortDID).and(
+          (post) => !!post.words && post.words.some(wordMatcher)
+        ).toArray();
         for (const post of dbPost) {
           const uri = makeFeedUri(post.shortDID, post.rev);
           map.set(uri, post);
         }
-        const wordMatcher = (
-          /** @param {string} w */
-          (w) => words.includes(w)
-        );
         for (const uncachedPost of outstandingPostUpdatesByURI.values()) {
           if ((_a3 = uncachedPost.words) == null ? void 0 : _a3.some(wordMatcher)) {
             const uri = makeFeedUri(uncachedPost.shortDID, uncachedPost.rev);
@@ -100183,14 +100292,22 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           }
         }
         const allPosts = [...map.values()];
+        if (!text)
+          return allPosts;
         const fuse = new Fuse(allPosts, {
           includeScore: true,
           keys: ["text"],
           includeMatches: true,
           shouldSort: true
         });
-        const matches = fuse.search(text, (options == null ? void 0 : options.max) ? { limit: options == null ? void 0 : options.max } : void 0);
-        return matches;
+        const matches = fuse.search(text);
+        const compact = matches.map((fuseMatch) => {
+          const joined = __spreadProps(__spreadValues(__spreadValues({}, fuseMatch), fuseMatch.item), {
+            item: void 0
+          });
+          return joined;
+        });
+        return compact;
       });
     }
     function getProfile(did) {
@@ -100273,6 +100390,8 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         service: service || BSKY_PUBLIC_URL
       })
     );
+    const agent_getProfile_throttled = throttledAsyncCache((actor) => agent.getProfile({ actor }));
+    const agent_resolveHandle_throttled = throttledAsyncCache((handle) => agent.com.atproto.identity.resolveHandle({ handle }));
     const agent_getPostThread_throttled = throttledAsyncCache((uri) => agent.getPostThread({ uri }));
     const agent_getRepoRecord_throttled = throttledAsyncCache((repo, rkey, collection) => {
       const postRecordPromise = agent.com.atproto.repo.getRecord({
@@ -100289,7 +100408,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       getPostOnly,
       getPostThreadIncrementally,
       getProfileIncrementally,
-      searchPosts,
+      searchPostsIncrementally,
       searchProfilesIncrementally
     };
     function firehose2() {
@@ -100413,11 +100532,11 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           return;
         let profileRemotePromise;
         if (likelyDID(didOrHandle)) {
-          profileRemotePromise = agent.getProfile({ actor: unwrapShortDID(didOrHandle) });
+          profileRemotePromise = agent_getProfile_throttled(unwrapShortDID(didOrHandle));
         } else {
-          profileRemotePromise = agent.com.atproto.identity.resolveHandle({ handle: unwrapShortHandle(didOrHandle) }).then((rec) => {
+          profileRemotePromise = agent_resolveHandle_throttled(unwrapShortHandle(didOrHandle)).then((rec) => {
             const shortDID = shortenDID(rec.data.did);
-            return agent.getProfile({ actor: unwrapShortDID(shortDID) });
+            return agent_getProfile_throttled(unwrapShortDID(shortDID));
           });
         }
         const profileLocal = yield new __await(dbStore.getProfile(didOrHandle));
@@ -100428,8 +100547,86 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         return profileRemoteResolved;
       });
     }
-    function searchPosts(text, options) {
-      return dbStore.searchPosts(text, options);
+    function searchPostsIncrementally(shortDID, text) {
+      if (shortDID) {
+        return searchAccountHistoryPostsIncrementally(shortDID, text);
+      } else if (!text) {
+        return [];
+      } else {
+        return searchAllPostsIncrementally(text);
+      }
+    }
+    function searchAccountHistoryPostsIncrementally(shortDID, text) {
+      return __asyncGenerator(this, null, function* () {
+        var _a3, _b, _c, _d, _e;
+        let REPORT_UPDATES_FREQUENCY_MSEC = 700;
+        const cachedMatchesPromise = dbStore.searchPosts(shortDID, text);
+        const allCachedHistoryPromise = !text ? cachedMatchesPromise : dbStore.searchPosts(shortDID, text);
+        const plcDirHistoryPromise = plcDirectoryHistoryRaw(shortDID);
+        let lastSearchReport = 0;
+        let anyUpdates = false;
+        let lastMatches = yield new __await(cachedMatchesPromise);
+        if (lastMatches == null ? void 0 : lastMatches.length) {
+          lastSearchReport = Date.now();
+          yield lastMatches;
+        }
+        const plcDirHistoryRecords = yield new __await(plcDirHistoryPromise);
+        dbStore.capturePlcDirectoryEntries(plcDirHistoryRecords);
+        const profile = yield new __await(dbStore.getProfile(shortDID));
+        const pdsAgent = new ColdskyAgent({
+          service: (_a3 = profile == null ? void 0 : profile.history) == null ? void 0 : _a3[0].pds
+        });
+        let cursor2 = "";
+        const fullDID = unwrapShortDID(shortDID);
+        let knownHistoryRevs;
+        while (true) {
+          const moreData = yield new __await(pdsAgent.com.atproto.repo.listRecords({
+            repo: unwrapShortDID(shortDID),
+            cursor: cursor2,
+            collection: "app.bsky.feed.post",
+            limit: Math.random() * 10 + 88
+          }));
+          if (!knownHistoryRevs) {
+            const allHistory = yield new __await(allCachedHistoryPromise);
+            knownHistoryRevs = new Set((allHistory || []).map((rec) => rec.rev));
+          }
+          if ((_c = (_b = moreData == null ? void 0 : moreData.data) == null ? void 0 : _b.records) == null ? void 0 : _c.length) {
+            for (const rec of moreData.data.records) {
+              const recEx = (
+                /** @type {*} */
+                rec.value
+              );
+              recEx.$type = "app.bsky.feed.post";
+              recEx.repo = fullDID;
+              recEx.rev = /** @type {string} */
+              (_d = breakFeedUri(rec.uri)) == null ? void 0 : _d.postID;
+              if (!knownHistoryRevs.has(recEx.rev))
+                anyUpdates = true;
+              dbStore.captureRecord(recEx, Date.now());
+            }
+          }
+          if (anyUpdates && Date.now() - lastSearchReport > REPORT_UPDATES_FREQUENCY_MSEC) {
+            const newMatches = yield new __await(dbStore.searchPosts(shortDID, text));
+            if (newMatches == null ? void 0 : newMatches.length) {
+              lastMatches = newMatches;
+              lastSearchReport = Date.now();
+              anyUpdates = false;
+              yield newMatches;
+              lastSearchReport = Date.now();
+            }
+          }
+          if (!((_e = moreData == null ? void 0 : moreData.data) == null ? void 0 : _e.cursor))
+            break;
+          cursor2 = moreData.data.cursor;
+        }
+      });
+    }
+    function searchAllPostsIncrementally(text) {
+      return __asyncGenerator(this, null, function* () {
+        const localResultsPromise = dbStore.searchPosts(void 0, text);
+        const localResults = yield new __await(localResultsPromise);
+        yield localResults;
+      });
     }
     function searchProfilesIncrementally(text, options) {
       return __asyncGenerator(this, null, function* () {
@@ -100482,7 +100679,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
 
   // coldsky/lib/data/capture-plc-directory-entries.js
   function capturePLCDirectoryEntriesForStore(recs, store, intercepts) {
-    var _a3, _b, _c, _d, _e;
+    var _a3, _b, _c, _d, _e, _f;
     const affectedRepos = /* @__PURE__ */ new Map();
     for (const rec of recs) {
       const shortDID = shortenDID(rec.did);
@@ -100530,6 +100727,27 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
             (_c = intercepts == null ? void 0 : intercepts.profile) == null ? void 0 : _c.call(intercepts, repoData.profile);
             updatedRepos.push(repoData.profile);
           }
+        } else {
+          history.sort((a, b) => b.time - a.time);
+          const lastHistoryEntry = history[0];
+          if (!repoData.profile) {
+            repoData.profile = {
+              shortDID,
+              handle: lastHistoryEntry == null ? void 0 : lastHistoryEntry.shortHandle,
+              displayName: void 0,
+              description: void 0,
+              avatar: void 0,
+              banner: void 0,
+              words: detectWordStartsNormalized(lastHistoryEntry == null ? void 0 : lastHistoryEntry.shortHandle, void 0),
+              followersCount: void 0,
+              followsCount: void 0,
+              postsCount: void 0,
+              history,
+              asOf: (_d = history[0]) == null ? void 0 : _d.time
+            };
+          } else {
+            repoData.profile.history = history;
+          }
         }
       } else {
         history.sort((a, b) => b.time - a.time);
@@ -100547,10 +100765,10 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           followsCount: void 0,
           postsCount: void 0,
           history,
-          asOf: (_d = history[0]) == null ? void 0 : _d.time
+          asOf: (_e = history[0]) == null ? void 0 : _e.time
         };
         store.set(shortDID, repo);
-        (_e = intercepts == null ? void 0 : intercepts.profile) == null ? void 0 : _e.call(intercepts, repo.profile);
+        (_f = intercepts == null ? void 0 : intercepts.profile) == null ? void 0 : _f.call(intercepts, repo.profile);
         updatedRepos.push(repo.profile);
       }
     }
@@ -100595,8 +100813,11 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       if (words)
         repoData.profile.words = words;
       repoData.profile.asOf = asOf;
-      (_b = intercepts == null ? void 0 : intercepts.profile) == null ? void 0 : _b.call(intercepts, repoData.profile);
+    } else {
+      if (profileView.banner && !repoData.profile.banner)
+        repoData.profile.banner = profileView.banner;
     }
+    (_b = intercepts == null ? void 0 : intercepts.profile) == null ? void 0 : _b.call(intercepts, repoData.profile);
     return repoData.profile;
   }
 
@@ -101095,159 +101316,84 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   // coldsky/lib/index.js
   var atproto = atproto_api_import;
 
-  // src/api/firehose-threads.js
-  function firehoseThreads(db2) {
-    return streamBuffer(
-      /**
-       * @param {import('../../coldsky/src/api/akpa').StreamParameters<import('../../coldsky/lib').CompactThreadPostSet, import('../../coldsky/lib').CompactThreadPostSet[]>} streaming 
-       */
-      (streaming) => __async(this, null, function* () {
-        const getPostThreadCached = throttledAsyncCache(
-          (uri) => __async(this, null, function* () {
-            if (streaming.isEnded)
-              return;
-            let lastUpdatedThread;
-            try {
-              for (var iter = __forAwait(db2.getPostThreadIncrementally(uri)), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
-                const thread = temp.value;
-                if (streaming.isEnded)
-                  return;
-                if (thread)
-                  lastUpdatedThread = thread;
-              }
-            } catch (temp) {
-              error = [temp];
-            } finally {
-              try {
-                more && (temp = iter.return) && (yield temp.call(iter));
-              } finally {
-                if (error)
-                  throw error[0];
-              }
-            }
-            return lastUpdatedThread;
-          })
-        );
-        keepMonitoringFirehose();
-        yield streaming.finally;
-        console.log("firehoseThreads ended");
-        function keepMonitoringFirehose() {
-          return __async(this, null, function* () {
-            try {
-              for (var iter = __forAwait(db2.firehose()), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
-                const chunk = temp.value;
-                if (streaming.isEnded)
-                  break;
-                for (const msg of chunk.messages) {
-                  switch (msg.$type) {
-                    case "app.bsky.feed.like":
-                      handleLike(msg);
-                      continue;
-                    case "app.bsky.feed.post":
-                      handlePost(msg);
-                      continue;
-                    case "app.bsky.feed.repost":
-                      handleRepost(msg);
-                      continue;
-                  }
-                }
-              }
-            } catch (temp) {
-              error = [temp];
-            } finally {
-              try {
-                more && (temp = iter.return) && (yield temp.call(iter));
-              } finally {
-                if (error)
-                  throw error[0];
-              }
-            }
-          });
-        }
-        function yieldThread(thread) {
-          streaming.yield(thread, (buf2) => {
-            if (!buf2)
-              return [thread];
-            buf2.push(thread);
-            return buf2;
-          });
-        }
-        function handleLike(msg) {
-          return __async(this, null, function* () {
-            const thread = yield getPostThreadCached(msg.subject.uri);
-            if (!thread || thread.blocked || thread.notFound)
-              return;
-            yieldThread(thread);
-          });
-        }
-        function handlePost(msg) {
-          return __async(this, null, function* () {
-            const thread = yield getPostThreadCached("at://" + msg.repo + "/" + msg.path);
-            if (!thread || thread.blocked || thread.notFound)
-              return;
-            yieldThread(thread);
-          });
-        }
-        function handleRepost(msg) {
-          return __async(this, null, function* () {
-            const thread = yield getPostThreadCached(msg.subject.uri);
-            if (!thread || thread.blocked || thread.notFound)
-              return;
-            yieldThread(thread);
-          });
-        }
-      })
-    );
+  // src/widgets/account/full-did.js
+  var import_react6 = __toESM(require_react());
+  function FullDID(_a3) {
+    var _b = _a3, { shortDID, Component: Component2 } = _b, rest = __objRest(_b, ["shortDID", "Component"]);
+    if (!shortDID)
+      return void 0;
+    if (!Component2)
+      Component2 = "span";
+    const fullDID = unwrapShortDID(shortDID);
+    const shortDIDNormalized = shortenDID(fullDID);
+    if (shortDIDNormalized === fullDID)
+      return /* @__PURE__ */ import_react6.default.createElement(Component2, __spreadValues({}, rest), fullDID);
+    else
+      return /* @__PURE__ */ import_react6.default.createElement(Component2, __spreadValues({}, rest), /* @__PURE__ */ import_react6.default.createElement("span", { className: "did-plc-prefix" }, fullDID.slice(0, -shortDIDNormalized.length)), shortDID);
   }
 
-  // src/api/hash.js
-  function calcHash(value) {
-    if (!value)
-      return 13;
-    return hashString(String(value));
+  // src/widgets/account/full-handle.js
+  function FullHandle(_a3) {
+    var _b = _a3, { shortHandle, Component: Component2 } = _b, rest = __objRest(_b, ["shortHandle", "Component"]);
+    if (!shortHandle)
+      return void 0;
+    if (!Component2)
+      Component2 = "span";
+    const { mainText, tldSuffix, bskySocialSuffix, didPrefix, didBody } = breakHandleParts(shortHandle);
+    if (didBody)
+      return /* @__PURE__ */ import_react7.default.createElement(FullDID, __spreadValues({ shortDID: shortHandle, Component: Component2 }, rest));
+    return /* @__PURE__ */ import_react7.default.createElement(Component2, __spreadValues({}, rest), /* @__PURE__ */ import_react7.default.createElement("span", { className: "handle-main-text" }, mainText), tldSuffix && /* @__PURE__ */ import_react7.default.createElement(import_react7.default.Fragment, null, /* @__PURE__ */ import_react7.default.createElement("span", { className: "handle-tld-suffix-dot" }, tldSuffix.charAt(0)), /* @__PURE__ */ import_react7.default.createElement("span", { className: "handle-tld-suffix" }, tldSuffix.slice(1))), bskySocialSuffix && /* @__PURE__ */ import_react7.default.createElement(import_react7.default.Fragment, null, /* @__PURE__ */ import_react7.default.createElement("span", { className: "handle-bsky-social-suffix-dot" }, bskySocialSuffix.charAt(0)), /* @__PURE__ */ import_react7.default.createElement("span", { className: "handle-bsky-social-suffix" }, bskySocialSuffix.slice(1))));
   }
-  function hashString(str) {
-    let hash2 = 19;
-    for (let i = 0; i < str.length; i++) {
-      let char2 = str.charCodeAt(i);
-      hash2 = (hash2 << 5) - hash2 + char2;
-      hash2 = hash2 & hash2;
+  function breakHandleParts(shortHandle) {
+    if (!shortHandle)
+      return { mainText: shortHandle };
+    if (likelyDID(shortHandle)) {
+      const fullDID = unwrapShortDID(shortHandle);
+      const shortDID = shortenDID(shortHandle);
+      let didBody = shortDID;
+      let didPrefix = fullDID.slice(0, -shortDID.length);
+      return { mainText: shortHandle, didPrefix, didBody };
     }
-    return hash2;
+    ;
+    const fullHandle = unwrapShortHandle(shortHandle);
+    shortHandle = shortenHandle(shortHandle);
+    let bskySocialSuffix = shortHandle === fullHandle ? void 0 : fullHandle.slice(shortHandle.length);
+    let mainText = shortHandle;
+    let tldSuffix = void 0;
+    if (!bskySocialSuffix) {
+      if (shortHandle.endsWith(".bskysoci.al")) {
+        mainText = shortHandle.slice(0, -".bskysoci.al".length);
+        bskySocialSuffix = ".bskysoci.al";
+      } else {
+        const lastDot = shortHandle.lastIndexOf(".");
+        if (lastDot > 0) {
+          mainText = shortHandle.slice(0, lastDot);
+          tldSuffix = shortHandle.slice(lastDot);
+        }
+      }
+    }
+    return {
+      mainText,
+      tldSuffix,
+      bskySocialSuffix
+    };
   }
-  function nextRandom(rnd) {
-    if (!rnd)
-      rnd = 251;
-    if (rnd > 1)
-      rnd = Math.abs(rnd + 1 / rnd);
-    if (rnd > 10)
-      rnd = (rnd / 10 - Math.floor(rnd / 10)) * 10;
-    rnd = Math.pow(10, rnd + 0.3498572938623);
-    rnd = rnd - Math.floor(rnd);
-    return rnd;
-  }
-
-  // node_modules/@mui/icons-material/esm/FavoriteBorder.js
-  var import_jsx_runtime45 = __toESM(require_jsx_runtime());
-  var FavoriteBorder_default = createSvgIcon(/* @__PURE__ */ (0, import_jsx_runtime45.jsx)("path", {
-    d: "M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3m-4.4 15.55-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05"
-  }), "FavoriteBorder");
 
   // coldsky/src/api/forAwait.js
-  var import_react6 = __toESM(require_react());
+  var import_react8 = __toESM(require_react());
   function forAwait(from7, derive) {
-    const [state, setState] = (0, import_react6.useState)(initAwaitState);
+    const [state, setState] = (0, import_react8.useState)(initAwaitState);
     state.reactSetState = setState;
-    (0, import_react6.useEffect)(state.effectMount, []);
+    (0, import_react8.useEffect)(state.effectMount, []);
     return (
       /** @type {*} */
       state.hookUse(from7, derive)
     );
   }
   function useForAwait(from7, derive) {
-    const [state, setState] = (0, import_react6.useState)(initAwaitState);
+    const [state, setState] = (0, import_react8.useState)(initAwaitState);
     state.reactSetState = setState;
-    (0, import_react6.useEffect)(state.effectMount, []);
+    (0, import_react8.useEffect)(state.effectMount, []);
     const current = (
       /** @type {*} */
       state.hookUse(from7, derive, true)
@@ -101591,75 +101737,6 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // src/widgets/account/account-label.js
-  var import_react9 = __toESM(require_react());
-
-  // src/widgets/account/full-handle.js
-  var import_react8 = __toESM(require_react());
-
-  // src/widgets/account/full-did.js
-  var import_react7 = __toESM(require_react());
-  function FullDID(_a3) {
-    var _b = _a3, { shortDID, Component: Component2 } = _b, rest = __objRest(_b, ["shortDID", "Component"]);
-    if (!shortDID)
-      return void 0;
-    if (!Component2)
-      Component2 = "span";
-    const fullDID = unwrapShortDID(shortDID);
-    const shortDIDNormalized = shortenDID(fullDID);
-    if (shortDIDNormalized === fullDID)
-      return /* @__PURE__ */ import_react7.default.createElement(Component2, __spreadValues({}, rest), fullDID);
-    else
-      return /* @__PURE__ */ import_react7.default.createElement(Component2, __spreadValues({}, rest), /* @__PURE__ */ import_react7.default.createElement("span", { className: "did-plc-prefix" }, fullDID.slice(0, -shortDIDNormalized.length)), shortDID);
-  }
-
-  // src/widgets/account/full-handle.js
-  function FullHandle(_a3) {
-    var _b = _a3, { shortHandle, Component: Component2 } = _b, rest = __objRest(_b, ["shortHandle", "Component"]);
-    if (!shortHandle)
-      return void 0;
-    if (!Component2)
-      Component2 = "span";
-    const { mainText, tldSuffix, bskySocialSuffix, didPrefix, didBody } = breakHandleParts(shortHandle);
-    if (didBody)
-      return /* @__PURE__ */ import_react8.default.createElement(FullDID, __spreadValues({ shortDID: shortHandle, Component: Component2 }, rest));
-    return /* @__PURE__ */ import_react8.default.createElement(Component2, __spreadValues({}, rest), /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-main-text" }, mainText), tldSuffix && /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-tld-suffix-dot" }, tldSuffix.charAt(0)), /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-tld-suffix" }, tldSuffix.slice(1))), bskySocialSuffix && /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-bsky-social-suffix-dot" }, bskySocialSuffix.charAt(0)), /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-bsky-social-suffix" }, bskySocialSuffix.slice(1))));
-  }
-  function breakHandleParts(shortHandle) {
-    if (!shortHandle)
-      return { mainText: shortHandle };
-    if (likelyDID(shortHandle)) {
-      const fullDID = unwrapShortDID(shortHandle);
-      const shortDID = shortenDID(shortHandle);
-      let didBody = shortDID;
-      let didPrefix = fullDID.slice(0, -shortDID.length);
-      return { mainText: shortHandle, didPrefix, didBody };
-    }
-    ;
-    const fullHandle = unwrapShortHandle(shortHandle);
-    shortHandle = shortenHandle(shortHandle);
-    let bskySocialSuffix = shortHandle === fullHandle ? void 0 : fullHandle.slice(shortHandle.length);
-    let mainText = shortHandle;
-    let tldSuffix = void 0;
-    if (!bskySocialSuffix) {
-      if (shortHandle.endsWith(".bskysoci.al")) {
-        mainText = shortHandle.slice(0, -".bskysoci.al".length);
-        bskySocialSuffix = ".bskysoci.al";
-      } else {
-        const lastDot = shortHandle.lastIndexOf(".");
-        if (lastDot > 0) {
-          mainText = shortHandle.slice(0, lastDot);
-          tldSuffix = shortHandle.slice(lastDot);
-        }
-      }
-    }
-    return {
-      mainText,
-      tldSuffix,
-      bskySocialSuffix
-    };
-  }
-
-  // src/widgets/account/account-label.js
   function AccountLabel(_a3) {
     var _b = _a3, { account, withDisplayName, className, Component: Component2 } = _b, rest = __objRest(_b, ["account", "withDisplayName", "className", "Component"]);
     if (!Component2)
@@ -101685,15 +101762,226 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // src/landing/fun-background.js
+  var import_react11 = __toESM(require_react());
+
+  // src/api/firehose-threads.js
+  function firehoseThreads(db2) {
+    return streamBuffer(
+      /**
+       * @param {import('../../coldsky/src/api/akpa').StreamParameters<import('../../coldsky/lib').CompactThreadPostSet, import('../../coldsky/lib').CompactThreadPostSet[]>} streaming 
+       */
+      (streaming) => __async(this, null, function* () {
+        const getPostThreadCached = throttledAsyncCache(
+          (uri) => __async(this, null, function* () {
+            if (streaming.isEnded)
+              return;
+            let lastUpdatedThread;
+            try {
+              for (var iter = __forAwait(db2.getPostThreadIncrementally(uri)), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
+                const thread = temp.value;
+                if (streaming.isEnded)
+                  return;
+                if (thread)
+                  lastUpdatedThread = thread;
+              }
+            } catch (temp) {
+              error = [temp];
+            } finally {
+              try {
+                more && (temp = iter.return) && (yield temp.call(iter));
+              } finally {
+                if (error)
+                  throw error[0];
+              }
+            }
+            return lastUpdatedThread;
+          })
+        );
+        keepMonitoringFirehose();
+        yield streaming.finally;
+        console.log("firehoseThreads ended");
+        function keepMonitoringFirehose() {
+          return __async(this, null, function* () {
+            try {
+              for (var iter = __forAwait(db2.firehose()), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
+                const chunk = temp.value;
+                if (streaming.isEnded)
+                  break;
+                for (const msg of chunk.messages) {
+                  switch (msg.$type) {
+                    case "app.bsky.feed.like":
+                      handleLike(msg);
+                      continue;
+                    case "app.bsky.feed.post":
+                      handlePost(msg);
+                      continue;
+                    case "app.bsky.feed.repost":
+                      handleRepost(msg);
+                      continue;
+                  }
+                }
+              }
+            } catch (temp) {
+              error = [temp];
+            } finally {
+              try {
+                more && (temp = iter.return) && (yield temp.call(iter));
+              } finally {
+                if (error)
+                  throw error[0];
+              }
+            }
+          });
+        }
+        function yieldThread(thread) {
+          streaming.yield(thread, (buf2) => {
+            if (!buf2)
+              return [thread];
+            buf2.push(thread);
+            return buf2;
+          });
+        }
+        function handleLike(msg) {
+          return __async(this, null, function* () {
+            const thread = yield getPostThreadCached(msg.subject.uri);
+            if (!thread || thread.blocked || thread.notFound)
+              return;
+            yieldThread(thread);
+          });
+        }
+        function handlePost(msg) {
+          return __async(this, null, function* () {
+            const thread = yield getPostThreadCached("at://" + msg.repo + "/" + msg.path);
+            if (!thread || thread.blocked || thread.notFound)
+              return;
+            yieldThread(thread);
+          });
+        }
+        function handleRepost(msg) {
+          return __async(this, null, function* () {
+            const thread = yield getPostThreadCached(msg.subject.uri);
+            if (!thread || thread.blocked || thread.notFound)
+              return;
+            yieldThread(thread);
+          });
+        }
+      })
+    );
+  }
+
+  // src/api/hash.js
+  function calcHash(value) {
+    if (!value)
+      return 13;
+    return hashString(String(value));
+  }
+  function hashString(str) {
+    let hash2 = 19;
+    for (let i = 0; i < str.length; i++) {
+      let char2 = str.charCodeAt(i);
+      hash2 = (hash2 << 5) - hash2 + char2;
+      hash2 = hash2 & hash2;
+    }
+    return hash2;
+  }
+  function nextRandom(rnd) {
+    if (!rnd)
+      rnd = 251;
+    if (rnd > 1)
+      rnd = Math.abs(rnd + 1 / rnd);
+    if (rnd > 10)
+      rnd = (rnd / 10 - Math.floor(rnd / 10)) * 10;
+    rnd = Math.pow(10, rnd + 0.3498572938623);
+    rnd = rnd - Math.floor(rnd);
+    return rnd;
+  }
+
+  // node_modules/@mui/icons-material/esm/FavoriteBorder.js
+  var import_jsx_runtime45 = __toESM(require_jsx_runtime());
+  var FavoriteBorder_default = createSvgIcon(/* @__PURE__ */ (0, import_jsx_runtime45.jsx)("path", {
+    d: "M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3m-4.4 15.55-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05"
+  }), "FavoriteBorder");
+
+  // src/widgets/preformatted.js
+  var import_react10 = __toESM(require_react());
+  function PreFormatted({ text, className, Component: Component2, ParagraphComponent, BreakComponent, charClass }) {
+    if (!text)
+      return null;
+    const UseComponent = Component2 || "div";
+    const UseParagraphComponent = ParagraphComponent || "p";
+    const UseBreakComponent = BreakComponent || "br";
+    const entries = [];
+    const codePoints = [...text];
+    let spanStart = 0;
+    let spanClassName = "";
+    let offset = 0;
+    let trailingBreaks;
+    for (let iCp = 0; iCp < codePoints.length; iCp++) {
+      const cp = codePoints[iCp];
+      if (NEWLINE_REGEX.test(cp)) {
+        if (trailingBreaks)
+          trailingBreaks.push(cp);
+        else {
+          if (spanStart < offset) {
+            entries.push(
+              /* @__PURE__ */ import_react10.default.createElement(UseParagraphComponent, { key: entries.length, className: spanClassName }, text.slice(spanStart, offset).replace("  ", "\xA0 "))
+            );
+          }
+          trailingBreaks = [cp];
+        }
+        spanStart = offset;
+      } else if (trailingBreaks == null ? void 0 : trailingBreaks.length) {
+        appendLineBreak(trailingBreaks, entries, UseBreakComponent);
+        spanStart = offset;
+        spanClassName = typeof charClass === "function" ? charClass(offset, text, cp) || "" : "";
+      } else {
+        const currentClassName = typeof charClass === "function" ? charClass(offset, text, cp) || "" : "";
+        if (currentClassName !== spanClassName) {
+          if (spanStart < offset) {
+            entries.push(
+              /* @__PURE__ */ import_react10.default.createElement(UseParagraphComponent, { key: entries.length, className: spanClassName }, text.slice(spanStart, offset).replace("  ", "\xA0 "))
+            );
+          }
+          spanStart = offset;
+          spanClassName = currentClassName;
+        }
+      }
+      offset += cp.length;
+    }
+    if (trailingBreaks == null ? void 0 : trailingBreaks.length) {
+      appendLineBreak(trailingBreaks, entries, UseBreakComponent);
+    } else if (spanStart < offset) {
+      if (spanStart < text.length) {
+        entries.push(
+          /* @__PURE__ */ import_react10.default.createElement(UseParagraphComponent, { key: entries.length, className: spanClassName }, text.slice(spanStart).replace("  ", "\xA0 "))
+        );
+      }
+    }
+    return /* @__PURE__ */ import_react10.default.createElement(UseComponent, { className }, entries);
+  }
+  var NEWLINE_REGEX = /\n|\r/g;
+  function appendLineBreak(trailingBreaks, entries, BreakComponent) {
+    trailingBreaks.shift();
+    while (true) {
+      const breakCodePoint = trailingBreaks.shift();
+      if (!breakCodePoint)
+        break;
+      entries.push(
+        /* @__PURE__ */ import_react10.default.createElement(BreakComponent, { key: entries.length }, breakCodePoint)
+      );
+    }
+  }
+
+  // src/landing/fun-background.js
   var POST_DEBOUNCE_MSEC = 5e3;
   var POST_MAX_AGE = 1e3 * 40;
   var DESIRED_POST_COUNT = 4;
   function FunBackground() {
     const db2 = useDB();
     const { bestThreads } = forAwait("now", () => getFirehoseThreads(db2)) || {};
-    return /* @__PURE__ */ import_react10.default.createElement("div", { className: "fun-background" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "fun-background-scroller" }, bestThreads && bestThreads.map((thread, i) => {
+    return /* @__PURE__ */ import_react11.default.createElement("div", { className: "fun-background" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "fun-background-scroller" }, bestThreads && bestThreads.map((thread, i) => {
       var _a3, _b;
-      return /* @__PURE__ */ import_react10.default.createElement(
+      return /* @__PURE__ */ import_react11.default.createElement(
         ThreadBubble,
         {
           key: ((_a3 = thread == null ? void 0 : thread.current) == null ? void 0 : _a3.shortDID) + ((_b = thread == null ? void 0 : thread.current) == null ? void 0 : _b.rev) || "undefined",
@@ -101768,7 +102056,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     rnd = nextRandom(rnd);
     const left = rnd * 80 - 2;
     const navigate = useNavigate();
-    return /* @__PURE__ */ import_react10.default.createElement(
+    return /* @__PURE__ */ import_react11.default.createElement(
       "div",
       {
         className: "fun-background-thread-bubble",
@@ -101797,7 +102085,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           }
         })
       },
-      /* @__PURE__ */ import_react10.default.createElement(
+      /* @__PURE__ */ import_react11.default.createElement(
         "div",
         {
           className: "fun-background-thread",
@@ -101805,136 +102093,33 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
             animationDuration: `${rockDuration.toFixed(2)}s`
           }
         },
-        /* @__PURE__ */ import_react10.default.createElement(AccountLabel, { className: "fun-background-thread-author", account: thread.current.shortDID }),
-        /* @__PURE__ */ import_react10.default.createElement("div", { className: "fun-background-thread-content" }, thread.current.text),
-        /* @__PURE__ */ import_react10.default.createElement("div", { className: "fun-background-thread-likes" }, /* @__PURE__ */ import_react10.default.createElement(FavoriteBorder_default, null), !((_c = thread == null ? void 0 : thread.current) == null ? void 0 : _c.likeCount) ? "" : thread.current.likeCount.toLocaleString())
+        /* @__PURE__ */ import_react11.default.createElement(AccountLabel, { className: "fun-background-thread-author", account: thread.current.shortDID }),
+        /* @__PURE__ */ import_react11.default.createElement(PreFormatted, { className: "fun-background-thread-content", text: thread.current.text }),
+        /* @__PURE__ */ import_react11.default.createElement("div", { className: "fun-background-thread-likes" }, /* @__PURE__ */ import_react11.default.createElement(FavoriteBorder_default, null), !((_c = thread == null ? void 0 : thread.current) == null ? void 0 : _c.likeCount) ? "" : thread.current.likeCount.toLocaleString())
       )
     );
   }
 
   // package.json
-  var version5 = "0.2.9";
-
-  // src/localise.js
-  function localise(english, languageMap) {
-    if (!(langs == null ? void 0 : langs.length))
-      return english;
-    for (const lang of langs) {
-      if (languageMap[lang])
-        return languageMap[lang];
-    }
-    for (const lang of langs) {
-      if (languageMap[lang])
-        return languageMap[lang];
-    }
-    return english;
-  }
-  var langSubstitutes = {
-    ru: "uk",
-    be: "uk"
-  };
-  var _a2;
-  var langs = extendDashLeads(
-    !navigator ? void 0 : ((_a2 = navigator.languages) == null ? void 0 : _a2.length) ? navigator.languages.map((lang) => lang.toLowerCase()) : navigator.language ? [navigator.language.toLowerCase()] : void 0
-  );
-  function extendDashLeads(langs2) {
-    if (!langs2)
-      return langs2;
-    const result = [];
-    for (const lang of langs2) {
-      result.push(langSubstitutes[lang] || lang);
-    }
-    for (const lang of langs2) {
-      const dashLead = lang.split("-")[0];
-      if (dashLead !== lang)
-        result.push(langSubstitutes[dashLead] || dashLead);
-    }
-    return result;
-  }
-
-  // src/icon-inject/overlay-avatar.js
-  function overlayAvatar(avatarURL) {
-    return __async(this, null, function* () {
-      const png = yield fetch("https://corsproxy.io/?" + avatarURL).then((r2) => r2.blob());
-      const dataURI = yield readBlob(png);
-      const img = yield awaitImageOnload(dataURI);
-      const canvas = document.createElement("canvas");
-      canvas.width = 128;
-      canvas.height = 128;
-      canvas.style.cssText = "position: absolute; top: -9999px; left: -9999px; pointer-events: none;";
-      const scratchCtx = canvas.getContext("2d");
-      if (!scratchCtx) {
-        return;
-      }
-      scratchCtx.filter = "grayscale(0.4) contrast(1.5)";
-      scratchCtx.clearRect(0, 0, canvas.width, canvas.height);
-      scratchCtx.globalCompositeOperation = "source-over";
-      scratchCtx.drawImage(img, 8, 8, 116, 116);
-      scratchCtx.fillStyle = "#fff";
-      scratchCtx.globalCompositeOperation = "destination-in";
-      scratchCtx.beginPath();
-      scratchCtx.arc(64, 64, 64, 0, 2 * Math.PI, true);
-      scratchCtx.closePath();
-      scratchCtx.fill();
-      scratchCtx.strokeStyle = "#000";
-      scratchCtx.lineWidth = 8;
-      scratchCtx.globalCompositeOperation = "source-over";
-      scratchCtx.beginPath();
-      scratchCtx.arc(64, 64, 60, 0, 2 * Math.PI, true);
-      scratchCtx.closePath();
-      scratchCtx.stroke();
-      const imgData = canvas.toDataURL();
-      return imgData;
-    });
-  }
-  function awaitImageOnload(src6) {
-    return new Promise((resolve, reject) => {
-      const img = document.createElement("img");
-      img.src = src6;
-      img.onload = () => resolve(img);
-      img.onerror = (event, source, lineno, colno, error) => reject(error || event);
-    });
-  }
-  function readBlob(b) {
-    return new Promise(function(resolve, reject) {
-      const reader = new FileReader();
-      reader.onloadend = function() {
-        resolve(reader.result);
-      };
-      reader.onerror = function() {
-        reject(reader.error);
-      };
-      reader.readAsDataURL(b);
-    });
-  }
-
-  // src/icon-inject/replace-icon.js
-  function replaceIcon(icon) {
-    const allLinks = [...document.getElementsByTagName("link")];
-    for (const lnk of allLinks) {
-      if (/icon/i.test(lnk.rel || "")) {
-        lnk.href = icon || "gist-icon.png";
-      }
-    }
-  }
+  var version5 = "0.2.10";
 
   // src/landing/landing.js
   var uppercase_GIST = localise("\u{1D4D6}\u{1D4D8}\u{1D4E2}\u{1D4E3}", { uk: "\u{1D4F7}\u{1D4EE}\u{1D4F9}\u{1D4EE}\u{1D4EC}\u{1D502}\u{1D4F0}" });
   function Landing() {
-    (0, import_react11.useEffect)(() => {
+    (0, import_react12.useEffect)(() => {
       document.documentElement.classList.remove("account");
       document.title = uppercase_GIST;
       replaceIcon(null);
     });
-    return /* @__PURE__ */ import_react11.default.createElement(LandingCore, null);
+    return /* @__PURE__ */ import_react12.default.createElement(LandingCore, null);
   }
   function LandingCore() {
     const db2 = useDB();
-    const [timeout2] = import_react11.default.useState({ timeout: 0, searchText: "" });
+    const [timeout2] = import_react12.default.useState({ timeout: 0, searchText: "" });
     const [searchParams, setSearchParams] = useSearchParams();
-    const [searchText, setSearchText] = import_react11.default.useState(searchParams.get("q") || "");
-    const [searchResults, setSearchResults] = import_react11.default.useState(
-      /** @type {{complete?: boolean} & import('../api/search').MatchCompactProfile[]} */
+    const [searchText, setSearchText] = import_react12.default.useState(searchParams.get("q") || "");
+    const [searchResults, setSearchResults] = import_react12.default.useState(
+      /** @type {{complete?: boolean} & import('../../coldsky/lib').MatchCompactProfile[]} */
       []
     );
     if (searchText !== timeout2.searchText) {
@@ -101945,7 +102130,8 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         setSearchResults([]);
         return;
       }
-      timeout2.timeout = setTimeout(() => __async(this, null, function* () {
+      timeout2.timeout = /** @type {*} */
+      setTimeout(() => __async(this, null, function* () {
         setSearchParams({ q: searchText });
         try {
           for (var iter = __forAwait(db2.searchProfilesIncrementally(searchText)), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
@@ -101971,9 +102157,9 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
             return r2;
           });
         }
-      }), 500);
+      }), 400);
     }
-    return /* @__PURE__ */ import_react11.default.createElement("div", { className: "landing" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "landing-top-bar" }, /* @__PURE__ */ import_react11.default.createElement("a", { href: "https://bsky.app/profile/gist.ing" }, "Gist")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "landing-handle-band" }, /* @__PURE__ */ import_react11.default.createElement(
+    return /* @__PURE__ */ import_react12.default.createElement("div", { className: "landing" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "landing-top-bar" }, /* @__PURE__ */ import_react12.default.createElement("a", { href: "https://bsky.app/profile/gist.ing" }, "Gist")), /* @__PURE__ */ import_react12.default.createElement("div", { className: "landing-handle-band" }, /* @__PURE__ */ import_react12.default.createElement(
       TextField_default,
       {
         id: "handle",
@@ -101990,11 +102176,115 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           setSearchText(searchText2);
         }
       }
-    )), !searchResults.length ? void 0 : /* @__PURE__ */ import_react11.default.createElement("div", { className: "landing-auto-completion-area" }, (searchResults.length < 10 ? searchResults : searchResults.slice(0, 10)).map((profile) => /* @__PURE__ */ import_react11.default.createElement(Link, { key: profile.shortDID, to: `/${profile.handle}`, className: "landing-auto-complete-entry" }, /* @__PURE__ */ import_react11.default.createElement(AccountLabel, { account: profile, Component: "div", withDisplayName: true }))), searchResults.complete ? void 0 : /* @__PURE__ */ import_react11.default.createElement("div", { className: "landing-auto-completion-progress" }, "...")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "landing-bottom-bar" }, "v", version5), /* @__PURE__ */ import_react11.default.createElement(FunBackground, null));
+    )), !searchResults.length ? void 0 : /* @__PURE__ */ import_react12.default.createElement("div", { className: "landing-auto-completion-area" }, (searchResults.length < 10 ? searchResults : searchResults.slice(0, 10)).map((profile) => /* @__PURE__ */ import_react12.default.createElement(Link, { key: profile.shortDID, to: `/${profile.handle}`, className: "landing-auto-complete-entry" }, /* @__PURE__ */ import_react12.default.createElement(AccountLabel, { account: profile, Component: "div", withDisplayName: true }))), searchResults.complete ? void 0 : /* @__PURE__ */ import_react12.default.createElement("div", { className: "landing-auto-completion-progress" }, "...")), /* @__PURE__ */ import_react12.default.createElement("div", { className: "landing-bottom-bar" }, "v", version5), /* @__PURE__ */ import_react12.default.createElement(FunBackground, null));
   }
 
   // src/history/history.js
+  var import_react18 = __toESM(require_react());
+
+  // src/history/timeline.js
+  var import_react16 = __toESM(require_react());
+
+  // src/widgets/visible.js
+  var import_react13 = __toESM(require_react());
+  var import_react14 = __toESM(require_react());
+  function Visible(_a3) {
+    var _b = _a3, { Component: Component2 = "div", onVisible, onObscured, rootMargin, threshold, children } = _b, rest = __objRest(_b, ["Component", "onVisible", "onObscured", "rootMargin", "threshold", "children"]);
+    let [visible, setVisible] = (0, import_react14.useState)(false);
+    const ref = (0, import_react14.useRef)(null);
+    (0, import_react14.useEffect)(() => {
+      if (!ref.current) {
+        return;
+      }
+      const observer = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting !== visible) {
+          setVisible(visible = entry.isIntersecting);
+          if (entry.isIntersecting)
+            onVisible == null ? void 0 : onVisible();
+          else
+            onObscured == null ? void 0 : onObscured();
+        }
+      }, {
+        rootMargin,
+        threshold
+      });
+      observer.observe(ref.current);
+      return () => observer.disconnect();
+    }, [ref.current]);
+    return /* @__PURE__ */ import_react13.default.createElement(Component2, __spreadValues({ ref }, rest), children);
+  }
+
+  // src/widgets/post/post.js
   var import_react15 = __toESM(require_react());
+  function Post({ post }) {
+    return /* @__PURE__ */ import_react15.default.createElement(PostFrame, null, typeof post === "string" ? /* @__PURE__ */ import_react15.default.createElement(LoadingPostInProgress, { post }) : /* @__PURE__ */ import_react15.default.createElement(LoadedPost, { post }));
+  }
+  function PostFrame({ children }) {
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-frame-outer" }, children);
+  }
+  function LoadingPostInProgress({ post }) {
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-loading-in-progress" }, localise("Post is loading...", { uk: "\u0417\u0430\u0447\u0435\u043A\u0430\u0439\u0442\u0435..." }));
+  }
+  function LoadedPost({ post }) {
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-loaded-content" }, /* @__PURE__ */ import_react15.default.createElement(AccountLabel, { className: "post-author", account: post.shortDID }), /* @__PURE__ */ import_react15.default.createElement(PreFormatted, { className: "post-content", text: post.text }), /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-likes" }, /* @__PURE__ */ import_react15.default.createElement(FavoriteBorder_default, null), !(post == null ? void 0 : post.likeCount) ? "" : post.likeCount.toLocaleString()));
+  }
+
+  // src/history/timeline.js
+  function Timeline({ shortDID }) {
+    const db2 = useDB();
+    const [{ timeline } = [], next2] = useForAwait(shortDID, getTimeline);
+    return /* @__PURE__ */ import_react16.default.createElement(import_react16.default.Fragment, null, !timeline ? void 0 : timeline.map((post, i) => /* @__PURE__ */ import_react16.default.createElement(Post, { key: i, post })), /* @__PURE__ */ import_react16.default.createElement(
+      Visible,
+      {
+        onVisible: () => next2()
+      },
+      /* @__PURE__ */ import_react16.default.createElement("button", { onClick: () => next2() }, "Search more...")
+    ));
+    function getTimeline(didOrHandle) {
+      return __asyncGenerator(this, null, function* () {
+        try {
+          let shortDID2;
+          try {
+            for (var iter = __forAwait(db2.getProfileIncrementally(didOrHandle)), more, temp, error; more = !(temp = yield new __await(iter.next())).done; more = false) {
+              const profile = temp.value;
+              if (profile.shortDID)
+                shortDID2 = profile.shortDID;
+            }
+          } catch (temp) {
+            error = [temp];
+          } finally {
+            try {
+              more && (temp = iter.return) && (yield new __await(temp.call(iter)));
+            } finally {
+              if (error)
+                throw error[0];
+            }
+          }
+          try {
+            for (var iter2 = __forAwait(db2.searchPostsIncrementally(shortDID2, void 0)), more2, temp2, error2; more2 = !(temp2 = yield new __await(iter2.next())).done; more2 = false) {
+              const entries = temp2.value;
+              yield { timeline: entries };
+            }
+          } catch (temp2) {
+            error2 = [temp2];
+          } finally {
+            try {
+              more2 && (temp2 = iter2.return) && (yield new __await(temp2.call(iter2)));
+            } finally {
+              if (error2)
+                throw error2[0];
+            }
+          }
+          console.log("timeline to end...");
+        } finally {
+          console.log("timeline finally");
+        }
+      });
+    }
+  }
+
+  // src/history/history-page-decorations.js
+  var import_react17 = __toESM(require_react());
 
   // src/api/unicode-styles/sanitize-for-regex.js
   var regex_escapeableRegexChars = /[#-.]|[[-^]|[?|{}]/g;
@@ -102291,67 +102581,11 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     return plainCh;
   }
 
-  // src/history/timeline.js
-  var import_react14 = __toESM(require_react());
-
-  // src/widgets/visible.js
-  var import_react12 = __toESM(require_react());
-  var import_react13 = __toESM(require_react());
-  function Visible(_a3) {
-    var _b = _a3, { Component: Component2 = "div", onVisible, onObscured, rootMargin, threshold, children } = _b, rest = __objRest(_b, ["Component", "onVisible", "onObscured", "rootMargin", "threshold", "children"]);
-    let [visible, setVisible] = (0, import_react13.useState)(false);
-    const ref = (0, import_react13.useRef)(null);
-    (0, import_react13.useEffect)(() => {
-      if (!ref.current) {
-        return;
-      }
-      const observer = new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting !== visible) {
-          setVisible(visible = entry.isIntersecting);
-          if (entry.isIntersecting)
-            onVisible == null ? void 0 : onVisible();
-          else
-            onObscured == null ? void 0 : onObscured();
-        }
-      }, {
-        rootMargin,
-        threshold
-      });
-      observer.observe(ref.current);
-      return () => observer.disconnect();
-    }, [ref.current]);
-    return /* @__PURE__ */ import_react12.default.createElement(Component2, __spreadValues({ ref }, rest), children);
-  }
-
-  // src/history/timeline.js
-  function Timeline({ shortDID }) {
-    const db2 = useDB();
-    const [{ timeline } = {}, next2] = useForAwait(shortDID, getTimeline);
-    return /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Fragment, null, !timeline ? void 0 : timeline.map((event, i) => /* @__PURE__ */ import_react14.default.createElement("div", { key: i }, JSON.stringify(event, null, 2))), /* @__PURE__ */ import_react14.default.createElement(
-      Visible,
-      {
-        onVisible: () => next2()
-      },
-      /* @__PURE__ */ import_react14.default.createElement("button", { onClick: () => next2() }, "Search more...")
-    ));
-    function getTimeline(shortDID2) {
-      return __asyncGenerator(this, null, function* () {
-        try {
-          const entries = yield new __await(db2.searchPosts(shortDID2));
-          yield { timeline: entries };
-          console.log("timeline to end...");
-        } finally {
-          console.log("timeline finally");
-        }
-      });
-    }
-  }
-
-  // src/history/history.js
+  // src/history/history-page-decorations.js
   var middledot = "\xB7";
-  function History() {
+  function HistoryPageDecorations({ children }) {
     let { handle } = useParams();
-    (0, import_react15.useEffect)(() => {
+    (0, import_react17.useEffect)(() => {
       document.documentElement.classList.add("account");
       if (!handle) {
         document.title = uppercase_GIST;
@@ -102372,22 +102606,24 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         document.title = title;
       }
     });
-    return /* @__PURE__ */ import_react15.default.createElement(HistoryCore, null);
+    return children;
+  }
+
+  // src/history/history.js
+  function History() {
+    return /* @__PURE__ */ import_react18.default.createElement(HistoryPageDecorations, null, /* @__PURE__ */ import_react18.default.createElement(HistoryCore, null));
   }
   function HistoryCore() {
     const db2 = useDB();
     let { handle } = useParams();
-    const resolved = forAwait(
-      handle,
-      () => db2.getProfileIncrementally(handle)
-    ) || {
-      did: "did:plc:1234567890",
-      handle: localise("loading....bsky.social", { uk: "\u0445\u0432\u0438\u043B\u0438\u043D\u043E\u0447\u043A\u0443....bsky.social" }),
-      displayName: localise("Just a moment", { uk: "\u0417\u0430\u0447\u0435\u043A\u0430\u0439\u0442\u0435, \u0437\u0430\u0440\u0430 \u0431\u0443\u0434\u0435" }),
+    const resolved = forAwait(handle, () => db2.getProfileIncrementally(handle)) || {
+      did: likelyDID(handle) ? shortenDID(handle) : localise("did/" + handle, { uk: "\u0434\u0456\u0434/" + handle }),
+      handle: likelyDID(handle) ? localise("loading....bsky.social", { uk: "\u0445\u0432\u0438\u043B\u0438\u043D\u043E\u0447\u043A\u0443....bsky.social" }) : handle,
+      displayName: likelyDID(handle) ? localise("loading....bsky.social", { uk: "\u0445\u0432\u0438\u043B\u0438\u043D\u043E\u0447\u043A\u0443....bsky.social" }) : handle,
       description: localise("Important announcement", { uk: "\u0426\u044F \u0456\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0456\u044F \u0432\u0430\u0441 \u0437\u0434\u0438\u0432\u0443\u0454" }),
       placeholder: true
     };
-    (0, import_react15.useEffect)(() => {
+    (0, import_react18.useEffect)(() => {
       var stop = false;
       const avatar = resolved.avatar;
       if (avatar) {
@@ -102402,34 +102638,41 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         stop = true;
       };
     }, [resolved == null ? void 0 : resolved.avatar]);
-    console.log("profile ", resolved);
-    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "history-view" }, /* @__PURE__ */ import_react15.default.createElement(
+    console.log("profile ", resolved, resolved.banner);
+    return /* @__PURE__ */ import_react18.default.createElement("div", { className: "history-view" }, /* @__PURE__ */ import_react18.default.createElement(
       "div",
       {
-        className: suffixClassWhenEmpty("history-account-banner-bg", resolved.banner),
+        className: suffixClassWhenEmpty("history-account-banner-bg", resolved.banner, resolved),
         style: !resolved.banner ? void 0 : { backgroundImage: `url(${resolved.banner})` }
       }
-    ), /* @__PURE__ */ import_react15.default.createElement(
+    ), /* @__PURE__ */ import_react18.default.createElement(
       "div",
       {
-        className: suffixClassWhenEmpty("history-account-avatar", resolved.avatar),
+        className: suffixClassWhenEmpty("history-account-avatar", resolved.avatar, resolved),
         style: !resolved.avatar ? void 0 : { backgroundImage: `url(${resolved.avatar})` }
       }
-    ), /* @__PURE__ */ import_react15.default.createElement("div", { className: suffixClassWhenEmpty("history-account-displayName-and-handle", resolved.displayName) }, /* @__PURE__ */ import_react15.default.createElement("span", { className: "history-account-displayName" }, resolved.displayName), /* @__PURE__ */ import_react15.default.createElement("div", { className: "history-account-handle" }, /* @__PURE__ */ import_react15.default.createElement("span", { className: "at-sign" }, "@"), /* @__PURE__ */ import_react15.default.createElement(FullHandle, { shortHandle: resolved.handle }))), /* @__PURE__ */ import_react15.default.createElement("div", { className: "unmoved-sticky-background" }), /* @__PURE__ */ import_react15.default.createElement("div", { className: suffixClassWhenEmpty("history-account-description", resolved.description) }, resolved.description), /* @__PURE__ */ import_react15.default.createElement("div", { className: "timeline-container" }, /* @__PURE__ */ import_react15.default.createElement(Timeline, { shortDID: handle })));
+    ), /* @__PURE__ */ import_react18.default.createElement("div", { className: suffixClassWhenEmpty("history-account-displayName-and-handle", resolved.displayName, resolved) }, /* @__PURE__ */ import_react18.default.createElement("span", { className: suffixClassWhenEmpty("history-account-displayName", resolved.displayName, resolved) }, resolved.displayName), /* @__PURE__ */ import_react18.default.createElement("div", { className: "history-account-handle" }, /* @__PURE__ */ import_react18.default.createElement("span", { className: "at-sign" }, "@"), /* @__PURE__ */ import_react18.default.createElement(FullHandle, { shortHandle: resolved.handle }))), /* @__PURE__ */ import_react18.default.createElement("div", { className: "unmoved-sticky-background" }), /* @__PURE__ */ import_react18.default.createElement(
+      PreFormatted,
+      {
+        text: resolved.description,
+        className: suffixClassWhenEmpty("history-account-description", resolved.description, resolved)
+      }
+    ), /* @__PURE__ */ import_react18.default.createElement("div", { className: "timeline-container" }, resolved.placeholder ? void 0 : /* @__PURE__ */ import_react18.default.createElement(Timeline, { shortDID: resolved.shortDID })));
   }
-  function suffixClassWhenEmpty(className, value) {
-    return value ? className : className + " " + className + "-empty";
+  function suffixClassWhenEmpty(className, value, hasPlaceholder) {
+    const withEmpty = value ? className : className + " " + className + "-empty";
+    return (hasPlaceholder == null ? void 0 : hasPlaceholder.placeholder) ? withEmpty + " " + className + "-placeholder" : withEmpty;
   }
 
   // src/index.js
   var db;
   var DB_NAME = "gisting-cache";
-  var DBContext = import_react16.default.createContext(
+  var DBContext = import_react19.default.createContext(
     /** @type {DBAccess} */
     /** @type {*} */
     null
   );
-  var useDB = () => import_react16.default.useContext(DBContext);
+  var useDB = () => import_react19.default.useContext(DBContext);
   function runApp() {
     if (!db) {
       db = defineCachedStore({ dbName: DB_NAME });
@@ -102438,9 +102681,9 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     const useRouter = /file/i.test(location.protocol) ? createHashRouter : createBrowserRouter;
     const router = useRouter(
       [
-        { path: "/", element: /* @__PURE__ */ import_react16.default.createElement(Landing, null) },
-        { path: "/index.html", element: /* @__PURE__ */ import_react16.default.createElement(Landing, null) },
-        { path: "/:handle", element: /* @__PURE__ */ import_react16.default.createElement(History, null) }
+        { path: "/", element: /* @__PURE__ */ import_react19.default.createElement(Landing, null) },
+        { path: "/index.html", element: /* @__PURE__ */ import_react19.default.createElement(Landing, null) },
+        { path: "/:handle", element: /* @__PURE__ */ import_react19.default.createElement(History, null) }
       ],
       {
         basename
@@ -102472,7 +102715,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       }
     });
     (0, import_client.createRoot)(root).render(
-      /* @__PURE__ */ import_react16.default.createElement(ThemeProvider5, { theme }, /* @__PURE__ */ import_react16.default.createElement(DBContext.Provider, { value: db }, /* @__PURE__ */ import_react16.default.createElement(RouterProvider, { router })))
+      /* @__PURE__ */ import_react19.default.createElement(ThemeProvider5, { theme }, /* @__PURE__ */ import_react19.default.createElement(DBContext.Provider, { value: db }, /* @__PURE__ */ import_react19.default.createElement(RouterProvider, { router })))
     );
   }
   runApp();

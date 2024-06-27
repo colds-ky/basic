@@ -4,54 +4,25 @@ import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { forAwait } from '../../coldsky/src/api/forAwait';
-import { uppercase_GIST } from '../landing/landing';
 import { localise } from '../localise';
-import { FullHandle, breakHandleParts } from '../widgets/account/full-handle';
+import { FullHandle } from '../widgets/account/full-handle';
 
-import { applyModifier } from '../api/unicode-styles/apply-modifier';
 import { Timeline } from './timeline';
 import { overlayAvatar, replaceIcon } from '../icon-inject';
 import { useDB } from '..';
 
 import './history.css';
+import { PreFormatted } from '../widgets/preformatted';
+import { HistoryPageDecorations } from './history-page-decorations';
+import { likelyDID, shortenDID } from '../../coldsky/lib';
 
 const middledot = '\u00B7';
 
 export function History() {
-  let { handle } = useParams();
-
-  useEffect(() => {
-    document.documentElement.classList.add('account');
-
-    if (!handle) {
-      document.title = uppercase_GIST;
-    } else {
-      const { mainText, tldSuffix, bskySocialSuffix, didPrefix, didBody } = breakHandleParts(handle);
-
-      let title;
-      if (didBody) {
-        title = applyModifier(didPrefix || '', 'typewriter') + applyModifier(didBody, 'bold');
-      } else {
-        title =
-          applyModifier(mainText.replace(/\./g, middledot), 'boldcursive') +
-          (
-          tldSuffix ? applyModifier(
-            tldSuffix.replace(/^\./, ' ' + middledot + ' ').replace(/\./g, middledot),
-            'cursive') : ''
-          ) +
-          (
-          bskySocialSuffix ? applyModifier(
-            bskySocialSuffix.replace(/^\./, ' ' + middledot + ' ').replace(/\./g, middledot),
-            'super') : ''
-          );
-      }
-
-      document.title = title;
-    }
-  });
-
   return (
-    <HistoryCore />
+    <HistoryPageDecorations>
+      <HistoryCore />
+    </HistoryPageDecorations>
   );
 }
 
@@ -60,12 +31,12 @@ function HistoryCore() {
   const db = useDB();
   let { handle } = useParams();
 
-  const resolved = forAwait(
-    handle,
-    () => db.getProfileIncrementally(handle)) || {
-    did: 'did:plc:1234567890',
-    handle: localise('loading....bsky.social', { uk: 'хвилиночку....bsky.social' }),
-    displayName: localise('Just a moment', { uk: 'Зачекайте, зара буде' }),
+  /** @type {import('../../coldsky/lib').CompactProfile & { placeholder?: boolean }} */
+  const resolved = forAwait(handle, () => db.getProfileIncrementally(handle)) ||
+  {
+    did: likelyDID(handle) ? shortenDID(handle) : localise('did/' + handle, { uk: 'дід/' + handle }),
+    handle: likelyDID(handle) ? localise('loading....bsky.social', { uk: 'хвилиночку....bsky.social' }) : handle,
+    displayName: likelyDID(handle) ? localise('loading....bsky.social', { uk: 'хвилиночку....bsky.social' }) : handle,
     description: localise('Important announcement', { uk: 'Ця інформація вас здивує' }),
     placeholder: true
   };
@@ -85,25 +56,24 @@ function HistoryCore() {
     }
   }, [resolved?.avatar]);
 
-  console.log('profile ', resolved);
-
+  console.log('profile ', resolved, resolved.banner);
 
   return (
     <div className='history-view'>
 
       <div
-        className={suffixClassWhenEmpty('history-account-banner-bg', resolved.banner)}
+        className={suffixClassWhenEmpty('history-account-banner-bg', resolved.banner, resolved)}
         style={!resolved.banner ? undefined : { backgroundImage: `url(${resolved.banner})` }}>
       </div>
 
       <div
-        className={suffixClassWhenEmpty('history-account-avatar', resolved.avatar)}
+        className={suffixClassWhenEmpty('history-account-avatar', resolved.avatar, resolved)}
         style={!resolved.avatar ? undefined : { backgroundImage: `url(${resolved.avatar})` }}>
       </div>
 
 
-      <div className={suffixClassWhenEmpty('history-account-displayName-and-handle', resolved.displayName)}>
-        <span className='history-account-displayName'>
+      <div className={suffixClassWhenEmpty('history-account-displayName-and-handle', resolved.displayName, resolved)}>
+        <span className={suffixClassWhenEmpty('history-account-displayName', resolved.displayName, resolved)}>
           {resolved.displayName}
         </span>
 
@@ -114,13 +84,14 @@ function HistoryCore() {
 
       <div className='unmoved-sticky-background'></div>
 
-      <div className={suffixClassWhenEmpty('history-account-description', resolved.description)}>
-        {resolved.description}
-      </div>
+      <PreFormatted
+      text={resolved.description}
+      className={suffixClassWhenEmpty('history-account-description', resolved.description, resolved)} />
 
       <div className='timeline-container'>
         {
-          <Timeline shortDID={handle} />
+          resolved.placeholder ? undefined :
+          <Timeline shortDID={resolved.shortDID} />
         }
       </div>
 
@@ -128,6 +99,12 @@ function HistoryCore() {
   );
 }
 
-function suffixClassWhenEmpty(className, value) {
-  return value ? className : className + ' ' + className + '-empty';
+/**
+ * @param {string} className
+ * @param {any} value
+ * @param {{ placeholder?: boolean } | undefined} hasPlaceholder
+ */
+function suffixClassWhenEmpty(className, value, hasPlaceholder) {
+  const withEmpty = value ? className : className + ' ' + className + '-empty';
+  return hasPlaceholder?.placeholder ? withEmpty + ' ' + className + '-placeholder' : withEmpty;
 }

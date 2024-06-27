@@ -2,17 +2,16 @@
 
 import { Input, TextField } from '@mui/material';
 import React, { useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
-import { FunBackground } from './fun-background';
-import { version } from '../../package.json';
-
-import './landing.css';
-import { localise } from '../localise';
-import { AccountLabel } from '../widgets/account';
-import { searchAccounts } from '../api/search';
 import { useDB } from '..';
 import { replaceIcon } from '../icon-inject';
+import { localise } from '../localise';
+import { AccountLabel } from '../widgets/account';
+import { FunBackground } from './fun-background';
+
+import { version } from '../../package.json';
+import './landing.css';
 
 export const uppercase_GIST = localise('𝓖𝓘𝓢𝓣', { uk: '𝓷𝓮𝓹𝓮𝓬𝔂𝓰' });
 
@@ -34,7 +33,7 @@ export function LandingCore() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchText, setSearchText] = React.useState(searchParams.get('q') || '');
   const [searchResults, setSearchResults] = React.useState(
-    /** @type {{complete?: boolean} & import('../api/search').MatchCompactProfile[]} */([]));
+    /** @type {{complete?: boolean} & import('../../coldsky/lib').MatchCompactProfile[]} */([]));
   
   if (searchText !== timeout.searchText) {
     clearTimeout(timeout.timeout);
@@ -45,7 +44,7 @@ export function LandingCore() {
       return;
     }
 
-    timeout.timeout = setTimeout(async () => {
+    timeout.timeout = /** @type {*} */(setTimeout(async () => {
       setSearchParams({ q: searchText });
       for await (const searchResults of db.searchProfilesIncrementally(searchText)) {
         if (timeout.searchText !== searchText) return;
@@ -58,7 +57,7 @@ export function LandingCore() {
           return r;
         });
       }
-    }, 500);
+    }, 400));
   }
 
   return (
