@@ -35909,6 +35909,14 @@ if (cid) {
 	const _breakGistingPostURL_Regex = /^http[s]?\:\/\/(6sky\.app|gist\.ing|gisti\.ng|gist\.ink)\/([a-z0-9\.\:\-]+)\/([a-z0-9]+)(\/|$)/i;
 
 	/**
+	 * @param {string} shortDID
+	 * @param {string} postID
+	 */
+	function makeBskyPostURL(shortDID, postID) {
+	  return 'https://bsky.app/profile/' + unwrapShortDID(shortDID) + '/post/' + postID;
+	}
+
+	/**
 	* @param {string | null | undefined} url
 	*/
 	function detectProfileURL(url) {
@@ -42723,7 +42731,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.46";
+	var version = "0.2.50";
 
 	// @ts-check
 
@@ -51062,15 +51070,23 @@ if (cid) {
 	   * @returns {Promise<import('.').CompactThreadPostSet | undefined>}
 	   */
 	  async function getPostThreadAsync(uri) {
-	    const shortDID = breakFeedURIPostOnly(uri)?.shortDID;
-	    if (!shortDID) return;
-	    let veryPost = outstandingPostUpdatesByURI.get(uri) || outstandingPostUpdatesInProgressByURI.get(uri);
-	    let threadStart = veryPost?.threadStart || uri;
-	    let asThreadStartPromise = db.posts.where('threadStart').equals(veryPost?.threadStart || uri).toArray();
-	    if (!veryPost) veryPost = await db.posts.get(uri);
-	    const dbPosts = await asThreadStartPromise;
-	    if (veryPost && !dbPosts.find(post => post.uri === veryPost.uri)) dbPosts.push(veryPost);
-	    const uncachedPostsForThread = [...outstandingPostUpdatesByURI.values(), ...outstandingPostUpdatesInProgressByURI.values()].filter(p => p.uri === veryPost?.uri || threadStart && p.threadStart === threadStart || p.uri === threadStart);
+	    const currentPostURIParsed = breakFeedURIPostOnly(uri);
+	    if (!currentPostURIParsed) return;
+	    const {
+	      shortDID,
+	      postID: currentPostID
+	    } = currentPostURIParsed;
+	    let currentPost = outstandingPostUpdatesByURI.get(uri) || outstandingPostUpdatesInProgressByURI.get(uri);
+	    if (!currentPost) currentPost = memStore.repos.get(shortDID)?.posts.get(currentPostID);
+	    if (!currentPost) await db.posts.get(uri);
+	    if (!currentPost) return;
+	    let threadStartURI = currentPost.threadStart || uri;
+	    const threadStartPostPromise = db.posts.get(threadStartURI);
+	    const dbPosts = await db.posts.where('threadStart').equals(threadStartURI).toArray();
+	    if (currentPost && !dbPosts.find(post => post.uri === currentPost.uri)) dbPosts.push(currentPost);
+	    const threadStartPost = await threadStartPostPromise;
+	    if (threadStartPost && !dbPosts.find(post => post.uri === threadStartPost.uri)) dbPosts.push(threadStartPost);
+	    const uncachedPostsForThread = [...outstandingPostUpdatesByURI.values(), ...outstandingPostUpdatesInProgressByURI.values()].filter(p => p.uri === currentPost?.uri || threadStartURI && p.threadStart === threadStartURI || p.uri === threadStartURI);
 	    const postsByUri = new Map(dbPosts.concat(uncachedPostsForThread).map(p => [p.uri, p]));
 	    const all = [...postsByUri.values()];
 	    const current = postsByUri.get(uri) || createSpeculativePost(shortDID, uri);
@@ -51079,7 +51095,7 @@ if (cid) {
 	      const rootShortDID = breakFeedURIPostOnly(current.threadStart)?.shortDID;
 	      if (rootShortDID && current.threadStart) {
 	        const dbRoot = await db.posts.get(current.threadStart);
-	        if (dbRoot) root = createSpeculativePost(rootShortDID, current.threadStart);
+	        if (dbRoot) root = dbRoot;else root = createSpeculativePost(rootShortDID, current.threadStart);
 	      }
 	      if (!root) root = current;
 	    }
@@ -51402,20 +51418,24 @@ if (cid) {
 	  if (local && !local.root.placeholder) yield local;
 	  const remoteThreadRaw = (await remotePromise)?.data?.thread;
 	  if ('post' in remoteThreadRaw) {
-	    dbStore.captureThreadView( /** @type {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost} */remoteThreadRaw, Date.now());
+	    const onePart = dbStore.captureThreadView( /** @type {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost} */remoteThreadRaw, Date.now());
 	    const ignoreBrokenPlaceholderUris = new Set();
 	    while (true) {
 	      const refreshedThread = await dbStore.getPostThread(uri);
+	      /** @type {string[]} */
 	      const allPlaceholders = [];
 	      if (refreshedThread?.all?.length) {
 	        for (const post of refreshedThread.all) {
-	          if (post.placeholder && !ignoreBrokenPlaceholderUris.has(post.uri)) allPlaceholders.push(post);
+	          if (post.placeholder && !ignoreBrokenPlaceholderUris.has(post.uri)) allPlaceholders.push(post.uri);
 	        }
 	      }
 	      yield refreshedThread;
 	      if (!allPlaceholders.length) break;
-	      const orphanRemotePromises = allPlaceholders.map(placeholderPost => ( /** @type {const} */
-	      [placeholderPost, agent_getPostThread_throttled(placeholderPost.uri)]));
+	      {
+	        if (refreshedThread) allPlaceholders.push(refreshedThread.root.uri);else if (onePart) allPlaceholders.push(onePart.threadStart || onePart.uri);
+	      }
+	      const orphanRemotePromises = allPlaceholders.map(placeholderPostURI => ( /** @type {const} */
+	      [placeholderPostURI, agent_getPostThread_throttled(placeholderPostURI)]));
 	      for (const [placeholderPost, orphanRemotePromise] of orphanRemotePromises) {
 	        try {
 	          const orphanRemoteRaw = (await orphanRemotePromise)?.data?.thread;
@@ -51423,7 +51443,8 @@ if (cid) {
 	            dbStore.captureThreadView( /** @type {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost} */orphanRemoteRaw, Date.now());
 	          }
 	        } catch (error) {
-	          ignoreBrokenPlaceholderUris.add(placeholderPost.uri);
+	          console.warn('Orphan post may be missing ', error);
+	          ignoreBrokenPlaceholderUris.add(placeholderPost);
 	        }
 	      }
 	    }
@@ -52590,7 +52611,8 @@ if (cid) {
 	    likeCount: undefined,
 	    repostCount: undefined,
 	    quoting,
-	    asOf: Date.parse(record.createdAt) || asOf
+	    asOf: Date.parse(record.createdAt) || asOf,
+	    labels: undefined
 	  };
 	  return compact;
 	}
@@ -53068,6 +53090,7 @@ if (cid) {
 	exports.isPromise = isPromise;
 	exports.known$Types = known$Types;
 	exports.likelyDID = likelyDID;
+	exports.makeBskyPostURL = makeBskyPostURL;
 	exports.makeFeedUri = makeFeedUri;
 	exports.parseTimestampOffset = parseTimestampOffset;
 	exports.plcDirectoryCompact = plcDirectoryCompact;
