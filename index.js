@@ -98463,13 +98463,82 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
 
   // src/api/record-cache.js
   var db = new import_wrapper_default("atproto-cache");
-  db.version(4).stores({
+  db.version(5).stores({
     records: "uri, did, cid, time, *w",
-    accounts: "did, *w"
+    accounts: "did, handle, *w"
   });
   var publicAgent = new ColdskyAgent({
     service: BSKY_PUBLIC_URL
   });
+  function resolveHandleOrDID(handleOrDID) {
+    return __async(this, null, function* () {
+      const wholeTextSearchFullPromise = directSearchAccountsFull(handleOrDID, 5).then((matches) => {
+        for (const pro of matches) {
+          storeAccountToCache(pro);
+          const shortHandle = shortenHandle(pro.handle);
+          if (shortHandle === shortenHandle(handleOrDID)) {
+            return { shortDID: shortenDID(pro.did), shortHandle };
+          }
+        }
+      });
+      const resolvePlcDirectPromise = !likelyDID(handleOrDID) ? void 0 : resolvePlcDirectly(handleOrDID).then((auditEntries) => {
+        var _a3, _b;
+        for (let i = 0; i < auditEntries.length; i++) {
+          const fromEnd = auditEntries[auditEntries.length - 1 - i];
+          if ((_b = (_a3 = fromEnd.operation) == null ? void 0 : _a3.alsoKnownAs) == null ? void 0 : _b.length) {
+            return {
+              shortDID: shortenDID(fromEnd.did),
+              shortHandle: shortenHandle(fromEnd.operation.alsoKnownAs[0].replace(/^at\:\/\//i, ""))
+            };
+          }
+        }
+      });
+      const cacheByDIDPromise = resolveDIDFromCache(handleOrDID);
+      const cacheByHandlePromise = resolveHandleFromCache(handleOrDID);
+      return new Promise(
+        /** @returns {{ shortDID: string, shortHandle: string }} */
+        (resolve) => {
+          [
+            wholeTextSearchFullPromise,
+            resolvePlcDirectPromise,
+            cacheByDIDPromise,
+            cacheByHandlePromise
+          ].map((promise) => __async(this, null, function* () {
+            const value = yield promise;
+            if (value)
+              resolve(value);
+          }));
+        }
+      );
+    });
+  }
+  function resolveHandleFromCache(handle) {
+    return __async(this, null, function* () {
+      const matchByHandle = yield db.accounts.where("handle").equals(unwrapShortHandle(handle)).first();
+      if (matchByHandle)
+        return {
+          shortDID: shortenDID(matchByHandle.did),
+          shortHandle: shortenHandle(matchByHandle.handle)
+        };
+    });
+  }
+  function resolveDIDFromCache(did) {
+    return __async(this, null, function* () {
+      const matchByHandle = yield db.accounts.where("did").equals(unwrapShortDID(did)).first();
+      if (matchByHandle)
+        return {
+          shortDID: shortenDID(matchByHandle.did),
+          shortHandle: shortenHandle(matchByHandle.handle)
+        };
+    });
+  }
+  function resolvePlcDirectly(did) {
+    return __async(this, null, function* () {
+      const fullDID = unwrapShortDID(did);
+      const entries = yield fetch(`https://plc.directory/${fullDID}/log/audit`).then((x) => x.json());
+      return entries;
+    });
+  }
   function searchAccounts(text) {
     const normalizedText = (text == null ? void 0 : text.trim()) || "";
     if (!normalizedText)
@@ -98746,12 +98815,12 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       return result;
     });
   }
-  function directSearchAccountsFull(searchText) {
+  function directSearchAccountsFull(searchText, limit) {
     return __async(this, null, function* () {
       var _a3;
       const result = (_a3 = (yield publicAgent.searchActors({
         q: searchText,
-        limit: 100
+        limit: limit || 100
       })).data) == null ? void 0 : _a3.actors;
       return result;
     });
@@ -99396,7 +99465,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // package.json
-  var version4 = "0.1.19";
+  var version4 = "0.1.20";
 
   // src/localise.js
   function localise(english, languageMap) {
@@ -99486,7 +99555,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         }
       }), 500);
     }
-    return /* @__PURE__ */ import_react11.default.createElement("div", { className: "landing" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "landing-top-bar" }, /* @__PURE__ */ import_react11.default.createElement("a", { href: "https://bsky.app/profile/gist.ing" }, "\u{1D572}\u{1D58E}\u{1D598}\u{1D599}")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "landing-handle-band" }, /* @__PURE__ */ import_react11.default.createElement(
+    return /* @__PURE__ */ import_react11.default.createElement("div", { className: "landing" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "landing-top-bar" }, /* @__PURE__ */ import_react11.default.createElement("a", { href: "https://bsky.app/profile/gist.ing" }, "Gist")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "landing-handle-band" }, /* @__PURE__ */ import_react11.default.createElement(
       TextField_default,
       {
         id: "handle",
@@ -99516,13 +99585,14 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
   function HistoryCore() {
     let { handle } = useParams();
+    const resolved = forAwait(handle, () => resolveHandleOrDID(handle));
     if (handle) {
       console.log({
         handle,
         unwrap: unwrapShortHandle(handle)
       });
     }
-    return /* @__PURE__ */ import_react12.default.createElement("div", null, "History...", handle);
+    return /* @__PURE__ */ import_react12.default.createElement("div", null, "History...", handle, resolved && /* @__PURE__ */ import_react12.default.createElement("pre", null, JSON.stringify(resolved, null, 2)));
   }
 
   // src/index.js

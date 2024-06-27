@@ -1,15 +1,15 @@
 // @ts-check
 
 import Dexie from 'dexie';
-import { ColdskyAgent, shortenDID } from '../../coldsky/lib';
+import { ColdskyAgent, likelyDID, shortenDID, shortenHandle, unwrapShortDID, unwrapShortHandle } from '../../coldsky/lib';
 import { BSKY_PUBLIC_URL } from '../../coldsky/lib/coldsky-agent';
 import { streamBuffer } from '../../coldsky/src/api/akpa';
 import Fuse from 'fuse.js';
 
 const db = new Dexie("atproto-cache");
-db.version(4).stores({
+db.version(5).stores({
   records: 'uri, did, cid, time, *w',
-  accounts: 'did, *w'
+  accounts: 'did, handle, *w'
 });
 
 const publicAgent = new ColdskyAgent({
@@ -23,6 +23,95 @@ const publicAgent = new ColdskyAgent({
 /**
  * @typedef {import ('@atproto/api/dist/client/types/app/bsky/actor/defs').ProfileViewBasic} ProfileViewBasic
  */
+
+export async function resolveHandleOrDID(handleOrDID) {
+  const wholeTextSearchFullPromise = directSearchAccountsFull(handleOrDID, 5).then(matches => {
+    for (const pro of matches) {
+      storeAccountToCache(pro);
+      const shortHandle = shortenHandle(pro.handle);
+      if (shortHandle === shortenHandle(handleOrDID)) {
+        return { shortDID: shortenDID(pro.did), shortHandle };
+      }
+    }
+  });
+
+  const resolvePlcDirectPromise = !likelyDID(handleOrDID) ? undefined :
+    resolvePlcDirectly(handleOrDID).then(auditEntries => {
+      for (let i = 0; i < auditEntries.length; i++) {
+        const fromEnd = auditEntries[auditEntries.length - 1 - i];
+        if (fromEnd.operation?.alsoKnownAs?.length) {
+          return {
+            shortDID: shortenDID(fromEnd.did),
+            shortHandle: shortenHandle(fromEnd.operation.alsoKnownAs[0].replace(/^at\:\/\//i, ''))
+          };
+        }
+      }
+    });
+  
+  const cacheByDIDPromise = resolveDIDFromCache(handleOrDID);
+  const cacheByHandlePromise = resolveHandleFromCache(handleOrDID);
+
+  return new Promise(
+    /** @returns {{ shortDID: string, shortHandle: string }} */
+    resolve => {
+      [
+        wholeTextSearchFullPromise,
+        resolvePlcDirectPromise,
+        cacheByDIDPromise,
+        cacheByHandlePromise
+      ].map(async promise => {
+        const value = await promise;
+        if (value)
+          resolve(value);
+      });
+    });
+}
+
+async function resolveHandleFromCache(handle) {
+  const matchByHandle = await db.accounts.where('handle').equals(unwrapShortHandle(handle)).first();
+  if (matchByHandle) return {
+    shortDID: shortenDID(matchByHandle.did),
+    shortHandle: shortenHandle(matchByHandle.handle)
+  };
+}
+
+async function resolveDIDFromCache(did) {
+  const matchByHandle = await db.accounts.where('did').equals(unwrapShortDID(did)).first();
+  if (matchByHandle) return {
+    shortDID: shortenDID(matchByHandle.did),
+    shortHandle: shortenHandle(matchByHandle.handle)
+  };
+}
+
+async function resolvePlcDirectly(did) {
+
+  /**
+   * @typedef {{
+   *   did: string,
+   *   operation: {
+   *     sig: string,
+   *     type: 'plc_operation' | string,
+   *     services: {
+   *       atproto_pds: {
+   *         type: 'AtprotoPersonalDataServer' | string,
+   *         endpoint: 'https://bsky.social' | string
+   *      }
+   *     },
+   *     alsoKnownAs: ('at://mihailik.bsky.social' | string)[]
+   *     rotationKeys: string[],
+   *     verificationMethods: { atproto: string }
+   *  },
+   *  cid: string,
+   *  nullified: boolean,
+   *  createdAt: '2023-06-23T10:02:29.289Z' | string
+   * }} PlcDirectoryAuditLogEntry
+   */
+
+  const fullDID = unwrapShortDID(did);
+  /** @type {PlcDirectoryAuditLogEntry[]} */
+  const entries = await fetch(`https://plc.directory/${fullDID}/log/audit`).then(x => x.json());
+  return entries;
+}
 
 /**
  * @param {string} text
@@ -383,12 +472,13 @@ async function directSearchAccountsTypeahead(searchText) {
 
 /**
  * @param {string} searchText
+ * @param {number} [limit]
  */
-async function directSearchAccountsFull(searchText) {
+async function directSearchAccountsFull(searchText, limit) {
 
   const result = (await publicAgent.searchActors({
     q: searchText,
-    limit: 100
+    limit: limit || 100
   })).data?.actors;
 
   return result;

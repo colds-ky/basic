@@ -57,7 +57,7 @@ export function LandingCore() {
   return (
     <div className='landing'>
       <div className='landing-top-bar'>
-        <a href="https://bsky.app/profile/gist.ing">𝕲𝖎𝖘𝖙</a>
+        <a href="https://bsky.app/profile/gist.ing">Gist</a>
       </div>
 
       <div className='landing-handle-band'>
