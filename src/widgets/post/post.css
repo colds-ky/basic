@@ -1,13 +1,33 @@
 .post-frame-outer {
   padding: 1em;
-  border: solid 1px #e9da8a;
+  border: solid 1px #f7d69c;
+  border-top-color: #e9c78a;
+  border-left-color: #e9c78a;
   background: #fffbeb;
-  box-shadow: 2px 4px 9px #0000002b;
+  box-shadow: 2px 4px 10px #0000002b;
   border-radius: 0.5em;
+}
+
+.thread-reply-post.post-frame-outer {
+  box-shadow: 2px 2px 10px #0000002b;
+}
+
+.post-top-line {
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+
+.post-top-line .post-date {
+  opacity: 0.5;
 }
 
 .post-likes {
   text-align: right;
   opacity: 0.4;
   margin-top: 0.2em;
+}
+
+.sub-thread {
+  z-index: 1;
+  position: relative;
 }

@@ -3,9 +3,10 @@
 import React from 'react';
 import { FullHandle } from './full-handle';
 
-import './account-label.css';
-import { forAwait } from '../../../coldsky/src/api/forAwait';
 import { useDB } from '../..';
+import { forAwait } from '../../../coldsky/src/api/forAwait';
+
+import './account-label.css';
 
 /**
  * @param {{

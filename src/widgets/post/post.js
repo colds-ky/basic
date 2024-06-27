@@ -8,6 +8,10 @@ import { AccountLabel } from '../account';
 import { PreFormatted } from '../preformatted';
 
 import './post.css';
+import { FormatTime } from '../format-time';
+import { breakFeedUri } from '../../../coldsky/lib';
+import { useDB } from '../..';
+import { forAwait } from '../../../coldsky/src/api/forAwait';
 
 /**
  * @typedef {import('../../../coldsky/lib').MatchCompactPost} MatchCompactPost
@@ -19,12 +23,12 @@ import './post.css';
  *  post: string | MatchCompactPost
  * }} _
  */
-export function Post({ className, post }) {
+export function Post({ className, post, ...rest }) {
   return (
-    <PostFrame className={className}>
+    <PostFrame className={className} {...rest}>
       {
         typeof post === 'string' ?
-          <LoadingPostInProgress post={post} /> :
+          <LoadingPostInProgress uri={post} /> :
           <LoadedPost post={post} />
       }
     </PostFrame>
@@ -37,9 +41,11 @@ export function Post({ className, post }) {
  *  children?: import('react').ReactNode
  * }} _
  */
-function PostFrame({ className, children }) {
+function PostFrame({ className, children, ...rest }) {
   return (
-    <div className={className ? 'post-frame-outer ' + className : 'post-frame-outer'}>
+    <div
+      className={className ? 'post-frame-outer ' + className : 'post-frame-outer'}
+      {...rest}>
       {children}
     </div>
   );
@@ -47,14 +53,23 @@ function PostFrame({ className, children }) {
 
 /**
  * @param {{
- *  post: string
+ *  uri: string
  * }} _
  */
-function LoadingPostInProgress({ post }) {
+function LoadingPostInProgress({ uri }) {
+  const db = useDB();
+  const post = forAwait(uri, () => db.getPostOnly(uri));
+  if (post) {
+    return (
+      <LoadedPost post={post} />
+    );
+  }
+
   return (
     <div className='post-loading-in-progress'>
       {
-        localise('Post is loading...', { uk: 'Зачекайте...' })}
+        localise('Post is loading...', { uk: 'Зачекайте...' })
+      }
     </div>
   );
 }
@@ -67,8 +82,24 @@ function LoadingPostInProgress({ post }) {
 function LoadedPost({ post }) {
   return (
     <div className='post-loaded-content'>
-      <AccountLabel className='post-author' account={post.shortDID} />
+      <div className='post-top-line'>
+        <AccountLabel className='post-author' account={post.shortDID} />
+        {post.asOf ?
+          <FormatTime className='post-date' time={post.asOf} />
+          : undefined
+        }
+      </div>
       <PreFormatted className='post-content' text={post.text} />
+      {
+        !post.embeds?.length ? undefined :
+          <div className='post-embeds'>
+            {
+              post.embeds.map((embed, idx) => (
+                <PostEmbed key={idx} embed={embed} />
+              ))
+            }
+          </div>
+      }
       <div className='post-likes'>
         <FavoriteBorder />
         {
@@ -77,5 +108,40 @@ function LoadedPost({ post }) {
         }
       </div>
     </div>
+  );
+}
+
+/**
+ * @param {{
+ *  className?: string,
+ *  embed: import('../../../coldsky/lib').CompactEmbed
+ * }} _
+ */
+function PostEmbed({ className, embed, ...rest }) {
+  const parsedPostURL = breakFeedUri(embed.url);
+
+  return (
+    <div className={'post-embed ' + (className || '')}>
+      {
+        parsedPostURL ?
+          <PostEmbeddedIntoAnother
+            uri={embed.url} /> :
+          <div className='post-embed-url'>
+            {JSON.stringify(embed)}
+          </div>
+      }
+    </div>
+  );
+}
+
+function PostEmbeddedIntoAnother({ uri }) {
+  return (
+    <a
+      className='post-embed-url'
+      href={uri}
+      target='_blank'
+      rel='noreferrer'>
+      <Post post={uri} />
+    </a>
   );
 }

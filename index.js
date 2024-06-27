@@ -2507,9 +2507,9 @@
           if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
             __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
           }
-          var React72 = require_react();
+          var React75 = require_react();
           var Scheduler = require_scheduler();
-          var ReactSharedInternals = React72.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+          var ReactSharedInternals = React75.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
           var suppressWarning = false;
           function setSuppressWarning(newSuppressWarning) {
             {
@@ -4114,7 +4114,7 @@
             {
               if (props.value == null) {
                 if (typeof props.children === "object" && props.children !== null) {
-                  React72.Children.forEach(props.children, function(child) {
+                  React75.Children.forEach(props.children, function(child) {
                     if (child == null) {
                       return;
                     }
@@ -27057,7 +27057,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
       if (true) {
         (function() {
           "use strict";
-          var React72 = require_react();
+          var React75 = require_react();
           var REACT_ELEMENT_TYPE = Symbol.for("react.element");
           var REACT_PORTAL_TYPE = Symbol.for("react.portal");
           var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
@@ -27083,7 +27083,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
             }
             return null;
           }
-          var ReactSharedInternals = React72.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+          var ReactSharedInternals = React75.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
           function error(format3) {
             {
               {
@@ -27965,7 +27965,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
         value: true
       });
       exports.default = StyledEngineProvider;
-      var React72 = _interopRequireWildcard(require_react());
+      var React75 = _interopRequireWildcard(require_react());
       var _propTypes = _interopRequireDefault(require_prop_types());
       var _react2 = (init_emotion_react_browser_esm(), __toCommonJS(emotion_react_browser_esm_exports));
       var _cache = _interopRequireDefault((init_emotion_cache_browser_esm(), __toCommonJS(emotion_cache_browser_esm_exports)));
@@ -28055,7 +28055,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
         value: true
       });
       exports.default = GlobalStyles3;
-      var React72 = _interopRequireWildcard(require_react());
+      var React75 = _interopRequireWildcard(require_react());
       var _propTypes = _interopRequireDefault(require_prop_types());
       var _react2 = (init_emotion_react_browser_esm(), __toCommonJS(emotion_react_browser_esm_exports));
       var _jsxRuntime = require_jsx_runtime();
@@ -76736,7 +76736,7 @@ if (cid) {
   });
 
   // src/index.js
-  var import_react19 = __toESM(require_react());
+  var import_react22 = __toESM(require_react());
   var import_client = __toESM(require_client());
 
   // node_modules/react-router-dom/dist/index.js
@@ -102199,19 +102199,301 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // src/history/history.js
-  var import_react18 = __toESM(require_react());
+  var import_react21 = __toESM(require_react());
 
   // src/history/timeline.js
+  var import_react19 = __toESM(require_react());
+
+  // src/widgets/post/thread.js
   var import_react16 = __toESM(require_react());
 
-  // src/widgets/visible.js
+  // src/widgets/account/account-chip.js
   var import_react13 = __toESM(require_react());
+  function AccountChip(_a3) {
+    var _b = _a3, { account, className, Component: Component2 } = _b, rest = __objRest(_b, ["account", "className", "Component"]);
+    if (!Component2)
+      Component2 = "span";
+    const db2 = useDB();
+    const profile = typeof account === "string" ? forAwait(
+      account,
+      () => db2.getProfileIncrementally(account)
+    ) || {
+      shortDID: account,
+      handle: account
+    } : account;
+    return /* @__PURE__ */ import_react13.default.createElement(
+      Component2,
+      __spreadProps(__spreadValues({
+        className: "account-avatar account-avatar-chip " + (className || "")
+      }, rest), {
+        style: !profile.avatar ? void 0 : {
+          backgroundImage: `url(${profile.avatar})`
+        }
+      }),
+      "@"
+    );
+  }
+
+  // src/widgets/post/post.js
+  var import_react15 = __toESM(require_react());
+
+  // src/widgets/format-time.js
   var import_react14 = __toESM(require_react());
+  var dtBuf = /* @__PURE__ */ new Date();
+  var dtNow = /* @__PURE__ */ new Date();
+  function FormatTime({ time, className, Component: Component2 }) {
+    if (time == null)
+      return null;
+    const fmt = formatTimeStr(time);
+    if (!fmt)
+      return null;
+    const UseComponent = Component2 || "time";
+    const useClassName = className ? className + " formatted-time" : "formatted-time";
+    let fullTimeStr;
+    if (typeof time === "string") {
+      dtBuf.setTime(Date.parse(time));
+      fullTimeStr = dtBuf.toLocaleString();
+    } else if (typeof time === "number") {
+      dtBuf.setTime(time);
+      fullTimeStr = dtBuf.toLocaleString();
+    } else {
+      fullTimeStr = dtBuf.toLocaleString();
+    }
+    return /* @__PURE__ */ import_react14.default.createElement(
+      UseComponent,
+      {
+        className: useClassName,
+        title: fullTimeStr
+      },
+      fmt
+    );
+  }
+  function formatTimeStr(time) {
+    if (time == null)
+      return void 0;
+    const now = Date.now();
+    const tm = typeof time === "number" ? time : typeof time === "string" ? Date.parse(time) : time.getTime();
+    const diffMsec = now - tm;
+    if (Math.abs(diffMsec) < 120) {
+      return localise("just now", { uk: "\u0449\u043E\u0439\u043D\u043E" });
+    }
+    dtBuf.setTime(tm);
+    if (diffMsec < 0) {
+      if (Math.abs(diffMsec) < 60 * 1e3 * 12)
+        return dtBuf.toLocaleTimeString();
+      else
+        return dtBuf.toLocaleString();
+    }
+    if (diffMsec < 60 * 1e3)
+      return localise("a minute ago", { uk: "\u0445\u0432\u0438\u043B\u0438\u043D\u0443 \u0442\u043E\u043C\u0443" });
+    if (diffMsec < 59 * 60 * 1e3)
+      return Math.round(diffMsec / (60 * 60 * 1e3)) + " " + localise("min ago", { uk: "\u0445\u0432 \u0442\u043E\u043C\u0443" });
+    if (dtBuf.getFullYear() === dtNow.getFullYear() && dtBuf.getMonth() === dtNow.getMonth() && dtBuf.getDate() === dtNow.getDate())
+      return dtBuf.toLocaleTimeString();
+    return dtBuf.toLocaleDateString();
+  }
+
+  // src/widgets/post/post.js
+  function Post(_a3) {
+    var _b = _a3, { className, post } = _b, rest = __objRest(_b, ["className", "post"]);
+    return /* @__PURE__ */ import_react15.default.createElement(PostFrame, __spreadValues({ className }, rest), typeof post === "string" ? /* @__PURE__ */ import_react15.default.createElement(LoadingPostInProgress, { uri: post }) : /* @__PURE__ */ import_react15.default.createElement(LoadedPost, { post }));
+  }
+  function PostFrame(_a3) {
+    var _b = _a3, { className, children } = _b, rest = __objRest(_b, ["className", "children"]);
+    return /* @__PURE__ */ import_react15.default.createElement(
+      "div",
+      __spreadValues({
+        className: className ? "post-frame-outer " + className : "post-frame-outer"
+      }, rest),
+      children
+    );
+  }
+  function LoadingPostInProgress({ uri }) {
+    const db2 = useDB();
+    const post = forAwait(uri, () => db2.getPostOnly(uri));
+    if (post) {
+      return /* @__PURE__ */ import_react15.default.createElement(LoadedPost, { post });
+    }
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-loading-in-progress" }, localise("Post is loading...", { uk: "\u0417\u0430\u0447\u0435\u043A\u0430\u0439\u0442\u0435..." }));
+  }
+  function LoadedPost({ post }) {
+    var _a3;
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-loaded-content" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-top-line" }, /* @__PURE__ */ import_react15.default.createElement(AccountLabel, { className: "post-author", account: post.shortDID }), post.asOf ? /* @__PURE__ */ import_react15.default.createElement(FormatTime, { className: "post-date", time: post.asOf }) : void 0), /* @__PURE__ */ import_react15.default.createElement(PreFormatted, { className: "post-content", text: post.text }), !((_a3 = post.embeds) == null ? void 0 : _a3.length) ? void 0 : /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-embeds" }, post.embeds.map((embed, idx) => /* @__PURE__ */ import_react15.default.createElement(PostEmbed, { key: idx, embed }))), /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-likes" }, /* @__PURE__ */ import_react15.default.createElement(FavoriteBorder_default, null), !(post == null ? void 0 : post.likeCount) ? "" : post.likeCount.toLocaleString()));
+  }
+  function PostEmbed(_a3) {
+    var _b = _a3, { className, embed } = _b, rest = __objRest(_b, ["className", "embed"]);
+    const parsedPostURL = breakFeedUri(embed.url);
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-embed " + (className || "") }, parsedPostURL ? /* @__PURE__ */ import_react15.default.createElement(
+      PostEmbeddedIntoAnother,
+      {
+        uri: embed.url
+      }
+    ) : /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-embed-url" }, JSON.stringify(embed)));
+  }
+  function PostEmbeddedIntoAnother({ uri }) {
+    return /* @__PURE__ */ import_react15.default.createElement(
+      "a",
+      {
+        className: "post-embed-url",
+        href: uri,
+        target: "_blank",
+        rel: "noreferrer"
+      },
+      /* @__PURE__ */ import_react15.default.createElement(Post, { post: uri })
+    );
+  }
+
+  // src/widgets/post/thread.js
+  function ThreadView(_a3) {
+    var _b = _a3, { className, shortDID, thread, underPrevious } = _b, rest = __objRest(_b, ["className", "shortDID", "thread", "underPrevious"]);
+    const root = layoutThread(shortDID, thread);
+    return /* @__PURE__ */ import_react16.default.createElement(
+      SubThread,
+      __spreadValues({
+        className: "thread-view " + (className || ""),
+        shortDID,
+        node: root,
+        underPrevious
+      }, rest)
+    );
+  }
+  function SubThread(_a3) {
+    var _b = _a3, {
+      className,
+      shortDID,
+      node: node2,
+      underPrevious
+    } = _b, rest = __objRest(_b, [
+      "className",
+      "shortDID",
+      "node",
+      "underPrevious"
+    ]);
+    return /* @__PURE__ */ import_react16.default.createElement(
+      "div",
+      __spreadValues({
+        className: "sub-thread " + (className || "")
+      }, rest),
+      /* @__PURE__ */ import_react16.default.createElement(
+        Post,
+        {
+          className: underPrevious ? "thread-reply-post" : void 0,
+          post: node2.post
+        }
+      ),
+      node2.children.map((child, i) => /* @__PURE__ */ import_react16.default.createElement(
+        CollapsedOrExpandedSubThread,
+        {
+          key: i,
+          shortDID,
+          node: child,
+          underPrevious: !i
+        }
+      ))
+    );
+  }
+  function CollapsedOrExpandedSubThread({ shortDID, node: node2, underPrevious }) {
+    let collapsedChunk = [];
+    let nextNode = node2;
+    while (true) {
+      if (nextNode.post.shortDID === shortDID || nextNode.children.length != 1)
+        break;
+      collapsedChunk.push(nextNode.post);
+      nextNode = nextNode.children[0];
+    }
+    if (collapsedChunk.length === 0) {
+      return /* @__PURE__ */ import_react16.default.createElement(SubThread, { shortDID, node: node2, underPrevious });
+    } else {
+      return /* @__PURE__ */ import_react16.default.createElement(import_react16.default.Fragment, null, /* @__PURE__ */ import_react16.default.createElement(CollapsedThreadPart, { children: collapsedChunk }), /* @__PURE__ */ import_react16.default.createElement(SubThread, { shortDID, node: nextNode }));
+    }
+  }
+  function CollapsedThreadPart({ children }) {
+    return /* @__PURE__ */ import_react16.default.createElement("div", { className: "collapsed-thread-part" }, children.length === 1 ? /* @__PURE__ */ import_react16.default.createElement(CollapsedSinglePost, { post: children[0] }) : children.length <= 4 ? /* @__PURE__ */ import_react16.default.createElement(CollapsedFewPosts, { posts: children }) : /* @__PURE__ */ import_react16.default.createElement(CollapsedManyPosts, { posts: children }));
+  }
+  function CollapsedSinglePost({ post }) {
+    return /* @__PURE__ */ import_react16.default.createElement("div", { className: "collapsed-single-post" }, /* @__PURE__ */ import_react16.default.createElement(AccountChip, { account: post.shortDID }));
+  }
+  function CollapsedFewPosts({ posts }) {
+    return /* @__PURE__ */ import_react16.default.createElement("div", { className: "collapsed-few-posts" }, posts.map((post) => /* @__PURE__ */ import_react16.default.createElement("span", { key: post.uri, className: "collapsed-few-post-one" }, /* @__PURE__ */ import_react16.default.createElement(AccountChip, { account: post.shortDID }))));
+  }
+  function CollapsedManyPosts({ posts }) {
+    const firstAccount = posts[0].shortDID;
+    const accountFrequencies = /* @__PURE__ */ new Map();
+    for (const post of posts) {
+      const shortDID = post.shortDID;
+      accountFrequencies.set(
+        shortDID,
+        (accountFrequencies.get(shortDID) || 0) + 1
+      );
+    }
+    const frequentAccounts = [...accountFrequencies.keys()].sort((a1, a2) => (accountFrequencies.get(a2) || 0) - (accountFrequencies.get(a1) || 0));
+    if (frequentAccounts.length > 3) {
+      frequentAccounts.splice(frequentAccounts.indexOf(firstAccount), 1);
+      frequentAccounts.length = 3;
+    }
+    return /* @__PURE__ */ import_react16.default.createElement("div", { className: "collapsed-many-posts" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "collapsed-many-posts-first" }, /* @__PURE__ */ import_react16.default.createElement(AccountChip, { account: firstAccount })), /* @__PURE__ */ import_react16.default.createElement("div", { className: "collapsed-many-posts-rest" }, frequentAccounts.map((account) => /* @__PURE__ */ import_react16.default.createElement("span", { key: account, className: "collapsed-many-posts-rest-one" }, /* @__PURE__ */ import_react16.default.createElement(AccountChip, { account }))), /* @__PURE__ */ import_react16.default.createElement("span", { className: "collapsed-many-posts-counter" }, posts.length.toLocaleString())));
+  }
+  function layoutThread(shortDID, thread) {
+    const allPosts = /* @__PURE__ */ new Map();
+    const ownPosts = /* @__PURE__ */ new Map();
+    for (const post of thread.all) {
+      allPosts.set(post.uri, post);
+      if (post.shortDID === shortDID) {
+        ownPosts.set(post.uri, post);
+      }
+    }
+    if (thread.root.shortDID === shortDID) {
+      ownPosts.set(thread.root.uri, thread.root);
+      allPosts.set(thread.root.uri, thread.root);
+    }
+    if (thread.current.shortDID === shortDID) {
+      ownPosts.set(thread.current.uri, thread.current);
+      allPosts.set(thread.current.uri, thread.current);
+    }
+    const ownEearlyFirst = [...ownPosts.values()].sort((p1, p2) => (p2.asOf || 0) - (p1.asOf || 0));
+    let root = {
+      post: thread.root,
+      children: []
+    };
+    const nodeByUri = /* @__PURE__ */ new Map();
+    ownPosts.delete(thread.root.uri);
+    nodeByUri.set(thread.root.uri, root);
+    while (true) {
+      let notPlaced = ownEearlyFirst.find((post) => !nodeByUri.has(post.uri));
+      if (!notPlaced)
+        break;
+      let node2 = {
+        post: notPlaced,
+        children: []
+      };
+      nodeByUri.set(notPlaced.uri, node2);
+      while (true) {
+        const parentNode = nodeByUri.get(node2.post.replyTo || "");
+        if (parentNode) {
+          parentNode.children.push(node2);
+          break;
+        }
+        const parentPost = allPosts.get(node2.post.replyTo || "");
+        if (!parentPost)
+          break;
+        node2 = {
+          post: parentPost,
+          children: [node2]
+        };
+        nodeByUri.set(node2.post.uri, node2);
+      }
+    }
+    return root;
+  }
+
+  // src/widgets/visible.js
+  var import_react17 = __toESM(require_react());
+  var import_react18 = __toESM(require_react());
   function Visible(_a3) {
     var _b = _a3, { Component: Component2 = "div", onVisible, onObscured, rootMargin, threshold, children } = _b, rest = __objRest(_b, ["Component", "onVisible", "onObscured", "rootMargin", "threshold", "children"]);
-    let [visible, setVisible] = (0, import_react14.useState)(false);
-    const ref = (0, import_react14.useRef)(null);
-    (0, import_react14.useEffect)(() => {
+    let [visible, setVisible] = (0, import_react18.useState)(false);
+    const ref = (0, import_react18.useRef)(null);
+    (0, import_react18.useEffect)(() => {
       if (!ref.current) {
         return;
       }
@@ -102230,22 +102512,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       observer.observe(ref.current);
       return () => observer.disconnect();
     }, [ref.current]);
-    return /* @__PURE__ */ import_react13.default.createElement(Component2, __spreadValues({ ref }, rest), children);
-  }
-
-  // src/widgets/post/post.js
-  var import_react15 = __toESM(require_react());
-  function Post({ className, post }) {
-    return /* @__PURE__ */ import_react15.default.createElement(PostFrame, { className }, typeof post === "string" ? /* @__PURE__ */ import_react15.default.createElement(LoadingPostInProgress, { post }) : /* @__PURE__ */ import_react15.default.createElement(LoadedPost, { post }));
-  }
-  function PostFrame({ className, children }) {
-    return /* @__PURE__ */ import_react15.default.createElement("div", { className: className ? "post-frame-outer " + className : "post-frame-outer" }, children);
-  }
-  function LoadingPostInProgress({ post }) {
-    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-loading-in-progress" }, localise("Post is loading...", { uk: "\u0417\u0430\u0447\u0435\u043A\u0430\u0439\u0442\u0435..." }));
-  }
-  function LoadedPost({ post }) {
-    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-loaded-content" }, /* @__PURE__ */ import_react15.default.createElement(AccountLabel, { className: "post-author", account: post.shortDID }), /* @__PURE__ */ import_react15.default.createElement(PreFormatted, { className: "post-content", text: post.text }), /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-likes" }, /* @__PURE__ */ import_react15.default.createElement(FavoriteBorder_default, null), !(post == null ? void 0 : post.likeCount) ? "" : post.likeCount.toLocaleString()));
+    return /* @__PURE__ */ import_react17.default.createElement(Component2, __spreadValues({ ref }, rest), children);
   }
 
   // src/history/timeline.js
@@ -102270,12 +102537,12 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     if (anyPlaceholder) {
       setTimeout(next2, 300);
     }
-    return /* @__PURE__ */ import_react16.default.createElement("div", { className: "timeline-container" }, !(retrieved == null ? void 0 : retrieved.timeline) ? void 0 : retrieved.timeline.map((thread, i) => /* @__PURE__ */ import_react16.default.createElement(ThreadView, { key: i, thread, shortDID })), /* @__PURE__ */ import_react16.default.createElement(
+    return /* @__PURE__ */ import_react19.default.createElement("div", { className: "timeline-container" }, !(retrieved == null ? void 0 : retrieved.timeline) ? void 0 : retrieved.timeline.map((thread, i) => /* @__PURE__ */ import_react19.default.createElement(ThreadView, { key: i, thread, shortDID })), /* @__PURE__ */ import_react19.default.createElement(
       Visible,
       {
         onVisible: () => next2()
       },
-      /* @__PURE__ */ import_react16.default.createElement("button", { onClick: () => next2() }, "Search more...")
+      /* @__PURE__ */ import_react19.default.createElement("button", { onClick: () => next2() }, "Search more...")
     ));
     function getTimeline(didOrHandle) {
       return __asyncGenerator(this, null, function* () {
@@ -102350,100 +102617,9 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       });
     }
   }
-  function ThreadView({ shortDID, thread, underPrevious }) {
-    const root = layoutThread(shortDID, thread);
-    return /* @__PURE__ */ import_react16.default.createElement(SubThread, { shortDID, node: root, underPrevious });
-  }
-  function SubThread({ shortDID, node: node2, underPrevious }) {
-    return /* @__PURE__ */ import_react16.default.createElement("div", { className: "sub-thread" }, /* @__PURE__ */ import_react16.default.createElement(
-      Post,
-      {
-        className: underPrevious ? "thread-reply-post" : void 0,
-        post: node2.post
-      }
-    ), node2.children.map((child, i) => /* @__PURE__ */ import_react16.default.createElement(
-      CollapsedOrExpandedSubThread,
-      {
-        key: i,
-        shortDID,
-        node: child,
-        underPrevious: !i
-      }
-    )));
-  }
-  function CollapsedOrExpandedSubThread({ shortDID, node: node2, underPrevious }) {
-    let collapsedChunk = [];
-    let nextNode = node2;
-    while (true) {
-      if (nextNode.post.shortDID === shortDID || nextNode.children.length != 1)
-        break;
-      collapsedChunk.push(nextNode.post);
-      nextNode = nextNode.children[0];
-    }
-    if (collapsedChunk.length === 0) {
-      return /* @__PURE__ */ import_react16.default.createElement(SubThread, { shortDID, node: node2, underPrevious });
-    } else {
-      return /* @__PURE__ */ import_react16.default.createElement(import_react16.default.Fragment, null, /* @__PURE__ */ import_react16.default.createElement(CollapsedThreadPart, { children: collapsedChunk }), /* @__PURE__ */ import_react16.default.createElement(SubThread, { shortDID, node: nextNode }));
-    }
-  }
-  function CollapsedThreadPart({ children }) {
-    return /* @__PURE__ */ import_react16.default.createElement("div", { className: "collapsed-thread-paret" }, children.length === 1 ? "..." : children.length + "...");
-  }
-  function layoutThread(shortDID, thread) {
-    const allPosts = /* @__PURE__ */ new Map();
-    const ownPosts = /* @__PURE__ */ new Map();
-    for (const post of thread.all) {
-      allPosts.set(post.uri, post);
-      if (post.shortDID === shortDID) {
-        ownPosts.set(post.uri, post);
-      }
-    }
-    if (thread.root.shortDID === shortDID) {
-      ownPosts.set(thread.root.uri, thread.root);
-      allPosts.set(thread.root.uri, thread.root);
-    }
-    if (thread.current.shortDID === shortDID) {
-      ownPosts.set(thread.current.uri, thread.current);
-      allPosts.set(thread.current.uri, thread.current);
-    }
-    const ownEearlyFirst = [...ownPosts.values()].sort((p1, p2) => (p2.asOf || 0) - (p1.asOf || 0));
-    let root = {
-      post: thread.root,
-      children: []
-    };
-    const nodeByUri = /* @__PURE__ */ new Map();
-    ownPosts.delete(thread.root.uri);
-    nodeByUri.set(thread.root.uri, root);
-    while (true) {
-      let notPlaced = ownEearlyFirst.find((post) => !nodeByUri.has(post.uri));
-      if (!notPlaced)
-        break;
-      let node2 = {
-        post: notPlaced,
-        children: []
-      };
-      nodeByUri.set(notPlaced.uri, node2);
-      while (true) {
-        const parentNode = nodeByUri.get(node2.post.replyTo || "");
-        if (parentNode) {
-          parentNode.children.push(node2);
-          break;
-        }
-        const parentPost = allPosts.get(node2.post.replyTo || "");
-        if (!parentPost)
-          break;
-        node2 = {
-          post: parentPost,
-          children: [node2]
-        };
-        nodeByUri.set(node2.post.uri, node2);
-      }
-    }
-    return root;
-  }
 
   // src/history/history-page-decorations.js
-  var import_react17 = __toESM(require_react());
+  var import_react20 = __toESM(require_react());
 
   // src/api/unicode-styles/sanitize-for-regex.js
   var regex_escapeableRegexChars = /[#-.]|[[-^]|[?|{}]/g;
@@ -102744,7 +102920,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   var middledot = "\xB7";
   function HistoryPageDecorations({ children }) {
     let { handle } = useParams();
-    (0, import_react17.useEffect)(() => {
+    (0, import_react20.useEffect)(() => {
       document.documentElement.classList.add("account");
       if (!handle) {
         document.title = uppercase_GIST;
@@ -102770,7 +102946,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
 
   // src/history/history.js
   function History() {
-    return /* @__PURE__ */ import_react18.default.createElement(HistoryPageDecorations, null, /* @__PURE__ */ import_react18.default.createElement(HistoryCore, null));
+    return /* @__PURE__ */ import_react21.default.createElement(HistoryPageDecorations, null, /* @__PURE__ */ import_react21.default.createElement(HistoryCore, null));
   }
   function HistoryCore() {
     const db2 = useDB();
@@ -102782,7 +102958,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       description: localise("Important announcement", { uk: "\u0426\u044F \u0456\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0456\u044F \u0432\u0430\u0441 \u0437\u0434\u0438\u0432\u0443\u0454" }),
       placeholder: true
     };
-    (0, import_react18.useEffect)(() => {
+    (0, import_react21.useEffect)(() => {
       var stop = false;
       const avatar = resolved.avatar;
       if (avatar) {
@@ -102798,25 +102974,25 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       };
     }, [resolved == null ? void 0 : resolved.avatar]);
     console.log("profile ", resolved, resolved.banner);
-    return /* @__PURE__ */ import_react18.default.createElement("div", { className: "history-view" }, /* @__PURE__ */ import_react18.default.createElement(
+    return /* @__PURE__ */ import_react21.default.createElement("div", { className: "history-view" }, /* @__PURE__ */ import_react21.default.createElement(
       "div",
       {
         className: suffixClassWhenEmpty("history-account-banner-bg", resolved.banner, resolved),
         style: !resolved.banner ? void 0 : { backgroundImage: `url(${resolved.banner})` }
       }
-    ), /* @__PURE__ */ import_react18.default.createElement(
+    ), /* @__PURE__ */ import_react21.default.createElement(
       "div",
       {
         className: suffixClassWhenEmpty("history-account-avatar", resolved.avatar, resolved),
         style: !resolved.avatar ? void 0 : { backgroundImage: `url(${resolved.avatar})` }
       }
-    ), /* @__PURE__ */ import_react18.default.createElement("div", { className: suffixClassWhenEmpty("history-account-displayName-and-handle", resolved.displayName, resolved) }, /* @__PURE__ */ import_react18.default.createElement("span", { className: suffixClassWhenEmpty("history-account-displayName", resolved.displayName, resolved) }, resolved.displayName), /* @__PURE__ */ import_react18.default.createElement("div", { className: "history-account-handle" }, /* @__PURE__ */ import_react18.default.createElement("span", { className: "at-sign" }, "@"), /* @__PURE__ */ import_react18.default.createElement(FullHandle, { shortHandle: resolved.handle }))), /* @__PURE__ */ import_react18.default.createElement("div", { className: "unmoved-sticky-background" }), /* @__PURE__ */ import_react18.default.createElement(
+    ), /* @__PURE__ */ import_react21.default.createElement("div", { className: suffixClassWhenEmpty("history-account-displayName-and-handle", resolved.displayName, resolved) }, /* @__PURE__ */ import_react21.default.createElement("span", { className: suffixClassWhenEmpty("history-account-displayName", resolved.displayName, resolved) }, resolved.displayName), /* @__PURE__ */ import_react21.default.createElement("div", { className: "history-account-handle" }, /* @__PURE__ */ import_react21.default.createElement("span", { className: "at-sign" }, "@"), /* @__PURE__ */ import_react21.default.createElement(FullHandle, { shortHandle: resolved.handle }))), /* @__PURE__ */ import_react21.default.createElement("div", { className: "unmoved-sticky-background" }), /* @__PURE__ */ import_react21.default.createElement(
       PreFormatted,
       {
         text: resolved.description,
         className: suffixClassWhenEmpty("history-account-description", resolved.description, resolved)
       }
-    ), /* @__PURE__ */ import_react18.default.createElement("div", { className: "timeline-container" }, resolved.placeholder ? void 0 : /* @__PURE__ */ import_react18.default.createElement(Timeline, { shortDID: resolved.shortDID })));
+    ), /* @__PURE__ */ import_react21.default.createElement("div", { className: "timeline-container" }, resolved.placeholder ? void 0 : /* @__PURE__ */ import_react21.default.createElement(Timeline, { shortDID: resolved.shortDID })));
   }
   function suffixClassWhenEmpty(className, value, hasPlaceholder) {
     const withEmpty = value ? className : className + " " + className + "-empty";
@@ -102826,12 +103002,12 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   // src/index.js
   var db;
   var DB_NAME = "gisting-cache";
-  var DBContext = import_react19.default.createContext(
+  var DBContext = import_react22.default.createContext(
     /** @type {DBAccess} */
     /** @type {*} */
     null
   );
-  var useDB = () => import_react19.default.useContext(DBContext);
+  var useDB = () => import_react22.default.useContext(DBContext);
   function runApp() {
     if (!db) {
       db = defineCachedStore({ dbName: DB_NAME });
@@ -102840,9 +103016,9 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     const useRouter = /file/i.test(location.protocol) ? createHashRouter : createBrowserRouter;
     const router = useRouter(
       [
-        { path: "/", element: /* @__PURE__ */ import_react19.default.createElement(Landing, null) },
-        { path: "/index.html", element: /* @__PURE__ */ import_react19.default.createElement(Landing, null) },
-        { path: "/:handle", element: /* @__PURE__ */ import_react19.default.createElement(History, null) }
+        { path: "/", element: /* @__PURE__ */ import_react22.default.createElement(Landing, null) },
+        { path: "/index.html", element: /* @__PURE__ */ import_react22.default.createElement(Landing, null) },
+        { path: "/:handle", element: /* @__PURE__ */ import_react22.default.createElement(History, null) }
       ],
       {
         basename
@@ -102874,7 +103050,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       }
     });
     (0, import_client.createRoot)(root).render(
-      /* @__PURE__ */ import_react19.default.createElement(ThemeProvider5, { theme }, /* @__PURE__ */ import_react19.default.createElement(DBContext.Provider, { value: db }, /* @__PURE__ */ import_react19.default.createElement(RouterProvider, { router })))
+      /* @__PURE__ */ import_react22.default.createElement(ThemeProvider5, { theme }, /* @__PURE__ */ import_react22.default.createElement(DBContext.Provider, { value: db }, /* @__PURE__ */ import_react22.default.createElement(RouterProvider, { router })))
     );
   }
   runApp();

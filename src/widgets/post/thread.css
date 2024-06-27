@@ -1,0 +1,53 @@
+.thread-view .thread-reply-post {
+  margin-top: -0.7em;
+}
+
+.thread-view .collapsed-thread-part {
+  padding-left: 2em;
+  margin: -0.8em 0;
+}
+
+.thread-view .collapsed-thread-part .collapsed-many-posts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+
+.thread-view .collapsed-thread-part .collapsed-many-posts .collapsed-many-posts-first,
+.thread-view .collapsed-thread-part .collapsed-many-posts .collapsed-many-posts-rest,
+.thread-view .collapsed-thread-part .collapsed-single-post,
+.thread-view .collapsed-thread-part .collapsed-few-posts .collapsed-few-post-one
+ {
+  padding: 0.7em;
+  padding-bottom: 1em;
+  border: solid 1px #f7d69c;
+  background: #fffcf2;
+  box-shadow: 0px 0px 10px #0000001c;
+  border-radius: 1.2em;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.thread-view .collapsed-thread-part .account-avatar-chip {
+  opacity: 0.6;
+}
+
+.thread-view .collapsed-thread-part .collapsed-many-posts .collapsed-many-posts-rest {
+  justify-self: start;
+  position: relative;
+  left: -0.4em;
+}
+
+.thread-view .collapsed-thread-part .collapsed-single-post {
+  display: inline-block;
+}
+
+.thread-view .collapsed-thread-part .collapsed-many-posts .collapsed-many-posts-rest .collapsed-many-posts-counter {
+  padding-left: 0.3em;
+  opacity: 0.5;
+}
+
+.thread-view .collapsed-thread-part .collapsed-few-posts .collapsed-few-post-one {
+  display: inline-block;
+  position: relative;
+  margin-right: -0.4em;
+}

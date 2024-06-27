@@ -202,26 +202,99 @@
   text-shadow: 0 0 14px #0052ff, 0 0 2px black;
 }
 
+/* src/widgets/account/account-chip.css */
+.account-avatar.account-avatar-chip {
+  background: no-repeat center center;
+  background-size: cover;
+  color: transparent;
+  border-radius: 200%;
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  margin-right: 0.25em;
+  position: relative;
+  top: -0.15em;
+}
+
 /* src/widgets/post/post.css */
 .post-frame-outer {
   padding: 1em;
-  border: solid 1px #e9da8a;
+  border: solid 1px #f7d69c;
+  border-top-color: #e9c78a;
+  border-left-color: #e9c78a;
   background: #fffbeb;
-  box-shadow: 2px 4px 9px #0000002b;
+  box-shadow: 2px 4px 10px #0000002b;
   border-radius: 0.5em;
+}
+.thread-reply-post.post-frame-outer {
+  box-shadow: 2px 2px 10px #0000002b;
+}
+.post-top-line {
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+.post-top-line .post-date {
+  opacity: 0.5;
 }
 .post-likes {
   text-align: right;
   opacity: 0.4;
   margin-top: 0.2em;
 }
+.sub-thread {
+  z-index: 1;
+  position: relative;
+}
+
+/* src/widgets/post/thread.css */
+.thread-view .thread-reply-post {
+  margin-top: -0.7em;
+}
+.thread-view .collapsed-thread-part {
+  padding-left: 2em;
+  margin: -0.8em 0;
+}
+.thread-view .collapsed-thread-part .collapsed-many-posts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+.thread-view .collapsed-thread-part .collapsed-many-posts .collapsed-many-posts-first,
+.thread-view .collapsed-thread-part .collapsed-many-posts .collapsed-many-posts-rest,
+.thread-view .collapsed-thread-part .collapsed-single-post,
+.thread-view .collapsed-thread-part .collapsed-few-posts .collapsed-few-post-one {
+  padding: 0.7em;
+  padding-bottom: 1em;
+  border: solid 1px #f7d69c;
+  background: #fffcf2;
+  box-shadow: 0px 0px 10px #0000001c;
+  border-radius: 1.2em;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.thread-view .collapsed-thread-part .account-avatar-chip {
+  opacity: 0.6;
+}
+.thread-view .collapsed-thread-part .collapsed-many-posts .collapsed-many-posts-rest {
+  justify-self: start;
+  position: relative;
+  left: -0.4em;
+}
+.thread-view .collapsed-thread-part .collapsed-single-post {
+  display: inline-block;
+}
+.thread-view .collapsed-thread-part .collapsed-many-posts .collapsed-many-posts-rest .collapsed-many-posts-counter {
+  padding-left: 0.3em;
+  opacity: 0.5;
+}
+.thread-view .collapsed-thread-part .collapsed-few-posts .collapsed-few-post-one {
+  display: inline-block;
+  position: relative;
+  margin-right: -0.4em;
+}
 
 /* src/history/timeline.css */
 .timeline-container {
   margin-right: 0.4em;
-}
-.timeline-container .thread-reply-post {
-  margin-top: -0.3em;
 }
 .timeline-container > .sub-thread {
   margin-top: 1em;
