@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/root-layout.css"],
+  "sourcesContent": [".autocomplete-list {\n  background: white;\n  position: relative;\n  z-index: 10;\n  padding: 0.25em 0.5em;\n  border: solid 1px black;\n}\n\nspan.autocomplete-post {\n  float: right;\n  font-size: 80%;\n  color: #b55f00;\n}\n"],
+  "mappings": ";AAAA,CAAC;AACC,cAAY;AACZ,YAAU;AACV,WAAS;AACT,WAAS,OAAO;AAChB,UAAQ,MAAM,IAAI;AACpB;AAEA,IAAI,CAAC;AACH,SAAO;AACP,aAAW;AACX,SAAO;AACT;",
+  "names": []
+}

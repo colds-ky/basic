@@ -6,7 +6,12 @@ import { isPromise } from '.';
  * @template {Function} TFunction
  * @param {TFunction} call
  * @param {{ maxConcurrency?: number, interval?: number }} _
- * @returns TFunction & { prepopulate: (value: any, ...args: any[]) => void, evict: (...args: any[]) => void }
+ * @returns {TFunction &
+ * {
+ *   peek: (...args: any[]) => any,
+ *   prepopulate: (value: any, ...args: any[]) => void,
+ *   evict: (...args: any[]) => void
+ * }}
  */
 export function throttledAsyncCache(call, { maxConcurrency = 3, interval = 100 } = {}) {
   const cache = multikeyMap();
@@ -16,10 +21,16 @@ export function throttledAsyncCache(call, { maxConcurrency = 3, interval = 100 }
 
   var scheduleMoreLaterTimeout;
 
+  throttledCall.peek = peek;
   throttledCall.prepopulate = prepopulate;
   throttledCall.evict = evict;
 
-  return throttledCall;
+  return /** @type {*} */(throttledCall);
+
+  function peek(...args) {
+    const result = cache.get(...args);
+    if (result && !isPromise(result.value)) return result.value;
+  }
 
   function prepopulate(value, ...args) {
     cache.set(...args, { value });

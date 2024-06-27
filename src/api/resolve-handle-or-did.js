@@ -64,3 +64,14 @@ export function resolveHandleOrDID(handleOrDid) {
   if (isPromise(didOrPromise)) return didOrPromise.then(resolveDIDCache);
   else return resolveDIDCache(didOrPromise);
 }
+resolveHandleOrDID.peek = peekHandleOrDID;
+
+/**
+ * @param {string | null | undefined} handleOrDID
+ * @returns {AccountInfo | undefined}
+ */
+function peekHandleOrDID(handleOrDID) {
+  if (!handleOrDID) return;
+  if (likelyDID(handleOrDID)) return resolveDIDCache.peek(unwrapShortDID(handleOrDID));
+  return resolveHandleCache.peek(unwrapShortHandle(handleOrDID));
+}

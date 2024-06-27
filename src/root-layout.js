@@ -1,11 +1,13 @@
 // @ts-check
 
 import React, { useState } from 'react';
-import { useDerived } from './api/derive';
-import { searchHandle } from './api';
+import { forAwait } from './api/forAwait';
+import { searchHandle, unwrapShortHandle } from './api';
 
 import atproto from '@atproto/api';
 import * as octokit from "octokit";
+
+import './root-layout.css';
 
 window['atproto'] = atproto;
 window['octokit'] = octokit;
@@ -27,10 +29,12 @@ export function RootLayout({
   inputPlaceholderText,
   autocompleteArea }) {
   const [text, setText] = useState('');
-  const matches = useDerived(
+
+  const matches = forAwait(
     text,
-    (text) => searchHandle(text),
-    (error, text) => [{ shortDID: text, shortHandle: text, rank: 1, error }]);
+    async (text) => ({ result: await searchHandle(text) }),
+    (error, text) => ({ result: [{ shortDID: text, shortHandle: text, rank: 1, error }] }))?.result || [];
+
   return (
     <table className="top-table">
       <tbody>
@@ -59,10 +63,21 @@ export function RootLayout({
                   }}
                 />
                 {
-                  !matches ? undefined :
-                    matches.map((m, index) =>
-                      <div key={index}>{m.shortHandle}</div>
-                    )
+                  !matches?.length ? undefined :
+                    <div className='autocomplete-list'>
+                      {
+                        matches.map((m, index) =>
+                          <div key={index} className='autocomplete-entry'>
+                            {
+                              unwrapShortHandle(m.shortHandle)
+                            }
+                            {
+                              m.postID ? <span className='autocomplete-post'>post#{m.postID}</span> : undefined
+                            }
+                          </div>
+                        )
+                      }
+                    </div>
                 }
                 {autocompleteArea}
               </div>

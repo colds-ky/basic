@@ -1,7 +1,7 @@
 // @ts-check
 /// <reference path="../../types.d.ts" />
 
-import { breakFeedUri, breakPostURL, isPromise, resolveHandleOrDID, shortenDID, shortenHandle } from '..';
+import { breakFeedUri, breakBskyURL, isPromise, resolveHandleOrDID, shortenDID, shortenHandle } from '..';
 import { performSearchOverBuckets } from './perform-search-over-buckets';
 
 /**
@@ -19,15 +19,25 @@ export function searchHandle(searchText) {
   if (cachedSearches[searchText]) return cachedSearches[searchText];
 
   const directResolvesOrPromises = searchText.split(/\s+/).filter(word => !!word).map(word => {
-    const postLink = breakPostURL(word) || breakFeedUri(word);
-    if (postLink) {
-      let accountOrPromise = resolveHandleOrDID(postLink.shortDID);
+    const bskyLink = breakBskyURL(word);
+    if (bskyLink) {
+      let accountOrPromise = resolveHandleOrDID(bskyLink.handleOrDID);
       if (isPromise(accountOrPromise))
         return accountOrPromise.catch(() => undefined).then(account =>
-          expandResolvedAccountToSearchMatch(word, account, postLink.postID));
+          expandResolvedAccountToSearchMatch(word, account, bskyLink.post));
       else
-        return expandResolvedAccountToSearchMatch(word, accountOrPromise, postLink.postID);
+        return expandResolvedAccountToSearchMatch(word, accountOrPromise, bskyLink.post);
     }
+
+    const feedLink = breakFeedUri(word);
+    if (feedLink) {
+      let accountOrPromise = resolveHandleOrDID(feedLink.shortDID);
+      if (isPromise(accountOrPromise))
+        return accountOrPromise.catch(() => undefined).then(account =>
+          expandResolvedAccountToSearchMatch(word, account, feedLink.postID));
+      else
+        return expandResolvedAccountToSearchMatch(word, accountOrPromise, feedLink.postID);
+  }
 
     /** @type {Promise<AccountInfo | undefined> | AccountInfo | undefined} */
     let accountOrPromise = resolveHandleOrDID(word);

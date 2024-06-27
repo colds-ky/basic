@@ -1,10 +1,12 @@
 // @ts-check
 /// <reference path="../types.d.ts" />
 
+import { resolveHandleOrDID } from './resolve-handle-or-did';
+
 export { resolveHandleOrDID } from './resolve-handle-or-did';
 export { searchHandle } from './search';
 
-export { useDerived } from './derive';
+export { forAwait as useDerived } from './forAwait';
 
 /**
  * @param {string} did
@@ -71,9 +73,9 @@ function cheapNormalizeHandle(handle) {
 
   const urlprefix = 'https://bsky.app/';
   if (handle && handle.lastIndexOf(urlprefix, 0) === 0) {
-    const postURL = breakPostURL(handle);
-    if (postURL && postURL.shortDID)
-      return postURL.shortDID;
+    const bskyURL = breakBskyURL(handle);
+    if (bskyURL && bskyURL.shortDID)
+      return bskyURL.shortDID;
   }
 
   if (handle && handle.lastIndexOf('at:', 0) === 0) {
@@ -87,14 +89,28 @@ function cheapNormalizeHandle(handle) {
 
 /**
 * @param {string | null | undefined} url
+* @returns {{ handleOrDID: string, shortDID?: string, shortHandle?: string, [aspect: string]: string } | undefined}
 */
-export function breakPostURL(url) {
+export function breakBskyURL(url) {
   if (!url) return;
-  const match = _breakPostURL_Regex.exec(url);
+  const match = _breakBskyURL_Regex.exec(url);
   if (!match) return;
-  return { shortDID: match[1], postID: match[2] };
+  const handleOrDID = match[1];
+  /** @type {ReturnType<typeof breakBskyURL>} */
+  let result;
+  const resolved = resolveHandleOrDID.peek(handleOrDID);
+  if (resolved) {
+    result = { handleOrDID, shortDID: resolved.shortDID, shortHandle: resolved.shortHandle };
+  } else {
+    if (likelyDID(handleOrDID)) result = { handleOrDID, shortDID: shortenDID(handleOrDID) };
+    else result = { handleOrDID, shortHandle: shortenHandle(handleOrDID) };
+  }
+
+  if (match[2] && match[4]) result[match[2]] = match[4];
+
+  return result;
 }
-const _breakPostURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/post\/([a-z0-9]+)$/;
+const _breakBskyURL_Regex = /^http[s]?\:\/\/bsky\.app\/profile\/([a-z0-9\.\:]+)\/([^\/]+)(\/([^\\]+)(\/|$))?/i;
 
 /**
 * @param {string | null | undefined} uri
