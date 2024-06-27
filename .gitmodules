@@ -29,7 +29,7 @@
 	path = index/i
 	url = https://github.com/colds-ky/index-i
 [submodule "j"]
-	path = j
+	path = index/j
 	url = https://github.com/colds-ky/index-j
 [submodule "index/k"]
 	path = index/k
