@@ -41839,7 +41839,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.24";
+	var version = "0.2.25";
 
 	// @ts-check
 
@@ -50372,8 +50372,29 @@ if (cid) {
 	    const remoteThreadRaw = (await remotePromise)?.data?.thread;
 	    if ('post' in remoteThreadRaw) {
 	      dbStore.captureThreadView( /** @type {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost} */remoteThreadRaw, Date.now());
-	      const refreshedThread = await dbStore.getPostThread(uri);
-	      yield refreshedThread;
+	      const ignoreBrokenPlaceholderUris = new Set();
+	      while (true) {
+	        const refreshedThread = await dbStore.getPostThread(uri);
+	        const allPlaceholders = [];
+	        if (refreshedThread?.all?.length) {
+	          for (const post of refreshedThread.all) {
+	            if (post.placeholder && !ignoreBrokenPlaceholderUris.has(post.uri)) allPlaceholders.push(post);
+	          }
+	        }
+	        yield refreshedThread;
+	        if (!allPlaceholders.length) break;
+	        const orphanRemotePromises = allPlaceholders.map(placeholderPost => [placeholderPost, agent_getPostThread_throttled(placeholderPost.uri)]);
+	        for (const [placeholderPost, orphanRemotePromise] of orphanRemotePromises) {
+	          try {
+	            const orphanRemoteRaw = (await orphanRemotePromise)?.data?.thread;
+	            if ('post' in orphanRemoteRaw) {
+	              dbStore.captureThreadView( /** @type {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost} */orphanRemoteRaw, Date.now());
+	            }
+	          } catch (error) {
+	            ignoreBrokenPlaceholderUris.add(placeholderPost.uri);
+	          }
+	        }
+	      }
 	    }
 	  }
 
