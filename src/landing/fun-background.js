@@ -26,7 +26,7 @@ export function FunBackground() {
 
         {
           bestThreads && bestThreads.map((thread, i) => (
-            <ThreadBubble key={(thread?.current?.shortDID + thread?.current?.rev) || 'undefined'}
+            <ThreadBubble key={thread?.current?.uri || 'undefined'}
               thread={thread}
             />
           ))
@@ -57,8 +57,7 @@ async function* getFirehoseThreads(db) {
 
     const threadTooOld = now - POST_MAX_AGE;
     for (const oldThread of bestCurrentThreads) {
-      const currentURI = makeFeedUri(oldThread.current.shortDID, oldThread.current.rev);
-      const seen = seenPostWhen.get(currentURI);
+      const seen = seenPostWhen.get(oldThread.current.uri);
       if (seen && seen > threadTooOld) {
         bestThreads.push(oldThread);
       }
@@ -68,9 +67,8 @@ async function* getFirehoseThreads(db) {
 
     for (const thread of chunk) {
       if (!thread?.current?.text) continue;
-      const currentURI = makeFeedUri(thread.current.shortDID, thread.current.rev);
-      if (seenPostWhen.has(currentURI)) continue;
-      seenPostWhen.set(currentURI, now);
+      if (seenPostWhen.has(thread.current.uri)) continue;
+      seenPostWhen.set(thread.current.uri, now);
 
       newThreads.push(thread);
     }
@@ -107,7 +105,7 @@ async function* getFirehoseThreads(db) {
  */
 function ThreadBubble({ thread }) {
   const db = useDB();
-  const hash = calcHash(thread?.current?.shortDID + ' ' + thread?.current?.rev);
+  const hash = calcHash(thread?.current?.uri);
   let rnd = nextRandom(Math.abs(hash / 1000 + hash));
   const slideDuration = 20 + rnd * 30; 
   rnd = nextRandom(rnd);

@@ -98279,9 +98279,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
               continue;
             const record = decode14(block.bytes);
             record.repo = commit.repo;
-            record.rev = commit.rev;
-            record.cid = op.cid && String(op.cid);
-            record.path = op.path;
+            record.uri = commit.repo + "/" + op.path;
             record.action = op.action;
             let unexpected = op.action !== "create" && op.action !== "update" && op.action !== "delete" || known$Types.indexOf(record.$type) < 0;
             if (unexpected) {
@@ -98337,7 +98335,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // coldsky/package.json
-  var version4 = "0.2.10";
+  var version4 = "0.2.11";
 
   // coldsky/lib/firehose-short-dids.js
   function firehoseShortDIDs(filterShortDIDs) {
@@ -100118,10 +100116,10 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // coldsky/lib/data/capture-records/speculative-post.js
-  function createSpeculativePost(shortDID, rev) {
+  function createSpeculativePost(shortDID, uri) {
     const speculativePost = {
+      uri,
       shortDID,
-      rev,
       text: void 0,
       facets: void 0,
       embeds: void 0,
@@ -100145,14 +100143,14 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     const db2 = (
       /**
        * @type {Dexie & {
-       *  posts: import('dexie').Table<import('.').CompactPost, [shortDID: string, rev: string]>,
-       *  profiles: import('dexie').Table<import('.').CompactProfile>
+       *  posts: import('dexie').Table<import('.').CompactPost, string>,
+       *  profiles: import('dexie').Table<import('.').CompactProfile, string>
        * }}
        */
       new import_wrapper_default(dbName || DEFAULT_DB_NAME)
     );
-    db2.version(2).stores({
-      posts: "[shortDID+rev], replyTo, threadStart, *quoting, *words",
+    db2.version(3).stores({
+      posts: "uri, shortDID, replyTo, threadStart, *quoting, *words",
       profiles: "shortDID, *handle, *words"
     });
     const memStore = defineStore({
@@ -100179,7 +100177,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     }
     function handlePostUpdate(post) {
       outstandingPostUpdatesByURI.set(
-        makeFeedUri(post.shortDID, post.rev),
+        post.uri,
         post
       );
       queueUpdate();
@@ -100209,24 +100207,24 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       }
       console.log("dumping to indexedDB: ", updateReport);
     }
-    function getPostOnly(url) {
-      if (!url)
+    function getPostOnly(uri) {
+      if (!uri)
         return;
-      const parsedURL = breakFeedUri(url) || breakPostURL(url);
+      const parsedURL = breakFeedUri(uri) || breakPostURL(uri);
       if (!parsedURL)
         return;
       let repo = memStore.repos.get(parsedURL.repo);
       if (repo) {
-        const existingPost = repo.posts.get(parsedURL.cid);
+        const existingPost = repo.posts.get(uri);
         if (existingPost)
           return existingPost;
       }
-      return db2.posts.get([parsedURL.shortDID, parsedURL.postID]).then((post) => {
+      return db2.posts.get(uri).then((post) => {
         if (!post)
           return;
         if (!repo)
           repo = createRepoData(parsedURL.repo);
-        repo.posts.set(post.rev, post);
+        repo.posts.set(post.uri, post);
         return post;
       });
     }
@@ -100235,30 +100233,31 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         return;
       return getPostThreadAsync(url);
     }
-    function getPostThreadAsync(url) {
+    function getPostThreadAsync(uri) {
       return __async(this, null, function* () {
-        const parsedURL = breakFeedUri(url) || breakPostURL(url);
-        if (!parsedURL)
+        var _a3, _b;
+        const shortDID = (_a3 = breakFeedUri(uri)) == null ? void 0 : _a3.shortDID;
+        if (!shortDID)
           return;
-        let veryPost = outstandingPostUpdatesByURI.get(url);
-        let threadStart = (veryPost == null ? void 0 : veryPost.threadStart) || url;
-        let asThreadStartPromise = db2.posts.where("threadStart").equals((veryPost == null ? void 0 : veryPost.threadStart) || url).toArray();
+        let veryPost = outstandingPostUpdatesByURI.get(uri);
+        let threadStart = (veryPost == null ? void 0 : veryPost.threadStart) || uri;
+        let asThreadStartPromise = db2.posts.where("threadStart").equals((veryPost == null ? void 0 : veryPost.threadStart) || uri).toArray();
         if (!veryPost)
-          veryPost = yield db2.posts.get([parsedURL.shortDID, parsedURL.postID]);
+          veryPost = yield db2.posts.get(uri);
         const dbPosts = yield asThreadStartPromise;
-        if (veryPost && !dbPosts.find((post) => post.shortDID === veryPost.shortDID && post.rev === veryPost.rev))
+        if (veryPost && !dbPosts.find((post) => post.shortDID === veryPost.shortDID && post.uri === veryPost.uri))
           dbPosts.push(veryPost);
-        const uncachedPostsForThread = [...outstandingPostUpdatesByURI.values()].filter((p) => p.shortDID === (veryPost == null ? void 0 : veryPost.shortDID) && p.rev === (veryPost == null ? void 0 : veryPost.rev) || threadStart && p.threadStart === threadStart);
-        const postsByUri = new Map(dbPosts.concat(uncachedPostsForThread).map((p) => [makeFeedUri(p.shortDID, p.rev), p]));
+        const uncachedPostsForThread = [...outstandingPostUpdatesByURI.values()].filter((p) => p.shortDID === (veryPost == null ? void 0 : veryPost.shortDID) && p.uri === (veryPost == null ? void 0 : veryPost.uri) || threadStart && p.threadStart === threadStart);
+        const postsByUri = new Map(dbPosts.concat(uncachedPostsForThread).map((p) => [p.uri, p]));
         const all = [...postsByUri.values()];
-        const current = postsByUri.get(url) || createSpeculativePost(parsedURL.shortDID, parsedURL.postID);
+        const current = postsByUri.get(uri) || createSpeculativePost(shortDID, uri);
         let root = (current == null ? void 0 : current.threadStart) ? postsByUri.get(current.threadStart) : void 0;
         if (!root) {
-          const parsedRootURL = breakFeedUri(current == null ? void 0 : current.threadStart);
-          if (parsedRootURL) {
-            const dbRoot = yield db2.posts.get([parsedRootURL.shortDID, parsedRootURL.postID]);
+          const rootShortDID = (_b = breakFeedUri(current.threadStart)) == null ? void 0 : _b.shortDID;
+          if (rootShortDID && current.threadStart) {
+            const dbRoot = yield db2.posts.get(current.threadStart);
             if (dbRoot)
-              root = createSpeculativePost(parsedRootURL.shortDID, parsedRootURL.postID);
+              root = createSpeculativePost(rootShortDID, current.threadStart);
           }
           if (!root)
             root = current;
@@ -100282,13 +100281,11 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           (post) => !!post.words && post.words.some(wordMatcher)
         ).toArray();
         for (const post of dbPost) {
-          const uri = makeFeedUri(post.shortDID, post.rev);
-          map.set(uri, post);
+          map.set(post.uri, post);
         }
         for (const uncachedPost of outstandingPostUpdatesByURI.values()) {
           if ((_a3 = uncachedPost.words) == null ? void 0 : _a3.some(wordMatcher)) {
-            const uri = makeFeedUri(uncachedPost.shortDID, uncachedPost.rev);
-            map.set(uri, uncachedPost);
+            map.set(uncachedPost.uri, uncachedPost);
           }
         }
         const allPosts = [...map.values()];
@@ -100428,8 +100425,8 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
                   messages.push(rec);
                   const updated = dbStore.captureRecord(rec, block.receiveTimestamp);
                   if (updated) {
-                    if ("rev" in updated)
-                      updatedPosts.set(makeFeedUri(updated.shortDID, updated.rev), updated);
+                    if ("uri" in updated)
+                      updatedPosts.set(updated.uri, updated);
                     else
                       updatedProfiles.set(updated.shortDID, updated);
                   }
@@ -100478,19 +100475,19 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       const dbPost = dbStore.getPostOnly(uri);
       if (dbPost && !isPromise(dbPost))
         return dbPost;
-      const parsedURI = breakFeedUri(uri) || breakPostURL(uri);
-      if (!parsedURI)
-        return;
       if (!dbPost)
-        return getPostOnlyAsync(parsedURI.shortDID, parsedURI.postID);
+        return getPostOnlyAsync(uri);
       else
-        return dbPost.then((post) => post || getPostOnlyAsync(parsedURI.shortDID, parsedURI.postID));
+        return dbPost.then((post) => post || getPostOnlyAsync(uri));
     }
-    function getPostOnlyAsync(shortDID, rev) {
+    function getPostOnlyAsync(uri) {
       return __async(this, null, function* () {
+        const parsedURL = breakFeedUri(uri);
+        if (!parsedURL)
+          throw new Error("Invalid post URI " + JSON.stringify(uri));
         const postRecord = yield agent_getRepoRecord_throttled(
-          unwrapShortDID(shortDID),
-          rev,
+          unwrapShortDID(parsedURL.shortDID),
+          parsedURL.postID,
           "app.bsky.actor.post"
         );
         const post = dbStore.captureRecord(
@@ -100498,20 +100495,20 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           postRecord.data,
           Date.now()
         );
-        if (post && "rev" in post)
+        if (post && "uri" in post)
           return post;
       });
     }
-    function getPostThreadIncrementally(url) {
+    function getPostThreadIncrementally(uri) {
       return __asyncGenerator(this, null, function* () {
         var _a3, _b;
-        if (!url)
+        if (!uri)
           return;
-        const parsedURL = breakFeedUri(url) || breakPostURL(url);
+        const parsedURL = breakFeedUri(uri);
         if (!parsedURL)
           return;
-        const remotePromise = agent_getPostThread_throttled(makeFeedUri(parsedURL.shortDID, parsedURL.postID));
-        const local = yield new __await(dbStore.getPostThread(url));
+        const remotePromise = agent_getPostThread_throttled(uri);
+        const local = yield new __await(dbStore.getPostThread(uri));
         if (local)
           yield local;
         const remoteThreadRaw = (_b = (_a3 = yield new __await(remotePromise)) == null ? void 0 : _a3.data) == null ? void 0 : _b.thread;
@@ -100521,7 +100518,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
             remoteThreadRaw,
             Date.now()
           );
-          const refreshedThread = yield new __await(dbStore.getPostThread(url));
+          const refreshedThread = yield new __await(dbStore.getPostThread(uri));
           yield refreshedThread;
         }
       });
@@ -100558,7 +100555,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     }
     function searchAccountHistoryPostsIncrementally(shortDID, text) {
       return __asyncGenerator(this, null, function* () {
-        var _a3, _b, _c, _d, _e;
+        var _a3, _b, _c, _d;
         let REPORT_UPDATES_FREQUENCY_MSEC = 700;
         const cachedMatchesPromise = dbStore.searchPosts(shortDID, text);
         const allCachedHistoryPromise = !text ? cachedMatchesPromise : dbStore.searchPosts(shortDID, text);
@@ -100578,7 +100575,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         });
         let cursor2 = "";
         const fullDID = unwrapShortDID(shortDID);
-        let knownHistoryRevs;
+        let knownHistoryUri;
         while (true) {
           const moreData = yield new __await(pdsAgent.com.atproto.repo.listRecords({
             repo: unwrapShortDID(shortDID),
@@ -100586,9 +100583,9 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
             collection: "app.bsky.feed.post",
             limit: Math.random() * 10 + 88
           }));
-          if (!knownHistoryRevs) {
+          if (!knownHistoryUri) {
             const allHistory = yield new __await(allCachedHistoryPromise);
-            knownHistoryRevs = new Set((allHistory || []).map((rec) => rec.rev));
+            knownHistoryUri = new Set((allHistory || []).map((rec) => rec.uri));
           }
           if ((_c = (_b = moreData == null ? void 0 : moreData.data) == null ? void 0 : _b.records) == null ? void 0 : _c.length) {
             for (const rec of moreData.data.records) {
@@ -100597,10 +100594,9 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
                 rec.value
               );
               recEx.$type = "app.bsky.feed.post";
+              recEx.uri = rec.uri;
               recEx.repo = fullDID;
-              recEx.rev = /** @type {string} */
-              (_d = breakFeedUri(rec.uri)) == null ? void 0 : _d.postID;
-              if (!knownHistoryRevs.has(recEx.rev))
+              if (!knownHistoryUri.has(rec.uri))
                 anyUpdates = true;
               dbStore.captureRecord(recEx, Date.now());
             }
@@ -100615,7 +100611,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
               lastSearchReport = Date.now();
             }
           }
-          if (!((_e = moreData == null ? void 0 : moreData.data) == null ? void 0 : _e.cursor))
+          if (!((_d = moreData == null ? void 0 : moreData.data) == null ? void 0 : _d.cursor))
             break;
           cursor2 = moreData.data.cursor;
         }
@@ -100823,24 +100819,21 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
 
   // coldsky/lib/data/capture-records/capture-like-record.js
   function captureLikeRecord(repo, likeRecord, store, intercepts) {
-    var _a3, _b, _c;
+    var _a3, _b;
     const shortDID = shortenDID(repo);
-    const uri = breakFeedUri((_a3 = likeRecord.subject) == null ? void 0 : _a3.uri);
-    if (!(uri == null ? void 0 : uri.shortDID) || !uri.postID)
-      return;
     let repoData = store.get(shortDID);
     if (!repoData)
       store.set(shortDID, repoData = createRepoData(shortDID));
-    const existingPost = repoData.posts.get(uri.postID);
+    const existingPost = repoData.posts.get(likeRecord.subject.uri);
     if (existingPost) {
       existingPost.likeCount = (existingPost.likeCount || 0) + 1;
-      (_b = intercepts == null ? void 0 : intercepts.post) == null ? void 0 : _b.call(intercepts, existingPost);
+      (_a3 = intercepts == null ? void 0 : intercepts.post) == null ? void 0 : _a3.call(intercepts, existingPost);
       return existingPost;
     } else {
-      const speculativePost = createSpeculativePost(uri.shortDID, uri.postID);
+      const speculativePost = createSpeculativePost(shortDID, likeRecord.subject.uri);
       speculativePost.likeCount = 1;
-      repoData.posts.set(uri.postID, speculativePost);
-      (_c = intercepts == null ? void 0 : intercepts.post) == null ? void 0 : _c.call(intercepts, speculativePost);
+      repoData.posts.set(likeRecord.subject.uri, speculativePost);
+      (_b = intercepts == null ? void 0 : intercepts.post) == null ? void 0 : _b.call(intercepts, speculativePost);
       return speculativePost;
     }
   }
@@ -101008,7 +101001,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // coldsky/lib/data/compact-post.js
-  function makeCompactPost(repo, rev, record, asOf) {
+  function makeCompactPost(repo, uri, record, asOf) {
     var _a3, _b, _c, _d, _e, _f;
     const shortDID = shortenDID(repo);
     let words = detectWordStartsNormalized(record.text, void 0);
@@ -101032,18 +101025,18 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       }
     }
     const compact = {
+      uri,
       shortDID,
-      rev,
       text: record.text,
       facets,
       embeds,
-      threadStart: ((_b = (_a3 = record.reply) == null ? void 0 : _a3.root) == null ? void 0 : _b.rev) === rev ? void 0 : (_d = (_c = record.reply) == null ? void 0 : _c.root) == null ? void 0 : _d.uri,
+      threadStart: ((_b = (_a3 = record.reply) == null ? void 0 : _a3.root) == null ? void 0 : _b.uri) === uri ? void 0 : (_d = (_c = record.reply) == null ? void 0 : _c.root) == null ? void 0 : _d.uri,
       replyTo: (_f = (_e = record.reply) == null ? void 0 : _e.parent) == null ? void 0 : _f.uri,
       words,
       likeCount: void 0,
       repostCount: void 0,
       quoting,
-      asOf
+      asOf: Date.parse(record.createdAt) || asOf
     };
     return compact;
   }
@@ -101068,7 +101061,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
 
   // coldsky/lib/data/capture-records/capture-post-record.js
   var REPO_LAST_ACCESS_AGE_MAX = 1e3 * 60 * 60 * 24 * 7 * 2;
-  function capturePostRecord(repo, rev, postRecord, store, asOf, intercepts) {
+  function capturePostRecord(repo, uri, postRecord, store, asOf, intercepts) {
     var _a3;
     const shortDID = shortenDID(repo);
     let repoData = store.get(shortDID);
@@ -101082,15 +101075,15 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       };
       store.set(shortDID, repoData);
     }
-    const existingPost = repoData.posts.get(rev);
+    const existingPost = repoData.posts.get(uri);
     if (existingPost && typeof existingPost.asOf === "number" && existingPost.asOf > asOf)
       return existingPost;
-    const createdPost = makeCompactPost(repo, rev, postRecord, asOf);
+    const createdPost = makeCompactPost(repo, uri, postRecord, asOf);
     if (existingPost) {
       createdPost.likeCount = existingPost.likeCount;
       createdPost.repostCount = existingPost.repostCount;
     }
-    repoData.posts.set(rev, createdPost);
+    repoData.posts.set(uri, createdPost);
     (_a3 = intercepts == null ? void 0 : intercepts.post) == null ? void 0 : _a3.call(intercepts, createdPost);
     return createdPost;
   }
@@ -101129,30 +101122,27 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
 
   // coldsky/lib/data/capture-records/capture-repost-record.js
   function captureRepostRecord(repo, repostRecord, store, intercepts) {
-    var _a3, _b, _c;
+    var _a3, _b;
     const shortDID = shortenDID(repo);
-    const uri = breakFeedUri((_a3 = repostRecord.subject) == null ? void 0 : _a3.uri);
-    if (!(uri == null ? void 0 : uri.shortDID) || !uri.postID)
-      return;
     let repoData = store.get(shortDID);
     if (!repoData)
       store.set(shortDID, repoData = createRepoData(shortDID));
-    const existingPost = repoData.posts.get(uri.postID);
+    const existingPost = repoData.posts.get(repostRecord.subject.uri);
     if (existingPost) {
       existingPost.repostCount = (existingPost.repostCount || 0) + 1;
-      (_b = intercepts == null ? void 0 : intercepts.post) == null ? void 0 : _b.call(intercepts, existingPost);
+      (_a3 = intercepts == null ? void 0 : intercepts.post) == null ? void 0 : _a3.call(intercepts, existingPost);
       return existingPost;
     } else {
-      const speculativePost = createSpeculativePost(uri.shortDID, uri.postID);
+      const speculativePost = createSpeculativePost(shortDID, repostRecord.subject.uri);
       speculativePost.repostCount = 1;
-      repoData.posts.set(uri.postID, speculativePost);
-      (_c = intercepts == null ? void 0 : intercepts.post) == null ? void 0 : _c.call(intercepts, speculativePost);
+      repoData.posts.set(repostRecord.subject.uri, speculativePost);
+      (_b = intercepts == null ? void 0 : intercepts.post) == null ? void 0 : _b.call(intercepts, speculativePost);
       return speculativePost;
     }
   }
 
   // coldsky/lib/data/capture-records/capture-all-records.js
-  function captureAllRecords(repo, rev, rec, store, asOf, intercepts) {
+  function captureAllRecords(repo, uri, rec, store, asOf, intercepts) {
     switch (rec["$type"]) {
       case "app.bsky.feed.like":
         return captureLikeRecord(
@@ -101173,7 +101163,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       case "app.bsky.feed.post":
         return capturePostRecord(
           repo,
-          rev,
+          uri,
           /** @type {RepoRecord$Typed['app.bsky.feed.post']} */
           rec,
           store,
@@ -101253,7 +101243,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     const parsedPostURI = breakFeedUri(postView.uri);
     const compactPost = capturePostRecord(
       postView.author.did,
-      (parsedPostURI == null ? void 0 : parsedPostURI.postID) || postView.cid,
+      postView.uri,
       /** @type {*} */
       postView.record,
       store,
@@ -101265,19 +101255,20 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     return compactPost;
   }
   function getPostOrPlaceholder(postURI, store) {
+    var _a3;
     if (!postURI)
       return;
-    const uri = breakFeedUri(postURI);
-    if (!(uri == null ? void 0 : uri.shortDID) || !uri.postID)
+    const shortDID = (_a3 = breakFeedUri(postURI)) == null ? void 0 : _a3.shortDID;
+    if (!shortDID)
       return;
-    let repoData = store.get(uri.shortDID);
+    let repoData = store.get(shortDID);
     if (!repoData)
-      store.set(uri.shortDID, repoData = createRepoData(uri.shortDID));
-    const existingPost = repoData.posts.get(uri.postID);
+      store.set(shortDID, repoData = createRepoData(shortDID));
+    const existingPost = repoData.posts.get(postURI);
     if (existingPost)
       return existingPost;
-    const speculativePost = createSpeculativePost(uri.shortDID, uri.postID);
-    repoData.posts.set(uri.postID, speculativePost);
+    const speculativePost = createSpeculativePost(shortDID, postURI);
+    repoData.posts.set(postURI, speculativePost);
     return speculativePost;
   }
 
@@ -101300,7 +101291,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       repos: store.repos
     };
     function captureRecord(record, now) {
-      return captureAllRecords(record.repo, record.rev, record, store.repos, now, intercepts);
+      return captureAllRecords(record.repo, record.uri, record, store.repos, now, intercepts);
     }
     function captureThreadView(threadView, now) {
       return captureThread(threadView, store.repos, now, intercepts);
@@ -101980,11 +101971,11 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     const db2 = useDB();
     const { bestThreads } = forAwait("now", () => getFirehoseThreads(db2)) || {};
     return /* @__PURE__ */ import_react11.default.createElement("div", { className: "fun-background" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "fun-background-scroller" }, bestThreads && bestThreads.map((thread, i) => {
-      var _a3, _b;
+      var _a3;
       return /* @__PURE__ */ import_react11.default.createElement(
         ThreadBubble,
         {
-          key: ((_a3 = thread == null ? void 0 : thread.current) == null ? void 0 : _a3.shortDID) + ((_b = thread == null ? void 0 : thread.current) == null ? void 0 : _b.rev) || "undefined",
+          key: ((_a3 = thread == null ? void 0 : thread.current) == null ? void 0 : _a3.uri) || "undefined",
           thread
         }
       );
@@ -102002,8 +101993,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           const now = Date.now();
           const threadTooOld = now - POST_MAX_AGE;
           for (const oldThread of bestCurrentThreads) {
-            const currentURI = makeFeedUri(oldThread.current.shortDID, oldThread.current.rev);
-            const seen = seenPostWhen.get(currentURI);
+            const seen = seenPostWhen.get(oldThread.current.uri);
             if (seen && seen > threadTooOld) {
               bestThreads.push(oldThread);
             }
@@ -102012,10 +102002,9 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           for (const thread of chunk) {
             if (!((_a3 = thread == null ? void 0 : thread.current) == null ? void 0 : _a3.text))
               continue;
-            const currentURI = makeFeedUri(thread.current.shortDID, thread.current.rev);
-            if (seenPostWhen.has(currentURI))
+            if (seenPostWhen.has(thread.current.uri))
               continue;
-            seenPostWhen.set(currentURI, now);
+            seenPostWhen.set(thread.current.uri, now);
             newThreads.push(thread);
           }
           newThreads.sort((t1, t2) => {
@@ -102046,9 +102035,9 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     });
   }
   function ThreadBubble({ thread }) {
-    var _a3, _b, _c;
+    var _a3, _b;
     const db2 = useDB();
-    const hash2 = calcHash(((_a3 = thread == null ? void 0 : thread.current) == null ? void 0 : _a3.shortDID) + " " + ((_b = thread == null ? void 0 : thread.current) == null ? void 0 : _b.rev));
+    const hash2 = calcHash((_a3 = thread == null ? void 0 : thread.current) == null ? void 0 : _a3.uri);
     let rnd = nextRandom(Math.abs(hash2 / 1e3 + hash2));
     const slideDuration = 20 + rnd * 30;
     rnd = nextRandom(rnd);
@@ -102095,13 +102084,13 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         },
         /* @__PURE__ */ import_react11.default.createElement(AccountLabel, { className: "fun-background-thread-author", account: thread.current.shortDID }),
         /* @__PURE__ */ import_react11.default.createElement(PreFormatted, { className: "fun-background-thread-content", text: thread.current.text }),
-        /* @__PURE__ */ import_react11.default.createElement("div", { className: "fun-background-thread-likes" }, /* @__PURE__ */ import_react11.default.createElement(FavoriteBorder_default, null), !((_c = thread == null ? void 0 : thread.current) == null ? void 0 : _c.likeCount) ? "" : thread.current.likeCount.toLocaleString())
+        /* @__PURE__ */ import_react11.default.createElement("div", { className: "fun-background-thread-likes" }, /* @__PURE__ */ import_react11.default.createElement(FavoriteBorder_default, null), !((_b = thread == null ? void 0 : thread.current) == null ? void 0 : _b.likeCount) ? "" : thread.current.likeCount.toLocaleString())
       )
     );
   }
 
   // package.json
-  var version5 = "0.2.10";
+  var version5 = "0.2.11";
 
   // src/landing/landing.js
   var uppercase_GIST = localise("\u{1D4D6}\u{1D4D8}\u{1D4E2}\u{1D4E3}", { uk: "\u{1D4F7}\u{1D4EE}\u{1D4F9}\u{1D4EE}\u{1D4EC}\u{1D502}\u{1D4F0}" });
@@ -102216,24 +102205,12 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
 
   // src/widgets/post/post.js
   var import_react15 = __toESM(require_react());
-  function Post({ post }) {
-    return /* @__PURE__ */ import_react15.default.createElement(PostFrame, null, typeof post === "string" ? /* @__PURE__ */ import_react15.default.createElement(LoadingPostInProgress, { post }) : /* @__PURE__ */ import_react15.default.createElement(LoadedPost, { post }));
-  }
-  function PostFrame({ children }) {
-    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-frame-outer" }, children);
-  }
-  function LoadingPostInProgress({ post }) {
-    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-loading-in-progress" }, localise("Post is loading...", { uk: "\u0417\u0430\u0447\u0435\u043A\u0430\u0439\u0442\u0435..." }));
-  }
-  function LoadedPost({ post }) {
-    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-loaded-content" }, /* @__PURE__ */ import_react15.default.createElement(AccountLabel, { className: "post-author", account: post.shortDID }), /* @__PURE__ */ import_react15.default.createElement(PreFormatted, { className: "post-content", text: post.text }), /* @__PURE__ */ import_react15.default.createElement("div", { className: "post-likes" }, /* @__PURE__ */ import_react15.default.createElement(FavoriteBorder_default, null), !(post == null ? void 0 : post.likeCount) ? "" : post.likeCount.toLocaleString()));
-  }
 
   // src/history/timeline.js
   function Timeline({ shortDID }) {
     const db2 = useDB();
-    const [{ timeline } = [], next2] = useForAwait(shortDID, getTimeline);
-    return /* @__PURE__ */ import_react16.default.createElement(import_react16.default.Fragment, null, !timeline ? void 0 : timeline.map((post, i) => /* @__PURE__ */ import_react16.default.createElement(Post, { key: i, post })), /* @__PURE__ */ import_react16.default.createElement(
+    const [retrieved, next2] = useForAwait(shortDID, getTimeline);
+    return /* @__PURE__ */ import_react16.default.createElement(import_react16.default.Fragment, null, !retrieved.timeline ? void 0 : retrieved.timeline.map((thread, i) => /* @__PURE__ */ import_react16.default.createElement(ThreadView, { key: i, thread, shortDID })), /* @__PURE__ */ import_react16.default.createElement(
       Visible,
       {
         onVisible: () => next2()
@@ -102260,10 +102237,45 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
                 throw error[0];
             }
           }
+          let historicalPostThreads = [];
           try {
             for (var iter2 = __forAwait(db2.searchPostsIncrementally(shortDID2, void 0)), more2, temp2, error2; more2 = !(temp2 = yield new __await(iter2.next())).done; more2 = false) {
               const entries = temp2.value;
-              yield { timeline: entries };
+              if (!(entries == null ? void 0 : entries.length))
+                continue;
+              const threadStarts = [...new Set(entries.map((post) => post.threadStart))];
+              const threads = [];
+              let resolveCount = 0;
+              let allResolved = () => {
+              };
+              let allResolvedPromise = new Promise((resolve) => allResolved = resolve);
+              for (let i = 0; i < threadStarts.length; i++) {
+                const threadIndex = i;
+                (() => __async(this, null, function* () {
+                  try {
+                    for (var iter3 = __forAwait(db2.getPostThreadIncrementally(threadStarts[threadIndex])), more3, temp3, error3; more3 = !(temp3 = yield iter3.next()).done; more3 = false) {
+                      const postThread = temp3.value;
+                      if (postThread)
+                        threads[threadIndex] = postThread;
+                    }
+                  } catch (temp3) {
+                    error3 = [temp3];
+                  } finally {
+                    try {
+                      more3 && (temp3 = iter3.return) && (yield temp3.call(iter3));
+                    } finally {
+                      if (error3)
+                        throw error3[0];
+                    }
+                  }
+                  resolveCount++;
+                  if (resolveCount === threadStarts.length)
+                    allResolved();
+                }))();
+              }
+              yield new __await(allResolvedPromise);
+              historicalPostThreads = historicalPostThreads.concat(threads);
+              yield { timeline: historicalPostThreads };
             }
           } catch (temp2) {
             error2 = [temp2];
@@ -102281,6 +102293,8 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         }
       });
     }
+  }
+  function ThreadView({ shortDID, thread }) {
   }
 
   // src/history/history-page-decorations.js
