@@ -79,3 +79,6 @@
 [submodule "index/z"]
 	path = index/z
 	url = https://github.com/colds-ky/index-z
+[submodule "index/j"]
+	path = index/j
+	url = https://github.com/colds-ky/index-j
