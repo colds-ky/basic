@@ -1207,7 +1207,7 @@
             }
             return dispatcher.useContext(Context);
           }
-          function useState12(initialState) {
+          function useState13(initialState) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useState(initialState);
           }
@@ -1215,11 +1215,11 @@
             var dispatcher = resolveDispatcher();
             return dispatcher.useReducer(reducer, initialArg, init);
           }
-          function useRef18(initialValue) {
+          function useRef19(initialValue) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useRef(initialValue);
           }
-          function useEffect15(create5, deps) {
+          function useEffect16(create5, deps) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useEffect(create5, deps);
           }
@@ -2001,15 +2001,15 @@
           exports.useContext = useContext11;
           exports.useDebugValue = useDebugValue3;
           exports.useDeferredValue = useDeferredValue;
-          exports.useEffect = useEffect15;
+          exports.useEffect = useEffect16;
           exports.useId = useId2;
           exports.useImperativeHandle = useImperativeHandle4;
           exports.useInsertionEffect = useInsertionEffect3;
           exports.useLayoutEffect = useLayoutEffect5;
           exports.useMemo = useMemo8;
           exports.useReducer = useReducer;
-          exports.useRef = useRef18;
-          exports.useState = useState12;
+          exports.useRef = useRef19;
+          exports.useState = useState13;
           exports.useSyncExternalStore = useSyncExternalStore;
           exports.useTransition = useTransition;
           exports.version = ReactVersion;
@@ -2505,9 +2505,9 @@
           if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
             __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
           }
-          var React68 = require_react();
+          var React69 = require_react();
           var Scheduler = require_scheduler();
-          var ReactSharedInternals = React68.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+          var ReactSharedInternals = React69.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
           var suppressWarning = false;
           function setSuppressWarning(newSuppressWarning) {
             {
@@ -4112,7 +4112,7 @@
             {
               if (props.value == null) {
                 if (typeof props.children === "object" && props.children !== null) {
-                  React68.Children.forEach(props.children, function(child) {
+                  React69.Children.forEach(props.children, function(child) {
                     if (child == null) {
                       return;
                     }
@@ -12559,7 +12559,7 @@
             }
           }
           var fakeInternalInstance = {};
-          var emptyRefsObject = new React68.Component().refs;
+          var emptyRefsObject = new React69.Component().refs;
           var didWarnAboutStateAssignmentForComponent;
           var didWarnAboutUninitializedState;
           var didWarnAboutGetSnapshotBeforeUpdateWithoutDidUpdate;
@@ -27011,7 +27011,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
       if (true) {
         (function() {
           "use strict";
-          var React68 = require_react();
+          var React69 = require_react();
           var REACT_ELEMENT_TYPE = Symbol.for("react.element");
           var REACT_PORTAL_TYPE = Symbol.for("react.portal");
           var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
@@ -27037,7 +27037,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
             }
             return null;
           }
-          var ReactSharedInternals = React68.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+          var ReactSharedInternals = React69.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
           function error(format3) {
             {
               {
@@ -27904,7 +27904,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
         value: true
       });
       exports.default = StyledEngineProvider;
-      var React68 = _interopRequireWildcard(require_react());
+      var React69 = _interopRequireWildcard(require_react());
       var _propTypes = _interopRequireDefault(require_prop_types());
       var _react2 = (init_emotion_react_browser_esm(), __toCommonJS(emotion_react_browser_esm_exports));
       var _cache = _interopRequireDefault((init_emotion_cache_browser_esm(), __toCommonJS(emotion_cache_browser_esm_exports)));
@@ -27994,7 +27994,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
         value: true
       });
       exports.default = GlobalStyles3;
-      var React68 = _interopRequireWildcard(require_react());
+      var React69 = _interopRequireWildcard(require_react());
       var _propTypes = _interopRequireDefault(require_prop_types());
       var _react2 = (init_emotion_react_browser_esm(), __toCommonJS(emotion_react_browser_esm_exports));
       var _jsxRuntime = require_jsx_runtime();
@@ -75745,7 +75745,7 @@ if (cid) {
   });
 
   // src/index.js
-  var import_react14 = __toESM(require_react());
+  var import_react16 = __toESM(require_react());
   var import_client = __toESM(require_client());
 
   // node_modules/react-router-dom/dist/index.js
@@ -97060,100 +97060,103 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
 
   // coldsky/src/api/akpa.js
   function streamBuffer(callback) {
-    return __asyncGenerator(this, null, function* () {
-      let finallyTrigger = () => {
-        args.isEnded = true;
-      };
-      let stop = false;
-      let buffer2;
-      let continueTrigger = () => {
-      };
-      let continuePromise = new Promise((resolve) => continueTrigger = function continueTriggerInitiallySet() {
-        resolve();
-      });
-      let yieldPassedTrigger = () => {
-      };
-      let yieldPassedPromise = new Promise((resolve) => yieldPassedTrigger = resolve);
-      let rejectError;
-      const args = {
-        yield: yieldFn,
-        reject,
-        complete,
-        isEnded: false,
-        finally: new Promise((resolve) => {
-          finallyTrigger = () => {
-            args.isEnded = true;
-            resolve();
-          };
-        })
-      };
-      callback(args);
-      try {
-        while (!stop) {
-          yield new __await(continuePromise);
-          if (rejectError)
-            throw rejectError.error;
-          if (stop)
-            return;
-          continuePromise = new Promise((resolve) => continueTrigger = function continueTriggerSubsequentlySet() {
-            resolve();
-          });
-          const yieldBuffer = buffer2;
-          buffer2 = void 0;
-          if (yieldBuffer) {
-            yield yieldBuffer;
-            const yieldCompleted = yieldPassedTrigger;
-            yieldPassedPromise = new Promise((resolve) => yieldPassedTrigger = resolve);
-            yieldCompleted();
-          }
-        }
-      } finally {
-        finallyTrigger();
-      }
-      function yieldFn(item, combine3) {
-        if (stop) {
-          console.error("Cannot yield after complete.");
-          return (
-            /** @type Promise<void> */
-            new Promise((resolve) => resolve())
-          );
-        }
-        if (rejectError) {
-          console.error("Cannot yield after reject.");
-          return (
-            /** @type Promise<void> */
-            new Promise((resolve) => resolve())
-          );
-        }
-        if (typeof combine3 === "function") {
-          buffer2 = combine3(buffer2, item);
-        } else {
-          if (!buffer2)
-            buffer2 = /** @type {TBuffer} */
-            [];
-          buffer2.push(item);
-        }
-        continueTrigger();
-        return yieldPassedPromise;
-      }
-      function reject(error) {
-        if (stop) {
-          console.error("Cannot reject after complete.");
-          return;
-        }
-        if (rejectError) {
-          console.error("Cannot reject after reject.");
-          return;
-        }
-        rejectError = { error };
-        args.isEnded = true;
-      }
-      function complete() {
-        stop = true;
-        args.isEnded = true;
-        continueTrigger();
-      }
+    let finallyTrigger = () => {
+      args.isEnded = true;
+    };
+    let stop = false;
+    let buffer2;
+    let continueTrigger = () => {
+    };
+    let continuePromise = new Promise((resolve) => continueTrigger = function continueTriggerInitiallySet() {
+      resolve();
     });
+    let yieldPassedTrigger = () => {
+    };
+    let yieldPassedPromise = new Promise((resolve) => yieldPassedTrigger = resolve);
+    let rejectError;
+    const args = {
+      yield: yieldFn,
+      reject,
+      complete,
+      isEnded: false,
+      finally: new Promise((resolve) => {
+        finallyTrigger = () => {
+          args.isEnded = true;
+          resolve();
+        };
+      })
+    };
+    callback(args);
+    return iterate();
+    function iterate() {
+      return __asyncGenerator(this, null, function* () {
+        try {
+          while (!stop) {
+            yield new __await(continuePromise);
+            if (rejectError)
+              throw rejectError.error;
+            if (stop)
+              return;
+            continuePromise = new Promise((resolve) => continueTrigger = function continueTriggerSubsequentlySet() {
+              resolve();
+            });
+            const yieldBuffer = buffer2;
+            buffer2 = void 0;
+            if (yieldBuffer) {
+              yield yieldBuffer;
+              const yieldCompleted = yieldPassedTrigger;
+              yieldPassedPromise = new Promise((resolve) => yieldPassedTrigger = resolve);
+              yieldCompleted();
+            }
+          }
+        } finally {
+          finallyTrigger();
+        }
+      });
+    }
+    function yieldFn(item, combine3) {
+      if (stop) {
+        console.error("Cannot yield after complete.");
+        return (
+          /** @type Promise<void> */
+          new Promise((resolve) => resolve())
+        );
+      }
+      if (rejectError) {
+        console.error("Cannot yield after reject.");
+        return (
+          /** @type Promise<void> */
+          new Promise((resolve) => resolve())
+        );
+      }
+      if (typeof combine3 === "function") {
+        buffer2 = combine3(buffer2, item);
+      } else {
+        if (!buffer2)
+          buffer2 = /** @type {TBuffer} */
+          [];
+        buffer2.push(item);
+      }
+      continueTrigger();
+      return yieldPassedPromise;
+    }
+    function reject(error) {
+      if (stop) {
+        console.error("Cannot reject after complete.");
+        return;
+      }
+      if (rejectError) {
+        console.error("Cannot reject after reject.");
+        return;
+      }
+      rejectError = { error };
+      args.isEnded = true;
+    }
+    function complete() {
+      stop = true;
+      args.isEnded = true;
+      continueTrigger();
+    }
   }
 
   // node_modules/fuse.js/dist/fuse.esm.js
@@ -98462,7 +98465,17 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // src/api/record-cache.js
-  var db = new import_wrapper_default("atproto-cache");
+  var db = (
+    /**
+    * @type {Dexie & {
+    *  records: Dexie.Table<HistoryPostRecord, string>,
+    *  likes: Dexie.Table<HistoryLikeRecord, string>,
+    *  reposts: Dexie.Table<HistoryRepostRecord, string>,
+    *  accounts: Dexie.Table<AccountRecord, string>
+    * }}
+    */
+    new import_wrapper_default("atproto-cache")
+  );
   db.version(9).stores({
     records: "uri, did, cid, time, thread, reply, qt, *w",
     likes: "did, uri, time",
@@ -98480,7 +98493,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       const cacheByDIDPromise = !likelyDID(handleOrDID) ? void 0 : resolveDIDFromCache(handleOrDID);
       const cacheByHandlePromise = resolveHandleFromCache(handleOrDID);
       const raceCachePromise = !cacheByDIDPromise ? cacheByHandlePromise : new Promise(
-        /** @param {(value: ProfileView) => void} resolve */
+        /** @param {(value: ProfileView | undefined) => void} resolve */
         (resolve) => {
           cacheByDIDPromise.then(resolve);
           cacheByHandlePromise.then(resolve);
@@ -98517,6 +98530,13 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     return __async(this, null, function* () {
       const matchByDID = yield db.accounts.where("did").equals(unwrapShortDID(did)).first();
       return matchByDID;
+    });
+  }
+  function resolvePlcDirectly(did) {
+    return __async(this, null, function* () {
+      const fullDID = unwrapShortDID(did);
+      const entries = yield fetch(`https://plc.directory/${fullDID}/log/audit`).then((x) => x.json());
+      return entries;
     });
   }
   function searchAccounts(text) {
@@ -98570,7 +98590,8 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
                 if (!entry.w) {
                   storeNewAccountsByShortDID.set(shortDID, entry);
                   clearTimeout(storeNewAccoutsDebounce);
-                  storeNewAccoutsDebounce = setTimeout(propagateStoreNewAccountsToCache, 1e3);
+                  storeNewAccoutsDebounce = /** @type {*} */
+                  setTimeout(propagateStoreNewAccountsToCache, 1e3);
                 }
               }
               if (!existing) {
@@ -98587,7 +98608,11 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       })
     );
     function propagateStoreNewAccountsToCache() {
-      const accounts = Array.from(storeNewAccountsByShortDID.values()).map((ac) => {
+      const accounts = Array.from(storeNewAccountsByShortDID.values()).map((prof) => {
+        const ac = (
+          /** @type {AccountRecord} */
+          prof
+        );
         const wordLeads = populateWordLeads(ac.displayName, []);
         populateWordLeads(ac.handle, wordLeads);
         populateWordLeads(ac.description, wordLeads);
@@ -98618,9 +98643,11 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       return;
     accountsToStoreInCacheByShortDID.set(shortDID, account);
     if (!maxDebounceAccountsToStoreInCache)
-      maxDebounceAccountsToStoreInCache = setTimeout(cacheAccountsNow, 3100);
+      maxDebounceAccountsToStoreInCache = /** @type {*} */
+      setTimeout(cacheAccountsNow, 3100);
     clearTimeout(debounceAccountsToStoreInCache);
-    debounceAccountsToStoreInCache = setTimeout(cacheAccountsNow, 300);
+    debounceAccountsToStoreInCache = /** @type {*} */
+    setTimeout(cacheAccountsNow, 300);
   }
   var postsToStoreInCacheByURI = /* @__PURE__ */ new Map();
   var likesToStoreInCacheByShortDIDAndURI = /* @__PURE__ */ new Map();
@@ -98694,7 +98721,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         uri: p.uri,
         did: p.author.did,
         cid: p.cid,
-        time: rec.createdAt && new Date(rec.createdAt).getTime(),
+        time: rec.createdAt ? new Date(rec.createdAt).getTime() : void 0,
         text,
         thread,
         reply,
@@ -98730,26 +98757,56 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     }
   }
   function collectPostText(post, textArray) {
-    var _a3, _b, _c;
+    var _a3, _b;
     if (!post)
       return textArray;
     if (post.text)
       textArray.push(post.text);
     if (post.embed) {
-      if ((_a3 = post.embed.images) == null ? void 0 : _a3.length) {
-        for (const img of post.embed.images) {
+      const embedImages = (
+        /** @type {import('@atproto/api').AppBskyEmbedImages.Main} */
+        post.embed
+      );
+      if ((_a3 = embedImages.images) == null ? void 0 : _a3.length) {
+        for (const img of embedImages.images) {
           if (img.alt)
             textArray.push(img.alt);
-          if (img.title)
-            textArray.push(img.title);
         }
       }
-      if ((_c = (_b = post.embed.media) == null ? void 0 : _b.images) == null ? void 0 : _c.length) {
-        for (const img of post.embed.media.images) {
-          if (img.alt)
-            textArray.push(img.alt);
-          if (img.title)
-            textArray.push(img.title);
+      const embedExternal = (
+        /** @type {import('@atproto/api').AppBskyEmbedExternal.Main} */
+        post.embed
+      );
+      if (embedExternal.external) {
+        if (embedExternal.external.title)
+          textArray.push(embedExternal.external.title);
+        if (embedExternal.external.description)
+          textArray.push(embedExternal.external.description);
+      }
+      const embedRecordWithMedia = (
+        /** @type {import('@atproto/api').AppBskyEmbedRecordWithMedia.Main} */
+        post.embed
+      );
+      if (embedRecordWithMedia.media) {
+        const mediaEmbedImages = (
+          /** @type {import('@atproto/api').AppBskyEmbedImages.Main} */
+          embedRecordWithMedia.media
+        );
+        if ((_b = mediaEmbedImages.images) == null ? void 0 : _b.length) {
+          for (const img of mediaEmbedImages.images) {
+            if (img.alt)
+              textArray.push(img.alt);
+          }
+        }
+        const mediaEmbedExternal = (
+          /** @type {import('@atproto/api').AppBskyEmbedExternal.Main} */
+          embedRecordWithMedia.media
+        );
+        if (mediaEmbedExternal.external) {
+          if (mediaEmbedExternal.external.title)
+            textArray.push(mediaEmbedExternal.external.title);
+          if (mediaEmbedExternal.external.description)
+            textArray.push(mediaEmbedExternal.external.description);
         }
       }
     }
@@ -98876,6 +98933,262 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         result.push(wLead);
     }
     return result;
+  }
+  var allHistoryRecordTypes = (
+    /** @type {const} */
+    ["app.bsky.feed.like", "app.bsky.feed.post", "app.bsky.feed.repost"]
+  );
+  function getProfileHistory(handleOrDID) {
+    return streamBuffer(
+      /**
+       * @param { import('../../coldsky/src/api/akpa').StreamParameters<
+       *  HistoryRecord[], HistoryRecord[]>} streaming
+       */
+      (streaming) => __async(this, null, function* () {
+        let profile = likelyDID(handleOrDID) ? yield resolveDIDFromCache(handleOrDID) : yield resolveHandleFromCache(handleOrDID);
+        if (!profile) {
+          try {
+            for (var iter = __forAwait(resolveHandleOrDIDToProfile(handleOrDID)), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
+              const pro = temp.value;
+              if (pro)
+                profile = pro;
+            }
+          } catch (temp) {
+            error = [temp];
+          } finally {
+            try {
+              more && (temp = iter.return) && (yield temp.call(iter));
+            } finally {
+              if (error)
+                throw error[0];
+            }
+          }
+        }
+        if (!profile)
+          throw new Error("Profile not found: " + handleOrDID);
+        const shortDID = shortenDID(profile.did);
+        const recordsPromise = db.records.where("did").equals(unwrapShortDID(shortDID)).toArray();
+        const likesPromise = db.likes.where("did").equals(shortDID).toArray();
+        const repostsPromise = db.reposts.where("did").equals(shortDID).toArray();
+        const earliest = {};
+        let result = [];
+        const recordsByURI = /* @__PURE__ */ new Map();
+        const likesByURIAndShortDID = /* @__PURE__ */ new Map();
+        const repostsByURIAndShortDID = /* @__PURE__ */ new Map();
+        recordsPromise.then(
+          (records) => {
+            var _a3;
+            const addedRecords = [];
+            for (const rec of records) {
+              if (recordsByURI.has(rec.uri))
+                continue;
+              if (rec.time) {
+                if (!earliest["app.bsky.feed.post"] || rec.time < earliest["app.bsky.feed.post"])
+                  earliest["app.bsky.feed.post"] = rec.time;
+              }
+              const historyRecord = (
+                /** @type {PostRecord} */
+                {
+                  $type: "app.bsky.feed.post",
+                  cid: rec.cid,
+                  did: rec.did,
+                  text: (_a3 = rec.text) == null ? void 0 : _a3[0],
+                  reply: rec.reply || rec.thread ? {
+                    root: rec.thread ? { uri: rec.thread } : void 0,
+                    parent: rec.reply ? { uri: rec.reply } : void 0
+                  } : void 0,
+                  createdAt: rec.time ? new Date(rec.time).toISOString() : (
+                    /** @type {*} */
+                    void 0
+                  )
+                }
+              );
+              addedRecords.push(historyRecord);
+              recordsByURI.set(rec.uri, historyRecord);
+            }
+            if (addedRecords.length) {
+              result = result.concat(addedRecords);
+              streaming.yield(result, (buf2) => result);
+            }
+          }
+        );
+        likesPromise.then(
+          (likes) => {
+            var _a3;
+            const addedLikes = [];
+            for (const rec of likes) {
+              const shortDID2 = shortenDID(rec.did);
+              if ((_a3 = likesByURIAndShortDID.get(rec.uri)) == null ? void 0 : _a3[shortDID2])
+                continue;
+              if (rec.time) {
+                const dt = new Date(rec.time).getTime();
+                if (!earliest["app.bsky.feed.like"] || dt < earliest["app.bsky.feed.like"])
+                  earliest["app.bsky.feed.like"] = dt;
+              }
+              const likeRecord = (
+                /** @type {LikeRecord} */
+                {
+                  subject: {
+                    uri: rec.uri
+                  },
+                  createdAt: rec.time ? new Date(rec.time).toISOString() : (
+                    /** @type {*} */
+                    void 0
+                  )
+                }
+              );
+              addedLikes.push(likeRecord);
+              let likesByURI = likesByURIAndShortDID.get(rec.uri);
+              if (likesByURI)
+                likesByURI[shortDID2] = likeRecord;
+              else
+                likesByURIAndShortDID.set(rec.uri, { [shortDID2]: likeRecord });
+            }
+            if (addedLikes.length) {
+              result = result.concat(addedLikes);
+              streaming.yield(result, (buf2) => result);
+            }
+          }
+        );
+        repostsPromise.then(
+          (reposts) => {
+            var _a3;
+            const addedReposts = [];
+            for (const rec of reposts) {
+              const shortDID2 = shortenDID(rec.did);
+              if ((_a3 = repostsByURIAndShortDID.get(rec.uri)) == null ? void 0 : _a3[shortDID2])
+                continue;
+              if (rec.time) {
+                const dt = new Date(rec.time).getTime();
+                if (!earliest["app.bsky.feed.repost"] || dt < earliest["app.bsky.feed.repost"])
+                  earliest["app.bsky.feed.repost"] = dt;
+              }
+              const repostRecord = (
+                /** @type {RepostRecord} */
+                {
+                  subject: {
+                    uri: rec.uri
+                  },
+                  createdAt: rec.time ? new Date(rec.time).toISOString() : (
+                    /** @type {*} */
+                    void 0
+                  )
+                }
+              );
+              addedReposts.push(repostRecord);
+              let repostsByURI = repostsByURIAndShortDID.get(rec.uri);
+              if (repostsByURI)
+                repostsByURI[shortDID2] = repostRecord;
+              else
+                repostsByURIAndShortDID.set(rec.uri, { [shortDID2]: repostRecord });
+            }
+            if (addedReposts.length) {
+              result = result.concat(addedReposts);
+              streaming.yield(result, (buf2) => result);
+            }
+          }
+        );
+        streaming.finally.then(() => {
+          console.log("getProfileHistory finally");
+        });
+        try {
+          for (var iter2 = __forAwait(getProfileHistoryViaListRecords(shortDID, earliest)), more2, temp2, error2; more2 = !(temp2 = yield iter2.next()).done; more2 = false) {
+            const chunk = temp2.value;
+            yield streaming.yield(chunk, (buf2) => buf2 ? buf2.concat(chunk) : chunk);
+          }
+        } catch (temp2) {
+          error2 = [temp2];
+        } finally {
+          try {
+            more2 && (temp2 = iter2.return) && (yield temp2.call(iter2));
+          } finally {
+            if (error2)
+              throw error2[0];
+          }
+        }
+        console.log("getProfileHistory just ended");
+      })
+    );
+  }
+  function getProfileHistoryViaListRecords(shortDID, earliest) {
+    return streamBuffer(
+      /**
+       * @param { import('../../coldsky/src/api/akpa').StreamParameters<
+       *  HistoryRecord[], HistoryRecord[]>} streaming
+       */
+      (streaming) => __async(this, null, function* () {
+        const pds = yield getPDS(shortDID);
+        if (!pds)
+          throw new Error("No PDS for DID: " + shortDID);
+        allHistoryRecordTypes.forEach(streamRecordBlocks);
+        function streamRecordBlocks(recordType) {
+          return __async(this, null, function* () {
+            const fullDID = unwrapShortDID(shortDID);
+            let nextCursor = "";
+            while (true) {
+              const url = `${pds}/xrpc/com.atproto.repo.listRecords?repo=${fullDID}&collection=${recordType}&limit=100&${!nextCursor ? "" : "&cursor=" + nextCursor}`;
+              const { records, cursor: cursor2 } = yield fetch(url).then((x) => x.json());
+              if (cursor2)
+                nextCursor = cursor2;
+              if (!records.length)
+                break;
+              const distilled = records.map(
+                recordType === "app.bsky.feed.post" ? (r2) => {
+                  const rec = r2.value;
+                  rec.uri = r2.uri;
+                  storePostIndexToCache({
+                    uri: rec.uri,
+                    record: rec,
+                    author: {
+                      did: rec.repo
+                    },
+                    indexedAt: rec.createdAt
+                  });
+                  return rec;
+                } : (r2) => r2.value
+              );
+              yield yieldRecords(distilled);
+            }
+            function yieldRecords(chunk) {
+              let earliestTime;
+              for (let rec of chunk) {
+                if (rec.createdAt) {
+                  const dt = new Date(rec.createdAt).getTime();
+                  if (!earliestTime || dt < earliestTime)
+                    earliestTime = dt;
+                }
+              }
+              const yielded = streaming.yield(chunk, (buf2) => buf2 ? buf2.concat(chunk) : chunk);
+              if (earliestTime) {
+                const existingEarliest = earliest[recordType];
+                if (!existingEarliest || existingEarliest > earliestTime)
+                  earliest[recordType] = earliestTime;
+              }
+              for (const anyRecordType of allHistoryRecordTypes) {
+                if (anyRecordType === recordType)
+                  continue;
+                const otherEarliestTime = earliest[anyRecordType];
+                if (!otherEarliestTime || !earliestTime || otherEarliestTime < earliestTime)
+                  return;
+              }
+              return yielded;
+            }
+          });
+        }
+      })
+    );
+  }
+  function getPDS(shortDID) {
+    return __async(this, null, function* () {
+      var _a3, _b, _c;
+      const plcEntries = yield resolvePlcDirectly(shortDID);
+      for (let i = 0; i < plcEntries.length; i++) {
+        const fromEnd = plcEntries[plcEntries.length - i - 1];
+        const pdsEndpoint = (_c = (_b = (_a3 = fromEnd.operation) == null ? void 0 : _a3.services) == null ? void 0 : _b.atproto_pds) == null ? void 0 : _c.endpoint;
+        if (pdsEndpoint)
+          return pdsEndpoint;
+      }
+    });
   }
 
   // src/api/firehose-threads.js
@@ -99040,6 +99353,22 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       state.hookUse(from7, derive)
     );
   }
+  function useForAwait(from7, derive) {
+    const [state, setState] = (0, import_react6.useState)(initAwaitState);
+    state.reactSetState = setState;
+    (0, import_react6.useEffect)(state.effectMount, []);
+    const current = (
+      /** @type {*} */
+      state.hookUse(from7, derive, true)
+    );
+    return [current, next2];
+    function next2() {
+      return (
+        /** @type {*} */
+        state.next()
+      );
+    }
+  }
   function initAwaitState() {
     return new AwaitState();
   }
@@ -99050,22 +99379,23 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       /** @type {boolean} */
       __publicField(this, "withinHook");
       /** @type {AwaitState | undefined} */
-      __publicField(this, "repalcedWith");
+      __publicField(this, "replacedWith");
       /**
        * @param {TFrom} from
        * @param {TSourceOf<TFrom, TTo>} derive
+       * @param {boolean} [firstTimeOnly]
        * @returns {TTo | undefined}
        */
-      __publicField(this, "hookUse", (from7, derive) => {
+      __publicField(this, "hookUse", (from7, derive, firstTimeOnly) => {
         this.withinHook = true;
         try {
-          if (this.repalcedWith)
-            return this.repalcedWith.hookUse(from7, derive);
+          if (this.replacedWith)
+            return this.replacedWith.hookUse(from7, derive, firstTimeOnly);
           if (!this.run || this.run.from !== from7) {
             if (this.run)
               this.finishExistingIteration();
             this.initializeNewValues(from7, derive);
-          } else {
+          } else if (!firstTimeOnly) {
             this.nudgeContinuationFromHook();
           }
           return this.run.current;
@@ -99073,15 +99403,31 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           this.withinHook = false;
         }
       });
+      __publicField(this, "next", () => {
+        if (this.withinHook)
+          return this.hookUse(this.run.from, this.run.derive);
+        if (this.replacedWith)
+          return this.replacedWith.next();
+        this.nudgeContinuationFromHook();
+        this.replacedWith = new _AwaitState();
+        this.replacedWith.run = this.run;
+        this.replacedWith.reactSetState = this.reactSetState;
+        this.reactSetState((oldState) => {
+          if (oldState !== this && oldState !== this.replacedWith)
+            oldState.replacedWith = this.replacedWith;
+          return this.replacedWith;
+        });
+        return this.run.current;
+      });
       __publicField(this, "effectMount", () => {
-        if (this.repalcedWith)
-          return this.repalcedWith.effectMount();
+        if (this.replacedWith)
+          return this.replacedWith.effectMount();
         this.nudgeContinuationFromHook();
         return this.effectUnmount;
       });
       __publicField(this, "effectUnmount", () => {
-        if (this.repalcedWith)
-          return this.repalcedWith.effectUnmount();
+        if (this.replacedWith)
+          return this.replacedWith.effectUnmount();
         this.run.finished = true;
         this.finishExistingIteration();
       });
@@ -99157,10 +99503,14 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     continueWithScalar(from7, run, value) {
       this.run.current = value;
       if (!this.withinHook) {
-        this.repalcedWith = new _AwaitState();
-        this.repalcedWith.run = this.run;
-        this.repalcedWith.reactSetState = this.reactSetState;
-        this.reactSetState(this.repalcedWith);
+        this.replacedWith = new _AwaitState();
+        this.replacedWith.run = this.run;
+        this.replacedWith.reactSetState = this.reactSetState;
+        this.reactSetState((oldState) => {
+          if (oldState !== this && oldState !== this.replacedWith)
+            oldState.replacedWith = this.replacedWith;
+          return this.replacedWith;
+        });
       }
     }
     /**
@@ -99542,7 +99892,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // package.json
-  var version4 = "0.2.6";
+  var version4 = "0.2.7";
 
   // src/localise.js
   function localise(english, languageMap) {
@@ -99655,7 +100005,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // src/history/history.js
-  var import_react13 = __toESM(require_react());
+  var import_react15 = __toESM(require_react());
 
   // src/api/unicode-styles/sanitize-for-regex.js
   var regex_escapeableRegexChars = /[#-.]|[[-^]|[?|{}]/g;
@@ -99953,16 +100303,78 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // src/history/timeline.js
+  var import_react14 = __toESM(require_react());
+
+  // src/widgets/visible.js
   var import_react12 = __toESM(require_react());
-  function Timeline() {
-    return /* @__PURE__ */ import_react12.default.createElement("button", null, "thread...");
+  var import_react13 = __toESM(require_react());
+  function Visible(_a3) {
+    var _b = _a3, { Component: Component2 = "div", onVisible, onObscured, rootMargin, threshold, children } = _b, rest = __objRest(_b, ["Component", "onVisible", "onObscured", "rootMargin", "threshold", "children"]);
+    let [visible, setVisible] = (0, import_react13.useState)(false);
+    const ref = (0, import_react13.useRef)(null);
+    (0, import_react13.useEffect)(() => {
+      if (!ref.current) {
+        return;
+      }
+      const observer = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting !== visible) {
+          setVisible(visible = entry.isIntersecting);
+          if (entry.isIntersecting)
+            onVisible == null ? void 0 : onVisible();
+          else
+            onObscured == null ? void 0 : onObscured();
+        }
+      }, {
+        rootMargin,
+        threshold
+      });
+      observer.observe(ref.current);
+      return () => observer.disconnect();
+    }, [ref.current]);
+    return /* @__PURE__ */ import_react12.default.createElement(Component2, __spreadValues({ ref }, rest), children);
+  }
+
+  // src/history/timeline.js
+  function Timeline({ shortDID }) {
+    const [{ timeline } = {}, next2] = useForAwait(shortDID, getTimeline);
+    return /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Fragment, null, !timeline ? void 0 : timeline.map((event, i) => /* @__PURE__ */ import_react14.default.createElement("div", { key: i }, JSON.stringify(event, null, 2))), /* @__PURE__ */ import_react14.default.createElement(
+      Visible,
+      {
+        onVisible: () => next2()
+      },
+      /* @__PURE__ */ import_react14.default.createElement("button", { onClick: () => next2() }, "Search more...")
+    ));
+  }
+  function getTimeline(shortDID) {
+    return __asyncGenerator(this, null, function* () {
+      try {
+        try {
+          for (var iter = __forAwait(getProfileHistory(shortDID)), more, temp, error; more = !(temp = yield new __await(iter.next())).done; more = false) {
+            const timeline = temp.value;
+            yield { timeline };
+          }
+        } catch (temp) {
+          error = [temp];
+        } finally {
+          try {
+            more && (temp = iter.return) && (yield new __await(temp.call(iter)));
+          } finally {
+            if (error)
+              throw error[0];
+          }
+        }
+        console.log("timeline to end...");
+      } finally {
+        console.log("timeline finally");
+      }
+    });
   }
 
   // src/history/history.js
   var middledot = "\xB7";
   function History() {
     let { handle } = useParams();
-    (0, import_react13.useEffect)(() => {
+    (0, import_react15.useEffect)(() => {
       document.documentElement.classList.add("account");
       if (!handle) {
         document.title = uppercase_GIST;
@@ -99983,7 +100395,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         document.title = title;
       }
     });
-    return /* @__PURE__ */ import_react13.default.createElement(HistoryCore, null);
+    return /* @__PURE__ */ import_react15.default.createElement(HistoryCore, null);
   }
   function HistoryCore() {
     let { handle } = useParams();
@@ -99998,19 +100410,19 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       placeholder: true
     };
     console.log("profile ", resolved);
-    return /* @__PURE__ */ import_react13.default.createElement("div", { className: "history-view" }, /* @__PURE__ */ import_react13.default.createElement(
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "history-view" }, /* @__PURE__ */ import_react15.default.createElement(
       "div",
       {
         className: suffixClassWhenEmpty("history-account-banner-bg", resolved.banner),
         style: !resolved.banner ? void 0 : { backgroundImage: `url(${resolved.banner})` }
       }
-    ), /* @__PURE__ */ import_react13.default.createElement(
+    ), /* @__PURE__ */ import_react15.default.createElement(
       "div",
       {
         className: suffixClassWhenEmpty("history-account-avatar", resolved.avatar),
         style: !resolved.avatar ? void 0 : { backgroundImage: `url(${resolved.avatar})` }
       }
-    ), /* @__PURE__ */ import_react13.default.createElement("div", { className: suffixClassWhenEmpty("history-account-displayName-and-handle", resolved.displayName) }, /* @__PURE__ */ import_react13.default.createElement("span", { className: "history-account-displayName" }, resolved.displayName), /* @__PURE__ */ import_react13.default.createElement("div", { className: "history-account-handle" }, /* @__PURE__ */ import_react13.default.createElement("span", { className: "at-sign" }, "@"), /* @__PURE__ */ import_react13.default.createElement(FullHandle, { shortHandle: resolved.handle }))), /* @__PURE__ */ import_react13.default.createElement("div", { className: "unmoved-sticky-background" }), /* @__PURE__ */ import_react13.default.createElement("div", { className: suffixClassWhenEmpty("history-account-description", resolved.description) }, resolved.description), /* @__PURE__ */ import_react13.default.createElement("div", { className: "timeline-container" }, /* @__PURE__ */ import_react13.default.createElement(Timeline, null), /* @__PURE__ */ import_react13.default.createElement("pre", null, JSON.stringify(resolved, null, 2), /* @__PURE__ */ import_react13.default.createElement("hr", null), /* @__PURE__ */ import_react13.default.createElement("div", { style: { opacity: 0.6 } }, JSON.stringify(resolved, null, 2)), /* @__PURE__ */ import_react13.default.createElement("br", null), /* @__PURE__ */ import_react13.default.createElement("br", null), /* @__PURE__ */ import_react13.default.createElement("hr", null), JSON.stringify(resolved, null, 2))));
+    ), /* @__PURE__ */ import_react15.default.createElement("div", { className: suffixClassWhenEmpty("history-account-displayName-and-handle", resolved.displayName) }, /* @__PURE__ */ import_react15.default.createElement("span", { className: "history-account-displayName" }, resolved.displayName), /* @__PURE__ */ import_react15.default.createElement("div", { className: "history-account-handle" }, /* @__PURE__ */ import_react15.default.createElement("span", { className: "at-sign" }, "@"), /* @__PURE__ */ import_react15.default.createElement(FullHandle, { shortHandle: resolved.handle }))), /* @__PURE__ */ import_react15.default.createElement("div", { className: "unmoved-sticky-background" }), /* @__PURE__ */ import_react15.default.createElement("div", { className: suffixClassWhenEmpty("history-account-description", resolved.description) }, resolved.description), /* @__PURE__ */ import_react15.default.createElement("div", { className: "timeline-container" }, /* @__PURE__ */ import_react15.default.createElement(Timeline, { shortDID: handle })));
   }
   function suffixClassWhenEmpty(className, value) {
     return value ? className : className + " " + className + "-empty";
@@ -100022,9 +100434,9 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     const useRouter = /file/i.test(location.protocol) ? createHashRouter : createBrowserRouter;
     const router = useRouter(
       [
-        { path: "/", element: /* @__PURE__ */ import_react14.default.createElement(Landing, null) },
-        { path: "/index.html", element: /* @__PURE__ */ import_react14.default.createElement(Landing, null) },
-        { path: "/:handle", element: /* @__PURE__ */ import_react14.default.createElement(History, null) }
+        { path: "/", element: /* @__PURE__ */ import_react16.default.createElement(Landing, null) },
+        { path: "/index.html", element: /* @__PURE__ */ import_react16.default.createElement(Landing, null) },
+        { path: "/:handle", element: /* @__PURE__ */ import_react16.default.createElement(History, null) }
       ],
       {
         basename
@@ -100056,7 +100468,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       }
     });
     (0, import_client.createRoot)(root).render(
-      /* @__PURE__ */ import_react14.default.createElement(ThemeProvider5, { theme }, /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Fragment, null, /* @__PURE__ */ import_react14.default.createElement(RouterProvider, { router })))
+      /* @__PURE__ */ import_react16.default.createElement(ThemeProvider5, { theme }, /* @__PURE__ */ import_react16.default.createElement(import_react16.default.Fragment, null, /* @__PURE__ */ import_react16.default.createElement(RouterProvider, { router })))
     );
   }
   runApp();

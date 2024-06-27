@@ -70,6 +70,7 @@ function HistoryCore() {
 
   console.log('profile ', resolved);
 
+
   return (
     <div className='history-view'>
 
@@ -101,19 +102,9 @@ function HistoryCore() {
       </div>
 
       <div className='timeline-container'>
-        <Timeline />
-        <pre>
-          {JSON.stringify(resolved, null, 2)}
-          <hr />
-          <div style={{ opacity: 0.6 }}>
-            {JSON.stringify(resolved, null, 2)}
-          </div>
-
-          <br /><br />
-          <hr />
-          {JSON.stringify(resolved, null, 2)}
-          
-        </pre>
+        {
+          <Timeline shortDID={handle} />
+        }
       </div>
 
     </div>

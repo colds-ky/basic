@@ -6,7 +6,56 @@ import { BSKY_PUBLIC_URL } from '../../coldsky/lib/coldsky-agent';
 import { streamBuffer } from '../../coldsky/src/api/akpa';
 import Fuse from 'fuse.js';
 
-const db = new Dexie("atproto-cache");
+/**
+ * @typedef {{
+ *  uri: string,
+ *  did: string,
+ *  cid: string,
+ *  time?: number,
+ *  text?: string[],
+ *  thread?: string,
+ *  reply?: string,
+ *  qt?: string,
+ *  w: string[]
+ * }} HistoryPostRecord
+ */
+
+/**
+ * @typedef {{
+ *  did: string,
+ *  uri: string,
+ *  time: number
+ * }} HistoryLikeRecord
+ */
+
+/**
+ * @typedef {{
+ *  did: string,
+ *  uri: string,
+ *  time: number
+ *  }} HistoryRepostRecord
+ */
+
+/**
+ * @typedef {ProfileView & { w: string[] }} AccountRecord
+ */
+
+/** @typedef {import ('@atproto/api/dist/client/types/app/bsky/actor/defs').ProfileView} ProfileView */
+/** @typedef {import ('@atproto/api/dist/client/types/app/bsky/actor/defs').ProfileViewBasic} ProfileViewBasic */
+/** @typedef {import ('@atproto/api/dist/client/types/app/bsky/actor/defs').ProfileViewDetailed} ProfileViewDetailed */
+
+/** @typedef {import('../../coldsky/lib/firehose').FirehoseMessageRecordTypes['app.bsky.feed.like']} LikeRecord */
+/** @typedef {import('../../coldsky/lib/firehose').FirehoseMessageRecordTypes['app.bsky.feed.post']} PostRecord */
+/** @typedef {import('../../coldsky/lib/firehose').FirehoseMessageRecordTypes['app.bsky.feed.repost']} RepostRecord */
+
+const db = /**
+ * @type {Dexie & {
+ *  records: Dexie.Table<HistoryPostRecord, string>,
+ *  likes: Dexie.Table<HistoryLikeRecord, string>,
+ *  reposts: Dexie.Table<HistoryRepostRecord, string>,
+ *  accounts: Dexie.Table<AccountRecord, string>
+ * }}
+ */(new Dexie("atproto-cache"));
 db.version(9).stores({
   records: 'uri, did, cid, time, thread, reply, qt, *w',
   likes: 'did, uri, time',
@@ -17,18 +66,6 @@ db.version(9).stores({
 const publicAgent = new ColdskyAgent({
   service: BSKY_PUBLIC_URL
 });
-
-/**
- * @typedef {import ('@atproto/api/dist/client/types/app/bsky/actor/defs').ProfileView} ProfileView
- */
-
-/**
- * @typedef {import ('@atproto/api/dist/client/types/app/bsky/actor/defs').ProfileViewBasic} ProfileViewBasic
- */
-
-/**
- * @typedef {import ('@atproto/api/dist/client/types/app/bsky/actor/defs').ProfileViewDetailed} ProfileViewDetailed
- */
 
 /**
  * @returns {AsyncIterable<ProfileViewDetailed>}
@@ -42,7 +79,7 @@ export async function* resolveHandleOrDIDToProfile(handleOrDID) {
   const cacheByHandlePromise = resolveHandleFromCache(handleOrDID);
 
   const raceCachePromise = !cacheByDIDPromise ? cacheByHandlePromise : new Promise(
-    /** @param {(value: ProfileView) => void} resolve */
+    /** @param {(value: ProfileView | undefined) => void} resolve */
     resolve => {
       cacheByDIDPromise.then(resolve);
       cacheByHandlePromise.then(resolve);
@@ -86,7 +123,7 @@ export async function resolveProfileViaRequest(handleOrDID) {
 
 /**
  * @param {string} handle
- * @returns {Promise<ProfileViewBasic | ProfileView | undefined>}
+ * @returns {Promise<ProfileView | undefined>}
  */
 async function resolveHandleFromCache(handle) {
   const matchByHandle = await db.accounts.where('handle').equals(unwrapShortHandle(handle)).first();
@@ -95,7 +132,7 @@ async function resolveHandleFromCache(handle) {
 
 /**
  * @param {string} did
- * @returns {Promise<ProfileViewBasic | ProfileView | undefined>}
+ * @returns {Promise<ProfileView | undefined>}
  */
 async function resolveDIDFromCache(did) {
   const matchByDID = await db.accounts.where('did').equals(unwrapShortDID(did)).first();
@@ -148,7 +185,7 @@ export function searchAccounts(text) {
   const wordSearchFullPromises = words.map(word => directSearchAccountsFull(word));
   const cachedResults = searchAccountsFromCache(normalizedText);
 
-  /** @type {Map<string, ProfileViewBasic | ProfileView>} */
+  /** @type {Map<string, ProfileView>} */
   const storeNewAccountsByShortDID = new Map();
   let storeNewAccoutsDebounce = 0;
 
@@ -206,7 +243,7 @@ export function searchAccounts(text) {
               // for accounts directly from cache, don't store them back to cache
               storeNewAccountsByShortDID.set(shortDID, entry);
               clearTimeout(storeNewAccoutsDebounce);
-              storeNewAccoutsDebounce = setTimeout(propagateStoreNewAccountsToCache, 1000);
+              storeNewAccoutsDebounce = /** @type {*} */(setTimeout(propagateStoreNewAccountsToCache, 1000));
             }
           }
 
@@ -225,7 +262,8 @@ export function searchAccounts(text) {
     });
   
   function propagateStoreNewAccountsToCache() {
-    const accounts = Array.from(storeNewAccountsByShortDID.values()).map(ac => {
+    const accounts = Array.from(storeNewAccountsByShortDID.values()).map(prof => {
+      const ac = /** @type {AccountRecord} */(prof);
       const wordLeads = populateWordLeads(ac.displayName, []);
       populateWordLeads(ac.handle, wordLeads);
       populateWordLeads(ac.description, wordLeads);
@@ -244,7 +282,7 @@ let debounceAccountsToStoreInCache = 0;
 let maxDebounceAccountsToStoreInCache = 0;
 
 /**
- * @param {ProfileView | ProfileViewBasic} account 
+ * @param {ProfileView} account 
  */
 export function storeAccountToCache(account) {
   const shortDID = shortenDID(account.did);
@@ -262,9 +300,9 @@ export function storeAccountToCache(account) {
   accountsToStoreInCacheByShortDID.set(shortDID, account);
 
   if (!maxDebounceAccountsToStoreInCache)
-    maxDebounceAccountsToStoreInCache = setTimeout(cacheAccountsNow, 3100);
+    maxDebounceAccountsToStoreInCache = /** @type {*} */(setTimeout(cacheAccountsNow, 3100));
   clearTimeout(debounceAccountsToStoreInCache);
-  debounceAccountsToStoreInCache = setTimeout(cacheAccountsNow, 300);
+  debounceAccountsToStoreInCache = /** @type {*} */(setTimeout(cacheAccountsNow, 300));
 }
 
 /**
@@ -361,7 +399,7 @@ function storeToCacheNow() {
       uri: p.uri,
       did: p.author.did,
       cid: p.cid,
-      time: rec.createdAt && new Date(rec.createdAt).getTime(),
+      time: rec.createdAt ? new Date(rec.createdAt).getTime() : undefined,
       text,
       thread,
       reply,
@@ -412,17 +450,32 @@ function collectPostText(post, textArray) {
 
   if (post.text) textArray.push(post.text);
   if (post.embed) {
-    if (post.embed.images?.length) {
-      for (const img of post.embed.images) {
+    const embedImages =/** @type {import('@atproto/api').AppBskyEmbedImages.Main} */(post.embed);
+    if (embedImages.images?.length) {
+      for (const img of embedImages.images) {
         if (img.alt) textArray.push(img.alt);
-        if (img.title) textArray.push(img.title);
       }
     }
 
-    if (post.embed.media?.images?.length) {
-      for (const img of post.embed.media.images) {
-        if (img.alt) textArray.push(img.alt);
-        if (img.title) textArray.push(img.title);
+    const embedExternal = /** @type {import('@atproto/api').AppBskyEmbedExternal.Main} */(post.embed);
+    if (embedExternal.external) {
+      if (embedExternal.external.title) textArray.push(embedExternal.external.title);
+      if (embedExternal.external.description) textArray.push(embedExternal.external.description);
+    }
+
+    const embedRecordWithMedia = /** @type {import('@atproto/api').AppBskyEmbedRecordWithMedia.Main} */(post.embed);
+    if (embedRecordWithMedia.media) {
+      const mediaEmbedImages = /** @type {import('@atproto/api').AppBskyEmbedImages.Main} */(embedRecordWithMedia.media);
+      if (mediaEmbedImages.images?.length) {
+        for (const img of mediaEmbedImages.images) {
+          if (img.alt) textArray.push(img.alt);
+        }
+      }
+
+      const mediaEmbedExternal = /** @type {import('@atproto/api').AppBskyEmbedExternal.Main} */(embedRecordWithMedia.media);
+      if (mediaEmbedExternal.external) {
+        if (mediaEmbedExternal.external.title) textArray.push(mediaEmbedExternal.external.title);
+        if (mediaEmbedExternal.external.description) textArray.push(mediaEmbedExternal.external.description);
       }
     }
   }
@@ -470,7 +523,7 @@ function searchAccountsFromCache(text) {
 }
 
 /**
- * @param {(ProfileViewBasic | ProfileView)[]} results
+ * @param {ProfileView[]} results
  * @param {string} text
  * @param {string[]} words
  */
@@ -599,40 +652,255 @@ export function populateWordLeads(text, result) {
   return result;
 }
 
+const allHistoryRecordTypes = /** @type {const} */(['app.bsky.feed.like', 'app.bsky.feed.post', 'app.bsky.feed.repost']);
+
+/**
+ * @typedef {LikeRecord | PostRecord | RepostRecord} HistoryRecord
+ */
+
 /**
  * @param {string} handleOrDID
- * @returns {AsyncIterable<import('../../coldsky/lib/firehose').FirehoseMessage[]>}
+ * @returns {AsyncIterable<HistoryRecord[]>}
  */
-export async function* getProfileHistory(handleOrDID) {
-  let profile = likelyDID(handleOrDID) ?
-    await resolveDIDFromCache(handleOrDID) :
-    await resolveHandleFromCache(handleOrDID);
+export function getProfileHistory(handleOrDID) {
+  return streamBuffer(
+    /**
+     * @param { import('../../coldsky/src/api/akpa').StreamParameters<
+     *  HistoryRecord[], HistoryRecord[]>} streaming
+     */
+    async streaming => {
+      let profile = likelyDID(handleOrDID) ?
+        await resolveDIDFromCache(handleOrDID) :
+        await resolveHandleFromCache(handleOrDID);
 
-  if (!profile) {
-    for await (const pro of resolveHandleOrDIDToProfile(handleOrDID)) {
-      if (pro)
-        profile = pro;
-    }
-  }
+      if (!profile) {
+        for await (const pro of resolveHandleOrDIDToProfile(handleOrDID)) {
+          if (pro)
+            profile = pro;
+        }
+      }
 
-  if (!profile) throw new Error('Profile not found: ' + handleOrDID);
+      if (!profile) throw new Error('Profile not found: ' + handleOrDID);
 
-  const shortDID = shortenDID(profile.did);
+      const shortDID = shortenDID(profile.did);
 
-  const recordsPromise = db.records.where('did').equals(shortDID).toArray();
-  const likesPromise = db.likes.where('did').equals(shortDID).toArray();
-  const repostsPromise = db.reposts.where('did').equals(shortDID).toArray();
+      const recordsPromise = db.records.where('did').equals(unwrapShortDID(shortDID)).toArray();
+      const likesPromise = db.likes.where('did').equals(shortDID).toArray();
+      const repostsPromise = db.reposts.where('did').equals(shortDID).toArray();
 
+      const earliest = {};
+      /** @type {HistoryRecord[]} */
+      let result = [];
 
+      /** @type {Map<string, PostRecord>} */
+      const recordsByURI = new Map();
 
+      /** @type {Map<string, {[shortDID: string]: LikeRecord }>} */
+      const likesByURIAndShortDID = new Map();
+
+      /** @type {Map<string, {[shortDID: string]: RepostRecord }>} */
+      const repostsByURIAndShortDID = new Map();
+
+      recordsPromise.then(
+        records => {
+
+          /** @type {PostRecord[]} */
+          const addedRecords = [];
+
+          for (const rec of records) {
+            if (recordsByURI.has(rec.uri)) continue;
+
+            if (rec.time) {
+              if (!earliest['app.bsky.feed.post'] || rec.time < earliest['app.bsky.feed.post'])
+                earliest['app.bsky.feed.post'] = rec.time;
+            }
+
+            const historyRecord = /** @type {PostRecord} */({
+              $type: 'app.bsky.feed.post',
+              cid: rec.cid,
+              did: rec.did,
+              text: rec.text?.[0],
+              reply: rec.reply || rec.thread ? {
+                root: rec.thread ? { uri: rec.thread } : undefined,
+                parent: rec.reply ? { uri: rec.reply } : undefined
+              } : undefined,
+              createdAt: rec.time ? new Date(rec.time).toISOString() : /** @type {*} */(undefined)
+            });
+
+            addedRecords.push(historyRecord);
+            recordsByURI.set(rec.uri, historyRecord);
+          }
+
+          if (addedRecords.length) {
+            result = result.concat(addedRecords);
+            streaming.yield(result, buf => result);
+          }
+        });
+
+      likesPromise.then(
+        likes => {
+
+          /** @type {LikeRecord[]} */
+          const addedLikes = [];
+
+          for (const rec of likes) {
+            const shortDID = shortenDID(rec.did);
+
+            if (likesByURIAndShortDID.get(rec.uri)?.[shortDID]) continue;
+
+            if (rec.time) {
+              const dt = new Date(rec.time).getTime();
+              if (!earliest['app.bsky.feed.like'] || dt < earliest['app.bsky.feed.like'])
+                earliest['app.bsky.feed.like'] = dt;
+            }
+
+            const likeRecord = /** @type {LikeRecord} */({
+              subject: {
+                uri: rec.uri
+              },
+              createdAt: rec.time ? new Date(rec.time).toISOString() : /** @type {*} */(undefined)
+            });
+
+            addedLikes.push(likeRecord);
+
+            let likesByURI = likesByURIAndShortDID.get(rec.uri);
+            if (likesByURI) likesByURI[shortDID] = likeRecord;
+            else likesByURIAndShortDID.set(rec.uri, { [shortDID]: likeRecord });
+          }
+
+          if (addedLikes.length) {
+            result = result.concat(addedLikes);
+            streaming.yield(result, buf => result);
+          }
+        });
+      
+      repostsPromise.then(
+        reposts => {
+          /** @type {RepostRecord[]} */
+          const addedReposts = [];
+
+          for (const rec of reposts) {
+            const shortDID = shortenDID(rec.did);
+
+            if (repostsByURIAndShortDID.get(rec.uri)?.[shortDID]) continue;
+
+            if (rec.time) {
+              const dt = new Date(rec.time).getTime();
+              if (!earliest['app.bsky.feed.repost'] || dt < earliest['app.bsky.feed.repost'])
+                earliest['app.bsky.feed.repost'] = dt;
+            }
+
+            const repostRecord = /** @type {RepostRecord} */({
+              subject: {
+                uri: rec.uri
+              },
+              createdAt: rec.time ? new Date(rec.time).toISOString() : /** @type {*} */(undefined)
+            });
+
+            addedReposts.push(repostRecord);
+
+            let repostsByURI = repostsByURIAndShortDID.get(rec.uri);
+            if (repostsByURI) repostsByURI[shortDID] = repostRecord;
+            else repostsByURIAndShortDID.set(rec.uri, { [shortDID]: repostRecord });
+          }
+
+          if (addedReposts.length) {
+            result = result.concat(addedReposts);
+            streaming.yield(result, buf => result);
+          }
+        });
+      
+      streaming.finally.then(() => {
+        console.log('getProfileHistory finally');
+      });
+
+      for await (const chunk of getProfileHistoryViaListRecords(shortDID, earliest)) {
+        await streaming.yield(chunk, buf => buf ? buf.concat(chunk) : chunk);
+      }
+
+      console.log('getProfileHistory just ended');
+    });
 }
 
-async function* getProfileHistoryViaListRecords(shortDID) {
-  const pds = await getPDS(shortDID);
+/**
+ * @param {string} shortDID
+ * @param {Partial<Record<(typeof allHistoryRecordTypes)[number], number>>} earliest 
+ */
+function getProfileHistoryViaListRecords(shortDID, earliest) {
+  return streamBuffer(
+    /**
+     * @param { import('../../coldsky/src/api/akpa').StreamParameters<
+     *  HistoryRecord[], HistoryRecord[]>} streaming
+     */
+    async streaming => {
+      const pds = await getPDS(shortDID);
 
-  if (!pds) throw new Error('No PDS for DID: ' + shortDID);
+      if (!pds) throw new Error('No PDS for DID: ' + shortDID);
 
-  
+
+      allHistoryRecordTypes.forEach(streamRecordBlocks);
+
+      /**
+       * @param {'app.bsky.feed.like' | 'app.bsky.feed.post' | 'app.bsky.feed.repost'} recordType 
+       */
+      async function streamRecordBlocks(recordType) {
+        const fullDID = unwrapShortDID(shortDID);
+        let nextCursor = '';
+        while (true) {
+          const url = `${pds}/xrpc/com.atproto.repo.listRecords?repo=${fullDID}&collection=${recordType}&limit=100&${!nextCursor ? '' : '&cursor=' + nextCursor}`;
+          const { records, cursor } = await fetch(url).then(x => x.json());
+          if (cursor) nextCursor = cursor;
+          if (!records.length) break;
+          const distilled = records.map(
+            recordType === 'app.bsky.feed.post' ?
+              r => {
+                const rec = r.value;
+                rec.uri = r.uri;
+                storePostIndexToCache({
+                  uri: rec.uri,
+                  record: rec,
+                  author: {
+                    did: rec.repo
+                  },
+                  indexedAt: rec.createdAt
+                });
+                return rec;
+              } :
+              r => r.value);
+          await yieldRecords(distilled);
+        }
+
+        /**
+         * @param {import('../../coldsky/lib/firehose').FirehoseMessageOfType<recordType>[]} chunk 
+         */
+        function yieldRecords(chunk) {
+          let earliestTime;
+          for (let rec of chunk) {
+            if (rec.createdAt) {
+              const dt = new Date(rec.createdAt).getTime();
+              if (!earliestTime || dt < earliestTime) earliestTime = dt;
+            }
+          }
+
+          const yielded = streaming.yield(chunk, buf => buf ? buf.concat(chunk) : chunk);
+
+          if (earliestTime) {
+            const existingEarliest = earliest[recordType];
+            if (!existingEarliest || existingEarliest > earliestTime)
+              earliest[recordType] = earliestTime;
+          }
+
+          for (const anyRecordType of allHistoryRecordTypes) {
+            if (anyRecordType === recordType) continue;
+            const otherEarliestTime = earliest[anyRecordType];
+            if (!otherEarliestTime || !earliestTime || otherEarliestTime < earliestTime) return;
+          }
+
+          return yielded;
+        }
+      }
+
+    });
 }
 
 async function getPDS(shortDID) {
