@@ -94,6 +94,8 @@ function HistoryCore() {
         </div>
       </div>
 
+      <div className='unmoved-sticky-background'></div>
+
       <div className={suffixClassWhenEmpty('history-account-description', resolved.description)}>
         {resolved.description}
       </div>
