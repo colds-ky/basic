@@ -10727,72 +10727,78 @@ if (cid) {
 
 	var dist$1 = {};
 
-	(function (exports) {
-	  (() => {
+	var hasRequiredDist;
+	function requireDist() {
+	  if (hasRequiredDist) return dist$1;
+	  hasRequiredDist = 1;
+	  (function (exports) {
+	    (() => {
 
-	    var e = {
-	        d: (t, r) => {
-	          for (var n in r) e.o(r, n) && !e.o(t, n) && Object.defineProperty(t, n, {
-	            enumerable: !0,
-	            get: r[n]
-	          });
+	      var e = {
+	          d: (t, r) => {
+	            for (var n in r) e.o(r, n) && !e.o(t, n) && Object.defineProperty(t, n, {
+	              enumerable: !0,
+	              get: r[n]
+	            });
+	          },
+	          o: (e, t) => Object.prototype.hasOwnProperty.call(e, t),
+	          r: e => {
+	            "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {
+	              value: "Module"
+	            }), Object.defineProperty(e, "__esModule", {
+	              value: !0
+	            });
+	          }
 	        },
-	        o: (e, t) => Object.prototype.hasOwnProperty.call(e, t),
-	        r: e => {
-	          "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {
-	            value: "Module"
-	          }), Object.defineProperty(e, "__esModule", {
-	            value: !0
-	          });
-	        }
-	      },
-	      t = {};
-	    function r(e, t) {
-	      return void 0 === t && (t = "-"), new RegExp("^(?!0{4}" + t + "0{2}" + t + "0{2})((?=[0-9]{4}" + t + "(((0[^2])|1[0-2])|02(?=" + t + "(([0-1][0-9])|2[0-8])))" + t + "[0-9]{2})|(?=((([13579][26])|([2468][048])|(0[48]))0{2})|([0-9]{2}((((0|[2468])[48])|[2468][048])|([13579][26])))" + t + "02" + t + "29))([0-9]{4})" + t + "(?!((0[469])|11)" + t + "31)((0[1,3-9]|1[0-2])|(02(?!" + t + "3)))" + t + "(0[1-9]|[1-2][0-9]|3[0-1])$").test(e);
-	    }
-	    function n(e) {
-	      var t = /\D/.exec(e);
-	      return t ? t[0] : "";
-	    }
-	    function i(e, t, r) {
-	      void 0 === t && (t = ":"), void 0 === r && (r = !1);
-	      var i = new RegExp("^([0-1]|2(?=([0-3])|4" + t + "00))[0-9]" + t + "[0-5][0-9](" + t + "([0-5]|6(?=0))[0-9])?(.[0-9]{1,9})?$");
-	      if (!r || !/[Z+\-]/.test(e)) return i.test(e);
-	      if (/Z$/.test(e)) return i.test(e.replace("Z", ""));
-	      var o = e.includes("+"),
-	        a = e.split(/[+-]/),
-	        u = a[0],
-	        d = a[1];
-	      return i.test(u) && function (e, t, r) {
-	        return void 0 === r && (r = ":"), new RegExp(t ? "^(0(?!(2" + r + "4)|0" + r + "3)|1(?=([0-1]|2(?=" + r + "[04])|[34](?=" + r + "0))))([03469](?=" + r + "[03])|[17](?=" + r + "0)|2(?=" + r + "[04])|5(?=" + r + "[034])|8(?=" + r + "[04]))" + r + "([03](?=0)|4(?=5))[05]$" : "^(0(?=[^0])|1(?=[0-2]))([39](?=" + r + "[03])|[0-24-8](?=" + r + "00))" + r + "[03]0$").test(e);
-	      }(d, o, n(d));
-	    }
-	    function o(e) {
-	      var t = e.split("T"),
-	        o = t[0],
-	        a = t[1],
-	        u = r(o, n(o));
-	      if (!a) return !1;
-	      var d,
-	        s = (d = a.match(/([^Z+\-\d])(?=\d+\1)/), Array.isArray(d) ? d[0] : "");
-	      return u && i(a, s, !0);
-	    }
-	    function a(e, t) {
-	      return void 0 === t && (t = "-"), new RegExp("^[0-9]{4}" + t + "(0(?=[^0])|1(?=[0-2]))[0-9]$").test(e);
-	    }
-	    e.r(t), e.d(t, {
-	      isValidDate: () => r,
-	      isValidISODateString: () => o,
-	      isValidTime: () => i,
-	      isValidYearMonth: () => a
-	    });
-	    var u = exports;
-	    for (var d in t) u[d] = t[d];
-	    t.__esModule && Object.defineProperty(u, "__esModule", {
-	      value: !0
-	    });
-	  })();
-	})(dist$1);
+	        t = {};
+	      function r(e, t) {
+	        return void 0 === t && (t = "-"), new RegExp("^(?!0{4}" + t + "0{2}" + t + "0{2})((?=[0-9]{4}" + t + "(((0[^2])|1[0-2])|02(?=" + t + "(([0-1][0-9])|2[0-8])))" + t + "[0-9]{2})|(?=((([13579][26])|([2468][048])|(0[48]))0{2})|([0-9]{2}((((0|[2468])[48])|[2468][048])|([13579][26])))" + t + "02" + t + "29))([0-9]{4})" + t + "(?!((0[469])|11)" + t + "31)((0[1,3-9]|1[0-2])|(02(?!" + t + "3)))" + t + "(0[1-9]|[1-2][0-9]|3[0-1])$").test(e);
+	      }
+	      function n(e) {
+	        var t = /\D/.exec(e);
+	        return t ? t[0] : "";
+	      }
+	      function i(e, t, r) {
+	        void 0 === t && (t = ":"), void 0 === r && (r = !1);
+	        var i = new RegExp("^([0-1]|2(?=([0-3])|4" + t + "00))[0-9]" + t + "[0-5][0-9](" + t + "([0-5]|6(?=0))[0-9])?(.[0-9]{1,9})?$");
+	        if (!r || !/[Z+\-]/.test(e)) return i.test(e);
+	        if (/Z$/.test(e)) return i.test(e.replace("Z", ""));
+	        var o = e.includes("+"),
+	          a = e.split(/[+-]/),
+	          u = a[0],
+	          d = a[1];
+	        return i.test(u) && function (e, t, r) {
+	          return void 0 === r && (r = ":"), new RegExp(t ? "^(0(?!(2" + r + "4)|0" + r + "3)|1(?=([0-1]|2(?=" + r + "[04])|[34](?=" + r + "0))))([03469](?=" + r + "[03])|[17](?=" + r + "0)|2(?=" + r + "[04])|5(?=" + r + "[034])|8(?=" + r + "[04]))" + r + "([03](?=0)|4(?=5))[05]$" : "^(0(?=[^0])|1(?=[0-2]))([39](?=" + r + "[03])|[0-24-8](?=" + r + "00))" + r + "[03]0$").test(e);
+	        }(d, o, n(d));
+	      }
+	      function o(e) {
+	        var t = e.split("T"),
+	          o = t[0],
+	          a = t[1],
+	          u = r(o, n(o));
+	        if (!a) return !1;
+	        var d,
+	          s = (d = a.match(/([^Z+\-\d])(?=\d+\1)/), Array.isArray(d) ? d[0] : "");
+	        return u && i(a, s, !0);
+	      }
+	      function a(e, t) {
+	        return void 0 === t && (t = "-"), new RegExp("^[0-9]{4}" + t + "(0(?=[^0])|1(?=[0-2]))[0-9]$").test(e);
+	      }
+	      e.r(t), e.d(t, {
+	        isValidDate: () => r,
+	        isValidISODateString: () => o,
+	        isValidTime: () => i,
+	        isValidYearMonth: () => a
+	      });
+	      var u = exports;
+	      for (var d in t) u[d] = t[d];
+	      t.__esModule && Object.defineProperty(u, "__esModule", {
+	        value: !0
+	      });
+	    })();
+	  })(dist$1);
+	  return dist$1;
+	}
 
 	var hasRequiredFormats;
 	function requireFormats() {
@@ -10802,7 +10808,7 @@ if (cid) {
 	    value: true
 	  });
 	  formats.language = formats.cid = formats.nsid = formats.atIdentifier = formats.handle = formats.did = formats.atUri = formats.uri = formats.datetime = void 0;
-	  const iso_datestring_validator_1 = dist$1;
+	  const iso_datestring_validator_1 = requireDist();
 	  const cid_1 = require$$1;
 	  const types_1 = requireTypes();
 	  const syntax_1 = dist$4;
@@ -35144,7 +35150,7 @@ if (cid) {
 	 * @template {Function} TFunction
 	 * @param {TFunction} call
 	 * @param {{ maxConcurrency?: number, interval?: number }} _
-	 * @returns TFunction & { prepopulate: (value: any, ...args: any[]) => void, evict: (...args: any[]) => void }
+	 * @returns {TFunction & { prepopulate: (value: any, ...args: any[]) => void, evict: (...args: any[]) => void }}
 	 */
 	function throttledAsyncCache(call, {
 	  maxConcurrency = 3,
@@ -41882,7 +41888,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.31";
+	var version = "0.2.34";
 
 	// @ts-check
 
@@ -50032,7 +50038,7 @@ if (cid) {
 	  return {
 	    captureRecord: memStore.captureRecord,
 	    captureThreadView: memStore.captureThreadView,
-	    capturePostView: memStore.captureThreadView,
+	    capturePostView: memStore.capturePostView,
 	    captureProfileView: memStore.captureProfileView,
 	    deleteRecord,
 	    capturePlcDirectoryEntries: memStore.capturePLCDirectoryEntries,
@@ -50314,6 +50320,24 @@ if (cid) {
 	/** @typedef {import('.').CompactPost} CompactPost */
 	/** @typedef {import('.').CompactProfile} CompactProfile */
 	/** @typedef {import('.').MatchCompactPost} MatchCompactPost */
+	/** @typedef {import('.').CompactThreadPostSet} CompactThreadPostSet */
+
+	/**
+	 * @typedef {MatchCompactPost[] & {
+	 *  cachedOnly?: boolean,
+	 *  processedBatch?: CompactPost[],
+	 *  processedAllCount?: number
+	 * }} IncrementalMatchCompactPosts
+	 */
+
+	/**
+	 * @typedef {CompactThreadPostSet[] & {
+	 *  cachedOnly?: boolean,
+	 *  processedBatch?: CompactPost[],
+	 *  processedAllCount?: number,
+	 *  complete?: boolean
+	 * }} IncrementalMatchThreadResult
+	 */
 
 	/**
 	 * @param {{
@@ -50373,7 +50397,8 @@ if (cid) {
 	    getPostThreadIncrementally,
 	    getProfileIncrementally,
 	    searchPostsIncrementally,
-	    searchProfilesIncrementally
+	    searchProfilesIncrementally,
+	    getTimelineIncrementally
 	  };
 
 	  /**
@@ -50441,10 +50466,10 @@ if (cid) {
 	  async function getPostOnlyAsync(uri) {
 	    const parsedURL = breakFeedUri(uri);
 	    if (!parsedURL) throw new Error('Invalid post URI ' + JSON.stringify(uri));
+	    const postRecord =
 	    /**
-	     * @type {import('../firehose').FirehoseRecord$Typed<'app.bsky.feed.post'>}
-	     */
-	    const postRecord = (await agent_getRepoRecord_throttled(unwrapShortDID(parsedURL.shortDID), parsedURL.postID, 'app.bsky.feed.post'))?.data?.value;
+	    * @type {import('../firehose').FirehoseRecord$Typed<'app.bsky.feed.post'>} */
+	    (await agent_getRepoRecord_throttled(unwrapShortDID(parsedURL.shortDID), parsedURL.postID, 'app.bsky.feed.post'))?.data?.value;
 	    postRecord.$type = 'app.bsky.feed.post';
 	    postRecord.repo = parsedURL.shortDID;
 	    postRecord.uri = uri;
@@ -50455,7 +50480,7 @@ if (cid) {
 
 	  /**
 	   * @param {string | null | undefined} uri
-	   * @returns {AsyncGenerator<import('.').CompactThreadPostSet | undefined>}
+	   * @returns {AsyncGenerator<CompactThreadPostSet | undefined>}
 	   */
 	  async function* getPostThreadIncrementally(uri) {
 	    if (!uri) return;
@@ -50463,7 +50488,7 @@ if (cid) {
 	    if (!parsedURL) return;
 	    const remotePromise = agent_getPostThread_throttled(uri);
 	    const local = await dbStore.getPostThread(uri);
-	    if (local) yield local;
+	    if (local && !local.root.placeholder) yield local;
 	    const remoteThreadRaw = (await remotePromise)?.data?.thread;
 	    if ('post' in remoteThreadRaw) {
 	      dbStore.captureThreadView( /** @type {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost} */remoteThreadRaw, Date.now());
@@ -50478,7 +50503,8 @@ if (cid) {
 	        }
 	        yield refreshedThread;
 	        if (!allPlaceholders.length) break;
-	        const orphanRemotePromises = allPlaceholders.map(placeholderPost => [placeholderPost, agent_getPostThread_throttled(placeholderPost.uri)]);
+	        const orphanRemotePromises = allPlaceholders.map(placeholderPost => ( /** @type {const} */
+	        [placeholderPost, agent_getPostThread_throttled(placeholderPost.uri)]));
 	        for (const [placeholderPost, orphanRemotePromise] of orphanRemotePromises) {
 	          try {
 	            const orphanRemoteRaw = (await orphanRemotePromise)?.data?.thread;
@@ -50511,7 +50537,7 @@ if (cid) {
 	        })();
 	      } else {
 	        const rec = resolveHandlePromise;
-	        const shortDID = shortenDID(rec.data.did);
+	        const shortDID = shortenDID( /** @type {*} */rec.data.did);
 	        profileRemotePromise = agent_getProfile_throttled(unwrapShortDID(shortDID));
 	      }
 	    }
@@ -50523,17 +50549,126 @@ if (cid) {
 	  }
 
 	  /**
-	   * @param {string | null | undefined} shortDID
-	   * @param {string | null | undefined} text
-	   * @returns {[] | AsyncGenerator<MatchCompactPost[] & { cachedOnly?: boolean }>}
+	   * @param {string} shortDID
+	   * @param {string | null | undefined} searchQuery
+	   * @returns {AsyncGenerator<IncrementalMatchThreadResult>}
 	   */
-	  function searchPostsIncrementally(shortDID, text) {
+	  async function* getTimelineIncrementally(shortDID, searchQuery) {
+	    const enrichPostToThreadParallel = throttledAsyncCache(enrichPostToThread, {
+	      maxConcurrency: 10,
+	      interval: 1
+	    });
+	    let REPORT_INTERVAL_MSEC = 700;
+	    let PARALLELISE_THREAD_BATCH = 20;
+
+	    /** @type {CompactThreadPostSet[]} */
+	    let timeline = [];
+	    let lastReportTimestamp = Date.now() - REPORT_INTERVAL_MSEC / 2;
+
+	    /** @type {Map<string, number>} */
+	    let latestRelevantPostForThreadRootUri = new Map();
+
+	    /** @type {IncrementalMatchThreadResult | undefined} */
+	    let report;
+	    for await (const entries of searchAccountHistoryPostsIncrementally(shortDID, searchQuery)) {
+	      // start enriching posts to threads from the most recent
+	      entries.sort((a, b) => (b.asOf || 0) - (a.asOf || 0));
+	      for (let iEntry = 0; iEntry < entries.length; iEntry += PARALLELISE_THREAD_BATCH) {
+	        /** @type {typeof entries} */
+	        const entriesBatch = entries.slice(iEntry, iEntry + PARALLELISE_THREAD_BATCH);
+	        entriesBatch.cachedOnly = entries.cachedOnly;
+	        entriesBatch.processedAllCount = entries.processedAllCount;
+	        entriesBatch.processedBatch = entries.processedBatch;
+	        report = await processEntriesAndProduceBatchIfRequired(entriesBatch);
+	        if (report) yield report;
+	      }
+	    }
+	    if (report) {
+	      yield {
+	        ...report,
+	        complete: true
+	      };
+	    }
+
+	    /**
+	     * @param {IncrementalMatchCompactPosts} entries
+	     */
+
+	    async function processEntriesAndProduceBatchIfRequired(entries) {
+	      const threadPromises = entries.map(entry => enrichPostToThreadParallel(entry.threadStart || entry.uri, /* shallow */!!entries.cachedOnly));
+
+	      /** @type {Map<string, CompactPost>} */
+	      const searchMatchPosts = new Map();
+	      for (const post of entries) {
+	        searchMatchPosts.set(post.uri, post);
+	        if (!post.asOf) continue;
+	        const threadRootUri = post.threadStart || post.uri;
+	        let existingTimestamp = latestRelevantPostForThreadRootUri.get(threadRootUri);
+	        if (!existingTimestamp || existingTimestamp < post.asOf) latestRelevantPostForThreadRootUri.set(threadRootUri, post.asOf);
+	      }
+	      for (const threadPromise of threadPromises) {
+	        let postThreadRetrieved = await threadPromise;
+	        if (!postThreadRetrieved) continue;
+
+	        // Replace posts with search matches
+	        postThreadRetrieved = {
+	          ...postThreadRetrieved,
+	          all: postThreadRetrieved.all.map(post => searchMatchPosts.get(post.uri) || post),
+	          current: searchMatchPosts.get(postThreadRetrieved.current.uri) || postThreadRetrieved.current,
+	          root: searchMatchPosts.get(postThreadRetrieved.root.uri) || postThreadRetrieved.root
+	        };
+	        const timelineIndex = timeline.findIndex(t => t.root.uri === postThreadRetrieved.root.uri);
+	        if (timeline[timelineIndex] === postThreadRetrieved) continue;
+	        if (timelineIndex >= 0) timeline[timelineIndex] = postThreadRetrieved;else timeline.push(postThreadRetrieved);
+	        const now = Date.now();
+	        if (now - lastReportTimestamp > REPORT_INTERVAL_MSEC) {
+	          timeline.sort((a, b) => {
+	            const aTimestamp = latestRelevantPostForThreadRootUri.get(a.root.uri) || 0;
+	            const bTimestamp = latestRelevantPostForThreadRootUri.get(b.root.uri) || 0;
+	            return bTimestamp - aTimestamp;
+	          });
+
+	          /** @type {IncrementalMatchThreadResult | undefined} */
+	          const report = timeline.slice();
+	          report.cachedOnly = entries.cachedOnly;
+	          report.processedBatch = entries.processedBatch;
+	          report.processedAllCount = entries.processedAllCount;
+	          lastReportTimestamp = now;
+	          return report;
+	        }
+	      }
+	    }
+	  }
+
+	  /**
+	   * @param {string} uri
+	   * @param {boolean} shallow
+	   */
+	  async function enrichPostToThread(uri, shallow) {
+	    try {
+	      let enrichedThread;
+	      for await (const thread of getPostThreadIncrementally(uri)) {
+	        if (thread && shallow) return thread;
+	        if (thread) enrichedThread = thread;
+	      }
+	      return enrichedThread;
+	    } catch (error) {
+	      console.warn('Post ' + uri + ' could not be retrieved ', error);
+	    }
+	  }
+
+	  /**
+	   * @param {string | null | undefined} shortDID
+	   * @param {string | null | undefined} searchQuery
+	   * @returns {[] | AsyncGenerator<IncrementalMatchCompactPosts>}
+	   */
+	  function searchPostsIncrementally(shortDID, searchQuery) {
 	    if (shortDID) {
-	      return searchAccountHistoryPostsIncrementally(shortDID, text);
-	    } else if (!text) {
+	      return searchAccountHistoryPostsIncrementally(shortDID, searchQuery);
+	    } else if (!searchQuery) {
 	      return [];
 	    } else {
-	      return searchAllPostsIncrementally(text);
+	      return searchAllPostsIncrementally(searchQuery);
 	    }
 	  }
 
@@ -50544,15 +50679,26 @@ if (cid) {
 	  async function* searchAccountHistoryPostsIncrementally(shortDID, text) {
 	    let REPORT_UPDATES_FREQUENCY_MSEC = 700;
 	    const cachedMatchesPromise = dbStore.searchPosts(shortDID, text);
-	    const allCachedHistoryPromise = !text ? cachedMatchesPromise : dbStore.searchPosts(shortDID, text);
+	    const allCachedHistoryPromise = !text ? cachedMatchesPromise : dbStore.searchPosts(shortDID, undefined);
 	    const plcDirHistoryPromise = plcDirectoryHistoryRaw(shortDID);
 	    let lastSearchReport = 0;
+	    /** @type {CompactPost[] | undefined}  */
+	    let processedBatch;
 	    let anyUpdates = false;
 
-	    /** @type {MatchCompactPost[] & { cachedOnly?: boolean } | undefined} */
+	    /** @type {IncrementalMatchCompactPosts | undefined} */
 	    let lastMatches = await cachedMatchesPromise;
+
+	    /** @type {Set<string> | undefined} */
+	    let knownHistoryUri;
+	    if (!knownHistoryUri) {
+	      const allHistory = await allCachedHistoryPromise;
+	      knownHistoryUri = new Set((allHistory || []).map(rec => rec.uri));
+	    }
 	    if (lastMatches?.length) {
 	      lastMatches.cachedOnly = true;
+	      lastMatches.processedAllCount = knownHistoryUri.size;
+	      lastMatches.processedBatch = lastMatches.slice();
 	      lastSearchReport = Date.now();
 	      yield lastMatches;
 	    }
@@ -50564,8 +50710,6 @@ if (cid) {
 	    });
 	    let cursor = '';
 	    const fullDID = unwrapShortDID(shortDID);
-	    /** @type {Set<string> | undefined} */
-	    let knownHistoryUri;
 	    while (true) {
 	      const moreData = await pdsAgent.com.atproto.repo.listRecords({
 	        repo: unwrapShortDID(shortDID),
@@ -50573,10 +50717,6 @@ if (cid) {
 	        collection: 'app.bsky.feed.post',
 	        limit: Math.random() * 10 + 88
 	      });
-	      if (!knownHistoryUri) {
-	        const allHistory = await allCachedHistoryPromise;
-	        knownHistoryUri = new Set((allHistory || []).map(rec => rec.uri));
-	      }
 	      if (moreData?.data?.records?.length) {
 	        for (const rec of moreData.data.records) {
 	          /** @type {import('../firehose').FirehoseRecord$Typed<'app.bsky.feed.post'>} */
@@ -50584,17 +50724,26 @@ if (cid) {
 	          recEx.$type = 'app.bsky.feed.post';
 	          recEx.uri = rec.uri;
 	          recEx.repo = fullDID;
-	          if (!knownHistoryUri.has(rec.uri)) anyUpdates = true;
-	          dbStore.captureRecord(recEx, Date.now());
+	          const post = /** @type {CompactPost} */dbStore.captureRecord(recEx, Date.now());
+	          if (post) {
+	            if (!processedBatch) processedBatch = [post];else processedBatch.push(post);
+	          }
+	          if (!knownHistoryUri.has(rec.uri)) {
+	            knownHistoryUri.add(rec.uri);
+	            anyUpdates = true;
+	          }
 	        }
 	      }
-	      if (anyUpdates && Date.now() - lastSearchReport > REPORT_UPDATES_FREQUENCY_MSEC) {
-	        /** @type {MatchCompactPost[] & { cachedOnly?: boolean } | undefined} */
+	      if (anyUpdates || Date.now() - lastSearchReport > REPORT_UPDATES_FREQUENCY_MSEC) {
+	        /** @type {IncrementalMatchCompactPosts} */
 	        const newMatches = await dbStore.searchPosts(shortDID, text);
 	        if (newMatches?.length) {
 	          lastMatches = newMatches;
 	          lastSearchReport = Date.now();
 	          anyUpdates = false;
+	          newMatches.processedBatch = processedBatch;
+	          newMatches.processedAllCount = knownHistoryUri.size;
+	          processedBatch = undefined;
 	          yield newMatches;
 	          lastSearchReport = Date.now();
 	        }
@@ -50606,7 +50755,7 @@ if (cid) {
 
 	  /**
 	   * @param {string} text
-	   * @returns {AsyncGenerator<MatchCompactPost[] & { cachedOnly?: boolean }>}
+	   * @returns {AsyncGenerator<IncrementalMatchCompactPosts>}
 	   */
 	  async function* searchAllPostsIncrementally(text) {
 	    const searchStringSanitised = (text || '').trim().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, ' ').replace(/\s+/g, ' ');
@@ -51229,7 +51378,7 @@ if (cid) {
 
 	/**
 	 * @param {Set<string>} visitedRevs
-	 * @param {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost | 
+	 * @param {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost |
 	 *  import('@atproto/api').AppBskyFeedDefs.NotFoundPost |
 	 *  import('@atproto/api').AppBskyFeedDefs.BlockedPost | Record<string, unknown>} threadViewPostOrVariants
 	 * @param {{ threadStart?: string, replyTo?: string } | undefined} parentPostHint
@@ -51281,13 +51430,29 @@ if (cid) {
 	 * @param {import('./define-store').Intercepts} [intercepts]
 	 */
 	function capturePostView(visitedRevs, postView, store, now, intercepts) {
-	  if (!postView || visitedRevs.has(postView.cid)) return;
+	  if (!postView || visitedRevs.has(postView.cid)) return; // TODO: if visitedRevs is expected, use REV not CID, and update it after
+
 	  captureProfile(postView.author, store, now, intercepts);
 	  breakFeedUri(postView.uri);
 	  const compactPost = capturePostRecord(postView.author.did, postView.uri, /** @type {*} */postView.record, store, now, intercepts);
 	  compactPost.likeCount = postView.likeCount;
 	  compactPost.repostCount = postView.repostCount;
+	  compactPost.labels = capturePostLabels(postView.labels);
 	  return compactPost;
+	}
+
+	/**
+	 * @param {import('@atproto/api').AppBskyFeedDefs.PostView['labels'] | undefined} labels
+	 */
+	function capturePostLabels(labels) {
+	  if (!labels?.length) return;
+	  /** @type {Record<string, string>} */
+	  let labelsObj = {};
+	  for (const lab of labels) {
+	    if (lab.neg) continue;
+	    labelsObj[lab.val] = lab.cts;
+	  }
+	  return labelsObj;
 	}
 
 	/**
@@ -51444,6 +51609,36 @@ if (cid) {
 	 * }} PlcDirectoryAuditLogEntry
 	 */
 
+	// @ts-check
+
+	/**
+	 * @typedef {{
+	 *  shortDID: string,
+	 *  uri: string,
+	 *  placeholder?: boolean,
+	 *  text: string | undefined,
+	 *  facets: CompactFacet[] | undefined,
+	 *  embeds: CompactEmbed[] | undefined,
+	 *  quoting: string[] | undefined,
+	 *  threadStart: string | undefined,
+	 *  replyTo: string | undefined,
+	 *  words: string[] | undefined,
+	 *  likeCount: number | undefined,
+	 *  repostCount: number | undefined,
+	 *  asOf: number | undefined
+	 * }} CompactPost
+	 */
+
+	/**
+	 * @param {any} obj
+	 * @returns {obj is CompactPost}
+	 */
+	function isCompactPost(obj) {
+	  if (!obj) return false;
+	  if (typeof obj !== 'object') return false;
+	  return typeof obj.shortDID === 'string' && typeof obj.uri === 'string' && (obj.placeholder || typeof obj.text === 'string' || obj.embeds || obj.asOf);
+	}
+
 	const atproto = atproto_api_import;
 
 	// checkApplyGlobal();
@@ -51482,6 +51677,7 @@ if (cid) {
 	exports.firehoseShortDIDs = firehoseShortDIDs;
 	exports.getFeedBlobUrl = getFeedBlobUrl;
 	exports.getProfileBlobUrl = getProfileBlobUrl;
+	exports.isCompactPost = isCompactPost;
 	exports.isPromise = isPromise;
 	exports.likelyDID = likelyDID;
 	exports.makeFeedUri = makeFeedUri;
