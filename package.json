@@ -1,6 +1,6 @@
 {
   "name": "gist.ing",
-  "version": "0.2.42",
+  "version": "0.2.43",
   "description": "Gisting on the Ski",
   "main": "index.js",
   "private": true,
@@ -15,20 +15,34 @@
   "dependencies": {
     "@atproto/api": "*",
     "@atproto/repo": "*",
+    "cbor-x": "*",
+    "multiformats": "*",
+    "@ipld/car": "*",
+
+    "esbuild": "*",
+    "rollup": "*",
+    "@rollup/plugin-commonjs": "*",
+    "@rollup/plugin-node-resolve": "*",
+
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.14",
     "@mui/material": "^5.15.14",
-    "@rollup/plugin-commonjs": "^25.0.7",
-    "@rollup/plugin-node-resolve": "^15.2.2",
     "ag-grid-community": "^31.2.0",
     "ag-grid-react": "^31.2.0",
     "dexie": "^4.0.1",
-    "esbuild": "^0.20.2",
+
     "fuse.js": "^6.6.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.22.3",
-    "rollup": "^4.0.2"
+    "react-router-dom": "^6.22.3"
+  },
+  "leave_aside_overrides": {
+  "@atproto/api": { "multiformats": "$multiformats" },
+  "@atproto/common-web": { "multiformats": "$multiformats" },
+  "@atproto/lexicon": { "multiformats": "$multiformats" },
+  "@ipld/car": { "multiformats": "$multiformats" },
+  "@ipld/dag-cbor": { "multiformats": "$multiformats" },
+  "uint8arrays": { "multiformats": "$multiformats" }
   }
 }
