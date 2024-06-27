@@ -51,9 +51,9 @@
   var __commonJS = (cb, mod) => function __require2() {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
-  var __export = (target2, all2) => {
-    for (var name2 in all2)
-      __defProp(target2, name2, { get: all2[name2], enumerable: true });
+  var __export = (target2, all) => {
+    for (var name2 in all)
+      __defProp(target2, name2, { get: all[name2], enumerable: true });
   };
   var __copyProps = (to, from6, except, desc) => {
     if (from6 && typeof from6 === "object" || typeof from6 === "function") {
@@ -7642,16 +7642,16 @@ if (cid) {
          * @returns {number}
          */
         static shouldBreak(start, mid, end, startEmoji, midEmoji, endEmoji) {
-          const all2 = [start].concat(mid).concat([end]);
+          const all = [start].concat(mid).concat([end]);
           const allEmoji = [startEmoji].concat(midEmoji).concat([endEmoji]);
-          const previous = all2[all2.length - 2];
+          const previous = all[all.length - 2];
           const next = end;
           const nextEmoji = endEmoji;
-          const rIIndex = all2.lastIndexOf(boundaries_1.CLUSTER_BREAK.REGIONAL_INDICATOR);
-          if (rIIndex > 0 && all2.slice(1, rIIndex).every(function(c) {
+          const rIIndex = all.lastIndexOf(boundaries_1.CLUSTER_BREAK.REGIONAL_INDICATOR);
+          if (rIIndex > 0 && all.slice(1, rIIndex).every(function(c) {
             return c === boundaries_1.CLUSTER_BREAK.REGIONAL_INDICATOR;
           }) && [boundaries_1.CLUSTER_BREAK.PREPEND, boundaries_1.CLUSTER_BREAK.REGIONAL_INDICATOR].indexOf(previous) === -1) {
-            if (all2.filter(function(c) {
+            if (all.filter(function(c) {
               return c === boundaries_1.CLUSTER_BREAK.REGIONAL_INDICATOR;
             }).length % 2 === 1) {
               return BreakLastRegional;
@@ -7679,7 +7679,7 @@ if (cid) {
             return NotBreak;
           }
           const previousNonExtendIndex = allEmoji.slice(0, -1).lastIndexOf(boundaries_1.EXTENDED_PICTOGRAPHIC);
-          if (previousNonExtendIndex !== -1 && allEmoji[previousNonExtendIndex] === boundaries_1.EXTENDED_PICTOGRAPHIC && all2.slice(previousNonExtendIndex + 1, -2).every(function(c) {
+          if (previousNonExtendIndex !== -1 && allEmoji[previousNonExtendIndex] === boundaries_1.EXTENDED_PICTOGRAPHIC && all.slice(previousNonExtendIndex + 1, -2).every(function(c) {
             return c === boundaries_1.CLUSTER_BREAK.EXTEND;
           }) && previous === boundaries_1.CLUSTER_BREAK.ZWJ && nextEmoji === boundaries_1.EXTENDED_PICTOGRAPHIC) {
             return NotBreak;
@@ -35221,8 +35221,8 @@ if (cid) {
 
   // node_modules/tlds/index.json
   var require_tlds = __commonJS({
-    "node_modules/tlds/index.json"(exports, module2) {
-      module2.exports = [
+    "node_modules/tlds/index.json"(exports, module) {
+      module.exports = [
         "aaa",
         "aarp",
         "abb",
@@ -39237,8 +39237,8 @@ if (cid) {
 
   // node_modules/varint/encode.js
   var require_encode = __commonJS({
-    "node_modules/varint/encode.js"(exports, module2) {
-      module2.exports = encode13;
+    "node_modules/varint/encode.js"(exports, module) {
+      module.exports = encode13;
       var MSB5 = 128;
       var REST5 = 127;
       var MSBALL5 = ~REST5;
@@ -39268,8 +39268,8 @@ if (cid) {
 
   // node_modules/varint/decode.js
   var require_decode = __commonJS({
-    "node_modules/varint/decode.js"(exports, module2) {
-      module2.exports = read6;
+    "node_modules/varint/decode.js"(exports, module) {
+      module.exports = read6;
       var MSB5 = 128;
       var REST5 = 127;
       function read6(buf2, offset) {
@@ -39291,7 +39291,7 @@ if (cid) {
 
   // node_modules/varint/length.js
   var require_length = __commonJS({
-    "node_modules/varint/length.js"(exports, module2) {
+    "node_modules/varint/length.js"(exports, module) {
       var N15 = Math.pow(2, 7);
       var N25 = Math.pow(2, 14);
       var N35 = Math.pow(2, 21);
@@ -39301,7 +39301,7 @@ if (cid) {
       var N75 = Math.pow(2, 49);
       var N85 = Math.pow(2, 56);
       var N95 = Math.pow(2, 63);
-      module2.exports = function(value) {
+      module.exports = function(value) {
         return value < N15 ? 1 : value < N25 ? 2 : value < N35 ? 3 : value < N45 ? 4 : value < N55 ? 5 : value < N65 ? 6 : value < N75 ? 7 : value < N85 ? 8 : value < N95 ? 9 : 10;
       };
     }
@@ -39309,8 +39309,8 @@ if (cid) {
 
   // node_modules/varint/index.js
   var require_varint = __commonJS({
-    "node_modules/varint/index.js"(exports, module2) {
-      module2.exports = {
+    "node_modules/varint/index.js"(exports, module) {
+      module.exports = {
         encode: require_encode(),
         decode: require_decode(),
         encodingLength: require_length()
@@ -45151,7 +45151,7 @@ if (cid) {
   }
 
   // package.json
-  var version4 = "0.1.11";
+  var version4 = "0.1.12";
 
   // lib/firehose-short-dids.js
   function firehoseShortDIDs(filterShortDIDs) {
@@ -45424,40 +45424,6 @@ if (cid) {
         }
       }
     }));
-  }
-
-  // lib/index.js
-  var all = {
-    version: version4,
-    likelyDID,
-    shortenDID,
-    shortenHandle,
-    unwrapShortDID,
-    unwrapShortHandle,
-    breakFeedUri,
-    breakPostURL,
-    isPromise,
-    ColdskyAgent,
-    plcDirectory,
-    firehose,
-    firehoseShortDIDs
-  };
-  var lib_default = all;
-  checkApplyGlobal();
-  function checkApplyGlobal() {
-    if (typeof process !== "undefined" && typeof (process == null ? void 0 : process.exit) === "function") {
-      if (typeof module !== "undefined" && (module == null ? void 0 : module.exports)) {
-        for (const key in all) {
-          module.exports[key] = all[key];
-        }
-      }
-      return;
-    }
-    if (typeof window !== "undefined" && window) {
-      window["coldsky"] = all;
-    } else if (typeof global !== "undefined" && global) {
-      global["coldsky"] = all;
-    }
   }
 })();
 //# sourceMappingURL=libs.js.map
