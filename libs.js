@@ -41882,7 +41882,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.35";
+	var version = "0.2.36";
 
 	// @ts-check
 
@@ -50203,7 +50203,7 @@ if (cid) {
 	      allPosts?.sort((a1, a2) => (a2.asOf || 0) - (a1.asOf || 0));
 	      return allPosts;
 	    }
-	    const FUSE_THRESHOLD = 0.5;
+	    const FUSE_THRESHOLD = 0.6;
 	    const fuse = new Fuse(allPosts, {
 	      includeScore: true,
 	      keys: ['text'],
@@ -50561,17 +50561,14 @@ if (cid) {
 
 	  /** @type {import('.').IncrementalMatchCompactPosts | undefined} */
 	  let lastMatches = await cachedMatchesPromise;
+	  const allHistory = await allCachedHistoryPromise;
 
 	  /** @type {Set<string> | undefined} */
-	  let knownHistoryUri;
-	  if (!knownHistoryUri) {
-	    const allHistory = await allCachedHistoryPromise;
-	    knownHistoryUri = new Set((allHistory || []).map(rec => rec.uri));
-	  }
+	  let knownHistoryUri = new Set((allHistory || []).map(rec => rec.uri));
 	  if (lastMatches?.length) {
 	    lastMatches.cachedOnly = true;
 	    lastMatches.processedAllCount = knownHistoryUri.size;
-	    lastMatches.processedBatch = lastMatches.slice();
+	    lastMatches.processedBatch = allHistory.slice();
 	    lastSearchReport = Date.now();
 	    yield lastMatches;
 	  }
@@ -50610,16 +50607,14 @@ if (cid) {
 	    if (anyUpdates || Date.now() - lastSearchReport > REPORT_UPDATES_FREQUENCY_MSEC) {
 	      /** @type {import('.').IncrementalMatchCompactPosts} */
 	      const newMatches = await dbStore.searchPosts(shortDID, searchQuery);
-	      if (newMatches?.length) {
-	        lastMatches = newMatches;
-	        lastSearchReport = Date.now();
-	        anyUpdates = false;
-	        newMatches.processedBatch = processedBatch;
-	        newMatches.processedAllCount = knownHistoryUri.size;
-	        processedBatch = undefined;
-	        yield newMatches;
-	        lastSearchReport = Date.now();
-	      }
+	      lastMatches = newMatches;
+	      lastSearchReport = Date.now();
+	      anyUpdates = false;
+	      newMatches.processedBatch = processedBatch;
+	      newMatches.processedAllCount = knownHistoryUri.size;
+	      processedBatch = undefined;
+	      yield newMatches;
+	      lastSearchReport = Date.now();
 	    }
 	    if (!moreData?.data?.cursor) break;
 	    cursor = moreData.data.cursor;
@@ -50708,13 +50703,15 @@ if (cid) {
 
 	  /** @type {Map<string, number>} */
 	  let latestRelevantPostForThreadRootUri = new Map();
-	  for await (const entries of searchAccountHistoryPostsIncrementally({
+	  const searchPostIterator = searchAccountHistoryPostsIncrementally({
 	    ...args,
 	    shortDID,
 	    searchQuery
-	  })) {
+	  });
+	  for await (const entries of searchPostIterator) {
 	    // start enriching posts to threads from the most recent
 	    entries.sort((a, b) => (b.asOf || 0) - (a.asOf || 0));
+	    let anyReported = false;
 	    for (let iEntry = 0; iEntry < entries.length; iEntry += PARALLELISE_THREAD_BATCH) {
 	      /** @type {typeof entries} */
 	      const entriesBatch = entries.slice(iEntry, iEntry + PARALLELISE_THREAD_BATCH);
@@ -50722,8 +50719,19 @@ if (cid) {
 	      entriesBatch.processedAllCount = entries.processedAllCount;
 	      entriesBatch.processedBatch = entries.processedBatch;
 	      for await (const report of processEntriesAndProduceBatchIfRequired(entriesBatch)) {
-	        if (report) yield report;
+	        if (report) {
+	          anyReported = true;
+	          yield report;
+	        }
 	      }
+	    }
+	    if (!anyReported) {
+	      /** @type {import('.').IncrementalMatchThreadResult} */
+	      const dummyBatch = timeline.slice();
+	      dummyBatch.cachedOnly = entries.cachedOnly;
+	      dummyBatch.processedAllCount = entries.processedAllCount;
+	      dummyBatch.processedBatch = entries.processedBatch;
+	      yield dummyBatch;
 	    }
 	  }
 
