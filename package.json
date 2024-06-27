@@ -1,6 +1,6 @@
 {
   "name": "coldsky",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Library for BlueSky",
   "main": "libs.js",
   "scripts": {
@@ -20,8 +20,10 @@
   "devDependencies": {
     "@atproto/api": "^0.8.0",
     "@ipld/car": "^5.2.6",
+    "@octokit/rest": "^20.0.2",
     "cbor-x": "^1.5.8",
     "esbuild": "^0.19.11",
-    "multiformats": "^13.0.1"
+    "multiformats": "^13.0.1",
+    "octokit-commit-multiple-files": "^5.0.0"
   }
 }
