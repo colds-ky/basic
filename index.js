@@ -98462,9 +98462,9 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // src/api/record-cache.js
-  var db = new import_wrapper_default("atproto-record-cache");
-  db.version(3).stores({
-    records: "did, cid, time",
+  var db = new import_wrapper_default("atproto-cache");
+  db.version(4).stores({
+    records: "uri, did, cid, time, *w",
     accounts: "did, *w"
   });
   var publicAgent = new ColdskyAgent({
@@ -98482,7 +98482,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     const words = breakIntoWords(normalizedText);
     const wordSearchTypeaheadPromises = words.map((word) => directSearchAccountsTypeahead(word));
     const wordSearchFullPromises = words.map((word) => directSearchAccountsFull(word));
-    const cachedResults = searchAccountsFromCache([...words, normalizedText]);
+    const cachedResults = searchAccountsFromCache(normalizedText);
     const storeNewAccountsByShortDID = /* @__PURE__ */ new Map();
     let storeNewAccoutsDebounce = 0;
     return streamBuffer(
@@ -98539,23 +98539,21 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     );
     function propagateStoreNewAccountsToCache() {
       const accounts = Array.from(storeNewAccountsByShortDID.values()).map((ac) => {
-        const wordLeads = [];
-        for (const w of breakIntoWords(ac.displayName + " " + ac.handle + " " + ac.description)) {
-          const wLead = w.slice(0, 3).toLowerCase();
-          if (wordLeads.indexOf(wLead) < 0)
-            wordLeads.push(wLead);
-        }
+        const wordLeads = populateWordLeads(ac.displayName, []);
+        populateWordLeads(ac.handle, wordLeads);
+        populateWordLeads(ac.description, wordLeads);
         ac.w = wordLeads;
         return ac;
       });
       storeNewAccountsByShortDID.clear();
       db.accounts.bulkPut(accounts);
+      console.log("adding searched accounts ", accounts.length, " to cache ", accounts);
     }
   }
   var accountsToStoreInCacheByShortDID = /* @__PURE__ */ new Map();
   var debounceAccountsToStoreInCache = 0;
   var maxDebounceAccountsToStoreInCache = 0;
-  function cacheAccount(account) {
+  function storeAccountToCache(account) {
     const shortDID = shortenDID(account.did);
     const existing = accountsToStoreInCacheByShortDID.get(shortDID);
     let shouldStore = !existing;
@@ -98575,6 +98573,80 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     clearTimeout(debounceAccountsToStoreInCache);
     debounceAccountsToStoreInCache = setTimeout(cacheAccountsNow, 300);
   }
+  var postsToStoreInCacheByURI = /* @__PURE__ */ new Map();
+  var debouncePostsToStoreInCache = 0;
+  var maxDebouncePostsToStoreInCache = 0;
+  function storePostIndexToCache(post) {
+    const existing = postsToStoreInCacheByURI.get(post.uri);
+    let shouldStore = !existing;
+    if (existing) {
+      const indexed = post.indexedAt && new Date(post.indexedAt).getTime();
+      const existingIndexed = existing.indexedAt && new Date(existing.indexedAt).getTime();
+      if (!existingIndexed && indexed)
+        shouldStore = true;
+      else if (existingIndexed && indexed && indexed > existingIndexed)
+        shouldStore = true;
+    }
+    if (!shouldStore)
+      return;
+    postsToStoreInCacheByURI.set(post.uri, post);
+    if (!maxDebouncePostsToStoreInCache)
+      maxDebouncePostsToStoreInCache = setTimeout(cachePostsNow, 3100);
+    clearTimeout(debouncePostsToStoreInCache);
+    debouncePostsToStoreInCache = setTimeout(cachePostsNow, 300);
+  }
+  function cachePostsNow() {
+    clearTimeout(maxDebouncePostsToStoreInCache);
+    maxDebouncePostsToStoreInCache = 0;
+    clearTimeout(debouncePostsToStoreInCache);
+    debouncePostsToStoreInCache = 0;
+    const posts = Array.from(postsToStoreInCacheByURI.values()).map((p) => {
+      const wordLeads = [];
+      const text = collectPostText(p.record, []);
+      for (const textChunk of text) {
+        populateWordLeads(textChunk, wordLeads);
+      }
+      return {
+        uri: p.uri,
+        did: p.author.did,
+        cid: p.cid,
+        time: p.record.time,
+        text,
+        w: wordLeads
+      };
+    });
+    postsToStoreInCacheByURI.clear();
+    if (posts.length) {
+      db.records.bulkPut(posts);
+      console.log("adding records ", posts.length, " to cache ", posts);
+    }
+  }
+  function collectPostText(post, textArray) {
+    var _a3, _b, _c;
+    if (!post)
+      return textArray;
+    if (post.text)
+      textArray.push(post.text);
+    if (post.embed) {
+      if ((_a3 = post.embed.images) == null ? void 0 : _a3.length) {
+        for (const img of post.embed.images) {
+          if (img.alt)
+            textArray.push(img.alt);
+          if (img.title)
+            textArray.push(img.title);
+        }
+      }
+      if ((_c = (_b = post.embed.media) == null ? void 0 : _b.images) == null ? void 0 : _c.length) {
+        for (const img of post.embed.media.images) {
+          if (img.alt)
+            textArray.push(img.alt);
+          if (img.title)
+            textArray.push(img.title);
+        }
+      }
+    }
+    return textArray;
+  }
   function cacheAccountsNow() {
     clearTimeout(maxDebounceAccountsToStoreInCache);
     maxDebounceAccountsToStoreInCache = 0;
@@ -98593,16 +98665,11 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     accountsToStoreInCacheByShortDID.clear();
     if (accounts.length) {
       db.accounts.bulkPut(accounts);
-      console.log("adding ", accounts.length, " to cache ", accounts);
+      console.log("adding accounts ", accounts.length, " to cache ", accounts);
     }
   }
-  function searchAccountsFromCache(words) {
-    const wordLeads = [];
-    for (const w of words) {
-      const wLead = w.slice(0, 3).toLowerCase();
-      if (wordLeads.indexOf(wLead) < 0)
-        wordLeads.push(wLead);
-    }
+  function searchAccountsFromCache(text) {
+    const wordLeads = populateWordLeads(text, []);
     return wordLeads.map((wLead) => __async(this, null, function* () {
       const dbMatches = yield db.accounts.where("w").equals(wLead).toArray();
       return dbMatches;
@@ -98689,6 +98756,19 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       return result;
     });
   }
+  function populateWordLeads(text, result) {
+    if (!text)
+      return result;
+    const words = text.split(NOT_WORD_CHARACTERS_REGEX);
+    for (const word of words) {
+      if (word.length < 3)
+        continue;
+      const wLead = word.slice(0, 3).toLowerCase();
+      if (result.indexOf(wLead) < 0)
+        result.push(wLead);
+    }
+    return result;
+  }
 
   // src/api/firehose-threads.js
   function firehoseThreads() {
@@ -98764,7 +98844,8 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
             var _a3;
             if (!(thread2 == null ? void 0 : thread2.post) || seenPosts.has((_a3 = thread2 == null ? void 0 : thread2.post) == null ? void 0 : _a3.uri))
               return;
-            cacheAccount(thread2.post.author);
+            storeAccountToCache(thread2.post.author);
+            storePostIndexToCache(thread2.post);
             if (thread2.replies) {
               for (const reply of thread2.replies) {
                 walkThread(reply);
@@ -99304,7 +99385,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // package.json
-  var version4 = "0.1.14";
+  var version4 = "0.1.15";
 
   // src/localise.js
   function localise(english, languageMap) {

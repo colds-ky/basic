@@ -6,9 +6,9 @@ import { BSKY_PUBLIC_URL } from '../../coldsky/lib/coldsky-agent';
 import { streamBuffer } from '../../coldsky/src/api/akpa';
 import Fuse from 'fuse.js';
 
-const db = new Dexie("atproto-record-cache");
-db.version(3).stores({
-  records: 'did, cid, time',
+const db = new Dexie("atproto-cache");
+db.version(4).stores({
+  records: 'uri, did, cid, time, *w',
   accounts: 'did, *w'
 });
 
@@ -37,7 +37,7 @@ export function searchAccounts(text) {
   const words = breakIntoWords(normalizedText);
   const wordSearchTypeaheadPromises = words.map(word => directSearchAccountsTypeahead(word));
   const wordSearchFullPromises = words.map(word => directSearchAccountsFull(word));
-  const cachedResults = searchAccountsFromCache([...words, normalizedText]);
+  const cachedResults = searchAccountsFromCache(normalizedText);
 
   /** @type {Map<string, ProfileViewBasic | ProfileView>} */
   const storeNewAccountsByShortDID = new Map();
@@ -117,17 +117,16 @@ export function searchAccounts(text) {
   
   function propagateStoreNewAccountsToCache() {
     const accounts = Array.from(storeNewAccountsByShortDID.values()).map(ac => {
-      const wordLeads = [];
-      for (const w of breakIntoWords(ac.displayName + ' ' + ac.handle + ' ' + ac.description)) {
-        const wLead = w.slice(0, 3).toLowerCase();
-        if (wordLeads.indexOf(wLead) < 0)
-          wordLeads.push(wLead);
-      }
+      const wordLeads = populateWordLeads(ac.displayName, []);
+      populateWordLeads(ac.handle, wordLeads);
+      populateWordLeads(ac.description, wordLeads);
       ac.w = wordLeads;
       return ac;
     });
     storeNewAccountsByShortDID.clear();
     db.accounts.bulkPut(accounts);
+
+    console.log('adding searched accounts ', accounts.length, ' to cache ', accounts);
   }
 }
 
@@ -138,7 +137,7 @@ let maxDebounceAccountsToStoreInCache = 0;
 /**
  * @param {ProfileView | ProfileViewBasic} account 
  */
-export function cacheAccount(account) {
+export function storeAccountToCache(account) {
   const shortDID = shortenDID(account.did);
   const existing = accountsToStoreInCacheByShortDID.get(shortDID);
   let shouldStore = !existing;
@@ -157,6 +156,93 @@ export function cacheAccount(account) {
     maxDebounceAccountsToStoreInCache = setTimeout(cacheAccountsNow, 3100);
   clearTimeout(debounceAccountsToStoreInCache);
   debounceAccountsToStoreInCache = setTimeout(cacheAccountsNow, 300);
+}
+
+/**
+ * @type {Map<string, import('@atproto/api/dist/client/types/app/bsky/feed/defs').PostView>}
+ */
+const postsToStoreInCacheByURI = new Map();
+let debouncePostsToStoreInCache = 0;
+let maxDebouncePostsToStoreInCache = 0;
+
+/** @param {import('@atproto/api/dist/client/types/app/bsky/feed/defs').PostView} post */
+export function storePostIndexToCache(post) {
+  const existing = postsToStoreInCacheByURI.get(post.uri);
+  let shouldStore = !existing;
+  if (existing) {
+    const indexed = post.indexedAt && new Date(post.indexedAt).getTime();
+    const existingIndexed = existing.indexedAt && new Date(existing.indexedAt).getTime();
+    if (!existingIndexed && indexed) shouldStore = true;
+    else if (existingIndexed && indexed && indexed > existingIndexed) shouldStore = true;
+  }
+
+  if (!shouldStore) return;
+
+  postsToStoreInCacheByURI.set(post.uri, post);
+
+  if (!maxDebouncePostsToStoreInCache)
+    maxDebouncePostsToStoreInCache = setTimeout(cachePostsNow, 3100);
+  clearTimeout(debouncePostsToStoreInCache);
+  debouncePostsToStoreInCache = setTimeout(cachePostsNow, 300);
+}
+
+function cachePostsNow() {
+  clearTimeout(maxDebouncePostsToStoreInCache);
+  maxDebouncePostsToStoreInCache = 0;
+  clearTimeout(debouncePostsToStoreInCache);
+  debouncePostsToStoreInCache = 0;
+
+  const posts = Array.from(postsToStoreInCacheByURI.values()).map(p => {
+    const wordLeads = [];
+    const text = collectPostText(p.record, []);
+    for (const textChunk of text) {
+      populateWordLeads(textChunk, wordLeads);
+    }
+
+    return {
+      uri: p.uri,
+      did: p.author.did,
+      cid: p.cid,
+      time: p.record.time,
+      text,
+      w: wordLeads
+    };
+  });
+
+  postsToStoreInCacheByURI.clear();
+  if (posts.length) {
+    db.records.bulkPut(posts);
+
+    console.log('adding records ', posts.length, ' to cache ', posts);
+
+  }
+}
+
+/**
+ * @param {import('../../coldsky/lib/firehose').FirehoseMessageOfType<'app.bsky.feed.post'> | undefined} post
+ * @param {string[]} textArray
+ */
+function collectPostText(post, textArray) {
+  if (!post) return textArray;
+
+  if (post.text) textArray.push(post.text);
+  if (post.embed) {
+    if (post.embed.images?.length) {
+      for (const img of post.embed.images) {
+        if (img.alt) textArray.push(img.alt);
+        if (img.title) textArray.push(img.title);
+      }
+    }
+
+    if (post.embed.media?.images?.length) {
+      for (const img of post.embed.media.images) {
+        if (img.alt) textArray.push(img.alt);
+        if (img.title) textArray.push(img.title);
+      }
+    }
+  }
+
+  return textArray;
 }
 
 function cacheAccountsNow() {
@@ -182,20 +268,15 @@ function cacheAccountsNow() {
   if (accounts.length) {
     db.accounts.bulkPut(accounts);
 
-    console.log('adding ', accounts.length, ' to cache ', accounts);
+    console.log('adding accounts ', accounts.length, ' to cache ', accounts);
   }
 }
 
 /**
- * @param {string[]} words
+ * @param {string} text
  */
-function searchAccountsFromCache(words) {
-  const wordLeads = [];
-  for (const w of words) {
-    const wLead = w.slice(0, 3).toLowerCase();
-    if (wordLeads.indexOf(wLead) < 0)
-      wordLeads.push(wLead);
-  }
+function searchAccountsFromCache(text) {
+  const wordLeads = populateWordLeads(text, []);
 
   return wordLeads.map(async wLead => {
     const dbMatches = await db.accounts.where('w').equals(wLead).toArray();
@@ -309,6 +390,25 @@ async function directSearchAccountsFull(searchText) {
     q: searchText,
     limit: 100
   })).data?.actors;
+
+  return result;
+}
+
+/**
+ * @param {string | null | undefined} text
+ * @param {string[]} result
+ */
+export function populateWordLeads(text, result) {
+  if (!text) return result;
+
+  const words = text.split(NOT_WORD_CHARACTERS_REGEX);
+  for (const word of words) {
+    if (word.length < 3) continue;
+
+    const wLead = word.slice(0, 3).toLowerCase();
+    if (result.indexOf(wLead) < 0)
+      result.push(wLead);
+  }
 
   return result;
 }
