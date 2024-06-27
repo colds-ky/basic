@@ -35,8 +35,9 @@ export function EmbedLinks({ className, post, links, ...rest }) {
               {
                 !link.description && !link.imgSrc ? undefined :
                   !link.description ?
-                    <span className='post-embed-link-image-wrapper post-embed-link-image-nodescr-wrapper'
-                      style={{ backgroundImage: 'url(' + link.url + ')' }}>
+                    <span className='post-embed-link-image-wrapper post-embed-link-image-nodescr-wrapper'>
+                      <span className='post-embed-link-gif-overlay'
+                        style={{ backgroundImage: 'url(' + link.url + ')' }} />
                       <img className='post-embed-link-image' src={link.imgSrc} />
                     </span> :
                     !link.imgSrc ?
@@ -51,8 +52,9 @@ export function EmbedLinks({ className, post, links, ...rest }) {
                             {link.description}
                           </span>
                         </span>
-                        <span className='post-embed-link-image-wrapper'
-                          style={{ backgroundImage: 'url(' + link.url + ')' }}>
+                        <span className='post-embed-link-image-wrapper'>
+                          <span className='post-embed-link-gif-overlay'
+                            style={{ backgroundImage: 'url(' + link.url + ')' }} />
                           <img className='post-embed-link-image' src={link.imgSrc} />
                         </span>
                       </div>
