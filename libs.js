@@ -38078,7 +38078,6 @@ if (cid) {
       }
     }
   });
-  var req=require_lib();
-  if (typeof module!=='undefined' && module && module.exports) module.exports=req;
+  require_lib();
 })();
 //# sourceMappingURL=libs.js.map
