@@ -483,7 +483,7 @@
   });
 
   // lib/plc-directory.js
-  function plcDirectory(since, overrides) {
+  function plcDirectoryRaw(since, overrides) {
     const useFetch = (overrides == null ? void 0 : overrides.fetch) || fetch;
     return streamBuffer((stream) => __async(this, null, function* () {
       const EXPORT_URL = "https://plc.directory/export";
@@ -558,13 +558,13 @@
   function plcDirectoryCompact(since, overrides) {
     return __asyncGenerator(this, null, function* () {
       var _a, _b, _c;
-      const iteration = plcDirectory(since, overrides);
+      const iteration = plcDirectoryRaw(since, overrides);
       try {
         for (var iter = __forAwait(iteration), more, temp, error; more = !(temp = yield new __await(iter.next())).done; more = false) {
           const chunk = temp.value;
           const compactEntries = [];
           for (const entry of chunk.entries) {
-            const timestamp = new Date(entry.createdAt).getTime();
+            const timestamp = Date.parse(entry.createdAt);
             const compact = {
               timestamp,
               shortDID: shortenDID(entry.did),
