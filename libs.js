@@ -42300,7 +42300,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.40";
+	var version = "0.2.41";
 
 	// @ts-check
 
@@ -50978,7 +50978,9 @@ if (cid) {
 	  const car = await CarReader.fromBytes(bytes);
 	  const recordsByCID = new Map();
 	  const keyByCID = new Map();
+	  let lastRest = Date.now();
 	  for await (const block of car.blocks()) {
+	    await restRegularly();
 	    const record = decode$7(block.bytes);
 	    if (record.$type) recordsByCID.set(String(block.cid), record);else if (Array.isArray(record.e)) {
 	      let key = '';
@@ -50998,12 +51000,18 @@ if (cid) {
 	  /** @type {import('./firehose').FirehoseRecord[]} */
 	  const records = [];
 	  const fullDID = unwrapShortDID(shortDID);
-	  for (const [cid, record] of recordsByCID) {
+	  for (const entry of recordsByCID) {
+	    const cid = entry[0];
+	    /** @type {import('./firehose').FirehoseRecord} */
+	    const record = entry[1];
+	    record.repo = fullDID;
 	    const key = keyByCID.get(cid);
 	    if (key) {
+	      record.path = key;
 	      record.uri = 'at://' + fullDID + key;
 	    }
 	    records.push(record);
+	    await restRegularly();
 	  }
 
 	  // record.seq = commit.seq; 471603945
@@ -51018,6 +51026,13 @@ if (cid) {
 	  // record.action = 'create';
 
 	  return records;
+	  function restRegularly() {
+	    const now = Date.now();
+	    if (now - lastRest > 100) {
+	      lastRest = now;
+	      return new Promise(resolve => setTimeout(resolve, 3));
+	    }
+	  }
 	}
 
 	// @ts-check
@@ -51331,7 +51346,7 @@ if (cid) {
 	  }
 
 	  /** @type {import('.').IncrementalMatchThreadResult} */
-	  const completeReport = report ? report.slice() : [];
+	  const completeReport = timeline.slice();
 	  completeReport.cachedOnly = false;
 	  completeReport.processedAllCount = report ? report.processedAllCount : 0;
 	  completeReport.processedBatch = report?.processedBatch;
