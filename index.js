@@ -98610,7 +98610,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         uri: p.uri,
         did: p.author.did,
         cid: p.cid,
-        time: p.record.time,
+        time: p.record.createdAt && new Date(p.record.createdAt).getTime(),
         text,
         w: wordLeads
       };
@@ -99385,7 +99385,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // package.json
-  var version4 = "0.1.15";
+  var version4 = "0.1.16";
 
   // src/localise.js
   function localise(english, languageMap) {

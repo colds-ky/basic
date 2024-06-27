@@ -203,7 +203,7 @@ function cachePostsNow() {
       uri: p.uri,
       did: p.author.did,
       cid: p.cid,
-      time: p.record.time,
+      time: p.record.createdAt && new Date(p.record.createdAt).getTime(),
       text,
       w: wordLeads
     };
