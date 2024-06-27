@@ -37,6 +37,16 @@ export function RootLayout({
                   autoComplete="off"
                   placeholder={inputPlaceholderText ?? 'Demo search text'}
                   value={text}
+                  onKeyDown={e => {
+                    if (e.keyCode !== 13) return;
+                    e.preventDefault();
+                    const commandText = (text || '').trim();
+                    if (commandText.lastIndexOf('/', 0) === 0) {
+                      const commandFn = window[commandText.slice(1)];
+                      if (typeof commandFn === 'function')
+                        commandFn();
+                    }
+                  }}
                   onChange={e => {
                     setText(e.target.value);
                   }}
