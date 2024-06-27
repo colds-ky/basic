@@ -1207,7 +1207,7 @@
             }
             return dispatcher.useContext(Context);
           }
-          function useState11(initialState) {
+          function useState12(initialState) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useState(initialState);
           }
@@ -1219,7 +1219,7 @@
             var dispatcher = resolveDispatcher();
             return dispatcher.useRef(initialValue);
           }
-          function useEffect12(create5, deps) {
+          function useEffect13(create5, deps) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useEffect(create5, deps);
           }
@@ -2001,7 +2001,7 @@
           exports.useContext = useContext11;
           exports.useDebugValue = useDebugValue3;
           exports.useDeferredValue = useDeferredValue;
-          exports.useEffect = useEffect12;
+          exports.useEffect = useEffect13;
           exports.useId = useId2;
           exports.useImperativeHandle = useImperativeHandle4;
           exports.useInsertionEffect = useInsertionEffect3;
@@ -2009,7 +2009,7 @@
           exports.useMemo = useMemo8;
           exports.useReducer = useReducer;
           exports.useRef = useRef18;
-          exports.useState = useState11;
+          exports.useState = useState12;
           exports.useSyncExternalStore = useSyncExternalStore;
           exports.useTransition = useTransition;
           exports.version = ReactVersion;
@@ -2505,9 +2505,9 @@
           if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
             __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
           }
-          var React66 = require_react();
+          var React67 = require_react();
           var Scheduler = require_scheduler();
-          var ReactSharedInternals = React66.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+          var ReactSharedInternals = React67.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
           var suppressWarning = false;
           function setSuppressWarning(newSuppressWarning) {
             {
@@ -4112,7 +4112,7 @@
             {
               if (props.value == null) {
                 if (typeof props.children === "object" && props.children !== null) {
-                  React66.Children.forEach(props.children, function(child) {
+                  React67.Children.forEach(props.children, function(child) {
                     if (child == null) {
                       return;
                     }
@@ -12559,7 +12559,7 @@
             }
           }
           var fakeInternalInstance = {};
-          var emptyRefsObject = new React66.Component().refs;
+          var emptyRefsObject = new React67.Component().refs;
           var didWarnAboutStateAssignmentForComponent;
           var didWarnAboutUninitializedState;
           var didWarnAboutGetSnapshotBeforeUpdateWithoutDidUpdate;
@@ -17484,8 +17484,8 @@
           function validateSuspenseListNestedChild(childSlot, index2) {
             {
               var isAnArray = isArray2(childSlot);
-              var isIterable = !isAnArray && typeof getIteratorFn(childSlot) === "function";
-              if (isAnArray || isIterable) {
+              var isIterable2 = !isAnArray && typeof getIteratorFn(childSlot) === "function";
+              if (isAnArray || isIterable2) {
                 var type = isAnArray ? "array" : "iterable";
                 error("A nested %s was passed to row #%s in <SuspenseList />. Wrap it in an additional SuspenseList to configure its revealOrder: <SuspenseList revealOrder=...> ... <SuspenseList revealOrder=...>{%s}</SuspenseList> ... </SuspenseList>", type, index2, type);
                 return false;
@@ -27011,7 +27011,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
       if (true) {
         (function() {
           "use strict";
-          var React66 = require_react();
+          var React67 = require_react();
           var REACT_ELEMENT_TYPE = Symbol.for("react.element");
           var REACT_PORTAL_TYPE = Symbol.for("react.portal");
           var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
@@ -27037,7 +27037,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
             }
             return null;
           }
-          var ReactSharedInternals = React66.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+          var ReactSharedInternals = React67.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
           function error(format3) {
             {
               {
@@ -27904,7 +27904,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
         value: true
       });
       exports.default = StyledEngineProvider;
-      var React66 = _interopRequireWildcard(require_react());
+      var React67 = _interopRequireWildcard(require_react());
       var _propTypes = _interopRequireDefault(require_prop_types());
       var _react2 = (init_emotion_react_browser_esm(), __toCommonJS(emotion_react_browser_esm_exports));
       var _cache = _interopRequireDefault((init_emotion_cache_browser_esm(), __toCommonJS(emotion_cache_browser_esm_exports)));
@@ -27994,7 +27994,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
         value: true
       });
       exports.default = GlobalStyles3;
-      var React66 = _interopRequireWildcard(require_react());
+      var React67 = _interopRequireWildcard(require_react());
       var _propTypes = _interopRequireDefault(require_prop_types());
       var _react2 = (init_emotion_react_browser_esm(), __toCommonJS(emotion_react_browser_esm_exports));
       var _jsxRuntime = require_jsx_runtime();
@@ -75745,7 +75745,7 @@ if (cid) {
   });
 
   // src/index.js
-  var import_react12 = __toESM(require_react());
+  var import_react13 = __toESM(require_react());
   var import_client = __toESM(require_client());
 
   // node_modules/react-router-dom/dist/index.js
@@ -91209,10 +91209,10 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   var TextField_default = TextField;
 
   // src/landing/landing.js
-  var import_react10 = __toESM(require_react());
+  var import_react11 = __toESM(require_react());
 
   // src/landing/fun-background.js
-  var import_react6 = __toESM(require_react());
+  var import_react7 = __toESM(require_react());
 
   // node_modules/dexie/import-wrapper.mjs
   var import_dexie = __toESM(require_dexie(), 1);
@@ -97062,6 +97062,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   function streamBuffer(callback) {
     return __asyncGenerator(this, null, function* () {
       let finallyTrigger = () => {
+        args.isEnded = true;
       };
       let stop = false;
       let buffer2;
@@ -97079,7 +97080,12 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         reject,
         complete,
         isEnded: false,
-        finally: new Promise((resolve) => finallyTrigger = resolve)
+        finally: new Promise((resolve) => {
+          finallyTrigger = () => {
+            args.isEnded = true;
+            resolve();
+          };
+        })
       };
       callback(args);
       try {
@@ -97152,92 +97158,90 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
 
   // src/api/firehose-threads.js
   function firehoseThreads() {
-    return __asyncGenerator(this, null, function* () {
-      try {
-        for (var iter = __forAwait(firehoseThreadsChunked()), more, temp, error; more = !(temp = yield new __await(iter.next())).done; more = false) {
-          const chunk = temp.value;
-          for (const thread of chunk)
-            yield thread;
-        }
-      } catch (temp) {
-        error = [temp];
-      } finally {
-        try {
-          more && (temp = iter.return) && (yield new __await(temp.call(iter)));
-        } finally {
-          if (error)
-            throw error[0];
-        }
-      }
-    });
-  }
-  function firehoseThreadsChunked() {
-    return streamBuffer((streaming) => __async(this, null, function* () {
-      const publicAgent2 = new ColdskyAgent({
-        service: BSKY_PUBLIC_URL
-      });
-      keepMonitoringFirehose();
-      yield streaming.finally;
-      function keepMonitoringFirehose() {
-        return __async(this, null, function* () {
-          try {
-            for (var iter = __forAwait(firehose()), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
-              const chunk = temp.value;
-              if (streaming.isEnded)
-                break;
-              for (const entry of chunk) {
-                for (const msg of entry.messages) {
-                  switch (msg.$type) {
-                    case "app.bsky.feed.like":
-                      handleLike(msg);
-                      continue;
-                    case "app.bsky.feed.post":
-                      handlePost(msg);
-                      continue;
-                    case "app.bsky.feed.repost":
-                      handleRepost(msg);
-                      continue;
+    return streamBuffer(
+      /**
+       * @param {import('../../coldsky/src/api/akpa').StreamParameters<ThreadViewPost, ThreadViewPost[]>} streaming 
+       */
+      (streaming) => __async(this, null, function* () {
+        const publicAgent2 = new ColdskyAgent({
+          service: BSKY_PUBLIC_URL
+        });
+        const getPostThreadCached = throttledAsyncCache(
+          (uri) => {
+            if (streaming.isEnded)
+              return;
+            return publicAgent2.getPostThread({ uri }).then((res) => {
+              var _a3;
+              return (_a3 = res == null ? void 0 : res.data) == null ? void 0 : _a3.thread;
+            });
+          }
+        );
+        keepMonitoringFirehose();
+        yield streaming.finally;
+        console.log("firehoseThreads ended");
+        function keepMonitoringFirehose() {
+          return __async(this, null, function* () {
+            try {
+              for (var iter = __forAwait(firehose()), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
+                const chunk = temp.value;
+                if (streaming.isEnded)
+                  break;
+                for (const entry of chunk) {
+                  for (const msg of entry.messages) {
+                    switch (msg.$type) {
+                      case "app.bsky.feed.like":
+                        handleLike(msg);
+                        continue;
+                      case "app.bsky.feed.post":
+                        handlePost(msg);
+                        continue;
+                      case "app.bsky.feed.repost":
+                        handleRepost(msg);
+                        continue;
+                    }
                   }
                 }
               }
-            }
-          } catch (temp) {
-            error = [temp];
-          } finally {
-            try {
-              more && (temp = iter.return) && (yield temp.call(iter));
+            } catch (temp) {
+              error = [temp];
             } finally {
-              if (error)
-                throw error[0];
+              try {
+                more && (temp = iter.return) && (yield temp.call(iter));
+              } finally {
+                if (error)
+                  throw error[0];
+              }
             }
-          }
-        });
-      }
-      function handleLike(msg) {
-        return __async(this, null, function* () {
-          var _a3, _b;
-          const thread = (_b = (_a3 = yield publicAgent2.getPostThread({
-            uri: msg.subject.uri
-          })) == null ? void 0 : _a3.data) == null ? void 0 : _b.thread;
-          if (!thread || thread.blocked || thread.notFound)
-            return;
-          streaming.yield(thread);
-        });
-      }
-      function handlePost(msg) {
-        return __async(this, null, function* () {
-          var _a3, _b;
-          const thread = (_b = (_a3 = yield publicAgent2.getPostThread({
-            uri: "at://" + msg.repo + "/" + msg.path
-          })) == null ? void 0 : _a3.data) == null ? void 0 : _b.thread;
-          if (!thread || thread.blocked || thread.notFound)
-            return;
-          streaming.yield(thread);
-        });
-      }
-      function handleRepost(msg) {
-      }
-    }));
+          });
+        }
+        function yieldThread(thread) {
+          streaming.yield(thread, (buf2) => {
+            if (!buf2)
+              return [thread];
+            buf2.push(thread);
+            return buf2;
+          });
+        }
+        function handleLike(msg) {
+          return __async(this, null, function* () {
+            const thread = yield getPostThreadCached(msg.subject.uri);
+            if (!thread || thread.blocked || thread.notFound)
+              return;
+            yieldThread(thread);
+          });
+        }
+        function handlePost(msg) {
+          return __async(this, null, function* () {
+            const thread = yield getPostThreadCached("at://" + msg.repo + "/" + msg.path);
+            if (!thread || thread.blocked || thread.notFound)
+              return;
+            yieldThread(thread);
+          });
+        }
+        function handleRepost(msg) {
+        }
+      })
+    );
   }
 
   // src/api/hash.js
@@ -97273,61 +97277,335 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     d: "M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3m-4.4 15.55-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05"
   }), "FavoriteBorder");
 
-  // src/landing/fun-background.js
-  var POST_DEBOUNCE_MSEC = 1e3;
-  function FunBackground() {
-    const [threads, setThreads] = import_react6.default.useState(
-      /** @type {import('@atproto/api/dist/client/types/app/bsky/feed/defs').ThreadViewPost[]} */
-      []
+  // coldsky/src/api/forAwait.js
+  var import_react6 = __toESM(require_react());
+  function forAwait(from7, derive) {
+    const [state, setState] = (0, import_react6.useState)(initAwaitState);
+    state.reactSetState = setState;
+    (0, import_react6.useEffect)(state.effectMount, []);
+    return (
+      /** @type {*} */
+      state.hookUse(from7, derive)
     );
-    import_react6.default.useState(() => __async(this, null, function* () {
-      var _a3, _b, _c, _d;
-      const seenPosts = /* @__PURE__ */ new Set();
-      let nextUpdate = Date.now() + POST_DEBOUNCE_MSEC;
-      let threadBuf = [];
-      try {
-        for (var iter = __forAwait(firehoseThreads()), more, temp, error; more = !(temp = yield iter.next()).done; more = false) {
-          const thread = temp.value;
-          if (!((_a3 = thread == null ? void 0 : thread.post) == null ? void 0 : _a3.record.text))
-            continue;
-          if (seenPosts.has((_b = thread == null ? void 0 : thread.post) == null ? void 0 : _b.uri))
-            continue;
-          seenPosts.add((_c = thread == null ? void 0 : thread.post) == null ? void 0 : _c.uri);
-          threadBuf.push(thread);
-          if (Date.now() >= nextUpdate && threadBuf.length > 5) {
-            threadBuf.sort((t1, t2) => {
-              var _a4, _b2, _c2, _d2, _e, _f;
-              const likes1 = (((_a4 = t1.post) == null ? void 0 : _a4.likeCount) || 0) + (((_c2 = (_b2 = t2.parent) == null ? void 0 : _b2.post) == null ? void 0 : _c2.likeCount) || 0);
-              const likes2 = (((_d2 = t2.post) == null ? void 0 : _d2.likeCount) || 0) + (((_f = (_e = t1.parent) == null ? void 0 : _e.post) == null ? void 0 : _f.likeCount) || 0);
-              return likes2 - likes1;
-            });
-            const addTop = threadBuf[0];
-            setThreads((threads2) => {
-              const newThreads = threads2.slice(
-                threads2.length > 20 ? 1 : 0
-              );
-              newThreads.push(addTop);
-              return newThreads;
-            });
-            threadBuf = [];
-            nextUpdate = Date.now() + POST_DEBOUNCE_MSEC * 0.5 + // wait less after less liked posts
-            Math.min(10, ((_d = addTop.post) == null ? void 0 : _d.likeCount) || 0) * POST_DEBOUNCE_MSEC * 0.1;
-          }
-        }
-      } catch (temp) {
-        error = [temp];
-      } finally {
+  }
+  function initAwaitState() {
+    return new AwaitState();
+  }
+  var AwaitState = class _AwaitState {
+    constructor() {
+      /** @type {TRun<TFrom, TTo>} */
+      __publicField(this, "run");
+      /** @type {boolean} */
+      __publicField(this, "withinHook");
+      /** @type {AwaitState | undefined} */
+      __publicField(this, "repalcedWith");
+      /**
+       * @param {TFrom} from
+       * @param {TSourceOf<TFrom, TTo>} derive
+       * @returns {TTo | undefined}
+       */
+      __publicField(this, "hookUse", (from7, derive) => {
+        this.withinHook = true;
         try {
-          more && (temp = iter.return) && (yield temp.call(iter));
+          if (this.repalcedWith)
+            return this.repalcedWith.hookUse(from7, derive);
+          if (!this.run || this.run.from !== from7) {
+            if (this.run)
+              this.finishExistingIteration();
+            this.initializeNewValues(from7, derive);
+          } else {
+            this.nudgeContinuationFromHook();
+          }
+          return this.run.current;
         } finally {
-          if (error)
-            throw error[0];
+          this.withinHook = false;
+        }
+      });
+      __publicField(this, "effectMount", () => {
+        if (this.repalcedWith)
+          return this.repalcedWith.effectMount();
+        this.nudgeContinuationFromHook();
+        return this.effectUnmount;
+      });
+      __publicField(this, "effectUnmount", () => {
+        if (this.repalcedWith)
+          return this.repalcedWith.effectUnmount();
+        this.run.finished = true;
+        this.finishExistingIteration();
+      });
+      __publicField(this, "iterationCompletedNaturally", () => {
+        this.finishExistingIteration();
+      });
+    }
+    reactSetState(setState) {
+    }
+    /**
+     * @param {TFrom} from
+     * @param {TSourceOf<TFrom, TTo>} derive
+     */
+    initializeNewValues(from7, derive) {
+      this.run = {
+        from: from7,
+        derive,
+        iterators: /* @__PURE__ */ new Set()
+      };
+      this.continueWithChecked(from7, this.run, derive, this.iterationCompletedNaturally);
+    }
+    finishExistingIteration() {
+      var _a3;
+      const iterators = Array.from(this.run.iterators);
+      this.run.iterators.clear();
+      for (const iter of iterators) {
+        try {
+          (_a3 = iter.return) == null ? void 0 : _a3.call(iter);
+        } catch (error) {
+          console.warn("DEBUG: error while stopping iterator", error);
         }
       }
-    }));
-    return /* @__PURE__ */ import_react6.default.createElement("div", { className: "fun-background" }, /* @__PURE__ */ import_react6.default.createElement("div", { className: "fun-background-scroller" }, threads.map((thread, i) => {
+    }
+    nudgeContinuationFromHook() {
       var _a3;
-      return /* @__PURE__ */ import_react6.default.createElement(
+      if (!((_a3 = this.run.nudgeCallbacks) == null ? void 0 : _a3.length))
+        return;
+      const nudge = this.run.nudgeCallbacks.pop();
+      if (typeof nudge === "function")
+        nudge();
+      if (!this.run.nudgeCallbacks.length)
+        this.run.nudgeCallbacks = void 0;
+    }
+    /**
+     * @param {TFrom} from
+     * @param {TRun<TFrom, TTo>} run
+     * @param {TSourceOf<TFrom, any>} derive
+     * @param {() => void} completedNaturally
+     */
+    continueWithChecked(from7, run, derive, completedNaturally) {
+      if (!this.canContinue(run))
+        return;
+      if (derive) {
+        if (typeof derive === "function")
+          return this.continueWithFunction(from7, run, derive, completedNaturally);
+        if (isPromise(derive))
+          return this.continueWithPromise(from7, run, derive, completedNaturally);
+        if (Array.isArray(derive))
+          return this.continueWithArray(from7, run, derive, completedNaturally);
+        if (isIterable(derive))
+          return this.continueWithIterable(from7, run, derive, completedNaturally);
+        if (isAsyncIterable(derive))
+          return this.continueWithAsyncIterable(from7, run, derive, completedNaturally);
+      }
+      this.continueWithScalar(from7, run, derive);
+      completedNaturally();
+    }
+    /**
+     * @param {TFrom} from
+     * @param {TRun<TFrom, TTo>} run
+     * @param {TTo} value
+     */
+    continueWithScalar(from7, run, value) {
+      this.run.current = value;
+      if (!this.withinHook) {
+        this.repalcedWith = new _AwaitState();
+        this.repalcedWith.run = this.run;
+        this.repalcedWith.reactSetState = this.reactSetState;
+        this.reactSetState(this.repalcedWith);
+      }
+    }
+    /**
+     * @param {TFrom} from
+     * @param {TRun<TFrom, TTo>} run
+     * @param {Function} func
+     * @param {() => void} completedNaturally
+     */
+    continueWithFunction(from7, run, func, completedNaturally) {
+      try {
+        const value = func(from7);
+        this.continueWithChecked(from7, run, value, completedNaturally);
+      } catch (error) {
+        this.continueWithError(error);
+      }
+    }
+    /**
+     * @param {Error} error
+     */
+    continueWithError(error) {
+      this.run.error = error;
+      this.run.finished = true;
+      this.finishExistingIteration();
+    }
+    /**
+     * @param {TFrom} from
+     * @param {TRun<TFrom, TTo>} run
+     * @param {Promise<any>} promise
+     * @param {() => void} completedNaturally
+     */
+    continueWithPromise(from7, run, promise, completedNaturally) {
+      promise.then(
+        (result) => {
+          if (!this.canContinue(run))
+            return;
+          this.continueWithChecked(from7, run, result, completedNaturally);
+        },
+        (error) => {
+          if (!this.canContinue(run))
+            return;
+          this.continueWithError(error);
+        }
+      );
+    }
+    /**
+    * @param {TFrom} from
+    * @param {TRun<TFrom, TTo>} run
+    * @param {any[]} array
+    * @param {() => void} completedNaturally
+    */
+    continueWithArray(from7, run, array, completedNaturally) {
+      this.continueWithIterable(from7, run, array, completedNaturally);
+    }
+    /**
+     * @param {TFrom} from
+     * @param {TRun<TFrom, TTo>} run
+     * @param {Iterable<any>} iterable
+     * @param {() => void} completedNaturally
+     */
+    continueWithIterable(from7, run, iterable, completedNaturally) {
+      let iterator;
+      try {
+        iterator = iterable[Symbol.iterator]();
+      } catch (error) {
+        return this.continueWithError(error);
+      }
+      if (!iterator)
+        return completedNaturally();
+      this.run.iterators.add(iterator);
+      this.continueWithIterator(from7, run, iterator, () => {
+        this.run.iterators.delete(iterator);
+        completedNaturally();
+      });
+    }
+    /**
+    * @param {TFrom} from
+    * @param {TRun<TFrom, TTo>} run
+    * @param {Iterator<any>} iterator
+    * @param {() => void} completedNaturally
+    */
+    continueWithIterator(from7, run, iterator, completedNaturally) {
+      try {
+        const iteratorResult = iterator.next();
+        if (iteratorResult.done) {
+          if (iteratorResult.value !== void 0)
+            this.continueWithChecked(from7, run, iteratorResult.value, completedNaturally);
+        } else {
+          this.continueWithChecked(
+            from7,
+            run,
+            iteratorResult.value,
+            () => {
+              this.continueWhenever(() => {
+                this.continueWithIterator(from7, run, iterator, completedNaturally);
+              });
+            }
+          );
+        }
+      } catch (error) {
+        this.continueWithError(error);
+      }
+    }
+    /**
+     * @param {TFrom} from
+     * @param {TRun<TFrom, TTo>} run
+     * @param {AsyncIterable<any>} asyncIterable
+     * @param {() => void} completedNaturally
+     */
+    continueWithAsyncIterable(from7, run, asyncIterable, completedNaturally) {
+      let asyncIterator;
+      try {
+        asyncIterator = asyncIterable[Symbol.asyncIterator]();
+      } catch (error) {
+        return this.continueWithError(error);
+      }
+      if (!asyncIterator)
+        return completedNaturally();
+      this.run.iterators.add(asyncIterator);
+      this.continueWithAsyncIterator(from7, run, asyncIterator, () => {
+        this.run.iterators.delete(asyncIterator);
+        completedNaturally();
+      });
+    }
+    /**
+    * @param {TFrom} from
+    * @param {TRun<TFrom, TTo>} run
+    * @param {AsyncIterator<any>} asyncIterator
+    * @param {() => void} completedNaturally
+    */
+    continueWithAsyncIterator(from7, run, asyncIterator, completedNaturally) {
+      return __async(this, null, function* () {
+        try {
+          const iteratorResult = yield asyncIterator.next();
+          if (iteratorResult.done) {
+            if (iteratorResult.value !== void 0)
+              this.continueWithChecked(from7, run, iteratorResult.value, completedNaturally);
+          } else {
+            this.continueWithChecked(
+              from7,
+              run,
+              iteratorResult.value,
+              () => {
+                this.continueWhenever(() => {
+                  this.continueWithAsyncIterator(from7, run, asyncIterator, completedNaturally);
+                });
+              }
+            );
+          }
+        } catch (error) {
+          this.continueWithError(error);
+        }
+      });
+    }
+    canContinue(run) {
+      if (run !== this.run) {
+        ["DEBUG: activity after stop"].toString();
+        return false;
+      }
+      return true;
+    }
+    continueWhenever(callback) {
+      if (this.withinHook) {
+        try {
+          callback();
+        } catch (error) {
+          this.continueWithError(error);
+        }
+        return;
+      }
+      if (this.run.nudgeCallbacks) {
+        this.run.nudgeCallbacks.push(callback);
+        return;
+      }
+      this.run.nudgeCallbacks = [];
+      try {
+        callback();
+      } catch (error) {
+        this.continueWithError(error);
+      }
+    }
+  };
+  function isIterable(value) {
+    return value && typeof value[Symbol.iterator] === "function";
+  }
+  function isAsyncIterable(value) {
+    return value && typeof value[Symbol.asyncIterator] === "function";
+  }
+
+  // src/landing/fun-background.js
+  var POST_DEBOUNCE_MSEC = 1e3;
+  var POST_MAX_AGE = 1e3 * 30;
+  var DESIRED_POST_COUNT = 7;
+  function FunBackground() {
+    const { bestThreads } = forAwait("now", getFirehoseThreads) || {};
+    return /* @__PURE__ */ import_react7.default.createElement("div", { className: "fun-background" }, /* @__PURE__ */ import_react7.default.createElement("div", { className: "fun-background-scroller" }, bestThreads && bestThreads.map((thread, i) => {
+      var _a3;
+      return /* @__PURE__ */ import_react7.default.createElement(
         ThreadBubble,
         {
           key: ((_a3 = thread == null ? void 0 : thread.post) == null ? void 0 : _a3.uri) || "undefined",
@@ -97336,6 +97614,58 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       );
     })));
   }
+  function getFirehoseThreads() {
+    return __asyncGenerator(this, null, function* () {
+      var _a3, _b, _c;
+      const seenPostWhen = /* @__PURE__ */ new Map();
+      let bestCurrentThreads = [];
+      try {
+        for (var iter = __forAwait(firehoseThreads()), more, temp, error; more = !(temp = yield new __await(iter.next())).done; more = false) {
+          const chunk = temp.value;
+          const bestThreads = [];
+          const now = Date.now();
+          const threadTooOld = now - POST_MAX_AGE;
+          for (const oldThread of bestCurrentThreads) {
+            if (seenPostWhen.get(oldThread.post.uri) > threadTooOld) {
+              bestThreads.push(oldThread);
+            }
+          }
+          const newThreads = [];
+          for (const thread of chunk) {
+            if (!((_a3 = thread == null ? void 0 : thread.post) == null ? void 0 : _a3.record.text))
+              continue;
+            if (seenPostWhen.has((_b = thread == null ? void 0 : thread.post) == null ? void 0 : _b.uri))
+              continue;
+            seenPostWhen.set((_c = thread == null ? void 0 : thread.post) == null ? void 0 : _c.uri, now);
+            newThreads.push(thread);
+          }
+          newThreads.sort((t1, t2) => {
+            var _a4, _b2, _c2, _d, _e, _f;
+            const likes1 = (((_a4 = t1.post) == null ? void 0 : _a4.likeCount) || 0) + (((_c2 = (_b2 = t2.parent) == null ? void 0 : _b2.post) == null ? void 0 : _c2.likeCount) || 0);
+            const likes2 = (((_d = t2.post) == null ? void 0 : _d.likeCount) || 0) + (((_f = (_e = t1.parent) == null ? void 0 : _e.post) == null ? void 0 : _f.likeCount) || 0);
+            return likes2 - likes1;
+          });
+          for (let i = 0; i < newThreads.length; i++) {
+            if (!i || bestThreads.length < DESIRED_POST_COUNT) {
+              bestThreads.push(newThreads[i]);
+            }
+          }
+          bestCurrentThreads = bestThreads;
+          yield { bestThreads };
+          yield new __await(new Promise((resolve) => setTimeout(resolve, POST_DEBOUNCE_MSEC)));
+        }
+      } catch (temp) {
+        error = [temp];
+      } finally {
+        try {
+          more && (temp = iter.return) && (yield new __await(temp.call(iter)));
+        } finally {
+          if (error)
+            throw error[0];
+        }
+      }
+    });
+  }
   function ThreadBubble({ thread }) {
     var _a3, _b, _c, _d;
     const hash2 = calcHash((_a3 = thread == null ? void 0 : thread.post) == null ? void 0 : _a3.uri);
@@ -97343,7 +97673,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     const animationDuration = 20 + rnd * 30;
     rnd = nextRandom(rnd);
     const left = rnd * 80 - 2;
-    return /* @__PURE__ */ import_react6.default.createElement(
+    return /* @__PURE__ */ import_react7.default.createElement(
       "div",
       {
         className: "fun-background-thread",
@@ -97352,13 +97682,13 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           left: `${left.toFixed(2)}%`
         }
       },
-      /* @__PURE__ */ import_react6.default.createElement("div", { className: "fun-background-thread-content" }, (_b = thread == null ? void 0 : thread.post) == null ? void 0 : _b.record.text),
-      /* @__PURE__ */ import_react6.default.createElement("div", { className: "fun-background-thread-likes" }, /* @__PURE__ */ import_react6.default.createElement(FavoriteBorder_default, null), !((_c = thread == null ? void 0 : thread.post) == null ? void 0 : _c.likeCount) ? "" : (_d = thread == null ? void 0 : thread.post) == null ? void 0 : _d.likeCount.toLocaleString())
+      /* @__PURE__ */ import_react7.default.createElement("div", { className: "fun-background-thread-content" }, (_b = thread == null ? void 0 : thread.post) == null ? void 0 : _b.record.text),
+      /* @__PURE__ */ import_react7.default.createElement("div", { className: "fun-background-thread-likes" }, /* @__PURE__ */ import_react7.default.createElement(FavoriteBorder_default, null), !((_c = thread == null ? void 0 : thread.post) == null ? void 0 : _c.likeCount) ? "" : (_d = thread == null ? void 0 : thread.post) == null ? void 0 : _d.likeCount.toLocaleString())
     );
   }
 
   // package.json
-  var version4 = "0.1.11";
+  var version4 = "0.1.12";
 
   // src/localise.js
   function localise(english, languageMap) {
@@ -97398,13 +97728,13 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
   }
 
   // src/widgets/account/account-label.js
-  var import_react9 = __toESM(require_react());
+  var import_react10 = __toESM(require_react());
 
   // src/widgets/account/full-handle.js
-  var import_react8 = __toESM(require_react());
+  var import_react9 = __toESM(require_react());
 
   // src/widgets/account/full-did.js
-  var import_react7 = __toESM(require_react());
+  var import_react8 = __toESM(require_react());
   function FullDID(_a3) {
     var _b = _a3, { shortDID, Component: Component2 } = _b, rest = __objRest(_b, ["shortDID", "Component"]);
     if (!shortDID)
@@ -97413,9 +97743,9 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       Component2 = "span";
     const fullDID = unwrapShortDID(shortDID);
     if (shortDID === fullDID)
-      return /* @__PURE__ */ import_react7.default.createElement(Component2, __spreadValues({}, rest), fullDID);
+      return /* @__PURE__ */ import_react8.default.createElement(Component2, __spreadValues({}, rest), fullDID);
     else
-      return /* @__PURE__ */ import_react7.default.createElement(Component2, __spreadValues({}, rest), /* @__PURE__ */ import_react7.default.createElement("span", { className: "did-plc-prefix" }, fullDID.slice(0, -shortDID.length)), shortDID);
+      return /* @__PURE__ */ import_react8.default.createElement(Component2, __spreadValues({}, rest), /* @__PURE__ */ import_react8.default.createElement("span", { className: "did-plc-prefix" }, fullDID.slice(0, -shortDID.length)), shortDID);
   }
 
   // src/widgets/account/full-handle.js
@@ -97426,7 +97756,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     if (!Component2)
       Component2 = "span";
     if (likelyDID(shortHandle))
-      return /* @__PURE__ */ import_react8.default.createElement(FullDID, __spreadValues({ shortDID: shortHandle, Component: Component2 }, rest));
+      return /* @__PURE__ */ import_react9.default.createElement(FullDID, __spreadValues({ shortDID: shortHandle, Component: Component2 }, rest));
     const fullHandle = unwrapShortHandle(shortHandle);
     shortHandle = shortenHandle(shortHandle);
     const bskySocialSuffix = shortHandle === fullHandle ? void 0 : fullHandle.slice(shortHandle.length);
@@ -97439,7 +97769,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         tldSuffix = shortHandle.slice(lastDot);
       }
     }
-    return /* @__PURE__ */ import_react8.default.createElement(Component2, __spreadValues({}, rest), /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-main-text" }, mainText), tldSuffix && /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-tld-suffix" }, tldSuffix), bskySocialSuffix && /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-bsky-social-suffix-dot" }, bskySocialSuffix.charAt(0)), /* @__PURE__ */ import_react8.default.createElement("span", { className: "handle-bsky-social-suffix" }, bskySocialSuffix.slice(1))));
+    return /* @__PURE__ */ import_react9.default.createElement(Component2, __spreadValues({}, rest), /* @__PURE__ */ import_react9.default.createElement("span", { className: "handle-main-text" }, mainText), tldSuffix && /* @__PURE__ */ import_react9.default.createElement("span", { className: "handle-tld-suffix" }, tldSuffix), bskySocialSuffix && /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, /* @__PURE__ */ import_react9.default.createElement("span", { className: "handle-bsky-social-suffix-dot" }, bskySocialSuffix.charAt(0)), /* @__PURE__ */ import_react9.default.createElement("span", { className: "handle-bsky-social-suffix" }, bskySocialSuffix.slice(1))));
   }
 
   // src/widgets/account/account-label.js
@@ -97447,7 +97777,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     var _b = _a3, { account, withDisplayName, className, Component: Component2 } = _b, rest = __objRest(_b, ["account", "withDisplayName", "className", "Component"]);
     if (!Component2)
       Component2 = "span";
-    return /* @__PURE__ */ import_react9.default.createElement(Component2, __spreadValues({ className: "account-label " + (className || "") }, rest), /* @__PURE__ */ import_react9.default.createElement("span", { className: "account-handle" }, /* @__PURE__ */ import_react9.default.createElement(
+    return /* @__PURE__ */ import_react10.default.createElement(Component2, __spreadValues({ className: "account-label " + (className || "") }, rest), /* @__PURE__ */ import_react10.default.createElement("span", { className: "account-handle" }, /* @__PURE__ */ import_react10.default.createElement(
       "span",
       {
         className: "account-avatar",
@@ -97456,7 +97786,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         }
       },
       "@"
-    ), /* @__PURE__ */ import_react9.default.createElement(FullHandle, { shortHandle: account.shortHandle || account.handle }), !withDisplayName || !account.displayName ? void 0 : /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, " ", /* @__PURE__ */ import_react9.default.createElement("span", { className: "account-label-display-name" }, account.displayName))));
+    ), /* @__PURE__ */ import_react10.default.createElement(FullHandle, { shortHandle: account.shortHandle || account.handle }), !withDisplayName || !account.displayName ? void 0 : /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, null, " ", /* @__PURE__ */ import_react10.default.createElement("span", { className: "account-label-display-name" }, account.displayName))));
   }
 
   // node_modules/fuse.js/dist/fuse.esm.js
@@ -98951,10 +99281,10 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
 
   // src/landing/landing.js
   function Landing() {
-    const [timeout2] = import_react10.default.useState({ timeout: 0, searchText: "" });
+    const [timeout2] = import_react11.default.useState({ timeout: 0, searchText: "" });
     const [searchParams, setSearchParams] = useSearchParams();
-    const [searchText, setSearchText] = import_react10.default.useState(searchParams.get("q") || "");
-    const [searchResults, setSearchResults] = import_react10.default.useState(
+    const [searchText, setSearchText] = import_react11.default.useState(searchParams.get("q") || "");
+    const [searchResults, setSearchResults] = import_react11.default.useState(
       /** @type {import('@atproto/api/dist/client/types/app/bsky/actor/defs').ProfileViewBasic[]} */
       []
     );
@@ -98994,7 +99324,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         }
       }), 500);
     }
-    return /* @__PURE__ */ import_react10.default.createElement("div", { className: "landing" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "landing-top-bar" }, /* @__PURE__ */ import_react10.default.createElement("a", { href: "https://bsky.app/profile/gist.ing" }, "\u{1D572}\u{1D58E}\u{1D598}\u{1D599}")), /* @__PURE__ */ import_react10.default.createElement("div", { className: "landing-handle-band" }, /* @__PURE__ */ import_react10.default.createElement(
+    return /* @__PURE__ */ import_react11.default.createElement("div", { className: "landing" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "landing-top-bar" }, /* @__PURE__ */ import_react11.default.createElement("a", { href: "https://bsky.app/profile/gist.ing" }, "\u{1D572}\u{1D58E}\u{1D598}\u{1D599}")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "landing-handle-band" }, /* @__PURE__ */ import_react11.default.createElement(
       TextField_default,
       {
         id: "handle",
@@ -99011,11 +99341,11 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
           setSearchText(searchText2);
         }
       }
-    )), !searchResults.length ? void 0 : /* @__PURE__ */ import_react10.default.createElement("div", { className: "landing-auto-completion-area" }, (searchResults.length < 10 ? searchResults : searchResults.slice(0, 10)).map((profile) => /* @__PURE__ */ import_react10.default.createElement(Link, { key: profile.did, to: `/${profile.handle}`, className: "landing-auto-complete-entry" }, /* @__PURE__ */ import_react10.default.createElement(AccountLabel, { account: profile, Component: "div", withDisplayName: true }))), searchResults.complete ? void 0 : /* @__PURE__ */ import_react10.default.createElement("div", { className: "landing-auto-completion-progress" }, "...")), /* @__PURE__ */ import_react10.default.createElement("div", { className: "landing-bottom-bar" }, "v", version4), /* @__PURE__ */ import_react10.default.createElement(FunBackground, null));
+    )), !searchResults.length ? void 0 : /* @__PURE__ */ import_react11.default.createElement("div", { className: "landing-auto-completion-area" }, (searchResults.length < 10 ? searchResults : searchResults.slice(0, 10)).map((profile) => /* @__PURE__ */ import_react11.default.createElement(Link, { key: profile.did, to: `/${profile.handle}`, className: "landing-auto-complete-entry" }, /* @__PURE__ */ import_react11.default.createElement(AccountLabel, { account: profile, Component: "div", withDisplayName: true }))), searchResults.complete ? void 0 : /* @__PURE__ */ import_react11.default.createElement("div", { className: "landing-auto-completion-progress" }, "...")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "landing-bottom-bar" }, "v", version4), /* @__PURE__ */ import_react11.default.createElement(FunBackground, null));
   }
 
   // src/history/history.js
-  var import_react11 = __toESM(require_react());
+  var import_react12 = __toESM(require_react());
   function History() {
     let { handle } = useParams();
     if (handle) {
@@ -99024,7 +99354,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
         unwrap: unwrapShortHandle(handle)
       });
     }
-    return /* @__PURE__ */ import_react11.default.createElement("div", null, "History...", handle);
+    return /* @__PURE__ */ import_react12.default.createElement("div", null, "History...", handle);
   }
 
   // src/index.js
@@ -99033,9 +99363,9 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
     const useRouter = /file/i.test(location.protocol) ? createHashRouter : createBrowserRouter;
     const router = useRouter(
       [
-        { path: "/", element: /* @__PURE__ */ import_react12.default.createElement(Landing, null) },
-        { path: "/index.html", element: /* @__PURE__ */ import_react12.default.createElement(Landing, null) },
-        { path: "/:handle", element: /* @__PURE__ */ import_react12.default.createElement(History, null) }
+        { path: "/", element: /* @__PURE__ */ import_react13.default.createElement(Landing, null) },
+        { path: "/index.html", element: /* @__PURE__ */ import_react13.default.createElement(Landing, null) },
+        { path: "/:handle", element: /* @__PURE__ */ import_react13.default.createElement(History, null) }
       ],
       {
         basename
@@ -99067,7 +99397,7 @@ Please use another name.` : (0, import_formatMuiErrorMessage.default)(18));
       }
     });
     (0, import_client.createRoot)(root).render(
-      /* @__PURE__ */ import_react12.default.createElement(ThemeProvider5, { theme }, /* @__PURE__ */ import_react12.default.createElement(import_react12.default.Fragment, null, /* @__PURE__ */ import_react12.default.createElement(RouterProvider, { router })))
+      /* @__PURE__ */ import_react13.default.createElement(ThemeProvider5, { theme }, /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(RouterProvider, { router })))
     );
   }
   runApp();
