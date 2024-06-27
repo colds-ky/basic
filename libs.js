@@ -10727,78 +10727,72 @@ if (cid) {
 
 	var dist$1 = {};
 
-	var hasRequiredDist;
-	function requireDist() {
-	  if (hasRequiredDist) return dist$1;
-	  hasRequiredDist = 1;
-	  (function (exports) {
-	    (() => {
+	(function (exports) {
+	  (() => {
 
-	      var e = {
-	          d: (t, r) => {
-	            for (var n in r) e.o(r, n) && !e.o(t, n) && Object.defineProperty(t, n, {
-	              enumerable: !0,
-	              get: r[n]
-	            });
-	          },
-	          o: (e, t) => Object.prototype.hasOwnProperty.call(e, t),
-	          r: e => {
-	            "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {
-	              value: "Module"
-	            }), Object.defineProperty(e, "__esModule", {
-	              value: !0
-	            });
-	          }
+	    var e = {
+	        d: (t, r) => {
+	          for (var n in r) e.o(r, n) && !e.o(t, n) && Object.defineProperty(t, n, {
+	            enumerable: !0,
+	            get: r[n]
+	          });
 	        },
-	        t = {};
-	      function r(e, t) {
-	        return void 0 === t && (t = "-"), new RegExp("^(?!0{4}" + t + "0{2}" + t + "0{2})((?=[0-9]{4}" + t + "(((0[^2])|1[0-2])|02(?=" + t + "(([0-1][0-9])|2[0-8])))" + t + "[0-9]{2})|(?=((([13579][26])|([2468][048])|(0[48]))0{2})|([0-9]{2}((((0|[2468])[48])|[2468][048])|([13579][26])))" + t + "02" + t + "29))([0-9]{4})" + t + "(?!((0[469])|11)" + t + "31)((0[1,3-9]|1[0-2])|(02(?!" + t + "3)))" + t + "(0[1-9]|[1-2][0-9]|3[0-1])$").test(e);
-	      }
-	      function n(e) {
-	        var t = /\D/.exec(e);
-	        return t ? t[0] : "";
-	      }
-	      function i(e, t, r) {
-	        void 0 === t && (t = ":"), void 0 === r && (r = !1);
-	        var i = new RegExp("^([0-1]|2(?=([0-3])|4" + t + "00))[0-9]" + t + "[0-5][0-9](" + t + "([0-5]|6(?=0))[0-9])?(.[0-9]{1,9})?$");
-	        if (!r || !/[Z+\-]/.test(e)) return i.test(e);
-	        if (/Z$/.test(e)) return i.test(e.replace("Z", ""));
-	        var o = e.includes("+"),
-	          a = e.split(/[+-]/),
-	          u = a[0],
-	          d = a[1];
-	        return i.test(u) && function (e, t, r) {
-	          return void 0 === r && (r = ":"), new RegExp(t ? "^(0(?!(2" + r + "4)|0" + r + "3)|1(?=([0-1]|2(?=" + r + "[04])|[34](?=" + r + "0))))([03469](?=" + r + "[03])|[17](?=" + r + "0)|2(?=" + r + "[04])|5(?=" + r + "[034])|8(?=" + r + "[04]))" + r + "([03](?=0)|4(?=5))[05]$" : "^(0(?=[^0])|1(?=[0-2]))([39](?=" + r + "[03])|[0-24-8](?=" + r + "00))" + r + "[03]0$").test(e);
-	        }(d, o, n(d));
-	      }
-	      function o(e) {
-	        var t = e.split("T"),
-	          o = t[0],
-	          a = t[1],
-	          u = r(o, n(o));
-	        if (!a) return !1;
-	        var d,
-	          s = (d = a.match(/([^Z+\-\d])(?=\d+\1)/), Array.isArray(d) ? d[0] : "");
-	        return u && i(a, s, !0);
-	      }
-	      function a(e, t) {
-	        return void 0 === t && (t = "-"), new RegExp("^[0-9]{4}" + t + "(0(?=[^0])|1(?=[0-2]))[0-9]$").test(e);
-	      }
-	      e.r(t), e.d(t, {
-	        isValidDate: () => r,
-	        isValidISODateString: () => o,
-	        isValidTime: () => i,
-	        isValidYearMonth: () => a
-	      });
-	      var u = exports;
-	      for (var d in t) u[d] = t[d];
-	      t.__esModule && Object.defineProperty(u, "__esModule", {
-	        value: !0
-	      });
-	    })();
-	  })(dist$1);
-	  return dist$1;
-	}
+	        o: (e, t) => Object.prototype.hasOwnProperty.call(e, t),
+	        r: e => {
+	          "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {
+	            value: "Module"
+	          }), Object.defineProperty(e, "__esModule", {
+	            value: !0
+	          });
+	        }
+	      },
+	      t = {};
+	    function r(e, t) {
+	      return void 0 === t && (t = "-"), new RegExp("^(?!0{4}" + t + "0{2}" + t + "0{2})((?=[0-9]{4}" + t + "(((0[^2])|1[0-2])|02(?=" + t + "(([0-1][0-9])|2[0-8])))" + t + "[0-9]{2})|(?=((([13579][26])|([2468][048])|(0[48]))0{2})|([0-9]{2}((((0|[2468])[48])|[2468][048])|([13579][26])))" + t + "02" + t + "29))([0-9]{4})" + t + "(?!((0[469])|11)" + t + "31)((0[1,3-9]|1[0-2])|(02(?!" + t + "3)))" + t + "(0[1-9]|[1-2][0-9]|3[0-1])$").test(e);
+	    }
+	    function n(e) {
+	      var t = /\D/.exec(e);
+	      return t ? t[0] : "";
+	    }
+	    function i(e, t, r) {
+	      void 0 === t && (t = ":"), void 0 === r && (r = !1);
+	      var i = new RegExp("^([0-1]|2(?=([0-3])|4" + t + "00))[0-9]" + t + "[0-5][0-9](" + t + "([0-5]|6(?=0))[0-9])?(.[0-9]{1,9})?$");
+	      if (!r || !/[Z+\-]/.test(e)) return i.test(e);
+	      if (/Z$/.test(e)) return i.test(e.replace("Z", ""));
+	      var o = e.includes("+"),
+	        a = e.split(/[+-]/),
+	        u = a[0],
+	        d = a[1];
+	      return i.test(u) && function (e, t, r) {
+	        return void 0 === r && (r = ":"), new RegExp(t ? "^(0(?!(2" + r + "4)|0" + r + "3)|1(?=([0-1]|2(?=" + r + "[04])|[34](?=" + r + "0))))([03469](?=" + r + "[03])|[17](?=" + r + "0)|2(?=" + r + "[04])|5(?=" + r + "[034])|8(?=" + r + "[04]))" + r + "([03](?=0)|4(?=5))[05]$" : "^(0(?=[^0])|1(?=[0-2]))([39](?=" + r + "[03])|[0-24-8](?=" + r + "00))" + r + "[03]0$").test(e);
+	      }(d, o, n(d));
+	    }
+	    function o(e) {
+	      var t = e.split("T"),
+	        o = t[0],
+	        a = t[1],
+	        u = r(o, n(o));
+	      if (!a) return !1;
+	      var d,
+	        s = (d = a.match(/([^Z+\-\d])(?=\d+\1)/), Array.isArray(d) ? d[0] : "");
+	      return u && i(a, s, !0);
+	    }
+	    function a(e, t) {
+	      return void 0 === t && (t = "-"), new RegExp("^[0-9]{4}" + t + "(0(?=[^0])|1(?=[0-2]))[0-9]$").test(e);
+	    }
+	    e.r(t), e.d(t, {
+	      isValidDate: () => r,
+	      isValidISODateString: () => o,
+	      isValidTime: () => i,
+	      isValidYearMonth: () => a
+	    });
+	    var u = exports;
+	    for (var d in t) u[d] = t[d];
+	    t.__esModule && Object.defineProperty(u, "__esModule", {
+	      value: !0
+	    });
+	  })();
+	})(dist$1);
 
 	var hasRequiredFormats;
 	function requireFormats() {
@@ -10808,7 +10802,7 @@ if (cid) {
 	    value: true
 	  });
 	  formats.language = formats.cid = formats.nsid = formats.atIdentifier = formats.handle = formats.did = formats.atUri = formats.uri = formats.datetime = void 0;
-	  const iso_datestring_validator_1 = requireDist();
+	  const iso_datestring_validator_1 = dist$1;
 	  const cid_1 = require$$1;
 	  const types_1 = requireTypes();
 	  const syntax_1 = dist$4;
@@ -20819,24 +20813,24 @@ if (cid) {
 	      defs: {
 	        messageRef: {
 	          type: 'object',
-	          required: ['did', 'messageId'],
+	          required: ['did', 'messageId', 'convoId'],
 	          properties: {
 	            did: {
 	              type: 'string',
 	              format: 'did'
+	            },
+	            convoId: {
+	              type: 'string'
 	            },
 	            messageId: {
 	              type: 'string'
 	            }
 	          }
 	        },
-	        message: {
+	        messageInput: {
 	          type: 'object',
 	          required: ['text'],
 	          properties: {
-	            id: {
-	              type: 'string'
-	            },
 	            text: {
 	              type: 'string',
 	              maxLength: 10000,
@@ -21321,7 +21315,7 @@ if (cid) {
 	                },
 	                message: {
 	                  type: 'ref',
-	                  ref: 'lex:chat.bsky.convo.defs#message'
+	                  ref: 'lex:chat.bsky.convo.defs#messageInput'
 	                }
 	              }
 	            }
@@ -21350,6 +21344,7 @@ if (cid) {
 	              properties: {
 	                items: {
 	                  type: 'array',
+	                  maxLength: 100,
 	                  items: {
 	                    type: 'ref',
 	                    ref: 'lex:chat.bsky.convo.sendMessageBatch#batchItem'
@@ -21384,7 +21379,7 @@ if (cid) {
 	            },
 	            message: {
 	              type: 'ref',
-	              ref: 'lex:chat.bsky.convo.defs#message'
+	              ref: 'lex:chat.bsky.convo.defs#messageInput'
 	            }
 	          }
 	        }
@@ -21529,6 +21524,10 @@ if (cid) {
 	            type: 'params',
 	            required: ['messageId'],
 	            properties: {
+	              convoId: {
+	                type: 'string',
+	                description: 'Conversation that the message is from. NOTE: this field will eventually be required.'
+	              },
 	              messageId: {
 	                type: 'string'
 	              },
@@ -21790,7 +21789,7 @@ if (cid) {
 	            },
 	            subject: {
 	              type: 'union',
-	              refs: ['lex:com.atproto.admin.defs#repoRef', 'lex:com.atproto.repo.strongRef']
+	              refs: ['lex:com.atproto.admin.defs#repoRef', 'lex:com.atproto.repo.strongRef', 'lex:chat.bsky.convo.defs#messageRef']
 	            },
 	            subjectBlobCids: {
 	              type: 'array',
@@ -27114,7 +27113,7 @@ if (cid) {
 	Object.defineProperty(defs$2, "__esModule", {
 	  value: true
 	});
-	defs$2.validateLogDeleteMessage = defs$2.isLogDeleteMessage = defs$2.validateLogCreateMessage = defs$2.isLogCreateMessage = defs$2.validateLogLeaveConvo = defs$2.isLogLeaveConvo = defs$2.validateLogBeginConvo = defs$2.isLogBeginConvo = defs$2.validateConvoView = defs$2.isConvoView = defs$2.validateMessageViewSender = defs$2.isMessageViewSender = defs$2.validateDeletedMessageView = defs$2.isDeletedMessageView = defs$2.validateMessageView = defs$2.isMessageView = defs$2.validateMessage = defs$2.isMessage = defs$2.validateMessageRef = defs$2.isMessageRef = void 0;
+	defs$2.validateLogDeleteMessage = defs$2.isLogDeleteMessage = defs$2.validateLogCreateMessage = defs$2.isLogCreateMessage = defs$2.validateLogLeaveConvo = defs$2.isLogLeaveConvo = defs$2.validateLogBeginConvo = defs$2.isLogBeginConvo = defs$2.validateConvoView = defs$2.isConvoView = defs$2.validateMessageViewSender = defs$2.isMessageViewSender = defs$2.validateDeletedMessageView = defs$2.isDeletedMessageView = defs$2.validateMessageView = defs$2.isMessageView = defs$2.validateMessageInput = defs$2.isMessageInput = defs$2.validateMessageRef = defs$2.isMessageRef = void 0;
 	const util_1$4 = util$2;
 	const lexicons_1$3 = lexicons;
 	function isMessageRef(v) {
@@ -27125,14 +27124,14 @@ if (cid) {
 	  return lexicons_1$3.lexicons.validate('chat.bsky.convo.defs#messageRef', v);
 	}
 	defs$2.validateMessageRef = validateMessageRef;
-	function isMessage(v) {
-	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#message';
+	function isMessageInput(v) {
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#messageInput';
 	}
-	defs$2.isMessage = isMessage;
-	function validateMessage(v) {
-	  return lexicons_1$3.lexicons.validate('chat.bsky.convo.defs#message', v);
+	defs$2.isMessageInput = isMessageInput;
+	function validateMessageInput(v) {
+	  return lexicons_1$3.lexicons.validate('chat.bsky.convo.defs#messageInput', v);
 	}
-	defs$2.validateMessage = validateMessage;
+	defs$2.validateMessageInput = validateMessageInput;
 	function isMessageView(v) {
 	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#messageView';
 	}
@@ -41840,7 +41839,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.23";
+	var version = "0.2.24";
 
 	// @ts-check
 
