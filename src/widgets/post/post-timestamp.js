@@ -24,11 +24,14 @@ export function PostTimestamp({ className, post, since, linkTimestamp }) {
  const db = useDB();
  const profile = forAwait(post.shortDID, () => db.getProfileIncrementally(post.shortDID));
 
- const parsedURI = breakFeedURIPostOnly(post.uri);
+  const parsedURI = breakFeedURIPostOnly(post.uri);
+  let aggregateClassName = className ? 'post-date ' + className : 'post-date';
+  if (post.asOf && since && post.asOf - since >= 0 && post.asOf - since < 1000 * 60 * 20)
+    aggregateClassName += ' post-date-new';
 
  return (
    <Link
-     className={className ? 'post-date ' + className : 'post-date'}
+     className={aggregateClassName}
      to={
        '/' + (profile?.handle || parsedURI?.shortDID) +
        '/' + parsedURI?.postID}>

@@ -16,102 +16,103 @@ import { ThreadNestedChildren } from './thread-nested-children';
  * }} _
  */
 export function ThreadConversationView({
- className,
- conversationDirection,
- unrollMainConversation,
- linkTimestamp,
- linkAuthor
+  className,
+  conversationDirection,
+  unrollMainConversation,
+  linkTimestamp,
+  linkAuthor
 }) {
- const conversationSegments = [];
- let prevPost = conversationDirection.post;
- conversationSegments.push(
-   <CompletePostContent
-     key={'conversation-starter:' + conversationDirection.post.uri}
-     className='conversation-starter'
-     post={conversationDirection.post}
-     linkTimestamp={linkTimestamp}
-     linkAuthor={linkAuthor}
-     replies={conversationDirection.insignificants}
-   />
- );
+  const conversationSegments = [];
+  let prevPost = conversationDirection.post;
+  conversationSegments.push(
+    <CompletePostContent
+      key={'conversation-starter:' + conversationDirection.post.uri}
+      className='conversation-starter'
+      post={conversationDirection.post}
+      linkTimestamp={linkTimestamp}
+      linkAuthor={linkAuthor}
+      replies={conversationDirection.insignificants}
+    />
+  );
 
- /** @type {import('./thread-structure').ThreadBranch | undefined} */
- let prevConvo = conversationDirection;
- /** @type {import('./thread-structure').ThreadBranch[] | undefined} */
- let intermediateInsignificants;
- /** @type {import('./thread-structure').ThreadBranch[] | undefined} */
- let asides;
- while (prevConvo) {
-   asides = concatArraysSlim(asides, prevConvo.asides);
-   const showNext =
-     prevConvo.conversationDirection &&
-     (
-      unrollMainConversation && prevConvo.isLeadingToTargetPost ||
-      prevConvo.conversationDirection.isSignificant ||
-      prevConvo.conversationDirection.isParentOfSignificant
-    );
+  /** @type {import('./thread-structure').ThreadBranch | undefined} */
+  let prevConvo = conversationDirection;
+  /** @type {import('./thread-structure').ThreadBranch[] | undefined} */
+  let intermediateInsignificants;
+  /** @type {import('./thread-structure').ThreadBranch[] | undefined} */
+  let asides;
+  while (prevConvo) {
+    asides = concatArraysSlim(asides, prevConvo.asides);
+    const showNext =
+      prevConvo.conversationDirection &&
+      (
+        unrollMainConversation && prevConvo.isLeadingToTargetPost ||
+        prevConvo.conversationDirection.isSignificant ||
+        prevConvo.conversationDirection.isParentOfSignificant
+      ) &&
+      prevConvo.conversationDirection;
 
-   if (showNext) {
+    if (showNext) {
 
-     const suppressAuthor =
-       prevConvo.conversationDirection?.post.shortDID === prevConvo.post.shortDID &&
-       !asides?.length; // if same author, and no visual interjection - no need to repeat the author's name
+      const suppressAuthor =
+        showNext.post.shortDID === prevConvo.post.shortDID &&
+        !asides?.length; // if same author, and no visual interjection - no need to repeat the author's name
 
-     if (intermediateInsignificants?.length) {
-       conversationSegments.push(
-         <InsignificantMarkers
-           key={'insignificants:' + prevConvo.post.uri}
-           branches={intermediateInsignificants}
-         />
-       );
-       intermediateInsignificants = undefined;
-     }
+      let addedSpacing = false;
+      if (intermediateInsignificants?.length) {
+        conversationSegments.push(
+          <InsignificantMarkers
+            key={'insignificants:' + prevConvo.post.uri}
+            branches={intermediateInsignificants}
+          />
+        );
+        intermediateInsignificants = undefined;
+        addedSpacing = true;
+      }
 
-     if (asides?.length) {
-       conversationSegments.push(
-         <ThreadNestedChildren
-           key={'asides:' + prevConvo.post.uri}
-           branches={asides}
-         />
-       );
-       asides = undefined;
-     }
+      if (asides?.length) {
+        conversationSegments.push(
+          <ThreadNestedChildren
+            key={'asides:' + prevConvo.post.uri}
+            branches={asides}
+          />
+        );
+        asides = undefined;
+        addedSpacing = true;
+      }
 
-     if (!intermediateInsignificants?.length && !asides?.length && !prevConvo.post.embeds?.length) {
+      if (suppressAuthor &&
+        !addedSpacing &&
+        !intermediateInsignificants?.length && !asides?.length && !prevConvo.post.embeds?.length) {
+        conversationSegments.push(
+          <hr className='conversation-divider' key={'conversation-divider:' + prevConvo.post.uri} />
+        );
+      }
+
       conversationSegments.push(
-        <hr className='conversation-divider' key={'conversation-divider:' + prevConvo.post.uri} />
+        <CompletePostContent
+          key={'conversation:' + showNext.post.uri}
+          className='conversation'
+          post={showNext.post}
+          incrementTimestampSince={prevConvo.post.asOf}
+          linkTimestamp={linkTimestamp}
+          linkAuthor={linkAuthor}
+          suppressAuthor={suppressAuthor}
+        />
       );
-     }
-
-     if (prevConvo.conversationDirection && (
-      unrollMainConversation && prevConvo.conversationDirection.isLeadingToTargetPost ||
-      prevConvo.isSignificant && prevConvo.significantPostCount
-     )) {
-       conversationSegments.push(
-         <CompletePostContent
-           key={'conversation:' + prevConvo.conversationDirection.post.uri}
-           className='conversation'
-           post={prevConvo.conversationDirection.post}
-           incrementTimestampSince={prevConvo.post.asOf}
-           linkTimestamp={linkTimestamp}
-           linkAuthor={linkAuthor}
-           suppressAuthor={suppressAuthor}
-         />
-       );
-     } else {
+    } else {
       if (!intermediateInsignificants) intermediateInsignificants = [prevConvo];
       else intermediateInsignificants.push(prevConvo);
-     }
-   }
+    }
 
-   prevConvo = prevConvo.conversationDirection;
- }
+    prevConvo = prevConvo.conversationDirection;
+  }
 
- return (
-   <PostFrame className={'thread-conversation-view ' + (className || '')}>
-     {conversationSegments}
-   </PostFrame>
- );
+  return (
+    <PostFrame className={'thread-conversation-view ' + (className || '')}>
+      {conversationSegments}
+    </PostFrame>
+  );
 }
 
 /**

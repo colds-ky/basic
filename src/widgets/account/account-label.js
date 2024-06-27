@@ -26,7 +26,6 @@ import { Link } from 'react-router-dom';
  * }} _
  */
 export function AccountLabel({ account, withDisplayName, className, linkToTimeline, Component, ...rest }) {
-  if (!Component) Component = 'span';
 
   const db = useDB();
   const profile = typeof account === 'string' ? forAwait(
@@ -58,17 +57,32 @@ export function AccountLabel({ account, withDisplayName, className, linkToTimeli
     </>
   );
 
-  return (
-    <Component className={'account-label ' + (className || '')} {...rest}>
-      {
-        linkToTimeline ?
-          <Link className='account-handle' to={'/' + profile?.handle}>
-            {inner}
-          </Link> :
-          <span className='account-handle'>
-            {inner}
-          </span>
-      }
-    </Component>
-  );
+  if (Component) {
+
+    return (
+      <Component className={'account-label ' + (className || '')} {...rest}>
+        {
+          linkToTimeline ?
+            <Link className='account-handle' to={'/' + profile?.handle}>
+              {inner}
+            </Link> :
+            <span className='account-handle'>
+              {inner}
+            </span>
+        }
+      </Component>
+    );
+  } else {
+    let aggregateClassName = 'account-handle account-label';
+    if (className) aggregateClassName += ' ' + className;
+    return (
+      linkToTimeline ?
+        <Link className={aggregateClassName} to={'/' + profile?.handle}>
+          {inner}
+        </Link> :
+        <span className={aggregateClassName}>
+          {inner}
+        </span>
+    );
+  }
 }
