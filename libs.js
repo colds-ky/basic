@@ -10727,78 +10727,72 @@ if (cid) {
 
 	var dist$1 = {};
 
-	var hasRequiredDist;
-	function requireDist() {
-	  if (hasRequiredDist) return dist$1;
-	  hasRequiredDist = 1;
-	  (function (exports) {
-	    (() => {
+	(function (exports) {
+	  (() => {
 
-	      var e = {
-	          d: (t, r) => {
-	            for (var n in r) e.o(r, n) && !e.o(t, n) && Object.defineProperty(t, n, {
-	              enumerable: !0,
-	              get: r[n]
-	            });
-	          },
-	          o: (e, t) => Object.prototype.hasOwnProperty.call(e, t),
-	          r: e => {
-	            "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {
-	              value: "Module"
-	            }), Object.defineProperty(e, "__esModule", {
-	              value: !0
-	            });
-	          }
+	    var e = {
+	        d: (t, r) => {
+	          for (var n in r) e.o(r, n) && !e.o(t, n) && Object.defineProperty(t, n, {
+	            enumerable: !0,
+	            get: r[n]
+	          });
 	        },
-	        t = {};
-	      function r(e, t) {
-	        return void 0 === t && (t = "-"), new RegExp("^(?!0{4}" + t + "0{2}" + t + "0{2})((?=[0-9]{4}" + t + "(((0[^2])|1[0-2])|02(?=" + t + "(([0-1][0-9])|2[0-8])))" + t + "[0-9]{2})|(?=((([13579][26])|([2468][048])|(0[48]))0{2})|([0-9]{2}((((0|[2468])[48])|[2468][048])|([13579][26])))" + t + "02" + t + "29))([0-9]{4})" + t + "(?!((0[469])|11)" + t + "31)((0[1,3-9]|1[0-2])|(02(?!" + t + "3)))" + t + "(0[1-9]|[1-2][0-9]|3[0-1])$").test(e);
-	      }
-	      function n(e) {
-	        var t = /\D/.exec(e);
-	        return t ? t[0] : "";
-	      }
-	      function i(e, t, r) {
-	        void 0 === t && (t = ":"), void 0 === r && (r = !1);
-	        var i = new RegExp("^([0-1]|2(?=([0-3])|4" + t + "00))[0-9]" + t + "[0-5][0-9](" + t + "([0-5]|6(?=0))[0-9])?(.[0-9]{1,9})?$");
-	        if (!r || !/[Z+\-]/.test(e)) return i.test(e);
-	        if (/Z$/.test(e)) return i.test(e.replace("Z", ""));
-	        var o = e.includes("+"),
-	          a = e.split(/[+-]/),
-	          u = a[0],
-	          d = a[1];
-	        return i.test(u) && function (e, t, r) {
-	          return void 0 === r && (r = ":"), new RegExp(t ? "^(0(?!(2" + r + "4)|0" + r + "3)|1(?=([0-1]|2(?=" + r + "[04])|[34](?=" + r + "0))))([03469](?=" + r + "[03])|[17](?=" + r + "0)|2(?=" + r + "[04])|5(?=" + r + "[034])|8(?=" + r + "[04]))" + r + "([03](?=0)|4(?=5))[05]$" : "^(0(?=[^0])|1(?=[0-2]))([39](?=" + r + "[03])|[0-24-8](?=" + r + "00))" + r + "[03]0$").test(e);
-	        }(d, o, n(d));
-	      }
-	      function o(e) {
-	        var t = e.split("T"),
-	          o = t[0],
-	          a = t[1],
-	          u = r(o, n(o));
-	        if (!a) return !1;
-	        var d,
-	          s = (d = a.match(/([^Z+\-\d])(?=\d+\1)/), Array.isArray(d) ? d[0] : "");
-	        return u && i(a, s, !0);
-	      }
-	      function a(e, t) {
-	        return void 0 === t && (t = "-"), new RegExp("^[0-9]{4}" + t + "(0(?=[^0])|1(?=[0-2]))[0-9]$").test(e);
-	      }
-	      e.r(t), e.d(t, {
-	        isValidDate: () => r,
-	        isValidISODateString: () => o,
-	        isValidTime: () => i,
-	        isValidYearMonth: () => a
-	      });
-	      var u = exports;
-	      for (var d in t) u[d] = t[d];
-	      t.__esModule && Object.defineProperty(u, "__esModule", {
-	        value: !0
-	      });
-	    })();
-	  })(dist$1);
-	  return dist$1;
-	}
+	        o: (e, t) => Object.prototype.hasOwnProperty.call(e, t),
+	        r: e => {
+	          "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {
+	            value: "Module"
+	          }), Object.defineProperty(e, "__esModule", {
+	            value: !0
+	          });
+	        }
+	      },
+	      t = {};
+	    function r(e, t) {
+	      return void 0 === t && (t = "-"), new RegExp("^(?!0{4}" + t + "0{2}" + t + "0{2})((?=[0-9]{4}" + t + "(((0[^2])|1[0-2])|02(?=" + t + "(([0-1][0-9])|2[0-8])))" + t + "[0-9]{2})|(?=((([13579][26])|([2468][048])|(0[48]))0{2})|([0-9]{2}((((0|[2468])[48])|[2468][048])|([13579][26])))" + t + "02" + t + "29))([0-9]{4})" + t + "(?!((0[469])|11)" + t + "31)((0[1,3-9]|1[0-2])|(02(?!" + t + "3)))" + t + "(0[1-9]|[1-2][0-9]|3[0-1])$").test(e);
+	    }
+	    function n(e) {
+	      var t = /\D/.exec(e);
+	      return t ? t[0] : "";
+	    }
+	    function i(e, t, r) {
+	      void 0 === t && (t = ":"), void 0 === r && (r = !1);
+	      var i = new RegExp("^([0-1]|2(?=([0-3])|4" + t + "00))[0-9]" + t + "[0-5][0-9](" + t + "([0-5]|6(?=0))[0-9])?(.[0-9]{1,9})?$");
+	      if (!r || !/[Z+\-]/.test(e)) return i.test(e);
+	      if (/Z$/.test(e)) return i.test(e.replace("Z", ""));
+	      var o = e.includes("+"),
+	        a = e.split(/[+-]/),
+	        u = a[0],
+	        d = a[1];
+	      return i.test(u) && function (e, t, r) {
+	        return void 0 === r && (r = ":"), new RegExp(t ? "^(0(?!(2" + r + "4)|0" + r + "3)|1(?=([0-1]|2(?=" + r + "[04])|[34](?=" + r + "0))))([03469](?=" + r + "[03])|[17](?=" + r + "0)|2(?=" + r + "[04])|5(?=" + r + "[034])|8(?=" + r + "[04]))" + r + "([03](?=0)|4(?=5))[05]$" : "^(0(?=[^0])|1(?=[0-2]))([39](?=" + r + "[03])|[0-24-8](?=" + r + "00))" + r + "[03]0$").test(e);
+	      }(d, o, n(d));
+	    }
+	    function o(e) {
+	      var t = e.split("T"),
+	        o = t[0],
+	        a = t[1],
+	        u = r(o, n(o));
+	      if (!a) return !1;
+	      var d,
+	        s = (d = a.match(/([^Z+\-\d])(?=\d+\1)/), Array.isArray(d) ? d[0] : "");
+	      return u && i(a, s, !0);
+	    }
+	    function a(e, t) {
+	      return void 0 === t && (t = "-"), new RegExp("^[0-9]{4}" + t + "(0(?=[^0])|1(?=[0-2]))[0-9]$").test(e);
+	    }
+	    e.r(t), e.d(t, {
+	      isValidDate: () => r,
+	      isValidISODateString: () => o,
+	      isValidTime: () => i,
+	      isValidYearMonth: () => a
+	    });
+	    var u = exports;
+	    for (var d in t) u[d] = t[d];
+	    t.__esModule && Object.defineProperty(u, "__esModule", {
+	      value: !0
+	    });
+	  })();
+	})(dist$1);
 
 	var hasRequiredFormats;
 	function requireFormats() {
@@ -10808,7 +10802,7 @@ if (cid) {
 	    value: true
 	  });
 	  formats.language = formats.cid = formats.nsid = formats.atIdentifier = formats.handle = formats.did = formats.atUri = formats.uri = formats.datetime = void 0;
-	  const iso_datestring_validator_1 = requireDist();
+	  const iso_datestring_validator_1 = dist$1;
 	  const cid_1 = require$$1;
 	  const types_1 = requireTypes();
 	  const syntax_1 = dist$4;
@@ -41845,7 +41839,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.26";
+	var version = "0.2.27";
 
 	// @ts-check
 
@@ -50088,16 +50082,18 @@ if (cid) {
 	   * @returns {Promise<import('.').MatchCompactPost[]>}
 	   */
 	  async function searchPosts(did, text) {
-	    const words = detectWordStartsNormalized(text, undefined);
-	    if (!words?.length && !did) return [];
+	    const wordStarts = detectWordStartsNormalized(text, undefined);
+	    if (!wordStarts?.length && !did) return [];
+	    const words = breakIntoWords(text || '');
+	    words.push(text || '');
 	    const shortDID = shortenDID(did);
-	    const wordMatcher = !words ? () => true : /** @param {string} w */w => words.includes(w);
+	    const wordMatcher = !wordStarts ? () => true : /** @param {string} w */w => wordStarts.includes(w);
 
 	    /** @type {Map<string, import('.').CompactPost>} */
 	    const map = new Map();
 
 	    // search by both shortDID and words
-	    const dbPosts = !shortDID ? await db.posts.where('words').anyOf(words || []).toArray() : !words?.length ? await db.posts.where('shortDID').equals(shortDID).toArray() : await db.posts.where('shortDID').equals(shortDID).and(post => !!post.words && post.words.some(wordMatcher)).toArray();
+	    const dbPosts = !shortDID ? await db.posts.where('words').anyOf(wordStarts || []).toArray() : !wordStarts?.length ? await db.posts.where('shortDID').equals(shortDID).toArray() : await db.posts.where('shortDID').equals(shortDID).and(post => !!post.words && post.words.some(wordMatcher)).toArray();
 	    for (const post of dbPosts) {
 	      map.set(post.uri, post);
 	    }
@@ -50125,7 +50121,7 @@ if (cid) {
 	      shouldSort: true,
 	      findAllMatches: true,
 	      ignoreLocation: true,
-	      threshold: 0.6
+	      threshold: 0.4
 	    });
 	    const matches = fuse.search(text);
 
@@ -50136,7 +50132,8 @@ if (cid) {
 	      const joined = {
 	        ...fuseMatch,
 	        ...fuseMatch.item,
-	        item: undefined
+	        item: undefined,
+	        searchWords: words
 	      };
 	      return joined;
 	    });
@@ -50185,12 +50182,14 @@ if (cid) {
 	   */
 	  async function searchProfiles(text, options) {
 	    if (!text) return;
-	    const words = detectWordStartsNormalized(text, undefined);
-	    if (!words?.length) return;
+	    const wordStarts = detectWordStartsNormalized(text, undefined);
+	    if (!wordStarts?.length) return;
+	    const words = breakIntoWords(text);
+	    words.push(text);
 
 	    /** @type {Map<string, import('.').CompactProfile>} */
 	    const map = new Map();
-	    const dbProfiles = await db.profiles.where('words').anyOf(words).toArray();
+	    const dbProfiles = await db.profiles.where('words').anyOf(wordStarts).toArray();
 	    for (const prof of dbProfiles) {
 	      map.set(prof.shortDID, prof);
 	    }
@@ -50212,6 +50211,7 @@ if (cid) {
 	      return {
 	        ...fuseMatch,
 	        ...fuseMatch.item,
+	        searchWords: words,
 	        item: undefined
 	      };
 	    });
