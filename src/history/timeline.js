@@ -35,8 +35,8 @@ export function Timeline({ shortDID, searchQuery }) {
 
   let minTimestamp = 0;
   let maxTimestamp = 0;
-  if (retrieved?.timeline?.length) {
-    for (const thread of retrieved.timeline) {
+  if (retrieved?.length) {
+    for (const thread of retrieved) {
       if (thread.root?.asOf && (!minTimestamp || thread.root.asOf < minTimestamp))
         minTimestamp = thread.root.asOf;
       for (const post of thread.all) {
@@ -56,7 +56,7 @@ export function Timeline({ shortDID, searchQuery }) {
       undefined :
       retrieved.processedBatch.filter(post => post.asOf && post.asOf < maxTimestamp);
   
-  let visiblePosts = retrieved?.timeline || [];
+  let visiblePosts = retrieved || [];
   if (visiblePosts.length > maxPosts) {
     visiblePosts = visiblePosts.slice(0, maxPosts);
   }
@@ -109,7 +109,7 @@ export function Timeline({ shortDID, searchQuery }) {
             cachedOnly={retrieved?.cachedOnly}
             complete={retrieved?.complete}
             searchQuery={searchQuery}
-            filteredCount={retrieved?.timeline?.length}
+            filteredCount={retrieved?.length}
             processedAllCount={retrieved?.processedAllCount}
             next={() => {
               revealMore();
@@ -122,7 +122,7 @@ export function Timeline({ shortDID, searchQuery }) {
 
   function revealMore() {
     searchMore();
-    if (retrieved?.timeline?.length > maxPosts) {
+    if (retrieved?.length > maxPosts) {
       setMaxPosts(maxPosts + EXPAND_VISIBLE_POSTS);
     }
   }
@@ -216,13 +216,20 @@ export function Timeline({ shortDID, searchQuery }) {
       </div>
     );
   }
+  /**
+ * @param {string} didOrHandle
+ * @param {string | undefined} searchQuery
+ */
+  function getTimeline(didOrHandle, searchQuery) {
+    return db.getTimelineIncrementally(didOrHandle, searchQuery);
+  }
 
 
   /**
    * @param {string} didOrHandle
    * @param {string | undefined} searchQuery
    */
-  async function* getTimeline(didOrHandle, searchQuery) {
+  async function* getTimelineOld(didOrHandle, searchQuery) {
     try {
       let shortDID;
       for await (const profile of db.getProfileIncrementally(didOrHandle)) {
