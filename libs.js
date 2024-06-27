@@ -10727,78 +10727,72 @@ if (cid) {
 
 	var dist$1 = {};
 
-	var hasRequiredDist;
-	function requireDist() {
-	  if (hasRequiredDist) return dist$1;
-	  hasRequiredDist = 1;
-	  (function (exports) {
-	    (() => {
+	(function (exports) {
+	  (() => {
 
-	      var e = {
-	          d: (t, r) => {
-	            for (var n in r) e.o(r, n) && !e.o(t, n) && Object.defineProperty(t, n, {
-	              enumerable: !0,
-	              get: r[n]
-	            });
-	          },
-	          o: (e, t) => Object.prototype.hasOwnProperty.call(e, t),
-	          r: e => {
-	            "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {
-	              value: "Module"
-	            }), Object.defineProperty(e, "__esModule", {
-	              value: !0
-	            });
-	          }
+	    var e = {
+	        d: (t, r) => {
+	          for (var n in r) e.o(r, n) && !e.o(t, n) && Object.defineProperty(t, n, {
+	            enumerable: !0,
+	            get: r[n]
+	          });
 	        },
-	        t = {};
-	      function r(e, t) {
-	        return void 0 === t && (t = "-"), new RegExp("^(?!0{4}" + t + "0{2}" + t + "0{2})((?=[0-9]{4}" + t + "(((0[^2])|1[0-2])|02(?=" + t + "(([0-1][0-9])|2[0-8])))" + t + "[0-9]{2})|(?=((([13579][26])|([2468][048])|(0[48]))0{2})|([0-9]{2}((((0|[2468])[48])|[2468][048])|([13579][26])))" + t + "02" + t + "29))([0-9]{4})" + t + "(?!((0[469])|11)" + t + "31)((0[1,3-9]|1[0-2])|(02(?!" + t + "3)))" + t + "(0[1-9]|[1-2][0-9]|3[0-1])$").test(e);
-	      }
-	      function n(e) {
-	        var t = /\D/.exec(e);
-	        return t ? t[0] : "";
-	      }
-	      function i(e, t, r) {
-	        void 0 === t && (t = ":"), void 0 === r && (r = !1);
-	        var i = new RegExp("^([0-1]|2(?=([0-3])|4" + t + "00))[0-9]" + t + "[0-5][0-9](" + t + "([0-5]|6(?=0))[0-9])?(.[0-9]{1,9})?$");
-	        if (!r || !/[Z+\-]/.test(e)) return i.test(e);
-	        if (/Z$/.test(e)) return i.test(e.replace("Z", ""));
-	        var o = e.includes("+"),
-	          a = e.split(/[+-]/),
-	          u = a[0],
-	          d = a[1];
-	        return i.test(u) && function (e, t, r) {
-	          return void 0 === r && (r = ":"), new RegExp(t ? "^(0(?!(2" + r + "4)|0" + r + "3)|1(?=([0-1]|2(?=" + r + "[04])|[34](?=" + r + "0))))([03469](?=" + r + "[03])|[17](?=" + r + "0)|2(?=" + r + "[04])|5(?=" + r + "[034])|8(?=" + r + "[04]))" + r + "([03](?=0)|4(?=5))[05]$" : "^(0(?=[^0])|1(?=[0-2]))([39](?=" + r + "[03])|[0-24-8](?=" + r + "00))" + r + "[03]0$").test(e);
-	        }(d, o, n(d));
-	      }
-	      function o(e) {
-	        var t = e.split("T"),
-	          o = t[0],
-	          a = t[1],
-	          u = r(o, n(o));
-	        if (!a) return !1;
-	        var d,
-	          s = (d = a.match(/([^Z+\-\d])(?=\d+\1)/), Array.isArray(d) ? d[0] : "");
-	        return u && i(a, s, !0);
-	      }
-	      function a(e, t) {
-	        return void 0 === t && (t = "-"), new RegExp("^[0-9]{4}" + t + "(0(?=[^0])|1(?=[0-2]))[0-9]$").test(e);
-	      }
-	      e.r(t), e.d(t, {
-	        isValidDate: () => r,
-	        isValidISODateString: () => o,
-	        isValidTime: () => i,
-	        isValidYearMonth: () => a
-	      });
-	      var u = exports;
-	      for (var d in t) u[d] = t[d];
-	      t.__esModule && Object.defineProperty(u, "__esModule", {
-	        value: !0
-	      });
-	    })();
-	  })(dist$1);
-	  return dist$1;
-	}
+	        o: (e, t) => Object.prototype.hasOwnProperty.call(e, t),
+	        r: e => {
+	          "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {
+	            value: "Module"
+	          }), Object.defineProperty(e, "__esModule", {
+	            value: !0
+	          });
+	        }
+	      },
+	      t = {};
+	    function r(e, t) {
+	      return void 0 === t && (t = "-"), new RegExp("^(?!0{4}" + t + "0{2}" + t + "0{2})((?=[0-9]{4}" + t + "(((0[^2])|1[0-2])|02(?=" + t + "(([0-1][0-9])|2[0-8])))" + t + "[0-9]{2})|(?=((([13579][26])|([2468][048])|(0[48]))0{2})|([0-9]{2}((((0|[2468])[48])|[2468][048])|([13579][26])))" + t + "02" + t + "29))([0-9]{4})" + t + "(?!((0[469])|11)" + t + "31)((0[1,3-9]|1[0-2])|(02(?!" + t + "3)))" + t + "(0[1-9]|[1-2][0-9]|3[0-1])$").test(e);
+	    }
+	    function n(e) {
+	      var t = /\D/.exec(e);
+	      return t ? t[0] : "";
+	    }
+	    function i(e, t, r) {
+	      void 0 === t && (t = ":"), void 0 === r && (r = !1);
+	      var i = new RegExp("^([0-1]|2(?=([0-3])|4" + t + "00))[0-9]" + t + "[0-5][0-9](" + t + "([0-5]|6(?=0))[0-9])?(.[0-9]{1,9})?$");
+	      if (!r || !/[Z+\-]/.test(e)) return i.test(e);
+	      if (/Z$/.test(e)) return i.test(e.replace("Z", ""));
+	      var o = e.includes("+"),
+	        a = e.split(/[+-]/),
+	        u = a[0],
+	        d = a[1];
+	      return i.test(u) && function (e, t, r) {
+	        return void 0 === r && (r = ":"), new RegExp(t ? "^(0(?!(2" + r + "4)|0" + r + "3)|1(?=([0-1]|2(?=" + r + "[04])|[34](?=" + r + "0))))([03469](?=" + r + "[03])|[17](?=" + r + "0)|2(?=" + r + "[04])|5(?=" + r + "[034])|8(?=" + r + "[04]))" + r + "([03](?=0)|4(?=5))[05]$" : "^(0(?=[^0])|1(?=[0-2]))([39](?=" + r + "[03])|[0-24-8](?=" + r + "00))" + r + "[03]0$").test(e);
+	      }(d, o, n(d));
+	    }
+	    function o(e) {
+	      var t = e.split("T"),
+	        o = t[0],
+	        a = t[1],
+	        u = r(o, n(o));
+	      if (!a) return !1;
+	      var d,
+	        s = (d = a.match(/([^Z+\-\d])(?=\d+\1)/), Array.isArray(d) ? d[0] : "");
+	      return u && i(a, s, !0);
+	    }
+	    function a(e, t) {
+	      return void 0 === t && (t = "-"), new RegExp("^[0-9]{4}" + t + "(0(?=[^0])|1(?=[0-2]))[0-9]$").test(e);
+	    }
+	    e.r(t), e.d(t, {
+	      isValidDate: () => r,
+	      isValidISODateString: () => o,
+	      isValidTime: () => i,
+	      isValidYearMonth: () => a
+	    });
+	    var u = exports;
+	    for (var d in t) u[d] = t[d];
+	    t.__esModule && Object.defineProperty(u, "__esModule", {
+	      value: !0
+	    });
+	  })();
+	})(dist$1);
 
 	var hasRequiredFormats;
 	function requireFormats() {
@@ -10808,7 +10802,7 @@ if (cid) {
 	    value: true
 	  });
 	  formats.language = formats.cid = formats.nsid = formats.atIdentifier = formats.handle = formats.did = formats.atUri = formats.uri = formats.datetime = void 0;
-	  const iso_datestring_validator_1 = requireDist();
+	  const iso_datestring_validator_1 = dist$1;
 	  const cid_1 = require$$1;
 	  const types_1 = requireTypes();
 	  const syntax_1 = dist$4;
@@ -41757,13 +41751,13 @@ if (cid) {
 	 */
 
 	const known$Types = ['app.bsky.feed.like', 'app.bsky.feed.post', 'app.bsky.feed.repost', 'app.bsky.feed.threadgate', 'app.bsky.graph.follow', 'app.bsky.graph.block', 'app.bsky.graph.list', 'app.bsky.graph.listitem', 'app.bsky.actor.profile', 'app.bsky.feed.generator'];
-	firehose.knownTypes = known$Types;
+	firehose$1.knownTypes = known$Types;
 	let cbor_x_extended = false;
 
 	/**
 	 * @returns {AsyncGenerator<FirehoseBlock[], void, void>}
 	 */
-	async function* firehose() {
+	async function* firehose$1() {
 	  ensureCborXExtended();
 
 	  /** @type {typeof WebSocket} */
@@ -41888,7 +41882,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.34";
+	var version = "0.2.35";
 
 	// @ts-check
 
@@ -41913,7 +41907,7 @@ if (cid) {
 	  let errorCount = 0;
 	  while (true) {
 	    try {
-	      for await (const block of firehose()) {
+	      for await (const block of firehose$1()) {
 	        lastHealth = Date.now();
 	        if (!block?.length) continue;
 	        for (const entry of block) {
@@ -50209,6 +50203,7 @@ if (cid) {
 	      allPosts?.sort((a1, a2) => (a2.asOf || 0) - (a1.asOf || 0));
 	      return allPosts;
 	    }
+	    const FUSE_THRESHOLD = 0.5;
 	    const fuse = new Fuse(allPosts, {
 	      includeScore: true,
 	      keys: ['text'],
@@ -50216,9 +50211,9 @@ if (cid) {
 	      shouldSort: true,
 	      findAllMatches: true,
 	      ignoreLocation: true,
-	      threshold: 0.4
+	      threshold: FUSE_THRESHOLD
 	    });
-	    const matches = fuse.search(text);
+	    const matches = fuse.search(text).filter(m => (m.score || 0) <= FUSE_THRESHOLD);
 
 	    /**
 	     * @type {import('.').MatchCompactPost[]}
@@ -50317,27 +50312,590 @@ if (cid) {
 	// @ts-check
 
 
-	/** @typedef {import('.').CompactPost} CompactPost */
-	/** @typedef {import('.').CompactProfile} CompactProfile */
-	/** @typedef {import('.').MatchCompactPost} MatchCompactPost */
-	/** @typedef {import('.').CompactThreadPostSet} CompactThreadPostSet */
+	/** @typedef {import('..').CompactPost} CompactPost */
+	/** @typedef {import('..').CompactProfile} CompactProfile */
 
 	/**
-	 * @typedef {MatchCompactPost[] & {
-	 *  cachedOnly?: boolean,
-	 *  processedBatch?: CompactPost[],
-	 *  processedAllCount?: number
-	 * }} IncrementalMatchCompactPosts
+	 * @param {ReturnType<typeof import('../define-cache-indexedDB-store').defineCacheIndexedDBStore>} dbStore
+	 * @returns {AsyncGenerator<import('..').CompactFirehoseBlock>}
+	 */
+	async function* firehose(dbStore) {
+	  for await (const blockSet of firehose$1()) {
+	    /** @type {Map<string, CompactPost>} */
+	    const updatedPosts = new Map();
+	    /** @type {Map<string, CompactProfile>} */
+	    const updatedProfiles = new Map();
+
+	    /** @type {import('../../firehose').FirehoseRecord[]} */
+	    const messages = [];
+
+	    /** @type {import('../../firehose').FirehoseRecord[] | undefined} */
+	    let deletes;
+
+	    /** @type {import('../../firehose').FirehoseRecord[] | undefined} */
+	    let unexpecteds;
+	    for (const block of blockSet) {
+	      if (block.messages) {
+	        for (const rec of block.messages) {
+	          messages.push(rec);
+	          const updated = dbStore.captureRecord(rec, block.receiveTimestamp);
+	          if (updated) {
+	            if ('uri' in updated) updatedPosts.set(updated.uri, updated);else updatedProfiles.set(updated.shortDID, updated);
+	          }
+	        }
+	      }
+	      if (block.deletes?.length) {
+	        if (!deletes) deletes = [];
+	        for (const rec of block.deletes) {
+	          dbStore.deleteRecord(rec);
+	          deletes.push(rec);
+	        }
+	      }
+	      if (block.unexpected?.length) {
+	        if (!unexpecteds) unexpecteds = block.unexpected;else if (block.unexpected.length === 1) unexpecteds.push(block.unexpected[0]);else unexpecteds = unexpecteds.concat(block.unexpected);
+	      }
+	    }
+	    yield {
+	      messages,
+	      posts: [...updatedPosts.values()],
+	      profiles: [...updatedProfiles.values()],
+	      deletes,
+	      unexpecteds
+	    };
+	  }
+	}
+
+	// @ts-check
+
+
+	/**
+	 * @typedef {{
+	 *  uri: string | null | undefined,
+	 *  agent_getRepoRecord_throttled: (repo, rkey, collection) => ReturnType<import('@atproto/api').BskyAgent['com']['atproto']['repo']['getRecord']>,
+	 *  dbStore: ReturnType<typeof import('../define-cache-indexedDB-store').defineCacheIndexedDBStore>
+	 * }} Args
 	 */
 
 	/**
-	 * @typedef {CompactThreadPostSet[] & {
-	 *  cachedOnly?: boolean,
-	 *  processedBatch?: CompactPost[],
-	 *  processedAllCount?: number,
-	 *  complete?: boolean
-	 * }} IncrementalMatchThreadResult
+	 * @param {Args} args
 	 */
+	function getPostOnly(args) {
+	  if (!args.uri) return;
+	  const dbPost = args.dbStore.getPostOnly(args.uri);
+	  if (dbPost && !isPromise(dbPost) && !dbPost.placeholder) return dbPost;
+	  if (!dbPost || !isPromise(dbPost)) return getPostOnlyAsync(args);else return dbPost.then(post => post && !post.placeholder ? post : getPostOnlyAsync(args));
+	}
+
+	/**
+	 * @param {Args} _
+	 */
+	async function getPostOnlyAsync({
+	  uri,
+	  dbStore,
+	  agent_getRepoRecord_throttled
+	}) {
+	  if (!uri) return;
+	  const parsedURL = breakFeedUri(uri);
+	  if (!parsedURL) throw new Error('Invalid post URI ' + JSON.stringify(uri));
+	  const postRecord =
+	  /**
+	  * @type {import('../../firehose').FirehoseRecord$Typed<'app.bsky.feed.post'>} */
+	  (await agent_getRepoRecord_throttled(unwrapShortDID(parsedURL.shortDID), parsedURL.postID, 'app.bsky.feed.post'))?.data?.value;
+	  postRecord.$type = 'app.bsky.feed.post';
+	  postRecord.repo = parsedURL.shortDID;
+	  postRecord.uri = uri;
+	  postRecord.action = 'create';
+	  const post = dbStore.captureRecord(postRecord, Date.now());
+	  if (post && 'uri' in post) return post;
+	}
+
+	// @ts-check
+
+
+	/**
+	 * @typedef {{
+	 *  uri: string | null | undefined,
+	 *  agent_getPostThread_throttled: (uri) => ReturnType<import('@atproto/api').BskyAgent['getPostThread']>,
+	 *  dbStore: ReturnType<typeof import('../define-cache-indexedDB-store').defineCacheIndexedDBStore>
+	 * }} Args
+	 */
+
+	/**
+	 * @param {Args} _
+	 * @returns {AsyncGenerator<import('..').CompactThreadPostSet | undefined>}
+	 */
+	async function* getPostThreadIncrementally({
+	  uri,
+	  dbStore,
+	  agent_getPostThread_throttled
+	}) {
+	  if (!uri) return;
+	  const parsedURL = breakFeedUri(uri);
+	  if (!parsedURL) return;
+	  const remotePromise = agent_getPostThread_throttled(uri);
+	  const local = await dbStore.getPostThread(uri);
+	  if (local && !local.root.placeholder) yield local;
+	  const remoteThreadRaw = (await remotePromise)?.data?.thread;
+	  if ('post' in remoteThreadRaw) {
+	    dbStore.captureThreadView( /** @type {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost} */remoteThreadRaw, Date.now());
+	    const ignoreBrokenPlaceholderUris = new Set();
+	    while (true) {
+	      const refreshedThread = await dbStore.getPostThread(uri);
+	      const allPlaceholders = [];
+	      if (refreshedThread?.all?.length) {
+	        for (const post of refreshedThread.all) {
+	          if (post.placeholder && !ignoreBrokenPlaceholderUris.has(post.uri)) allPlaceholders.push(post);
+	        }
+	      }
+	      yield refreshedThread;
+	      if (!allPlaceholders.length) break;
+	      const orphanRemotePromises = allPlaceholders.map(placeholderPost => ( /** @type {const} */
+	      [placeholderPost, agent_getPostThread_throttled(placeholderPost.uri)]));
+	      for (const [placeholderPost, orphanRemotePromise] of orphanRemotePromises) {
+	        try {
+	          const orphanRemoteRaw = (await orphanRemotePromise)?.data?.thread;
+	          if ('post' in orphanRemoteRaw) {
+	            dbStore.captureThreadView( /** @type {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost} */orphanRemoteRaw, Date.now());
+	          }
+	        } catch (error) {
+	          ignoreBrokenPlaceholderUris.add(placeholderPost.uri);
+	        }
+	      }
+	    }
+	  }
+	}
+
+	// @ts-check
+
+
+	/**
+	 * @typedef {{
+	 *  didOrHandle: string | null | undefined,
+	 *  agent_getProfile_throttled: (did) => ReturnType<import('@atproto/api').BskyAgent['getProfile']>,
+	 *  agent_resolveHandle_throttled: (handle) => ReturnType<import('@atproto/api').BskyAgent['resolveHandle']>,
+	 *  dbStore: ReturnType<typeof import('../define-cache-indexedDB-store').defineCacheIndexedDBStore>
+	 * }} Args
+	 */
+
+	/**
+	 * @param {Args} _
+	 */
+	async function* getProfileIncrementally({
+	  didOrHandle,
+	  dbStore,
+	  agent_getProfile_throttled,
+	  agent_resolveHandle_throttled
+	}) {
+	  if (!didOrHandle) return;
+	  let profileRemotePromise;
+	  if (likelyDID(didOrHandle)) {
+	    profileRemotePromise = agent_getProfile_throttled(unwrapShortDID(didOrHandle));
+	  } else {
+	    const resolveHandlePromise = agent_resolveHandle_throttled(unwrapShortHandle(didOrHandle));
+	    if (isPromise(resolveHandlePromise)) {
+	      profileRemotePromise = (async () => {
+	        const rec = await resolveHandlePromise;
+	        const shortDID = shortenDID(rec.data.did);
+	        return agent_getProfile_throttled(unwrapShortDID(shortDID));
+	      })();
+	    } else {
+	      const rec = resolveHandlePromise;
+	      const shortDID = shortenDID( /** @type {*} */rec.data.did);
+	      profileRemotePromise = agent_getProfile_throttled(unwrapShortDID(shortDID));
+	    }
+	  }
+	  const profileLocal = await dbStore.getProfile(didOrHandle);
+	  if (profileLocal) yield profileLocal;
+	  const profileRemoteRaw = (await profileRemotePromise).data;
+	  const profileRemoteResolved = dbStore.captureProfileView(profileRemoteRaw, Date.now());
+	  yield profileRemoteResolved;
+	}
+
+	// @ts-check
+
+
+	/**
+	 * @typedef {{
+	 *  shortDID: string | null | undefined,
+	 *  searchQuery: string | null | undefined,
+	 *  agent_searchPosts_throttled: (q: string, limit: number | undefined, sort: string | undefined, cursor?: string) => ReturnType<import('@atproto/api').BskyAgent['app']['bsky']['feed']['searchPosts']>
+	 *  dbStore: ReturnType<typeof import('../define-cache-indexedDB-store').defineCacheIndexedDBStore>
+	 * }} Args
+	 */
+
+	/**
+	 * @param {Args} args
+	 * @returns {[] | AsyncGenerator<import('.').IncrementalMatchCompactPosts>}
+	 */
+	function searchPostsIncrementally(args) {
+	  const {
+	    shortDID,
+	    searchQuery
+	  } = args;
+	  if (shortDID) {
+	    return searchAccountHistoryPostsIncrementally(args);
+	  } else if (!searchQuery) {
+	    return [];
+	  } else {
+	    return searchAllPostsIncrementally(args);
+	  }
+	}
+
+	/**
+	 * @param {Args} args
+	 */
+	async function* searchAccountHistoryPostsIncrementally(args) {
+	  const {
+	    shortDID,
+	    searchQuery,
+	    dbStore
+	  } = args;
+	  let REPORT_UPDATES_FREQUENCY_MSEC = 700;
+	  const cachedMatchesPromise = dbStore.searchPosts(shortDID, searchQuery);
+	  const allCachedHistoryPromise = !searchQuery ? cachedMatchesPromise : dbStore.searchPosts(shortDID, undefined);
+	  const plcDirHistoryPromise = plcDirectoryHistoryRaw( /** @type {string} */shortDID);
+	  let lastSearchReport = 0;
+	  /** @type {import('..').CompactPost[] | undefined}  */
+	  let processedBatch;
+	  let anyUpdates = false;
+
+	  /** @type {import('.').IncrementalMatchCompactPosts | undefined} */
+	  let lastMatches = await cachedMatchesPromise;
+
+	  /** @type {Set<string> | undefined} */
+	  let knownHistoryUri;
+	  if (!knownHistoryUri) {
+	    const allHistory = await allCachedHistoryPromise;
+	    knownHistoryUri = new Set((allHistory || []).map(rec => rec.uri));
+	  }
+	  if (lastMatches?.length) {
+	    lastMatches.cachedOnly = true;
+	    lastMatches.processedAllCount = knownHistoryUri.size;
+	    lastMatches.processedBatch = lastMatches.slice();
+	    lastSearchReport = Date.now();
+	    yield lastMatches;
+	  }
+	  const plcDirHistoryRecords = await plcDirHistoryPromise;
+	  dbStore.capturePlcDirectoryEntries(plcDirHistoryRecords);
+	  const profile = await dbStore.getProfile( /** @type {string} */shortDID);
+	  const pdsAgent = new ColdskyAgent({
+	    service: profile?.history?.[0].pds
+	  });
+	  let cursor = '';
+	  const fullDID = unwrapShortDID( /** @type {string} */shortDID);
+	  while (true) {
+	    const moreData = await pdsAgent.com.atproto.repo.listRecords({
+	      repo: unwrapShortDID( /** @type {string} */shortDID),
+	      cursor,
+	      collection: 'app.bsky.feed.post',
+	      limit: Math.random() * 10 + 88
+	    });
+	    if (moreData?.data?.records?.length) {
+	      for (const rec of moreData.data.records) {
+	        /** @type {import('../../firehose').FirehoseRecord$Typed<'app.bsky.feed.post'>} */
+	        const recEx = /** @type {*} */rec.value;
+	        recEx.$type = 'app.bsky.feed.post';
+	        recEx.uri = rec.uri;
+	        recEx.repo = fullDID;
+	        const post = /** @type {import('..').CompactPost} */dbStore.captureRecord(recEx, Date.now());
+	        if (post) {
+	          if (!processedBatch) processedBatch = [post];else processedBatch.push(post);
+	        }
+	        if (!knownHistoryUri.has(rec.uri)) {
+	          knownHistoryUri.add(rec.uri);
+	          anyUpdates = true;
+	        }
+	      }
+	    }
+	    if (anyUpdates || Date.now() - lastSearchReport > REPORT_UPDATES_FREQUENCY_MSEC) {
+	      /** @type {import('.').IncrementalMatchCompactPosts} */
+	      const newMatches = await dbStore.searchPosts(shortDID, searchQuery);
+	      if (newMatches?.length) {
+	        lastMatches = newMatches;
+	        lastSearchReport = Date.now();
+	        anyUpdates = false;
+	        newMatches.processedBatch = processedBatch;
+	        newMatches.processedAllCount = knownHistoryUri.size;
+	        processedBatch = undefined;
+	        yield newMatches;
+	        lastSearchReport = Date.now();
+	      }
+	    }
+	    if (!moreData?.data?.cursor) break;
+	    cursor = moreData.data.cursor;
+	  }
+	}
+
+	/**
+	 * @param {Args} args
+	 * @returns {AsyncGenerator<import('.').IncrementalMatchCompactPosts>}
+	 */
+	async function* searchAllPostsIncrementally(args) {
+	  const {
+	    searchQuery,
+	    dbStore,
+	    agent_searchPosts_throttled
+	  } = args;
+	  const searchStringSanitised = (searchQuery || '').trim().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, ' ').replace(/\s+/g, ' ');
+	  let remoteSearchLatestPromise = agent_searchPosts_throttled(searchStringSanitised, 97, 'latest');
+	  const localResultsPromise = dbStore.searchPosts(undefined, searchQuery);
+	  /** @type {import('..').MatchCompactPost[] & { cachedOnly?: boolean }} */
+	  const localResults = await localResultsPromise;
+	  if (localResults?.length) {
+	    localResults.cachedOnly = true;
+	    yield localResults;
+	  }
+	  let cursor = '';
+	  while (true) {
+	    const remoteSearchData = (await remoteSearchLatestPromise).data;
+	    const now = Date.now();
+	    for (const postRaw of remoteSearchData?.posts || []) {
+	      dbStore.capturePostView(postRaw, now);
+	    }
+	    const refreshedResults = await dbStore.searchPosts(undefined, searchQuery);
+	    if (remoteSearchData?.cursor) {
+	      cursor = remoteSearchData.cursor;
+	      remoteSearchLatestPromise = agent_searchPosts_throttled(searchStringSanitised, 97, 'latest', cursor);
+	    }
+	    if (refreshedResults?.length) {
+	      yield refreshedResults;
+	    }
+	    if (!remoteSearchData?.cursor) break;
+	  }
+	}
+
+	// @ts-check
+
+
+	/**
+	 * @typedef {{
+	 *  shortDID: string | null | undefined,
+	 *  searchQuery: string | null | undefined,
+	 *  agent_searchPosts_throttled: import('./search-posts-incrementally').Args['agent_searchPosts_throttled'],
+	 *  agent_getPostThread_throttled: (uri) => ReturnType<import('@atproto/api').BskyAgent['getPostThread']>,
+	 *  dbStore: ReturnType<typeof import('../define-cache-indexedDB-store').defineCacheIndexedDBStore>
+	 * }} Args
+	 */
+
+	/**
+	 * @param {Args} args
+	 * @returns {AsyncGenerator<import('.').IncrementalMatchThreadResult>}
+	 */
+	async function* getTimelineIncrementally(args) {
+	  const {
+	    shortDID,
+	    searchQuery
+	  } = args;
+	  const enrichPostToThreadParallel = throttledAsyncCache(
+	  /**
+	   * @param {string} uri
+	   * @param {boolean} shallow
+	   */
+	  (uri, shallow) => enrichPostToThread({
+	    ...args,
+	    uri,
+	    shallow
+	  }), {
+	    maxConcurrency: 10,
+	    interval: 1
+	  });
+	  let REPORT_INTERVAL_MSEC = 700;
+	  let PARALLELISE_THREAD_BATCH = 20;
+
+	  /** @type {import('..').CompactThreadPostSet[]} */
+	  let timeline = [];
+	  let lastReportTimestamp = Date.now() - REPORT_INTERVAL_MSEC / 2;
+
+	  /** @type {Map<string, number>} */
+	  let latestRelevantPostForThreadRootUri = new Map();
+	  for await (const entries of searchAccountHistoryPostsIncrementally({
+	    ...args,
+	    shortDID,
+	    searchQuery
+	  })) {
+	    // start enriching posts to threads from the most recent
+	    entries.sort((a, b) => (b.asOf || 0) - (a.asOf || 0));
+	    for (let iEntry = 0; iEntry < entries.length; iEntry += PARALLELISE_THREAD_BATCH) {
+	      /** @type {typeof entries} */
+	      const entriesBatch = entries.slice(iEntry, iEntry + PARALLELISE_THREAD_BATCH);
+	      entriesBatch.cachedOnly = entries.cachedOnly;
+	      entriesBatch.processedAllCount = entries.processedAllCount;
+	      entriesBatch.processedBatch = entries.processedBatch;
+	      for await (const report of processEntriesAndProduceBatchIfRequired(entriesBatch)) {
+	        if (report) yield report;
+	      }
+	    }
+	  }
+
+	  /**
+	   * @param {import('.').IncrementalMatchCompactPosts} entries
+	   */
+
+	  async function* processEntriesAndProduceBatchIfRequired(entries) {
+	    const threadPromises = entries.map(entry => enrichPostToThreadParallel(entry.threadStart || entry.uri, /* shallow */!!entries.cachedOnly));
+
+	    /** @type {Map<string, import('..').CompactPost>} */
+	    const searchMatchPosts = new Map();
+	    for (const post of entries) {
+	      searchMatchPosts.set(post.uri, post);
+	      if (!post.asOf) continue;
+	      const threadRootUri = post.threadStart || post.uri;
+	      let existingTimestamp = latestRelevantPostForThreadRootUri.get(threadRootUri);
+	      if (!existingTimestamp || existingTimestamp < post.asOf) latestRelevantPostForThreadRootUri.set(threadRootUri, post.asOf);
+	    }
+	    let reportDue = false;
+	    for (const threadPromise of threadPromises) {
+	      let postThreadRetrieved = await threadPromise;
+	      if (!postThreadRetrieved) continue;
+
+	      // Replace posts with search matches
+	      postThreadRetrieved = {
+	        ...postThreadRetrieved,
+	        all: postThreadRetrieved.all.map(post => searchMatchPosts.get(post.uri) || post),
+	        current: searchMatchPosts.get(postThreadRetrieved.current.uri) || postThreadRetrieved.current,
+	        root: searchMatchPosts.get(postThreadRetrieved.root.uri) || postThreadRetrieved.root
+	      };
+	      const timelineIndex = timeline.findIndex(t => t.root.uri === postThreadRetrieved.root.uri);
+	      if (timeline[timelineIndex] === postThreadRetrieved) continue;
+	      if (timelineIndex >= 0) timeline[timelineIndex] = postThreadRetrieved;else timeline.push(postThreadRetrieved);
+	      const now = Date.now();
+	      if (now - lastReportTimestamp > REPORT_INTERVAL_MSEC) {
+	        const report = makeReport();
+	        yield report;
+	      } else {
+	        reportDue = true;
+	      }
+	    }
+	    if (reportDue) {
+	      const report = makeReport();
+	      yield report;
+	    }
+	    function makeReport() {
+	      timeline.sort((a, b) => {
+	        const aTimestamp = latestRelevantPostForThreadRootUri.get(a.root.uri) || 0;
+	        const bTimestamp = latestRelevantPostForThreadRootUri.get(b.root.uri) || 0;
+	        return bTimestamp - aTimestamp;
+	      });
+
+	      /** @type {import('.').IncrementalMatchThreadResult | undefined} */
+	      const report = timeline.slice();
+	      report.cachedOnly = entries.cachedOnly;
+	      report.processedBatch = entries.processedBatch;
+	      report.processedAllCount = entries.processedAllCount;
+	      lastReportTimestamp = Date.now();
+	      reportDue = false;
+	      return report;
+	    }
+	  }
+	}
+
+	/**
+	 * @param {import( './get-post-thread-incrementally').Args & { shallow: boolean }} args
+	 */
+	async function enrichPostToThread(args) {
+	  try {
+	    let enrichedThread;
+	    for await (const thread of getPostThreadIncrementally(args)) {
+	      if (thread && args.shallow) return thread;
+	      if (thread) enrichedThread = thread;
+	    }
+	    return enrichedThread;
+	  } catch (error) {
+	    console.warn('Post ' + args.uri + ' could not be retrieved ', error);
+	  }
+	}
+
+	// @ts-check
+
+
+	/**
+	 * @typedef {{
+	 *  searchQuery: string,
+	 *  max?: number,
+	 *  agent_searchActorsTypeAhead_throttled: (q: string, limit: number | undefined) => ReturnType<import('@atproto/api').BskyAgent['searchActorsTypeahead']>
+	 *  agent_searchActors_throttled: (q: string, limit: number | undefined) => ReturnType<import('@atproto/api').BskyAgent['searchActors']>
+	 *  dbStore: ReturnType<typeof import('../define-cache-indexedDB-store').defineCacheIndexedDBStore>
+	 * }} Args
+	 */
+
+	/**
+	 * @param {Args} args
+	 */
+	async function* searchProfilesIncrementally(args) {
+	  const {
+	    searchQuery,
+	    max,
+	    dbStore
+	  } = args;
+	  const localSearchPromise = dbStore.searchProfiles(searchQuery, max ? {
+	    max
+	  } : undefined);
+	  const normalizedText = searchQuery?.trim() || '';
+	  if (!normalizedText) return async function* nothing() {}();
+	  const wholeTextSearchTypeahedPromise = directSearchAccountsTypeahead({
+	    ...args,
+	    searchQuery: normalizedText
+	  });
+	  const wholeTextSearchFullPromise = directSearchAccountsFull({
+	    ...args,
+	    searchQuery: normalizedText
+	  });
+	  const words = breakIntoWords(normalizedText);
+	  const wordSearchTypeaheadPromises = words.map(word => directSearchAccountsTypeahead({
+	    ...args,
+	    searchQuery: word
+	  }));
+	  const wordSearchFullPromises = words.map(word => directSearchAccountsFull({
+	    ...args,
+	    searchQuery: word
+	  }));
+	  const localResult = await localSearchPromise;
+	  if (localResult?.length) {
+	    yield localResult;
+	  }
+	  const searchResponses = await Promise.all([wholeTextSearchTypeahedPromise, wholeTextSearchFullPromise, ...wordSearchTypeaheadPromises, ...wordSearchFullPromises]);
+	  for (const searchMatchList of searchResponses) {
+	    for (const searchMatch of searchMatchList) {
+	      dbStore.captureProfileView(searchMatch, Date.now());
+	    }
+	  }
+	  const refreshedSearch = await dbStore.searchProfiles(searchQuery, max ? {
+	    max
+	  } : undefined);
+	  return refreshedSearch;
+	}
+
+	/**
+	* @param {Args} args
+	*/
+	async function directSearchAccountsTypeahead(args) {
+	  const {
+	    searchQuery,
+	    agent_searchActorsTypeAhead_throttled
+	  } = args;
+	  const result = (await agent_searchActorsTypeAhead_throttled(searchQuery, 100)).data?.actors;
+	  return result;
+	}
+
+	/**
+	 * @param {Args} args
+	 */
+	async function directSearchAccountsFull(args) {
+	  const {
+	    searchQuery,
+	    agent_searchActors_throttled
+	  } = args;
+	  const result = (await agent_searchActors_throttled(searchQuery, 100)).data?.actors;
+	  return result;
+	}
+
+	// @ts-check
+
+
+	/** @typedef {import('..').CompactPost} CompactPost */
+	/** @typedef {import('..').CompactProfile} CompactProfile */
+	/** @typedef {import('..').MatchCompactPost} MatchCompactPost */
+	/** @typedef {import('..').CompactThreadPostSet} CompactThreadPostSet */
 
 	/**
 	 * @param {{
@@ -50392,443 +50950,55 @@ if (cid) {
 	    cursor
 	  }));
 	  return {
-	    firehose: firehose$1,
-	    getPostOnly,
-	    getPostThreadIncrementally,
-	    getProfileIncrementally,
-	    searchPostsIncrementally,
-	    searchProfilesIncrementally,
-	    getTimelineIncrementally
-	  };
-
-	  /**
-	   * @returns {AsyncGenerator<import('.').CompactFirehoseBlock>}
-	   */
-	  async function* firehose$1() {
-	    for await (const blockSet of firehose()) {
-	      /** @type {Map<string, CompactPost>} */
-	      const updatedPosts = new Map();
-	      /** @type {Map<string, CompactProfile>} */
-	      const updatedProfiles = new Map();
-
-	      /** @type {import('../firehose').FirehoseRecord[]} */
-	      const messages = [];
-
-	      /** @type {import('../firehose').FirehoseRecord[] | undefined} */
-	      let deletes;
-
-	      /** @type {import('../firehose').FirehoseRecord[] | undefined} */
-	      let unexpecteds;
-	      for (const block of blockSet) {
-	        if (block.messages) {
-	          for (const rec of block.messages) {
-	            messages.push(rec);
-	            const updated = dbStore.captureRecord(rec, block.receiveTimestamp);
-	            if (updated) {
-	              if ('uri' in updated) updatedPosts.set(updated.uri, updated);else updatedProfiles.set(updated.shortDID, updated);
-	            }
-	          }
-	        }
-	        if (block.deletes?.length) {
-	          if (!deletes) deletes = [];
-	          for (const rec of block.deletes) {
-	            dbStore.deleteRecord(rec);
-	            deletes.push(rec);
-	          }
-	        }
-	        if (block.unexpected?.length) {
-	          if (!unexpecteds) unexpecteds = block.unexpected;else if (block.unexpected.length === 1) unexpecteds.push(block.unexpected[0]);else unexpecteds = unexpecteds.concat(block.unexpected);
-	        }
-	      }
-	      yield {
-	        messages,
-	        posts: [...updatedPosts.values()],
-	        profiles: [...updatedProfiles.values()],
-	        deletes,
-	        unexpecteds
-	      };
-	    }
-	  }
-
-	  /**
-	   * @param {string | null | undefined} uri
-	   */
-	  function getPostOnly(uri) {
-	    if (!uri) return;
-	    const dbPost = dbStore.getPostOnly(uri);
-	    if (dbPost && !isPromise(dbPost) && !dbPost.placeholder) return dbPost;
-	    if (!dbPost || !isPromise(dbPost)) return getPostOnlyAsync(uri);else return dbPost.then(post => post && !post.placeholder ? post : getPostOnlyAsync(uri));
-	  }
-
-	  /**
-	   * @param {string} uri
-	   */
-	  async function getPostOnlyAsync(uri) {
-	    const parsedURL = breakFeedUri(uri);
-	    if (!parsedURL) throw new Error('Invalid post URI ' + JSON.stringify(uri));
-	    const postRecord =
+	    firehose: () => firehose(dbStore),
+	    /** @param {string | null | undefined} uri */
+	    getPostOnly: uri => getPostOnly({
+	      uri,
+	      dbStore,
+	      agent_getRepoRecord_throttled
+	    }),
+	    /** @param {string | null | undefined} uri */
+	    getPostThreadIncrementally: uri => getPostThreadIncrementally({
+	      uri,
+	      dbStore,
+	      agent_getPostThread_throttled
+	    }),
+	    /** @param {string | null | undefined} didOrHandle */
+	    getProfileIncrementally: didOrHandle => getProfileIncrementally({
+	      didOrHandle,
+	      dbStore,
+	      agent_getProfile_throttled,
+	      agent_resolveHandle_throttled
+	    }),
 	    /**
-	    * @type {import('../firehose').FirehoseRecord$Typed<'app.bsky.feed.post'>} */
-	    (await agent_getRepoRecord_throttled(unwrapShortDID(parsedURL.shortDID), parsedURL.postID, 'app.bsky.feed.post'))?.data?.value;
-	    postRecord.$type = 'app.bsky.feed.post';
-	    postRecord.repo = parsedURL.shortDID;
-	    postRecord.uri = uri;
-	    postRecord.action = 'create';
-	    const post = dbStore.captureRecord(postRecord, Date.now());
-	    if (post && 'uri' in post) return post;
-	  }
-
-	  /**
-	   * @param {string | null | undefined} uri
-	   * @returns {AsyncGenerator<CompactThreadPostSet | undefined>}
-	   */
-	  async function* getPostThreadIncrementally(uri) {
-	    if (!uri) return;
-	    const parsedURL = breakFeedUri(uri);
-	    if (!parsedURL) return;
-	    const remotePromise = agent_getPostThread_throttled(uri);
-	    const local = await dbStore.getPostThread(uri);
-	    if (local && !local.root.placeholder) yield local;
-	    const remoteThreadRaw = (await remotePromise)?.data?.thread;
-	    if ('post' in remoteThreadRaw) {
-	      dbStore.captureThreadView( /** @type {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost} */remoteThreadRaw, Date.now());
-	      const ignoreBrokenPlaceholderUris = new Set();
-	      while (true) {
-	        const refreshedThread = await dbStore.getPostThread(uri);
-	        const allPlaceholders = [];
-	        if (refreshedThread?.all?.length) {
-	          for (const post of refreshedThread.all) {
-	            if (post.placeholder && !ignoreBrokenPlaceholderUris.has(post.uri)) allPlaceholders.push(post);
-	          }
-	        }
-	        yield refreshedThread;
-	        if (!allPlaceholders.length) break;
-	        const orphanRemotePromises = allPlaceholders.map(placeholderPost => ( /** @type {const} */
-	        [placeholderPost, agent_getPostThread_throttled(placeholderPost.uri)]));
-	        for (const [placeholderPost, orphanRemotePromise] of orphanRemotePromises) {
-	          try {
-	            const orphanRemoteRaw = (await orphanRemotePromise)?.data?.thread;
-	            if ('post' in orphanRemoteRaw) {
-	              dbStore.captureThreadView( /** @type {import('@atproto/api').AppBskyFeedDefs.ThreadViewPost} */orphanRemoteRaw, Date.now());
-	            }
-	          } catch (error) {
-	            ignoreBrokenPlaceholderUris.add(placeholderPost.uri);
-	          }
-	        }
-	      }
-	    }
-	  }
-
-	  /**
-	   * @param {string | null | undefined} didOrHandle
-	   */
-	  async function* getProfileIncrementally(didOrHandle) {
-	    if (!didOrHandle) return;
-	    let profileRemotePromise;
-	    if (likelyDID(didOrHandle)) {
-	      profileRemotePromise = agent_getProfile_throttled(unwrapShortDID(didOrHandle));
-	    } else {
-	      const resolveHandlePromise = agent_resolveHandle_throttled(unwrapShortHandle(didOrHandle));
-	      if (isPromise(resolveHandlePromise)) {
-	        profileRemotePromise = (async () => {
-	          const rec = await resolveHandlePromise;
-	          const shortDID = shortenDID(rec.data.did);
-	          return agent_getProfile_throttled(unwrapShortDID(shortDID));
-	        })();
-	      } else {
-	        const rec = resolveHandlePromise;
-	        const shortDID = shortenDID( /** @type {*} */rec.data.did);
-	        profileRemotePromise = agent_getProfile_throttled(unwrapShortDID(shortDID));
-	      }
-	    }
-	    const profileLocal = await dbStore.getProfile(didOrHandle);
-	    if (profileLocal) yield profileLocal;
-	    const profileRemoteRaw = (await profileRemotePromise).data;
-	    const profileRemoteResolved = dbStore.captureProfileView(profileRemoteRaw, Date.now());
-	    yield profileRemoteResolved;
-	  }
-
-	  /**
-	   * @param {string} shortDID
-	   * @param {string | null | undefined} searchQuery
-	   * @returns {AsyncGenerator<IncrementalMatchThreadResult>}
-	   */
-	  async function* getTimelineIncrementally(shortDID, searchQuery) {
-	    const enrichPostToThreadParallel = throttledAsyncCache(enrichPostToThread, {
-	      maxConcurrency: 10,
-	      interval: 1
-	    });
-	    let REPORT_INTERVAL_MSEC = 700;
-	    let PARALLELISE_THREAD_BATCH = 20;
-
-	    /** @type {CompactThreadPostSet[]} */
-	    let timeline = [];
-	    let lastReportTimestamp = Date.now() - REPORT_INTERVAL_MSEC / 2;
-
-	    /** @type {Map<string, number>} */
-	    let latestRelevantPostForThreadRootUri = new Map();
-
-	    /** @type {IncrementalMatchThreadResult | undefined} */
-	    let report;
-	    for await (const entries of searchAccountHistoryPostsIncrementally(shortDID, searchQuery)) {
-	      // start enriching posts to threads from the most recent
-	      entries.sort((a, b) => (b.asOf || 0) - (a.asOf || 0));
-	      for (let iEntry = 0; iEntry < entries.length; iEntry += PARALLELISE_THREAD_BATCH) {
-	        /** @type {typeof entries} */
-	        const entriesBatch = entries.slice(iEntry, iEntry + PARALLELISE_THREAD_BATCH);
-	        entriesBatch.cachedOnly = entries.cachedOnly;
-	        entriesBatch.processedAllCount = entries.processedAllCount;
-	        entriesBatch.processedBatch = entries.processedBatch;
-	        report = await processEntriesAndProduceBatchIfRequired(entriesBatch);
-	        if (report) yield report;
-	      }
-	    }
-	    if (report) {
-	      yield {
-	        ...report,
-	        complete: true
-	      };
-	    }
-
-	    /**
-	     * @param {IncrementalMatchCompactPosts} entries
+	     * @param {string | null | undefined} shortDID
+	     * @param {string | null | undefined} searchQuery
 	     */
-
-	    async function processEntriesAndProduceBatchIfRequired(entries) {
-	      const threadPromises = entries.map(entry => enrichPostToThreadParallel(entry.threadStart || entry.uri, /* shallow */!!entries.cachedOnly));
-
-	      /** @type {Map<string, CompactPost>} */
-	      const searchMatchPosts = new Map();
-	      for (const post of entries) {
-	        searchMatchPosts.set(post.uri, post);
-	        if (!post.asOf) continue;
-	        const threadRootUri = post.threadStart || post.uri;
-	        let existingTimestamp = latestRelevantPostForThreadRootUri.get(threadRootUri);
-	        if (!existingTimestamp || existingTimestamp < post.asOf) latestRelevantPostForThreadRootUri.set(threadRootUri, post.asOf);
-	      }
-	      for (const threadPromise of threadPromises) {
-	        let postThreadRetrieved = await threadPromise;
-	        if (!postThreadRetrieved) continue;
-
-	        // Replace posts with search matches
-	        postThreadRetrieved = {
-	          ...postThreadRetrieved,
-	          all: postThreadRetrieved.all.map(post => searchMatchPosts.get(post.uri) || post),
-	          current: searchMatchPosts.get(postThreadRetrieved.current.uri) || postThreadRetrieved.current,
-	          root: searchMatchPosts.get(postThreadRetrieved.root.uri) || postThreadRetrieved.root
-	        };
-	        const timelineIndex = timeline.findIndex(t => t.root.uri === postThreadRetrieved.root.uri);
-	        if (timeline[timelineIndex] === postThreadRetrieved) continue;
-	        if (timelineIndex >= 0) timeline[timelineIndex] = postThreadRetrieved;else timeline.push(postThreadRetrieved);
-	        const now = Date.now();
-	        if (now - lastReportTimestamp > REPORT_INTERVAL_MSEC) {
-	          timeline.sort((a, b) => {
-	            const aTimestamp = latestRelevantPostForThreadRootUri.get(a.root.uri) || 0;
-	            const bTimestamp = latestRelevantPostForThreadRootUri.get(b.root.uri) || 0;
-	            return bTimestamp - aTimestamp;
-	          });
-
-	          /** @type {IncrementalMatchThreadResult | undefined} */
-	          const report = timeline.slice();
-	          report.cachedOnly = entries.cachedOnly;
-	          report.processedBatch = entries.processedBatch;
-	          report.processedAllCount = entries.processedAllCount;
-	          lastReportTimestamp = now;
-	          return report;
-	        }
-	      }
-	    }
-	  }
-
-	  /**
-	   * @param {string} uri
-	   * @param {boolean} shallow
-	   */
-	  async function enrichPostToThread(uri, shallow) {
-	    try {
-	      let enrichedThread;
-	      for await (const thread of getPostThreadIncrementally(uri)) {
-	        if (thread && shallow) return thread;
-	        if (thread) enrichedThread = thread;
-	      }
-	      return enrichedThread;
-	    } catch (error) {
-	      console.warn('Post ' + uri + ' could not be retrieved ', error);
-	    }
-	  }
-
-	  /**
-	   * @param {string | null | undefined} shortDID
-	   * @param {string | null | undefined} searchQuery
-	   * @returns {[] | AsyncGenerator<IncrementalMatchCompactPosts>}
-	   */
-	  function searchPostsIncrementally(shortDID, searchQuery) {
-	    if (shortDID) {
-	      return searchAccountHistoryPostsIncrementally(shortDID, searchQuery);
-	    } else if (!searchQuery) {
-	      return [];
-	    } else {
-	      return searchAllPostsIncrementally(searchQuery);
-	    }
-	  }
-
-	  /**
-	   * @param {string} shortDID
-	   * @param {string | null | undefined} text
-	   */
-	  async function* searchAccountHistoryPostsIncrementally(shortDID, text) {
-	    let REPORT_UPDATES_FREQUENCY_MSEC = 700;
-	    const cachedMatchesPromise = dbStore.searchPosts(shortDID, text);
-	    const allCachedHistoryPromise = !text ? cachedMatchesPromise : dbStore.searchPosts(shortDID, undefined);
-	    const plcDirHistoryPromise = plcDirectoryHistoryRaw(shortDID);
-	    let lastSearchReport = 0;
-	    /** @type {CompactPost[] | undefined}  */
-	    let processedBatch;
-	    let anyUpdates = false;
-
-	    /** @type {IncrementalMatchCompactPosts | undefined} */
-	    let lastMatches = await cachedMatchesPromise;
-
-	    /** @type {Set<string> | undefined} */
-	    let knownHistoryUri;
-	    if (!knownHistoryUri) {
-	      const allHistory = await allCachedHistoryPromise;
-	      knownHistoryUri = new Set((allHistory || []).map(rec => rec.uri));
-	    }
-	    if (lastMatches?.length) {
-	      lastMatches.cachedOnly = true;
-	      lastMatches.processedAllCount = knownHistoryUri.size;
-	      lastMatches.processedBatch = lastMatches.slice();
-	      lastSearchReport = Date.now();
-	      yield lastMatches;
-	    }
-	    const plcDirHistoryRecords = await plcDirHistoryPromise;
-	    dbStore.capturePlcDirectoryEntries(plcDirHistoryRecords);
-	    const profile = await dbStore.getProfile(shortDID);
-	    const pdsAgent = new ColdskyAgent({
-	      service: profile?.history?.[0].pds
-	    });
-	    let cursor = '';
-	    const fullDID = unwrapShortDID(shortDID);
-	    while (true) {
-	      const moreData = await pdsAgent.com.atproto.repo.listRecords({
-	        repo: unwrapShortDID(shortDID),
-	        cursor,
-	        collection: 'app.bsky.feed.post',
-	        limit: Math.random() * 10 + 88
-	      });
-	      if (moreData?.data?.records?.length) {
-	        for (const rec of moreData.data.records) {
-	          /** @type {import('../firehose').FirehoseRecord$Typed<'app.bsky.feed.post'>} */
-	          const recEx = /** @type {*} */rec.value;
-	          recEx.$type = 'app.bsky.feed.post';
-	          recEx.uri = rec.uri;
-	          recEx.repo = fullDID;
-	          const post = /** @type {CompactPost} */dbStore.captureRecord(recEx, Date.now());
-	          if (post) {
-	            if (!processedBatch) processedBatch = [post];else processedBatch.push(post);
-	          }
-	          if (!knownHistoryUri.has(rec.uri)) {
-	            knownHistoryUri.add(rec.uri);
-	            anyUpdates = true;
-	          }
-	        }
-	      }
-	      if (anyUpdates || Date.now() - lastSearchReport > REPORT_UPDATES_FREQUENCY_MSEC) {
-	        /** @type {IncrementalMatchCompactPosts} */
-	        const newMatches = await dbStore.searchPosts(shortDID, text);
-	        if (newMatches?.length) {
-	          lastMatches = newMatches;
-	          lastSearchReport = Date.now();
-	          anyUpdates = false;
-	          newMatches.processedBatch = processedBatch;
-	          newMatches.processedAllCount = knownHistoryUri.size;
-	          processedBatch = undefined;
-	          yield newMatches;
-	          lastSearchReport = Date.now();
-	        }
-	      }
-	      if (!moreData?.data?.cursor) break;
-	      cursor = moreData.data.cursor;
-	    }
-	  }
-
-	  /**
-	   * @param {string} text
-	   * @returns {AsyncGenerator<IncrementalMatchCompactPosts>}
-	   */
-	  async function* searchAllPostsIncrementally(text) {
-	    const searchStringSanitised = (text || '').trim().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, ' ').replace(/\s+/g, ' ');
-	    let remoteSearchLatestPromise = agent_searchPosts_throttled(searchStringSanitised, 97, 'latest');
-	    const localResultsPromise = dbStore.searchPosts(undefined, text);
-	    /** @type {MatchCompactPost[] & { cachedOnly?: boolean }} */
-	    const localResults = await localResultsPromise;
-	    if (localResults?.length) {
-	      localResults.cachedOnly = true;
-	      yield localResults;
-	    }
-	    let cursor = '';
-	    while (true) {
-	      const remoteSearchData = (await remoteSearchLatestPromise).data;
-	      const now = Date.now();
-	      for (const postRaw of remoteSearchData?.posts || []) {
-	        dbStore.capturePostView(postRaw, now);
-	      }
-	      const refreshedResults = await dbStore.searchPosts(undefined, text);
-	      if (remoteSearchData?.cursor) {
-	        cursor = remoteSearchData.cursor;
-	        remoteSearchLatestPromise = agent_searchPosts_throttled(searchStringSanitised, 97, 'latest', cursor);
-	      }
-	      if (refreshedResults?.length) {
-	        yield refreshedResults;
-	      }
-	      if (!remoteSearchData?.cursor) break;
-	    }
-	  }
-
-	  /**
-	   * @param {string} text
-	   * @param {{ max?: number }} [options]
-	   */
-	  async function* searchProfilesIncrementally(text, options) {
-	    const localSearchPromise = dbStore.searchProfiles(text, options);
-	    const normalizedText = text?.trim() || '';
-	    if (!normalizedText) return async function* nothing() {}();
-	    const wholeTextSearchTypeahedPromise = directSearchAccountsTypeahead(normalizedText);
-	    const wholeTextSearchFullPromise = directSearchAccountsFull(normalizedText);
-	    const words = breakIntoWords(normalizedText);
-	    const wordSearchTypeaheadPromises = words.map(word => directSearchAccountsTypeahead(word));
-	    const wordSearchFullPromises = words.map(word => directSearchAccountsFull(word));
-	    const localResult = await localSearchPromise;
-	    if (localResult?.length) {
-	      yield localResult;
-	    }
-	    const searchResponses = await Promise.all([wholeTextSearchTypeahedPromise, wholeTextSearchFullPromise, ...wordSearchTypeaheadPromises, ...wordSearchFullPromises]);
-	    for (const searchMatchList of searchResponses) {
-	      for (const searchMatch of searchMatchList) {
-	        dbStore.captureProfileView(searchMatch, Date.now());
-	      }
-	    }
-	    const refreshedSearch = await dbStore.searchProfiles(text, options);
-	    return refreshedSearch;
-	  }
-
-	  /**
-	  * @param {string} searchText
-	  */
-	  async function directSearchAccountsTypeahead(searchText) {
-	    const result = (await agent_searchActorsTypeAhead_throttled(searchText, 100)).data?.actors;
-	    return result;
-	  }
-
-	  /**
-	   * @param {string} searchText
-	   * @param {number} [limit]
-	   */
-	  async function directSearchAccountsFull(searchText, limit) {
-	    const result = (await agent_searchActors_throttled(searchText, 100)).data?.actors;
-	    return result;
-	  }
+	    searchPostsIncrementally: (shortDID, searchQuery) => searchPostsIncrementally({
+	      shortDID,
+	      searchQuery,
+	      dbStore,
+	      agent_searchPosts_throttled
+	    }),
+	    searchProfilesIncrementally: (searchQuery, max) => searchProfilesIncrementally({
+	      searchQuery,
+	      max,
+	      dbStore,
+	      agent_searchActorsTypeAhead_throttled,
+	      agent_searchActors_throttled
+	    }),
+	    /**
+	     * @param {string | null | undefined} shortDID
+	     * @param {string | null | undefined} searchQuery
+	     */
+	    getTimelineIncrementally: (shortDID, searchQuery) => getTimelineIncrementally({
+	      shortDID,
+	      searchQuery,
+	      dbStore,
+	      agent_getPostThread_throttled,
+	      agent_searchPosts_throttled
+	    })
+	  };
 	}
 
 	// @ts-check
@@ -51673,7 +51843,7 @@ if (cid) {
 	exports.defineStore = defineStore;
 	exports.detectProfileURL = detectProfileURL;
 	exports.detectWordStartsNormalized = detectWordStartsNormalized;
-	exports.firehose = firehose;
+	exports.firehose = firehose$1;
 	exports.firehoseShortDIDs = firehoseShortDIDs;
 	exports.getFeedBlobUrl = getFeedBlobUrl;
 	exports.getProfileBlobUrl = getProfileBlobUrl;
