@@ -87,7 +87,7 @@
 }
 
 .post-embeds-section .post-frame-outer {
-  transform: rotate(-1deg) translate(1.3em, 0px);
+  transform: rotate(-1deg) translate(0.4em, 0px);
   zoom: 0.95;
   background: linear-gradient(154deg, #fffefa, #fffbeb 19em);
   border-top-color: #e4bb73;

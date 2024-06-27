@@ -19,27 +19,37 @@ import { PostEmbedsSection } from './embedded';
  * @typedef {import('../../../coldsky/lib').MatchCompactPost} MatchCompactPost
  */
 
+const DEFAULT_EMBED_DEPTH = 25;
+
 /**
  * @param {{
  *  className?: string,
  *  post: string | MatchCompactPost,
  *  compact?: boolean,
  *  linkTimestamp?: boolean,
- *  linkAuthor?: boolean
+ *  linkAuthor?: boolean,
+ *  allowEmbedDepth?: number
  * }} _
  */
-export function Post({ className, post, compact, linkTimestamp, linkAuthor, ...rest }) {
+export function Post({ className, post, compact, linkTimestamp, linkAuthor, allowEmbedDepth, ...rest }) {
+  const nextAllowEmbedDepth = typeof allowEmbedDepth === 'number' ? allowEmbedDepth - 1 : DEFAULT_EMBED_DEPTH;
   return (
     <PostFrame className={className} {...rest}>
       {
         typeof post === 'string' ?
           <LoadingPostInProgress
-            uri={post} /> :
+            uri={post}
+            compact={compact}
+            linkTimestamp={linkTimestamp}
+            linkAuthor={linkAuthor}
+            allowEmbedDepth={nextAllowEmbedDepth}
+          /> :
           <LoadedPost
             post={post}
             compact={compact}
             linkTimestamp={linkTimestamp}
             linkAuthor={linkAuthor}
+            allowEmbedDepth={nextAllowEmbedDepth}
           />
       }
     </PostFrame>
@@ -52,7 +62,7 @@ export function Post({ className, post, compact, linkTimestamp, linkAuthor, ...r
  *  children?: import('react').ReactNode
  * }} _
  */
-function PostFrame({ className, children, ...rest }) {
+export function PostFrame({ className, children, ...rest }) {
   return (
     <div
       className={className ? 'post-frame-outer ' + className : 'post-frame-outer'}
@@ -64,15 +74,22 @@ function PostFrame({ className, children, ...rest }) {
 
 /**
  * @param {{
- *  uri: string
+ *  uri: string,
+ *  linkTimestamp?: boolean,
+ *  linkAuthor?: boolean,
+ *  compact?: boolean,
+ *  allowEmbedDepth?: number
  * }} _
  */
-function LoadingPostInProgress({ uri }) {
+function LoadingPostInProgress({ uri, ...rest }) {
   const db = useDB();
   const post = forAwait(uri, () => db.getPostOnly(uri));
   if (post) {
     return (
-      <LoadedPost post={post} />
+      <LoadedPost
+        post={post}
+        {...rest}
+      />
     );
   }
   const parsedURL = breakFeedUri(uri) || breakPostURL(uri);
@@ -99,10 +116,11 @@ function LoadingPostInProgress({ uri }) {
  *  post: MatchCompactPost,
  *  compact?: boolean,
  *  linkTimestamp?: boolean,
- *  linkAuthor?: boolean
+ *  linkAuthor?: boolean,
+ *  allowEmbedDepth?: number
  * }} _
  */
-function LoadedPost({ post, compact, linkTimestamp, linkAuthor }) {
+function LoadedPost({ post, compact, linkTimestamp, linkAuthor, allowEmbedDepth }) {
   return (
     <div className='post-loaded-content' onClick={() => {
       console.log('post clicked ', post);
@@ -118,7 +136,11 @@ function LoadedPost({ post, compact, linkTimestamp, linkAuthor }) {
         <PostTimestamp post={post} linkTimestamp={linkTimestamp} />
       </div>
       <PreFormatted className='post-content' text={post.text} />
-      <PostEmbedsSection post={post} compact={compact} />
+      <PostEmbedsSection
+        post={post}
+        compact={compact}
+        allowEmbedDepth={allowEmbedDepth}
+      />
       <div className='post-likes'>
         <FavoriteBorder />
         {

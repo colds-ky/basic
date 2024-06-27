@@ -2,23 +2,21 @@
 
 import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-
-import { forAwait } from '../../coldsky/src/api/forAwait';
-import { localise } from '../localise';
-import { FullHandle } from '../widgets/account/full-handle';
+import { useParams } from 'react-router-dom';
 
 import { useDB } from '..';
-import { breakFeedUri, likelyDID, makeFeedUri, shortenDID } from '../../coldsky/lib';
+import { likelyDID, makeFeedUri, shortenDID } from '../../coldsky/lib';
+import { forAwait } from '../../coldsky/src/api/forAwait';
 import { overlayAvatar, replaceIcon } from '../icon-inject';
-import { Thread, ThreadView } from '../widgets/post/thread';
+import { localise } from '../localise';
+import { FullHandle } from '../widgets/account/full-handle';
+import { Thread } from '../widgets/post/thread';
 import { PreFormatted } from '../widgets/preformatted';
+import { HistoryLayout } from './history-layout';
 import { HistoryPageDecorations } from './history-page-decorations';
 import { Timeline } from './timeline';
 
-
 import './history.css';
-import { TextField } from '@mui/material';
 
 export function History() {
   return (
@@ -67,6 +65,22 @@ function HistoryCore() {
   }, [handle]);
 
   const showSearch = !!(forceShowSearch || searchText);
+
+  return (
+    <HistoryLayout
+      profile={resolved}
+    >
+      {
+        resolved.placeholder ? undefined :
+          !post ? <Timeline shortDID={resolved.shortDID} /> :
+            <Thread
+              uri={makeFeedUri(resolved.shortDID, post)}
+              linkAuthor
+              linkTimestamp
+            />
+      }
+    </HistoryLayout>
+  );
 
   return (
     <div className='history-view'>

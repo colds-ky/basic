@@ -208,7 +208,7 @@
   position: relative;
 }
 .post-embeds-section .post-frame-outer {
-  transform: rotate(-1deg) translate(1.3em, 0px);
+  transform: rotate(-1deg) translate(0.4em, 0px);
   zoom: 0.95;
   background:
     linear-gradient(
@@ -539,6 +539,225 @@
   margin-right: -0.4em;
 }
 
+/* src/history/history-layout.css */
+.history-layout {
+  display: grid;
+  grid-template-rows: 14vmax 7vmax 7vmax auto auto 1fr;
+  grid-template-columns: 14vmax 1fr;
+  min-height: 100vmax;
+}
+.history-layout .history-account-banner-bg {
+  grid-row: 1 / 3;
+  grid-column: 1 / 3;
+  background: no-repeat left center;
+  background-size: cover;
+  border-bottom: solid 1px #dbdbdb;
+  z-index: 7;
+  background-color: white;
+}
+.history-layout .history-account-avatar {
+  grid-row: 2 / 4;
+  grid-column: 1;
+  font-size: 1vmax;
+  background: no-repeat center center;
+  background-size: cover;
+  border-radius: 200%;
+  box-shadow: inset -0.5em -0.5em 1em #00000026;
+  margin-top: 1em;
+  margin-left: 1em;
+  border: solid 0.6em white;
+  background-color: white;
+  position: sticky;
+  top: 0.8em;
+  z-index: 8;
+}
+.history-layout .history-account-avatar-bg {
+  position: sticky;
+  top: 1.7em;
+  grid-row: 2 / 4;
+  grid-column: 1;
+  margin-top: 1em;
+  margin-left: 0.5em;
+  z-index: 5;
+  border-radius: 200%;
+  box-shadow: 0 0 1.3em #0000009c;
+  transform: translateY(-1em) scaleX(0.7);
+}
+.history-layout .history-account-displayName-and-handle {
+  grid-row: 3;
+  grid-column: 2;
+  padding-top: 0.2em;
+  padding-left: 0.2em;
+  position: sticky;
+  top: 3vmax;
+  z-index: 10;
+}
+.history-layout .history-account-displayName-and-handle .history-account-displayName {
+  display: block;
+  position: relative;
+  height: 1em;
+  width: 100%;
+}
+.history-layout .history-account-displayName-and-handle .history-account-displayName .history-account-displayName-inner {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
+.history-layout .history-account-displayName-and-handle .history-account-displayName .history-account-displayName-stroke {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  -webkit-text-stroke: 5px white;
+  color: white;
+  filter: blur(1px);
+  pointer-events: none;
+}
+.history-layout .sticky-header-background,
+.history-layout .sticky-header-background-cover {
+  grid-row: 2 / 4;
+  grid-column: 1 / 3;
+  z-index: 5;
+}
+.history-layout .sticky-header-background {
+  position: sticky;
+  top: 0;
+  background:
+    linear-gradient(
+      to top,
+      transparent,
+      #00000017 1em,
+      white 1em);
+}
+.history-layout .sticky-header-background-cover {
+  background: white;
+}
+.history-layout .history-account-displayName {
+  font-size: 3vmax;
+  line-height: 1;
+  overflow-wrap: anywhere;
+  text-shadow: 0 0.3px 1px black;
+}
+.history-layout .history-account-handle {
+  padding-top: 0.5em;
+}
+.history-layout .history-account-handle .at-sign {
+  display: inline-block;
+  text-align: center;
+  transform: scale(1.1) translateY(0.05em);
+  padding-right: 0.05em;
+}
+.history-layout .history-account-handle .handle-bsky-social-suffix-dot {
+  padding-left: 0.1em;
+  padding-right: 0.05em;
+}
+.history-layout .history-account-handle .handle-tld-suffix-dot {
+  padding-left: 0.1em;
+  padding-right: 0.05em;
+}
+.history-layout .history-account-handle .handle-bsky-social-suffix {
+}
+.history-layout .history-account-description {
+  grid-row: 4;
+  grid-column: 1 / 3;
+  align-self: start;
+  line-height: 1.2;
+  z-index: 4;
+  position: relative;
+  padding-left: 0.4em;
+  margin-top: 1vmax;
+  overflow-wrap: anywhere;
+}
+.history-layout .history-account-description > p {
+  margin-top: 0.4em;
+  margin-bottom: 0;
+}
+.history-layout .history-account-description > p:first-child {
+  margin-top: 0;
+}
+.history-layout .timeline-container {
+  grid-row: 6;
+  grid-column: 1 / 3;
+  overflow-wrap: anywhere;
+}
+.history-layout .history-search-bar {
+  position: sticky;
+  top: 9vmax;
+  right: 0;
+  padding-right: 0.3em;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  grid-row: 2 / 4;
+  grid-column: 2;
+  align-self: center;
+  justify-self: end;
+  font-size: 130%;
+}
+.history-layout .history-search-bar-expanded {
+  grid-row: 5;
+  grid-column: 1 / 3;
+  top: 11.7vmax;
+  background:
+    linear-gradient(
+      to right,
+      #ffe765f0 50%,
+      #ffc9008f);
+  backdrop-filter: blur(3px) contrast(0.7);
+  border-bottom: solid 1px #dbca87;
+  border-top: solid 1px #d3cbaa;
+  box-shadow: 0 0.3em 0.5em #0000002e;
+  width: 100%;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+.history-layout .history-search-bar .history-search-icon {
+  color: white;
+  stroke: #25602dbf;
+  stroke-width: 0.7px;
+  font-size: 250%;
+  cursor: pointer;
+  background: #ffffffde;
+  border-radius: 3em;
+  padding: 0.1em;
+  border: solid 1px #bebebe;
+  box-shadow: 0.05em 0.07em 0.15em #00000030;
+}
+.history-layout .history-search-bar-expanded .history-search-icon {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  filter: drop-shadow(2px 3px 2px #ae8300de);
+}
+.history-layout .history-search-bar #history-search-input {
+  border: none;
+  outline: none;
+  font-size: 110%;
+  background: transparent;
+  padding-left: 1em;
+  padding-right: 0.5em;
+}
+@media (min-aspect-ratio: 5.5/5) {
+  .history-layout {
+    grid-template-rows: 10rem 5.5rem 5.5rem auto 1fr;
+    grid-template-columns: 11rem 1fr;
+  }
+  .history-layout .history-search-bar {
+    top: 10rem;
+  }
+  .history-layout .history-account-displayName-and-handle {
+    top: 3em;
+  }
+  .history-layout .history-account-displayName {
+    font-size: 2rem;
+  }
+  .history-layout .history-account-description {
+    margin-top: 0.6em;
+  }
+}
+
 /* src/history/timeline.css */
 .timeline-container {
   margin-right: 0.8em;
@@ -565,190 +784,5 @@
 /* src/history/history.css */
 html.account body {
   overflow: auto;
-}
-.history-view {
-  display: grid;
-  grid-template-rows: 14vmax 7vmax 7vmax auto 1fr;
-  grid-template-columns: 14vmax 1fr;
-  min-height: 100vmax;
-}
-.history-view .history-account-banner-bg {
-  grid-row: 1 / 3;
-  grid-column: 1 / 3;
-  background: no-repeat left center;
-  background-size: cover;
-  border-bottom: solid 1px #dbdbdb;
-  z-index: 7;
-  background-color: white;
-}
-.history-view .history-account-avatar {
-  grid-row: 2 / 4;
-  grid-column: 1;
-  font-size: 1vmax;
-  background: no-repeat center center;
-  background-size: cover;
-  border-radius: 200%;
-  box-shadow: inset -0.5em -0.5em 1em #00000026;
-  margin-top: 1em;
-  margin-left: 1em;
-  border: solid 0.6em white;
-  background-color: white;
-  position: sticky;
-  top: 0.8em;
-  z-index: 8;
-}
-.history-view .history-account-avatar-bg {
-  position: sticky;
-  top: 1.7em;
-  grid-row: 2 / 4;
-  grid-column: 1;
-  margin-top: 1em;
-  margin-left: 0.5em;
-  z-index: 5;
-  border-radius: 200%;
-  box-shadow: 0 0 1.3em #0000009c;
-  transform: translateY(-1em) scaleX(0.7);
-}
-.history-view .history-account-displayName-and-handle {
-  grid-row: 3;
-  grid-column: 2;
-  padding-top: 0.2em;
-  padding-left: 0.2em;
-  position: sticky;
-  top: 3vmax;
-  z-index: 10;
-}
-.history-view .history-account-displayName-and-handle .history-account-displayName {
-  display: block;
-  position: relative;
-  height: 1em;
-  width: 100%;
-}
-.history-view .history-account-displayName-and-handle .history-account-displayName .history-account-displayName-inner {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-}
-.history-view .history-account-displayName-and-handle .history-account-displayName .history-account-displayName-stroke {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  -webkit-text-stroke: 5px white;
-  color: white;
-  filter: blur(1px);
-  pointer-events: none;
-}
-.history-view .sticky-header-background,
-.history-view .sticky-header-background-cover {
-  grid-row: 2 / 4;
-  grid-column: 1 / 3;
-  z-index: 5;
-}
-.history-view .sticky-header-background {
-  position: sticky;
-  top: 0;
-  background:
-    linear-gradient(
-      to top,
-      transparent,
-      #00000017 1em,
-      white 1em);
-}
-.history-view .sticky-header-background-cover {
-  background: white;
-}
-.history-view .history-account-displayName {
-  font-size: 3vmax;
-  line-height: 1;
-  overflow-wrap: anywhere;
-  text-shadow: 0 0.3px 1px black;
-}
-.history-view .history-account-handle {
-  padding-top: 0.5em;
-}
-.history-view .history-account-handle .at-sign {
-  display: inline-block;
-  text-align: center;
-  transform: scale(1.1) translateY(0.05em);
-  padding-right: 0.05em;
-}
-.history-view .history-account-handle .handle-bsky-social-suffix-dot {
-  padding-left: 0.1em;
-  padding-right: 0.05em;
-}
-.history-view .history-account-handle .handle-tld-suffix-dot {
-  padding-left: 0.1em;
-  padding-right: 0.05em;
-}
-.history-view .history-account-handle .handle-bsky-social-suffix {
-}
-.history-view .history-account-description {
-  grid-row: 4;
-  grid-column: 1 / 3;
-  align-self: start;
-  line-height: 1.2;
-  z-index: 4;
-  position: relative;
-  padding-left: 0.4em;
-  margin-top: 1vmax;
-  overflow-wrap: anywhere;
-}
-.history-view .history-account-description > p {
-  margin-top: 0.4em;
-  margin-bottom: 0;
-}
-.history-view .history-account-description > p:first-child {
-  margin-top: 0;
-}
-.history-view .timeline-container {
-  grid-row: 5;
-  grid-column: 1 / 3;
-  overflow-wrap: anywhere;
-}
-.history-view .history-search-bar {
-  position: absolute;
-  top: 14vmax;
-  right: 0;
-  padding-right: 1.6em;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-}
-.history-view .history-search-bar-expanded {
-  background: #13671e;
-  border: solid 1px silver;
-  box-shadow: 0 0.1em 0.5em #00000054;
-  width: 100%;
-}
-.history-view .history-search-bar .history-search-icon {
-  color: white;
-  stroke: #13671e;
-  stroke-width: 0.7px;
-  font-size: 200%;
-  cursor: pointer;
-}
-.history-view .history-search-bar #history-search-input {
-  border: none;
-  outline: none;
-  font-size: 110%;
-  background: transparent;
-  color: white;
-}
-@media (min-aspect-ratio: 5.5/5) {
-  .history-view {
-    grid-template-rows: 10rem 5.5rem 5.5rem auto 1fr;
-    grid-template-columns: 11rem 1fr;
-  }
-  .history-view .history-account-displayName-and-handle {
-    top: 3em;
-  }
-  .history-view .history-account-displayName {
-    font-size: 2rem;
-  }
-  .history-view .history-account-description {
-    margin-top: 0.6em;
-  }
 }
 /*# sourceMappingURL=index.css.map */
