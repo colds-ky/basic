@@ -42300,7 +42300,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.39";
+	var version = "0.2.40";
 
 	// @ts-check
 
@@ -50448,7 +50448,17 @@ if (cid) {
 	   * }}
 	   */
 	  new Dexie(dbName || DEFAULT_DB_NAME);
+
+	  // this is to clean up old posts, with incorrect URI
 	  db.version(3).stores({
+	    posts: 'uri, shortDID, replyTo, threadStart, *quoting, *words',
+	    profiles: 'shortDID, *handle, *words'
+	  });
+	  db.version(4).stores({
+	    posts: null,
+	    profiles: 'shortDID, *handle, *words'
+	  });
+	  db.version(5).stores({
 	    posts: 'uri, shortDID, replyTo, threadStart, *quoting, *words',
 	    profiles: 'shortDID, *handle, *words'
 	  });
