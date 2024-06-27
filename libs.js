@@ -25,6 +25,13 @@ var __spreadValues = (a, b) => {
   return a;
 };
 var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
+  get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
+}) : x)(function(x) {
+  if (typeof require !== "undefined")
+    return require.apply(this, arguments);
+  throw Error('Dynamic require of "' + x + '" is not supported');
+});
 var __objRest = (source, exclude) => {
   var target2 = {};
   for (var prop in source)
@@ -40,7 +47,7 @@ var __objRest = (source, exclude) => {
 var __esm = (fn, res) => function __init() {
   return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
 };
-var __commonJS = (cb, mod) => function __require() {
+var __commonJS = (cb, mod) => function __require2() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
 var __export = (target2, all) => {
@@ -35213,8 +35220,8 @@ var require_sanitization = __commonJS({
 
 // node_modules/tlds/index.json
 var require_tlds = __commonJS({
-  "node_modules/tlds/index.json"(exports, module2) {
-    module2.exports = [
+  "node_modules/tlds/index.json"(exports, module) {
+    module.exports = [
       "aaa",
       "aarp",
       "abb",
@@ -39229,8 +39236,8 @@ var require_dist6 = __commonJS({
 
 // node_modules/varint/encode.js
 var require_encode = __commonJS({
-  "node_modules/varint/encode.js"(exports, module2) {
-    module2.exports = encode13;
+  "node_modules/varint/encode.js"(exports, module) {
+    module.exports = encode13;
     var MSB5 = 128;
     var REST5 = 127;
     var MSBALL5 = ~REST5;
@@ -39260,8 +39267,8 @@ var require_encode = __commonJS({
 
 // node_modules/varint/decode.js
 var require_decode = __commonJS({
-  "node_modules/varint/decode.js"(exports, module2) {
-    module2.exports = read6;
+  "node_modules/varint/decode.js"(exports, module) {
+    module.exports = read6;
     var MSB5 = 128;
     var REST5 = 127;
     function read6(buf2, offset) {
@@ -39283,7 +39290,7 @@ var require_decode = __commonJS({
 
 // node_modules/varint/length.js
 var require_length = __commonJS({
-  "node_modules/varint/length.js"(exports, module2) {
+  "node_modules/varint/length.js"(exports, module) {
     var N15 = Math.pow(2, 7);
     var N25 = Math.pow(2, 14);
     var N35 = Math.pow(2, 21);
@@ -39293,7 +39300,7 @@ var require_length = __commonJS({
     var N75 = Math.pow(2, 49);
     var N85 = Math.pow(2, 56);
     var N95 = Math.pow(2, 63);
-    module2.exports = function(value) {
+    module.exports = function(value) {
       return value < N15 ? 1 : value < N25 ? 2 : value < N35 ? 3 : value < N45 ? 4 : value < N55 ? 5 : value < N65 ? 6 : value < N75 ? 7 : value < N85 ? 8 : value < N95 ? 9 : 10;
     };
   }
@@ -39301,33 +39308,14 @@ var require_length = __commonJS({
 
 // node_modules/varint/index.js
 var require_varint = __commonJS({
-  "node_modules/varint/index.js"(exports, module2) {
-    module2.exports = {
+  "node_modules/varint/index.js"(exports, module) {
+    module.exports = {
       encode: require_encode(),
       decode: require_decode(),
       encodingLength: require_length()
     };
   }
 });
-
-// lib/index.js
-var lib_exports = {};
-__export(lib_exports, {
-  ColdskyAgent: () => ColdskyAgent,
-  breakFeedUri: () => breakFeedUri,
-  breakPostURL: () => breakPostURL,
-  firehose: () => firehose,
-  firehoseShortDIDs: () => firehoseShortDIDs,
-  isPromise: () => isPromise,
-  likelyDID: () => likelyDID,
-  plcDirectory: () => plcDirectory,
-  shortenDID: () => shortenDID,
-  shortenHandle: () => shortenHandle,
-  unwrapShortDID: () => unwrapShortDID,
-  unwrapShortHandle: () => unwrapShortHandle,
-  version: () => version4
-});
-module.exports = __toCommonJS(lib_exports);
 
 // lib/shorten.js
 function likelyDID(text) {
@@ -45034,7 +45022,7 @@ function firehose() {
     ensureCborXExtended();
     const WebSocketImpl = typeof WebSocket === "function" ? WebSocket : (
       /** @type {typeof WebSocket} */
-      require("ws")
+      __require("ws")
     );
     const wsAddress = "wss://bsky.network/xrpc/com.atproto.sync.subscribeRepos";
     const ws = new WebSocketImpl(wsAddress);
@@ -45162,7 +45150,7 @@ function ensureCborXExtended() {
 }
 
 // package.json
-var version4 = "0.1.13";
+var version4 = "0.1.14";
 
 // lib/firehose-short-dids.js
 function firehoseShortDIDs(filterShortDIDs) {
@@ -45436,4 +45424,19 @@ function plcDirectory(since, overrides) {
     }
   }));
 }
+export {
+  ColdskyAgent,
+  breakFeedUri,
+  breakPostURL,
+  firehose,
+  firehoseShortDIDs,
+  isPromise,
+  likelyDID,
+  plcDirectory,
+  shortenDID,
+  shortenHandle,
+  unwrapShortDID,
+  unwrapShortHandle,
+  version4 as version
+};
 //# sourceMappingURL=libs.js.map

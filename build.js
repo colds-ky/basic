@@ -51,7 +51,7 @@ async function buildLib(mode) {
 
   const options = {
     ...baseOptions,
-    format: 'cjs',
+    format: 'esm',
     entryPoints: ['lib/index.js'],
     plugins: [
       {
