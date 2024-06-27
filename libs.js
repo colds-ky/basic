@@ -42300,7 +42300,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.41";
+	var version = "0.2.42";
 
 	// @ts-check
 
@@ -50444,7 +50444,8 @@ if (cid) {
 	  /**
 	   * @type {Dexie & {
 	   *  posts: import('dexie').Table<import('.').CompactPost, string>,
-	   *  profiles: import('dexie').Table<import('.').CompactProfile, string>
+	   *  profiles: import('dexie').Table<import('.').CompactProfile, string>,
+	   *  repoSync: import('dexie').Table<{shortDID: string, lastSync: number }>
 	   * }}
 	   */
 	  new Dexie(dbName || DEFAULT_DB_NAME);
@@ -50461,6 +50462,11 @@ if (cid) {
 	  db.version(5).stores({
 	    posts: 'uri, shortDID, replyTo, threadStart, *quoting, *words',
 	    profiles: 'shortDID, *handle, *words'
+	  });
+	  db.version(6).stores({
+	    posts: 'uri, shortDID, replyTo, threadStart, *quoting, *words',
+	    profiles: 'shortDID, *handle, *words',
+	    repoSync: 'shortDID'
 	  });
 	  const memStore = defineStore({
 	    post: handlePostUpdate,
@@ -50493,7 +50499,9 @@ if (cid) {
 	    getPostThread,
 	    getProfile,
 	    searchPosts,
-	    searchProfiles
+	    searchProfiles,
+	    getLastRepoSync,
+	    syncRepoWithData
 	  };
 	  function deleteRecord(rec) {
 	    // TODO: reconcile memStore and IndexedDB
@@ -50762,6 +50770,34 @@ if (cid) {
 	    });
 	    return profileWithSearchData;
 	  }
+
+	  /**
+	   * @param {string} shortDID
+	   */
+	  async function getLastRepoSync(shortDID) {
+	    return db.repoSync.get(shortDID).then(sync => sync?.lastSync);
+	  }
+
+	  /**
+	   * @param {string} shortDID
+	   * @param {import('../firehose').FirehoseRecord[]} records
+	   * @param {number} now
+	   */
+	  async function syncRepoWithData(shortDID, records, now) {
+	    let lastSync = '';
+	    for (const record of records) {
+	      const parsedURI = breakFeedUri(record.uri);
+	      if (parsedURI?.postID && parsedURI.postID > lastSync) lastSync = parsedURI.postID;
+	    }
+	    const compact = [];
+	    for (const record of records) {
+	      const co = memStore.captureRecord(record, now);
+	      if (co) {
+	        compact.push(co);
+	      }
+	    }
+	    return compact;
+	  }
 	}
 
 	// @ts-check
@@ -51028,9 +51064,9 @@ if (cid) {
 	  return records;
 	  function restRegularly() {
 	    const now = Date.now();
-	    if (now - lastRest > 100) {
+	    if (now - lastRest > 20) {
 	      lastRest = now;
-	      return new Promise(resolve => setTimeout(resolve, 3));
+	      return new Promise(resolve => setTimeout(resolve, 1));
 	    }
 	  }
 	}
@@ -52048,6 +52084,7 @@ if (cid) {
 	 */
 	function capturePostRecord(repo, uri, postRecord, store, asOf, intercepts) {
 	  const shortDID = shortenDID(repo);
+	  if (!shortDID || !uri || !postRecord) return;
 	  let repoData = store.get(shortDID);
 	  if (!repoData) {
 	    repoData = {
