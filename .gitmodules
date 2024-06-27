@@ -1,3 +1,6 @@
 [submodule "dids"]
 	path = dids
 	url = https://github.com/colds-ky/dids
+[submodule "index/a"]
+	path = index/a
+	url = https://github.com/colds-ky/index-a
