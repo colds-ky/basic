@@ -84,8 +84,8 @@ export function Timeline({ shortDID, searchQuery }) {
               key={i}
               thread={thread}
               significantPost={post => searchQuery ? !!post.matches?.length : post.shortDID === shortDID}
-              linkTimestamp={true}
-              linkAuthor={true}
+              linkTimestamp
+              linkAuthor
             />
           ))
       }

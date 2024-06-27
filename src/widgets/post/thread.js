@@ -39,7 +39,7 @@ export function Thread({ className, significantPost, uri, linkTimestamp, linkAut
         thread={thread}
         unrollMainConversation
         linkTimestamp={linkTimestamp}
-
+        linkAuthor={linkAuthor}
         {...rest}
       />
   );

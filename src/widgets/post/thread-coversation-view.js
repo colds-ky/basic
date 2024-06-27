@@ -73,8 +73,11 @@ export function ThreadConversationView({
       if (asides?.length) {
         conversationSegments.push(
           <ThreadNestedChildren
+            className='thread-conversation-asides'
             key={'asides:' + prevConvo.post.uri}
             branches={asides}
+            linkTimestamp={linkTimestamp}
+            linkAuthor={linkAuthor}
           />
         );
         asides = undefined;
