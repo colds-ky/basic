@@ -13,6 +13,8 @@ import { FullHandle, breakHandleParts } from '../widgets/account/full-handle';
 import './history.css';
 import { applyModifier } from '../api/unicode-styles/apply-modifier';
 import { Timeline } from './timeline';
+import { overlayAvatar } from '../icon-inject/overlay-avatar';
+import { replaceIcon } from '../icon-inject/replace-icon';
 
 const middledot = '\u00B7';
 
@@ -67,6 +69,21 @@ function HistoryCore() {
     description: localise('Important announcement', { uk: 'Ця інформація вас здивує' }),
     placeholder: true
   };
+
+  useEffect(() => {
+    var stop = false;
+    const avatar = resolved.avatar;
+    if (avatar) {
+      (async () => {
+        const avatarIcon = await overlayAvatar(avatar).catch(() => { });
+        if (!stop) replaceIcon(avatarIcon || undefined);
+      })();
+    }
+
+    return () => {
+      stop = true;
+    }
+  }, [resolved?.avatar]);
 
   console.log('profile ', resolved);
 
