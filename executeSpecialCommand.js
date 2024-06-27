@@ -1,28 +1,9 @@
 // @ts-check
 
-(function () {
-  var command = window['executeSpecialCommand'];
-  window['executeSpecialCommand'] = executeSpecialCommand;
+function updateDIDs() {
+  alert('updateDIDs');
+}
 
-  if (typeof command === 'string')
-    executeSpecialCommand(command);
-
-
-  function executeSpecialCommand(command) {
-    switch (command) {
-      case 'update-dids':
-        return updateDIDs();
-      
-      case 'update-index':
-        return updateIndex();
-    }
-  }
-
-  function updateDIDs() {
-    alert('updateDIDs');
-  }
-
-  function updateIndex() {
-    alert('updateIndex');
-  }
-})()
+function updateIndex() {
+  alert('updateIndex');
+}
