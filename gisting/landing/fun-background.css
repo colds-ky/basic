@@ -1,0 +1,85 @@
+.fun-background {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  z-index: -1;
+  padding-right: 6vh;
+}
+
+.fun-background-padding {
+  position: relative;
+  height: 100%;
+}
+
+.fun-background .fun-background-scroller {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  transform: perspective(500px);
+}
+
+.fun-background .fun-background-scroller .fun-background-thread-bubble {
+  position: absolute;
+  bottom: -50vh;
+  margin: 1em;
+  max-width: 20em;
+  animation: 13s linear 1s forwards slidetop;
+  font-family: sans-serif;
+  font-size: 1.8vh;
+}
+
+.fun-background .fun-background-scroller .fun-background-thread {
+  animation: 3s ease-in-out infinite alternate rock;
+}
+
+.fun-background .fun-background-scroller .fun-background-thread .fun-background-thread-author {
+  white-space: nowrap;
+}
+
+.fun-background .fun-background-scroller .fun-background-thread .fun-background-thread-content > p {
+  margin: 0;
+  margin-top: 0.5em;
+  padding: 0;
+}
+
+.fun-background .fun-background-scroller .fun-background-thread .fun-background-thread-content > p:first-child {
+  margin-top: 0;
+}
+
+.fun-background .fun-background-scroller .fun-background-thread .fun-background-thread-likes {
+  text-align: right;
+  opacity: 0.4;
+  margin-top: 0.2em;
+}
+
+.fun-background .fun-background-scroller .fun-background-thread .fun-background-thread-likes svg {
+  transform: scale(0.8) translateY(0.3em);
+}
+
+@keyframes slidetop {
+  from {
+    transform: translateY(0);
+  }
+
+  5% {
+    transform: translateY(-30vh);
+  }
+
+  to {
+    transform: translateY(-180vh);
+  }
+}
+
+@keyframes rock {
+  from {
+    transform: rotate(-4deg);
+  }
+
+  50% {
+    transform: rotate(7deg);
+  }
+
+  to {
+    transform: rotate(-8deg);
+  }
+}

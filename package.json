@@ -1,18 +1,23 @@
 {
-  "name": "gist.ing",
-  "version": "0.2.51.9",
-  "description": "Gisting on the Ski",
-  "main": "index.js",
-  "private": true,
+  "name": "coldsky",
+  "version": "0.2.52",
+  "description": "Library and the app for BlueSky",
+  "main": "libs.js",
   "scripts": {
     "build": "node build.js",
     "watch": "node build.js --watch",
-    "start": "node build.js --serve"
+    "start": "node build.js --serve",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "bluesky",
+    "coldsky",
+    "atproto",
+    "social media"
+  ],
   "author": "Oleg Mihailik",
-  "license": "Apache-2.0",
-  "dependencies": {
+  "license": "not yet",
+  "devDependencies": {
     "@atproto/api": "*",
     "@atproto/repo": "*",
     "cbor-x": "*",
@@ -22,6 +27,9 @@
     "esbuild": "*",
     "rollup": "*",
     "@rollup/plugin-commonjs": "*",
+    "@rollup/plugin-json": "*",
+    "@rollup/plugin-babel": "*",
+    "@babel/core": "*",
     "@rollup/plugin-node-resolve": "*",
 
     "@emotion/react": "^11.11.4",

@@ -1,0 +1,1165 @@
+/* gisting/landing/fun-background.css */
+.fun-background {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  padding-right: 6vh;
+}
+.fun-background-padding {
+  position: relative;
+  height: 100%;
+}
+.fun-background .fun-background-scroller {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  transform: perspective(500px);
+}
+.fun-background .fun-background-scroller .fun-background-thread-bubble {
+  position: absolute;
+  bottom: -50vh;
+  margin: 1em;
+  max-width: 20em;
+  animation: 13s linear 1s forwards slidetop;
+  font-family: sans-serif;
+  font-size: 1.8vh;
+}
+.fun-background .fun-background-scroller .fun-background-thread {
+  animation: 3s ease-in-out infinite alternate rock;
+}
+.fun-background .fun-background-scroller .fun-background-thread .fun-background-thread-author {
+  white-space: nowrap;
+}
+.fun-background .fun-background-scroller .fun-background-thread .fun-background-thread-content > p {
+  margin: 0;
+  margin-top: 0.5em;
+  padding: 0;
+}
+.fun-background .fun-background-scroller .fun-background-thread .fun-background-thread-content > p:first-child {
+  margin-top: 0;
+}
+.fun-background .fun-background-scroller .fun-background-thread .fun-background-thread-likes {
+  text-align: right;
+  opacity: 0.4;
+  margin-top: 0.2em;
+}
+.fun-background .fun-background-scroller .fun-background-thread .fun-background-thread-likes svg {
+  transform: scale(0.8) translateY(0.3em);
+}
+@keyframes slidetop {
+  from {
+    transform: translateY(0);
+  }
+  5% {
+    transform: translateY(-30vh);
+  }
+  to {
+    transform: translateY(-180vh);
+  }
+}
+@keyframes rock {
+  from {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(7deg);
+  }
+  to {
+    transform: rotate(-8deg);
+  }
+}
+
+/* gisting/widgets/account/account-chip.css */
+.account-avatar.account-avatar-chip {
+  background: no-repeat center center;
+  background-size: cover;
+  color: transparent;
+  border-radius: 200%;
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  margin-right: 0.25em;
+  position: relative;
+  top: -0.15em;
+}
+
+/* gisting/widgets/post/post-text-content.css */
+.facet-mention {
+  text-decoration: none;
+}
+.facet-mention .account-avatar-chip {
+  margin-right: 0;
+  transform: scale(0.85) translateY(0.2em);
+  filter: contrast(1.5) brightness(1.1);
+  box-shadow: inset 1px 0.5px 2px #1919eea3;
+}
+.facet-mention:hover {
+  text-decoration: underline;
+}
+.complete-post-content .post-notes-area .post-replies .reply-avatars .reply-avatar-marker.reply-avatar-marker-more {
+  min-width: 2em;
+  text-align: center;
+  color: goldenrod;
+  color: #2f5bab;
+  font-style: italic;
+}
+.facet-url {
+  text-decoration: none;
+  color: rgb(6, 76, 197);
+}
+.facet-url:visited {
+  color: rgb(136, 0, 178);
+}
+.facet-url:hover {
+  text-decoration: underline;
+}
+.facet-url .link-text-before-domain {
+  opacity: 0.4;
+}
+.facet-url .link-text-after-domain {
+  opacity: 0.6;
+}
+.facet-url .unspecified-domain {
+  color: rgb(165, 25, 0);
+}
+.facet-url .suspicious-link {
+  color: rgb(255, 77, 92);
+}
+.search-match-highly-relevant {
+  background: gold;
+  border-radius: 0.3em;
+  padding: 0 0.1em;
+  margin: 0 -0.1em;
+}
+.search-match-relevant {
+  background-image:
+    linear-gradient(
+      to top,
+      #ffcd70,
+      transparent 0.6em);
+  border-radius: 0.2em;
+}
+
+/* gisting/widgets/account/full-handle.css */
+
+/* gisting/widgets/account/account-label.css */
+a.account-label.account-handle {
+  color: inherit;
+  text-decoration: none;
+}
+.account-label a.account-handle {
+  color: inherit;
+  text-decoration: none;
+}
+.account-label .handle-bsky-social-suffix {
+  display: inline-block;
+  zoom: 0.7;
+  transform: scaleY(1.43) translateY(0.08em);
+  transform-origin: bottom;
+  opacity: 0.6;
+}
+.account-label .handle-bsky-social-suffix-dot {
+  opacity: 0.6;
+  padding-left: 0.05em;
+  padding-right: 0.1em;
+}
+.account-label .account-avatar {
+  background: no-repeat center center;
+  background-size: cover;
+  color: transparent;
+  border-radius: 200%;
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  margin-right: 0.25em;
+  top: -0.2em;
+  margin-bottom: -0.25em;
+  position: relative;
+}
+.account-label .account-avatar.account-avatar-at-sign {
+  color: #7fa9f4;
+  display: inline-grid;
+  align-items: center;
+  justify-items: center;
+  transform: scale(1.2);
+}
+.account-label .handle-main-text {
+  color: #365ca1;
+}
+.account-label .handle-tld-suffix {
+  color: #123a82;
+  text-shadow: 0 0 1px #00389d;
+}
+.account-label .handle-bsky-social-suffix {
+  color: #365ca1;
+}
+.account-label .handle-bsky-social-suffix-dot {
+  color: #365ca1;
+}
+.account-label .account-label-display-name {
+  padding-left: 0.3em;
+}
+
+/* gisting/widgets/post/post.css */
+.post-frame-outer {
+  padding: 1em;
+  padding-bottom: 0.65em;
+  border: solid 1px #f7d69c;
+  border-top-color: #e9c78a;
+  border-left-color: #e9c78a;
+  background: #fffbeb;
+  box-shadow: 2px 4px 10px #0000002b;
+  border-radius: 0.5em;
+  z-index: 1;
+  position: relative;
+}
+.post-loading-in-progress {
+  color: inherit;
+  text-decoration: none;
+}
+.thread-reply-post.post-frame-outer {
+  box-shadow: 2px 2px 10px #0000002b;
+}
+.post-top-line {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  white-space: nowrap;
+}
+.post-top-line .tiny-text-for-copy-paste {
+  font-size: 0.1px;
+  grid-column: 1;
+}
+.post-top-line .post-author {
+  text-overflow: ellipsis;
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: auto auto auto 1fr;
+}
+.post-top-line .post-author-right-overlay {
+  grid-column: 2;
+  grid-row: 1;
+  pointer-events: none;
+  justify-self: end;
+  width: 4em;
+  background:
+    linear-gradient(
+      to left,
+      #fffbeb,
+      transparent);
+}
+@media (max-width: 540px) {
+  .post-top-line .post-author .account-label-display-name {
+    display: none;
+  }
+}
+.post-top-line .post-date {
+  grid-column: 3;
+  grid-row: 1;
+  color: #cbaa26;
+  text-decoration: none;
+  position: relative;
+  top: 0.2em;
+}
+.post-top-line .post-date.post-date-new {
+  font-weight: 100;
+  zoom: 0.9;
+  transform: scaleY(1.1);
+  color: #d3bc5c;
+}
+.post-text-content p {
+  margin: 0.7em 0;
+}
+.post-text-content p:first-child {
+  margin-top: 0.6em;
+}
+.post-text-content p:last-child {
+  margin-bottom: 0.3em;
+}
+.post-embeds-section {
+  margin: 0.7em 0;
+  margin-right: 3em;
+}
+.post-embeds-section .embed-frame-outer {
+  margin-bottom: 0.6em;
+}
+.post-embeds-section.post-embeds-section-compact {
+  zoom: 65%;
+}
+.complete-post-content {
+  position: relative;
+  min-height: 2.7em;
+}
+.complete-post-content.notes-height-2 {
+  min-height: 5.1em;
+}
+.complete-post-content.notes-height-3 {
+  min-height: 7em;
+}
+.complete-post-content.notes-height-4 {
+  min-height: 8.1em;
+}
+.complete-post-content.notes-height-5 {
+  min-height: 9.2em;
+}
+.complete-post-content .post-text-content {
+  margin-right: 2em;
+}
+.complete-post-content .post-notes-area {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+.complete-post-content .post-notes-area .post-replies {
+  cursor: pointer;
+  transition: transform 300ms;
+}
+.complete-post-content .post-notes-area .post-replies:hover {
+  transform: scale(1.1);
+}
+.complete-post-content .post-notes-area .post-replies .reply-avatars {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  margin-right: -0.5em;
+}
+.complete-post-content .post-notes-area .post-replies .reply-avatars .reply-avatar-marker {
+  display: block;
+}
+.complete-post-content .post-notes-area .post-replies .reply-avatars .reply-avatar-marker.reply-avatar-marker-more {
+  min-width: 2em;
+  text-align: center;
+  color: goldenrod;
+}
+.complete-post-content .post-after-notes {
+  clear: both;
+}
+.complete-post-content .post-likes {
+  text-align: right;
+  color: #d7ba43;
+  margin-top: 0.2em;
+}
+.complete-post-content .post-likes .tiny-text-for-copy-paste {
+  font-size: 0.1px;
+}
+.complete-post-content .post-likes .heart-icon {
+  position: relative;
+  top: 0.26em;
+}
+.complete-post-content .post-likes .heart-icon-no-likes {
+  color: white;
+}
+.complete-post-content .post-likes .post-like-count {
+  margin-left: 0.2em;
+}
+.sub-thread {
+  z-index: 1;
+  position: relative;
+}
+.post-embeds-section .post-frame-outer {
+  transform: rotate(-1deg) translate(1em, 0px);
+  transform-origin: bottom right;
+  zoom: 0.95;
+  background:
+    linear-gradient(
+      154deg,
+      #fffefa,
+      #fffbeb 19em);
+  border-top-color: #e4bb73;
+  border-left-color: #e39200;
+  box-shadow: 1px 2px 10px #0000002b;
+  z-index: 1;
+  position: relative;
+}
+.post-embeds-section .post-frame-outer .post-frame-outer {
+  zoom: 0.9;
+  transform: rotate(-1.3deg) translate(1.4em, -0.7em);
+  border-color: transparent;
+  box-shadow: 1px 2px 0.5em #4e36003d, 0px 0px 1px #4e360069;
+  s-filter: brightness(0.95) contrast(1.06) saturate(1.13);
+}
+.post-embeds-section .embed-frame-outer {
+  background: white;
+  border-radius: 0.5em;
+  overflow: hidden;
+  border: solid 1px #d9d4d4;
+  border-radius: 0.5em;
+  box-shadow: inset 2px 2px 7px #00000012;
+  position: relative;
+}
+.post-embeds-section .embed-frame-border {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5em;
+  border: solid 1px #d9d4d4;
+  border-radius: 0.5em;
+  box-shadow: inset 2px 2px 7px #00000012;
+  pointer-events: none;
+}
+.post-embeds-section .post-embed-link-title {
+  padding: 0.5em 1em;
+  padding-top: 0.6em;
+  font-size: 110%;
+  color: #2177bd;
+}
+.post-embeds-section .post-embed-link-title a {
+  color: inherit;
+  text-decoration: none;
+}
+.post-embeds-section .post-embed-link-title:hover a,
+.post-embeds-section .post-embed-link-title a:active {
+  text-decoration: underline;
+}
+.post-embeds-section .post-embed-link-url {
+  padding-left: 1.2em;
+  padding-bottom: 0.2em;
+  font-size: 90%;
+  color: white;
+  background: #379ef1;
+}
+.post-embeds-section .post-embed-link-url .post-embed-link-url-lead {
+  opacity: 0.5;
+}
+.post-embeds-section .post-embed-link-url .post-embed-link-url-trail {
+  opacity: 0.7;
+}
+.post-embeds-section .post-embed-link-url a {
+  color: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 100%;
+  overflow: hidden;
+  display: block;
+  padding-right: 0;
+}
+.post-embeds-section .post-embed-image-and-description,
+.post-embeds-section .post-embed-link-image-and-description {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.post-embeds-section .post-embed-image-and-description .post-embed-image-description-wrapper,
+.post-embeds-section .post-embed-link-image-and-description .post-embed-link-description-wrapper {
+  position: relative;
+  border-right: solid 1px #e5e5e5;
+}
+.post-embeds-section .post-embed-link .post-embed-link-description {
+  padding-top: 0.2em;
+  padding-left: 1em;
+  padding-bottom: 0.5em;
+  max-height: 6.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 90%;
+  color: #3d3d3d;
+}
+.post-embeds-section .post-embed-image-and-description .post-embed-image-description,
+.post-embeds-section .post-embed-link-image-and-description .post-embed-link-description {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  padding: 1em;
+  padding-right: 0.5em;
+  padding-bottom: 0.2em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 90%;
+  color: #3d3d3d;
+}
+.post-embeds-section .post-embed-image-and-description .post-embed-image-description p,
+.post-embeds-section .post-embed-link-image-and-description .post-embed-link-image-description p {
+  margin: 0.5em 0;
+}
+.post-embeds-section .post-embed-image-and-description .post-embed-image-description p:first-child,
+.post-embeds-section .post-embed-link-image-and-description .post-embed-link-image-description p:first-child {
+  margin-top: 0;
+}
+.post-embeds-section .post-embed-image-wrapper,
+.post-embeds-section .post-embed-link-image-wrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  position: relative;
+}
+.post-embeds-section .post-embed-link-gif-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: 15% 15%;
+}
+.post-embeds-section img.post-embed-image,
+.post-embeds-section img.post-embed-link-image {
+  width: 100%;
+  max-height: 20em;
+  min-height: 3em;
+  object-fit: cover;
+  object-position: 15% 15%;
+}
+.post-embeds-section .post-embed-images-multiple img.post-embed-image {
+  max-height: 6em;
+}
+.post-embeds-section .post-embed-images-2 img.post-embed-image {
+  max-height: 10em;
+}
+.post-embeds-section .post-embed-images-multiple .post-embed-image-and-description {
+  border-top: solid 1px #dbdbdb;
+}
+.post-embeds-section .post-embed-images-multiple .post-embed-image-and-description:first-child {
+  border-top: none;
+}
+
+/* gisting/widgets/post/thread.css */
+.thread-view .thread-reply-post {
+  margin-top: -0.7em;
+}
+.thread-view .collapsed-thread-part {
+  padding-left: 2em;
+  margin: -0.8em 0;
+}
+.thread-view .collapsed-thread-part .collapsed-many-posts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+.thread-view .collapsed-thread-part .collapsed-many-posts .collapsed-many-posts-first,
+.thread-view .collapsed-thread-part .collapsed-many-posts .collapsed-many-posts-rest,
+.thread-view .collapsed-thread-part .collapsed-single-post,
+.thread-view .collapsed-thread-part .collapsed-few-posts .collapsed-few-post-one {
+  padding: 0.7em;
+  padding-bottom: 1em;
+  border: solid 1px #f7d69c;
+  background: #fffcf2;
+  box-shadow: 0px 0px 10px #0000001c;
+  border-radius: 1.2em;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.thread-view .collapsed-thread-part .account-avatar-chip {
+  opacity: 0.6;
+}
+.thread-view .collapsed-thread-part .collapsed-many-posts .collapsed-many-posts-rest {
+  justify-self: start;
+  position: relative;
+  left: -0.4em;
+}
+.thread-view .collapsed-thread-part .collapsed-single-post {
+  display: inline-block;
+}
+.thread-view .collapsed-thread-part .collapsed-many-posts .collapsed-many-posts-rest .collapsed-many-posts-counter {
+  padding-left: 0.3em;
+  opacity: 0.5;
+}
+.thread-view .collapsed-thread-part .collapsed-few-posts .collapsed-few-post-one {
+  display: inline-block;
+  position: relative;
+  margin-right: -0.4em;
+}
+.thread-conversation-view .post-date.post-timestamp-small-note {
+  float: right;
+  font-weight: 100;
+  zoom: 0.9;
+  transform: scaleY(1.1);
+  color: #d3bc5c;
+  text-decoration: none;
+}
+.thread-conversation-view .post-date.post-timestamp-small-note:hover {
+  text-decoration: underline;
+}
+.thread-conversation-view .insignificant-expandable-markers {
+  text-align: center;
+  font-size: 80%;
+}
+.thread-conversation-view .complete-post-content .post-notes .insignificant-expandable-markers .account-avatar {
+  display: block;
+  text-align: right;
+}
+.thread-conversation-view hr.conversation-divider {
+  color: #deb40f;
+  background:
+    linear-gradient(
+      to right,
+      transparent,
+      currentColor,
+      currentColor,
+      transparent);
+  height: 1px;
+  border: none;
+}
+.thread-conversation-view .complete-post-content.conversation {
+  margin-bottom: 1.2em;
+}
+.thread-conversation-view .conversation-after-tight-post {
+  margin-top: 0.8em;
+}
+.thread-conversation-view .aside-interjection-section,
+.thread-forum-view .aside-interjection-section {
+  padding: 1.5em;
+  margin: 1.5em 0;
+  margin-left: 1.5em;
+  border: solid 1px #fdc3b5;
+  border-radius: 1em;
+  background: white;
+  box-shadow: inset 2px 2px 7px #0000001f;
+  display: flex;
+  flex-direction: column;
+  row-gap: 1.5em;
+}
+.complete-post-content .thread-post-expandos {
+  padding: 1.5em;
+  margin: 1.5em 0;
+  margin-left: 1.5em;
+  border: solid 1px #f3c97d;
+  border-radius: 1em;
+  background: rgb(255 254 250);
+  box-shadow: inset 2px 2px 7px #0000001f;
+  display: flex;
+  flex-direction: column;
+  row-gap: 1.5em;
+}
+.aside-interjection-section .bendy-line {
+  width: 25%;
+  margin-top: -1.5em;
+  justify-self: start;
+  position: relative;
+  color: #e7af47;
+  border-left: solid 1px currentColor;
+  border-bottom: solid 1px currentColor;
+  border-bottom-left-radius: 1em;
+  display: flex;
+  align-items: end;
+  padding-left: 2em;
+}
+.complete-post-content .thread-post-expandos .bendy-line {
+  color: #ffb5a3;
+}
+.aside-interjection-section .bendy-line::after {
+  content: " ";
+  position: absolute;
+  right: -1.5em;
+  bottom: -1.6em;
+  width: 1.5em;
+  height: 1.6em;
+  border-top: solid 1px currentColor;
+  border-right: solid 1px currentColor;
+  border-top-right-radius: 1em;
+}
+.aside-interjection-section .bendy-line .account-avatar {
+  position: relative;
+  top: 0.75em;
+}
+
+/* gisting/landing/landing.css */
+.landing {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 2fr auto 3fr auto;
+}
+.landing .landing-top-bar {
+  grid-row: 1;
+  padding: 0.2em;
+}
+.landing .landing-handle-band {
+  grid-row: 3;
+  background:
+    linear-gradient(
+      to right,
+      #ffdf4ad9,
+      #ffd8008f);
+  border-top: solid 1.5px #dcca78;
+  border-bottom: solid 1px #1a160082;
+  box-shadow: 0 22px 36px 5px #00000045;
+  backdrop-filter: blur(3px) contrast(0.7);
+  display: grid;
+}
+.landing .landing-handle-band:focus-within {
+  background:
+    linear-gradient(
+      to right,
+      #ffe055ec,
+      #ffd8008f);
+}
+.landing .landing-handle-band input {
+  padding-left: 0.5em;
+  font-size: 6.7vh;
+  -webkit-background-clip: text;
+}
+.landing .landing-handle-band label {
+  padding-left: 4.5vh;
+  padding-top: 1.5vh;
+  font-style: italic;
+  font-size: 2.5vh;
+}
+.landing .landing-auto-completion-area {
+  position: relative;
+  grid-row: 4;
+  align-self: start;
+  justify-self: start;
+  background-color: #e5edfccc;
+  background-image:
+    linear-gradient(
+      178deg,
+      #d7c95e,
+      transparent 21px);
+  padding: 0.5em;
+  padding-right: 0.7em;
+  padding-bottom: 0.25em;
+  margin-left: 0.5em;
+  margin-top: -1vh;
+  z-index: 1;
+  border: solid 1px #2b2b2b;
+  border-top: none;
+  font-size: 2.5vh;
+  font-family: sans-serif;
+  backdrop-filter: blur(3px) contrast(0.7);
+  box-shadow: 0 26px 20px 5px #00000030;
+}
+.landing .landing-auto-completion-area .landing-auto-complete-entry {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
+  padding: 0.2em 0;
+  text-decoration: none;
+  color: inherit;
+}
+.landing .landing-auto-completion-area .landing-auto-complete-entry-post .auto-complete-post-account {
+  display: inline-block;
+}
+.landing .landing-auto-completion-area .landing-auto-complete-entry-post .post-entry-first-line {
+  font-style: italic;
+  border: solid 1px cornflowerblue;
+  background: #ffffff85;
+  padding: 0.2em 0.3em;
+  border-radius: 0.2em;
+  margin-left: 0.4em;
+  color: #183691a8;
+}
+.landing .landing-auto-completion-area .landing-auto-completion-progress {
+  height: 0.1em;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  bottom: 0;
+  overflow: hidden;
+  transition: color 0.5s;
+}
+.landing .landing-auto-completion-area .landing-auto-completion-progress.landing-auto-completion-progress-profile {
+  color: forestgreen;
+}
+.landing .landing-auto-completion-area .landing-auto-completion-progress.landing-auto-completion-progress-post {
+  color: tomato;
+}
+.landing .landing-auto-completion-area .landing-auto-completion-progress-post.landing-auto-completion-progress.landing-auto-completion-progress-profile {
+  color: cornflowerblue;
+}
+.landing .landing-auto-completion-area .landing-auto-completion-progress:before {
+  content: " ";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(
+      to right,
+      transparent,
+      currentColor 15%,
+      transparent 30%);
+  animation: 2s linear infinite alternate bounce;
+}
+@keyframes bounce {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(70%);
+  }
+}
+.landing .landing-bottom-bar {
+  grid-row: 5;
+  padding: 0.2em 0.4em;
+  font-family: sans-serif;
+  color: #bdd4fc;
+  text-shadow: 0 0 14px #0052ff, 0 0 2px black;
+}
+
+/* gisting/history/history-layout.css */
+.history-layout {
+  display: grid;
+  grid-template-rows: 14vmax 7vmax 7vmax auto auto 1fr;
+  grid-template-columns: 14vmax 1fr;
+  min-height: 100vmax;
+}
+.history-layout .history-account-banner-bg {
+  grid-row: 1 / 3;
+  grid-column: 1 / 3;
+  background: no-repeat left center;
+  background-size: cover;
+  border-bottom: solid 1px #dbdbdb;
+  z-index: 7;
+  background-color: white;
+}
+.history-layout .history-account-avatar {
+  grid-row: 2 / 4;
+  grid-column: 1;
+  font-size: 1vmax;
+  background: no-repeat center center;
+  background-size: cover;
+  border-radius: 200%;
+  box-shadow: inset -0.5em -0.5em 1em #00000026;
+  margin-top: 1em;
+  margin-left: 1em;
+  border: solid 0.6em white;
+  background-color: white;
+  position: sticky;
+  top: 0.8em;
+  z-index: 8;
+}
+.history-layout .history-account-avatar-bg {
+  position: sticky;
+  top: 1.7em;
+  grid-row: 2 / 4;
+  grid-column: 1;
+  margin-top: 1em;
+  margin-left: 0.5em;
+  z-index: 5;
+  border-radius: 200%;
+  box-shadow: 0 0 1.3em #0000009c;
+  transform: translateY(-1em) scaleX(0.7);
+}
+.history-layout .history-account-displayName-and-handle {
+  grid-row: 3;
+  grid-column: 2;
+  padding-top: 0.2em;
+  padding-left: 0.2em;
+  position: sticky;
+  top: 3vmax;
+  z-index: 10;
+}
+.history-layout .history-account-displayName-and-handle .history-account-displayName {
+  display: block;
+  position: relative;
+  height: 1em;
+  width: 100%;
+}
+.history-layout .history-account-displayName-and-handle .history-account-displayName .history-account-displayName-inner {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
+.history-layout .history-account-displayName-and-handle .history-account-displayName .history-account-displayName-stroke {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  -webkit-text-stroke: 5px white;
+  color: white;
+  filter: blur(1px);
+  pointer-events: none;
+}
+.history-layout .sticky-header-background,
+.history-layout .sticky-header-background-cover {
+  grid-row: 2 / 4;
+  grid-column: 1 / 3;
+  z-index: 5;
+}
+.history-layout .sticky-header-background {
+  position: sticky;
+  top: -1px;
+  background:
+    linear-gradient(
+      to top,
+      transparent,
+      #00000017 1em,
+      white 1em);
+}
+.history-layout .sticky-header-background-cover {
+  background: white;
+}
+.history-layout .history-account-displayName {
+  font-size: 3vmax;
+  line-height: 1;
+  overflow-wrap: anywhere;
+  text-shadow: 0 0.3px 1px black;
+}
+.history-layout .history-account-handle {
+  padding-top: 0.3em;
+}
+.history-layout .history-account-handle .at-sign {
+  display: inline-block;
+  text-align: center;
+  transform: scale(1.1) translateY(0.05em);
+  padding-right: 0.05em;
+}
+.history-layout .history-account-handle .handle-bsky-social-suffix-dot {
+  padding-left: 0.1em;
+  padding-right: 0.05em;
+}
+.history-layout .history-account-handle .handle-tld-suffix-dot {
+  padding-left: 0.1em;
+  padding-right: 0.05em;
+}
+.history-layout .history-account-handle .handle-bsky-social-suffix {
+}
+.history-layout .history-account-description {
+  grid-row: 4;
+  grid-column: 1 / 3;
+  align-self: start;
+  line-height: 1.2;
+  z-index: 4;
+  position: relative;
+  padding-left: 0.4em;
+  margin-top: 1vmax;
+  overflow-wrap: anywhere;
+}
+.history-layout .history-account-description > p {
+  margin-top: 0.4em;
+  margin-bottom: 0;
+}
+.history-layout .history-account-description > p:first-child {
+  margin-top: 0;
+}
+.history-layout .timeline-container {
+  grid-row: 6;
+  grid-column: 1 / 3;
+  overflow-wrap: anywhere;
+}
+.history-layout .history-search-bar {
+  position: sticky;
+  top: 9vmax;
+  right: 0;
+  padding-right: 0.3em;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  grid-row: 2 / 4;
+  grid-column: 2;
+  align-self: center;
+  justify-self: end;
+  font-size: 130%;
+}
+.history-layout .history-search-bar-expanded {
+  grid-row: 5;
+  grid-column: 1 / 3;
+  top: 11.7vmax;
+  background:
+    linear-gradient(
+      to right,
+      #ffe765f0 50%,
+      #ffc9008f);
+  backdrop-filter: blur(3px) contrast(0.7);
+  border-bottom: solid 1px #dbca87;
+  border-top: solid 1px #d3cbaa;
+  box-shadow: 0 0.3em 0.5em #0000002e;
+  width: 100%;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+.history-layout .history-search-bar .history-search-icon {
+  color: #a07c22;
+  font-size: 185%;
+  cursor: pointer;
+  background: #ffe992;
+  border-radius: 3em;
+  padding: 0.09em;
+  border: solid 1px #e7ddb5;
+  box-shadow: 0.05em 0.07em 0.15em #0000001a;
+}
+.history-layout .history-search-bar-expanded .history-search-icon {
+  background: transparent;
+  color: white;
+  box-shadow: none;
+  border: none;
+  filter: drop-shadow(1px 2px 2px #a77d00);
+}
+.history-layout .history-search-bar #history-search-input {
+  border: none;
+  outline: none;
+  font-size: 110%;
+  background: transparent;
+  padding-left: 0.4em;
+  padding-right: 0;
+  color: #725600;
+  width: 100%;
+}
+@media (min-aspect-ratio: 5.5/5) {
+  .history-layout {
+    grid-template-rows: 10rem 5.5rem 5.5rem auto auto 1fr;
+    grid-template-columns: 11rem 1fr;
+  }
+  .history-layout .history-search-bar {
+    top: 10rem;
+  }
+  .history-layout .history-account-displayName-and-handle {
+    top: 3em;
+  }
+  .history-layout .history-account-displayName {
+    font-size: 2rem;
+  }
+  .history-layout .history-account-description {
+    margin-top: 0.6em;
+  }
+}
+
+/* gisting/history/timeline/search-animations.css */
+.search-animation {
+  height: 30em;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: -5em;
+}
+.search-animation .flying-post {
+  max-width: 18em;
+  position: absolute;
+  top: 2em;
+}
+.search-animation .flying-post .post-inner {
+  zoom: 0.7;
+}
+.search-animation.search-animation-to-right .flying-post {
+  left: -9em;
+  animation: 6s forwards slideright;
+}
+.search-animation.search-animation-to-left .flying-post {
+  right: -9em;
+  animation: 6s forwards slideleft;
+}
+@keyframes slideright {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(200vw);
+  }
+}
+@keyframes slideleft {
+  from {
+    transform: translateX(0) rotate(10deg);
+    opacity: 0;
+    filter: blur(3px);
+  }
+  20% {
+    opacity: 1;
+    filter: none;
+  }
+  70% {
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100vw) rotate(-10deg);
+    opacity: 0;
+  }
+}
+
+/* gisting/history/timeline/timeline.css */
+.timeline-container {
+  margin-right: 0.8em;
+  margin-bottom: 1.3em;
+}
+.timeline-container > .sub-thread {
+  margin-top: 1.6em;
+}
+.timeline-container > .post-frame-outer {
+  margin-left: 1em;
+  margin-top: 1.6em;
+}
+.timeline-container .sub-thread {
+  padding-left: 1em;
+}
+.timeline-container .timeline-bottom-visibility-spacer {
+  position: relative;
+  pointer-events: none;
+}
+.timeline-container .timeline-bottom-visibility-spacer .timeline-bottom-visibility-spacer-inner {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 150vh;
+}
+.timeline-container .timeline-footer {
+  width: 100%;
+  text-align: center;
+  padding-left: 1.6em;
+}
+.timeline-container .timeline-footer button.footer-button {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  padding-top: 2em;
+  color: gray;
+  animation: 10s linear 1s infinite alternate cycle-colors;
+}
+.timeline-container .timeline-footer.timeline-footer-complete button.footer-button,
+.timeline-container .timeline-footer.timeline-footer-search-complete button.footer-button {
+  color: gray;
+  animation: none;
+}
+@keyframes cycle-colors {
+  0% {
+    color: gray;
+  }
+  25% {
+    color: #4c00ff;
+  }
+  50% {
+    color: #ff2700;
+  }
+  75% {
+    color: forestgreen;
+  }
+  100% {
+    color: gray;
+  }
+}
+.timeline-container .timeline-footer button.footer-button .footer-cog-icon {
+  animation: rotating 2s linear infinite;
+  transition: transform 2s;
+  position: relative;
+  top: 0.3em;
+  left: -0.1em;
+}
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.timeline-container .timeline-footer.timeline-footer-complete button.footer-button .footer-cog-icon,
+.timeline-container .timeline-footer.timeline-footer-search-complete button.footer-button .footer-cog-icon {
+  animation: none;
+  transform: scale(0);
+}
+
+/* gisting/history/history.css */
+html.account body {
+  overflow: auto;
+}
+.history-footer {
+  color: #ababab;
+  margin-bottom: -1em;
+  padding-left: 0.4em;
+  padding-top: 1.2em;
+  font-size: 97%l;
+}
+/*# sourceMappingURL=index.css.map */
