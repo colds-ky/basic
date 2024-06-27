@@ -4,3 +4,9 @@
 [submodule "index/a"]
 	path = index/a
 	url = https://github.com/colds-ky/index-a
+[submodule "index/b"]
+	path = index/b
+	url = https://github.com/colds-ky/index-b
+[submodule "index/c"]
+	path = index/c
+	url = https://github.com/colds-ky/index-c
