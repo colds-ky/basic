@@ -28,6 +28,9 @@
 [submodule "index/i"]
 	path = index/i
 	url = https://github.com/colds-ky/index-i
+[submodule "j"]
+	path = j
+	url = https://github.com/colds-ky/index-j
 [submodule "index/k"]
 	path = index/k
 	url = https://github.com/colds-ky/index-k

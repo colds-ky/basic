@@ -17,6 +17,47 @@ body {
   background-size: cover;
 }
 
+.autocomplete {
+  background: white;
+  z-index: 10;
+  position: relative;
+  top: 3px;
+  left: -2px;
+  border: solid 1px black;
+  box-shadow: 5px 8px 11px #000000a6;
+  font-family: sans-serif;
+}
+
+span.at {
+  color: gray;
+  display: inline-block;
+  zoom: 0.7;
+  position: relative;
+  top: -0.13em;
+  padding-right: 0.2em;
+}
+
+.stdHandleSuffix {
+  color: cornflowerblue;
+}
+
+.displayName {
+  font-weight: 200;
+  color: gray;
+}
+
+.result {
+  padding: 0.2em 0.3em;
+}
+
+.more {
+  color: gray;
+  font-style: italic;
+  padding: 0.2em;
+  padding-top: 0.1em;
+  padding-left: 1.2em;
+}
+
 </style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,7 +83,7 @@ body {
             <div
               style="margin-top: -0.7em;margin-left: 0.5em;color: white;text-shadow: 0 0 4px #0060a8, 0 0 3px #0060a8, 0 0 2px #0060a8, 0 0 2px #0060a8; padding-bottom: 0.5em">
               social media up there</div>
-              <input id=search autocomplete=off
+              <input id=searchINPUT autocomplete=off
                 placeholder="Demo search text"
                 style="width: 100%; box-shadow: 0 1px 10px 3px #3278a8; border-radius: 0.3em; border: solid 1.5px #4878c1; padding: 0.2em 0.6em;">
           </div>
