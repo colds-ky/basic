@@ -7,9 +7,9 @@ import { streamBuffer } from '../../coldsky/src/api/akpa';
 import Fuse from 'fuse.js';
 
 const db = new Dexie("atproto-record-cache");
-db.version(1).stores({
-  records: 'did, cid, time, touch',
-  accounts: 'did, touch'
+db.version(3).stores({
+  records: 'did, cid, time',
+  accounts: 'did, *w'
 });
 
 const publicAgent = new ColdskyAgent({
@@ -31,13 +31,17 @@ export function searchAccounts(text) {
   const normalizedText = text?.trim() || '';
   if (!normalizedText) return (async function * nothing() { })();
 
-
   const wholeTextSearchTypeahedPromise = directSearchAccountsTypeahead(normalizedText);
   const wholeTextSearchFullPromise = directSearchAccountsFull(normalizedText);
 
   const words = breakIntoWords(normalizedText);
   const wordSearchTypeaheadPromises = words.map(word => directSearchAccountsTypeahead(word));
   const wordSearchFullPromises = words.map(word => directSearchAccountsFull(word));
+  const cachedResults = searchAccountsFromCache([...words, normalizedText]);
+
+  /** @type {Map<string, ProfileViewBasic | ProfileView>} */
+  const storeNewAccountsByShortDID = new Map();
+  let storeNewAccoutsDebounce = 0;
 
   return streamBuffer(
     /**
@@ -70,6 +74,9 @@ export function searchAccounts(text) {
       for (const promise of wordSearchFullPromises) {
         waitFor.push(awaitPromiseAndMerge(promise));
       }
+      for (const promise of cachedResults) {
+        waitFor.push(awaitPromiseAndMerge(promise));
+      }
 
       await Promise.all(waitFor);
       streaming.complete();
@@ -84,8 +91,16 @@ export function searchAccounts(text) {
         for (const entry of result) {
           const shortDID = shortenDID(entry.did);
           const existing = byShortDID[shortDID];
-          if (!existing || !existing.description && entry.description)
+          if (!existing || !existing.description && entry.description) {
             byShortDID[shortDID] = entry;
+            if (!entry.w) {
+              // for accounts directly from cache, don't store them back to cache
+              storeNewAccountsByShortDID.set(shortDID, entry);
+              clearTimeout(storeNewAccoutsDebounce);
+              storeNewAccoutsDebounce = setTimeout(propagateStoreNewAccountsToCache, 1000);
+            }
+          }
+
           if (!existing) {
             results.push(entry);
             anyNew = true;
@@ -99,8 +114,39 @@ export function searchAccounts(text) {
         streaming.yield(results, buf => buf ? buf.concat(results) : results);
       }
     });
+  
+  function propagateStoreNewAccountsToCache() {
+    const accounts = Array.from(storeNewAccountsByShortDID.values()).map(ac => {
+      const wordLeads = [];
+      for (const w of breakIntoWords(ac.displayName + ' ' + ac.handle + ' ' + ac.description)) {
+        const wLead = w.slice(0, 3).toLowerCase();
+        if (wordLeads.indexOf(wLead) < 0)
+          wordLeads.push(wLead);
+      }
+      ac.w = wordLeads;
+      return ac;
+    });
+    storeNewAccountsByShortDID.clear();
+    db.accounts.bulkPut(accounts);
+  }
 }
 
+/**
+ * @param {string[]} words
+ */
+function searchAccountsFromCache(words) {
+  const wordLeads = [];
+  for (const w of words) {
+    const wLead = w.slice(0, 3).toLowerCase();
+    if (wordLeads.indexOf(wLead) < 0)
+      wordLeads.push(wLead);
+  }
+
+  return wordLeads.map(async wLead => {
+    const dbMatches = await db.accounts.where('w').equals(wLead).toArray();
+    return dbMatches;
+  });
+}
 
 /**
  * @param {(ProfileViewBasic | ProfileView)[]} results
@@ -108,8 +154,13 @@ export function searchAccounts(text) {
  * @param {string[]} words
  */
 function sortResultsByText(results, text, words) {
-  const fuseKeyFields = new Fuse(results, {
-    keys: ['handle', 'displayName', 'description'],
+  const resultsWithHandleJoin = results.map(r => {
+    const withHandleJoin = { ...r, handlejoin: (r.handle || '').replace(/[^\w\d]+/g, '').toLowerCase() };
+    return withHandleJoin;
+  });
+
+  const fuseKeyFields = new Fuse(resultsWithHandleJoin, {
+    keys: ['handle', 'displayName', 'description', 'handlejoin'],
     findAllMatches: true,
     includeScore: true
   });
@@ -188,7 +239,7 @@ async function directSearchAccountsTypeahead(searchText) {
 
   const result = (await publicAgent.searchActorsTypeahead({
     q: searchText,
-    limit: 80
+    limit: 100
   })).data?.actors;
 
   return result;
@@ -201,7 +252,7 @@ async function directSearchAccountsFull(searchText) {
 
   const result = (await publicAgent.searchActors({
     q: searchText,
-    limit: 80
+    limit: 100
   })).data?.actors;
 
   return result;
