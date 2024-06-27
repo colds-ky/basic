@@ -10,17 +10,23 @@ import { getKeyShortDID } from '../api/core';
  *    content: string,
  *    commit: string,
  *    timestamp: number
- *  }>
+ *  }>;
+ *  provideAuthToken(token: string): Promise;
+ *  commitChanges(baseCommitHash: string, files: { path: string, content: string}[]): Promise;
  * }} _
  */
 export async function updateDIDs({
-  readFile
+  readFile,
+  provideAuthToken,
+  commitChanges
 }) {
   const startCursorFileEntry = await readFile('/dids/cursors.json');
 
   /** @type {import('../../dids/cursors.json')} */
   const startCursorsJSON = JSON.parse(
     startCursorFileEntry.content);
+  
+  let committingStarted = false;
 
   const populatedDIDs = {
     /** @type {string[]} */
@@ -85,6 +91,8 @@ export async function updateDIDs({
     while (true) {
       const startTime = Date.now();
       try {
+        if (committingStarted) return;
+
         let received = await fetchMore();
         populatedDIDs.requestCount++;
         populatedDIDs.requestTime += Date.now() - startTime;
@@ -109,6 +117,7 @@ export async function updateDIDs({
         cursor: populatedDIDs.currentCursor,
         limit: 995
       });
+      if (committingStarted) return;
       if (!response.data) return;
 
       if (response.data.repos?.length) {
@@ -134,7 +143,68 @@ export async function updateDIDs({
     }
   }
 
-  async function verifyGitHubAuth(username, password) {
-    //
+  async function verifyGitHubAuth(authToken) {
+    committingStarted = true;
+    const authPromise = provideAuthToken(authToken);
+
+    const bucketFileEntriesOrNull = await Promise.all(
+      Object.entries(populatedDIDs.buckets).map(
+        async ([twoLetter, bucket]) => {
+          const bucketPath = twoLetter === 'web' ?
+            '/dids/web.json' :
+            '/dids/' + twoLetter[0] + '/' + twoLetter + '.json';
+
+          const bucketFileEntry = await readFile(bucketPath);
+
+          /** @type {Set<string>} */
+          const existingBucketShortDIDs = new Set(JSON.parse(bucketFileEntry.content));
+
+          const newShortDIDs = bucket.filter(shortDID => !existingBucketShortDIDs.has(shortDID));
+
+          if (!newShortDIDs.length) return;
+          const newContent =
+            bucketFileEntry.content.trim().slice(0, -1) + '\n' +
+            packDidsJson(newShortDIDs, '');
+
+          return {
+            bucketPath,
+            bucket,
+            newShortDIDs,
+            newContent,
+            ...bucketFileEntry
+          };
+        }));
+    
+    const bucketFileEntries =
+      /** @type {NonNullable<typeof bucketFileEntriesOrNull[0]>[]} */
+      (bucketFileEntriesOrNull.filter(Boolean));
+
+    await authPromise;
+
+    return {
+      bucketData: bucketFileEntries,
+      applyChanges
+    };
+
+    function applyChanges() {
+      return commitChanges(
+        bucketFileEntries[0].commit,
+        bucketFileEntries.map(entry => ({
+          path: entry.bucketPath,
+          content: entry.newContent
+        })));
+    }
   }
+}
+
+function packDidsJson(dids, lead = '[\n', tail = '\n]\n') {
+  const DIDS_SINGLE_LINE = 6;
+  const didsLines = [];
+  for (let i = 0; i < dids.length; i += DIDS_SINGLE_LINE) {
+    const chunk = dids.slice(i, i + DIDS_SINGLE_LINE);
+    const line = chunk.map(shortDID => '"' + shortDID + '"').join(',');
+    didsLines.push(line);
+  }
+
+  return lead + didsLines.join(',\n') + tail;
 }

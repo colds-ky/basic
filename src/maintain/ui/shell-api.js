@@ -1,15 +1,37 @@
 // @ts-check
 
 import { Octokit } from 'octokit';
+import { throttledAsyncCache } from '../../api/throttled-async-cache';
 
 /**
- * @returns {{
- *  readFile: Parameters<typeof import('../updateDIDs').updateDIDs>[0]['readFile']
- * }}
+ * @returns {Parameters<typeof import('../updateDIDs').updateDIDs>[0]}
  */
 export function createShellAPIs() {
   const octokit = new Octokit();
-  return { readFile };
+  /** @type {typeof octokit} */
+  let authOctokit = /** @type {*} */(undefined);
+  return {
+    readFile,
+    provideAuthToken,
+    commitChanges
+  };
+
+  async function provideAuthToken(authToken) {
+    authOctokit = new Octokit({
+      auth: authToken
+    });
+    await authOctokit.rest.users.getAuthenticated();
+  }
+
+  async function commitChanges(baseCommitHash, files) {
+    const commitResponse = await octokit.rest.repos.getCommit({
+      ref: baseCommitHash,
+      owner: 'colds-ky',
+      repo: 'dids'
+    });
+
+    throw new Error('TODO: perform commit');
+  }
 
   async function readFile(filePath) {
     if (filePath.lastIndexOf('/dids/', 0) !== 0)
@@ -19,26 +41,48 @@ export function createShellAPIs() {
   }
 
   /**
+   * @type {{
+   *  commit:Awaited<ReturnType<typeof octokit.rest.repos.getCommit>>;
+   *  timestamp: number
+   * }} */
+  var lastCommit;
+
+  const getContentCache = throttledAsyncCache(
+    (owner, repo, path, ref) =>
+      octokit.rest.repos.getContent({
+        owner,
+        repo,
+        path,
+        ref
+      }),
+  );
+
+  /**
    * @param {string} repo
    * @param {string} path
    */
   async function readRepoFile(repo, path) {
-    const commitResponse = await octokit.rest.repos.getCommit({
-      ref: 'main',
-      owner: 'colds-ky',
-      repo
-    });
-    const commit = Array.isArray(commitResponse.data) ?
-      commitResponse.data[0] :
-      commitResponse;
+    let commit = lastCommit?.commit;
+    if (!commit || Math.abs(lastCommit.timestamp - Date.now()) > 30000) {
+      const commitResponse = await octokit.rest.repos.getCommit({
+        ref: 'main',
+        owner: 'colds-ky',
+        repo
+      });
+      commit = Array.isArray(commitResponse.data) ?
+        commitResponse.data[0] :
+        commitResponse;
+      lastCommit = {
+        commit,
+        timestamp: Date.now()
+      };
+    }
 
-
-    const result = await octokit.rest.repos.getContent({
-      owner: 'colds-ky',
+    const result = await getContentCache(
+      'colds-ky',
       repo,
       path,
-      ref: commit.data.sha
-    });
+      commit.data.sha);
 
     if (Array.isArray(result.data)) throw new Error('Expected file, got directory: ' + JSON.stringify(path));
     if (result.data.type !== 'file') throw new Error('Expected file, got ' + JSON.stringify(result.data.type) + ': ' + JSON.stringify(path));

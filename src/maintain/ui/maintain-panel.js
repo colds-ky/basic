@@ -6,6 +6,7 @@ import { createShellAPIs } from './shell-api';
 import { forAwait } from '../../api/forAwait';
 
 import './maintain-panel.css';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
 
 /** @type {ReturnType<typeof updateDIDs> | undefined} */
 let maintainStarted;
@@ -30,9 +31,80 @@ export function MaintainPanel() {
     };
   }, [maintain]);
 
+  const buckets = maintain?.populatedDIDs.buckets ?
+    Object.entries(maintain.populatedDIDs.buckets)
+      .map(([twoLetter, bucket]) => /** @type {const} */([twoLetter, bucket.length]))
+      .sort((a, b) => b[1] - a[1]):
+    [];
+
+  const leadBuckets = buckets.slice(0, 20);
+  const trailBuckets = leadBuckets.length === buckets.length ? [] :
+    buckets.slice(-5);
+
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [authToken, setAuthToken] = useState('');
+
+  const [applyData, setApplyData] = useState(
+    /** @type {undefined | Awaited<ReturnType<typeof maintain.verifyGitHubAuth>>} */
+    (undefined)
+  );
+
   return (
     <div className='maintain-panel'>
-      <div className='maintain-panel-title'>Update DIDs</div>
+      <div className='maintain-panel-title'>
+        Update DIDs
+        <Button className='apply-button' variant='contained'
+          onClick={() => {
+            if (!authToken) {
+              setAuthDialogOpen(true);
+              return;
+            }
+
+            startApplying();
+          }}>
+          <span>
+            {
+              !authToken ? 'Enter AUTH TOKEN' :
+                applyData ? 'Start applying ' +
+                  applyData.bucketData.length + ' buckets ' +
+                  'to ' + applyData.bucketData[0].commit.slice(0, 7) :
+                  'Prepare changes for AUTH TOKEN'
+            }
+          </span>
+        </Button>
+        <Dialog open={authDialogOpen} onClose={() => {
+          setAuthToken('');
+          setAuthDialogOpen(false);
+        }}>
+          <DialogTitle>AUTH TOKEN</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              AUTH TOKEN is required to apply the changes to GitHub repo.
+              The token will be stored in your browser's local storage.
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="name"
+              label="AUTH TOKEN"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={authToken}
+              onChange={e => setAuthToken(e.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => {
+              setAuthDialogOpen(false);
+            }}>Apply</Button>
+            <Button onClick={() => {
+              setAuthToken('');
+              setAuthDialogOpen(false);
+            }}>Cancel</Button>
+          </DialogActions>
+        </Dialog>
+      </div>
       {
         !maintain ? 'Loading...' :
           <>
@@ -41,12 +113,32 @@ export function MaintainPanel() {
               <span className='cursor'> {maintain.populatedDIDs.currentCursor} cursor</span>
             </div>
             <div className='buckets'>
-            {
-              Object.keys(maintain.populatedDIDs.buckets).map(twoLetter => (
-                <div key={twoLetter} className='bucket'>
-                  {twoLetter}: {maintain.populatedDIDs.buckets[twoLetter].length.toLocaleString()}
-                </div>
-              ))
+              {
+                leadBuckets.map(
+                  ([twoLetter, count], index) =>
+                    <div key={index} className='bucket'>
+                      <span className='two-letter'>{twoLetter}</span>
+                      <span className='count'>{count.toLocaleString()}</span>
+                    </div>
+                )
+              }
+              {
+                !trailBuckets.length ? undefined :
+                  <>
+                    ...
+                    {
+                      trailBuckets.map(
+                        ([twoLetter, count], index) =>
+                          <div key={index} className='bucket'>
+                            <span className='two-letter'>{twoLetter}</span>
+                            <span className='count'>{count.toLocaleString()}</span>
+                          </div>
+                      )
+                    }
+                    <div>
+                      Total {buckets.length.toLocaleString()} keys.
+                    </div>
+                  </>
               }
             </div>
             <div className='stats'>
@@ -57,4 +149,9 @@ export function MaintainPanel() {
       }
     </div>
   );
+
+  async function startApplying() {
+    const applyData = await maintain.verifyGitHubAuth(authToken);
+    setApplyData(applyData);
+  }
 }
