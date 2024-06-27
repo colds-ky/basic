@@ -54,7 +54,7 @@ export function ThreadConversationView({
    if (showNext) {
 
      const suppressAuthor =
-       prevConvo.conversationDirection?.post.shortDID === prevPost.shortDID &&
+       prevConvo.conversationDirection?.post.shortDID === prevConvo.post.shortDID &&
        !asides?.length; // if same author, and no visual interjection - no need to repeat the author's name
 
      if (intermediateInsignificants?.length) {
