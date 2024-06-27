@@ -25,6 +25,13 @@
     return a2;
   };
   var __spreadProps = (a2, b) => __defProps(a2, __getOwnPropDescs(b));
+  var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
+    get: (a2, b) => (typeof require !== "undefined" ? require : a2)[b]
+  }) : x)(function(x) {
+    if (typeof require !== "undefined")
+      return require.apply(this, arguments);
+    throw Error('Dynamic require of "' + x + '" is not supported');
+  });
   var __objRest = (source, exclude) => {
     var target = {};
     for (var prop in source)
@@ -40,7 +47,7 @@
   var __esm = (fn, res) => function __init() {
     return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
   };
-  var __commonJS = (cb, mod) => function __require() {
+  var __commonJS = (cb, mod) => function __require2() {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
   var __export = (target, all) => {
@@ -1196,7 +1203,7 @@
             }
             return dispatcher.useContext(Context);
           }
-          function useState3(initialState) {
+          function useState4(initialState) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useState(initialState);
           }
@@ -1208,7 +1215,7 @@
             var dispatcher = resolveDispatcher();
             return dispatcher.useRef(initialValue);
           }
-          function useEffect3(create, deps) {
+          function useEffect4(create, deps) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useEffect(create, deps);
           }
@@ -1990,7 +1997,7 @@
           exports.useContext = useContext;
           exports.useDebugValue = useDebugValue;
           exports.useDeferredValue = useDeferredValue;
-          exports.useEffect = useEffect3;
+          exports.useEffect = useEffect4;
           exports.useId = useId;
           exports.useImperativeHandle = useImperativeHandle;
           exports.useInsertionEffect = useInsertionEffect;
@@ -1998,7 +2005,7 @@
           exports.useMemo = useMemo;
           exports.useReducer = useReducer;
           exports.useRef = useRef;
-          exports.useState = useState3;
+          exports.useState = useState4;
           exports.useSyncExternalStore = useSyncExternalStore;
           exports.useTransition = useTransition;
           exports.version = ReactVersion;
@@ -2494,9 +2501,9 @@
           if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
             __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
           }
-          var React5 = require_react();
+          var React6 = require_react();
           var Scheduler = require_scheduler();
-          var ReactSharedInternals = React5.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+          var ReactSharedInternals = React6.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
           var suppressWarning = false;
           function setSuppressWarning(newSuppressWarning) {
             {
@@ -4101,7 +4108,7 @@
             {
               if (props.value == null) {
                 if (typeof props.children === "object" && props.children !== null) {
-                  React5.Children.forEach(props.children, function(child) {
+                  React6.Children.forEach(props.children, function(child) {
                     if (child == null) {
                       return;
                     }
@@ -12548,7 +12555,7 @@
             }
           }
           var fakeInternalInstance = {};
-          var emptyRefsObject = new React5.Component().refs;
+          var emptyRefsObject = new React6.Component().refs;
           var didWarnAboutStateAssignmentForComponent;
           var didWarnAboutUninitializedState;
           var didWarnAboutGetSnapshotBeforeUpdateWithoutDidUpdate;
@@ -23629,7 +23636,7 @@
       var __getOwnPropNames2 = Object.getOwnPropertyNames;
       var __getProtoOf2 = Object.getPrototypeOf;
       var __hasOwnProp2 = Object.prototype.hasOwnProperty;
-      var __commonJS2 = (cb, mod) => function __require() {
+      var __commonJS2 = (cb, mod) => function __require2() {
         return mod || (0, cb[__getOwnPropNames2(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
       };
       var __export2 = (target, all) => {
@@ -60675,11 +60682,11 @@ if (cid) {
   });
 
   // src/app.js
-  var import_react4 = __toESM(require_react());
+  var import_react5 = __toESM(require_react());
   var import_client = __toESM(require_client());
 
   // src/root-layout.js
-  var import_react3 = __toESM(require_react());
+  var import_react4 = __toESM(require_react());
   var import_api5 = __toESM(require_dist());
 
   // node_modules/octokit/dist-web/index.js
@@ -64398,7 +64405,7 @@ if (cid) {
     const fullDID = unwrapShortDID(did);
     if (!shortDID)
       return void 0;
-    if (shortDID && shortDID === fullDID)
+    if (shortDID !== fullDID)
       return shortDID.slice(0, 2);
     return "web";
   }
@@ -65104,9 +65111,14 @@ if (cid) {
 
   // src/maintain/updateDIDs.js
   var import_api2 = __toESM(require_dist());
-  function updateDIDs() {
-    return __async(this, null, function* () {
-      const startCursorsJSON = yield fetch("./dids/cursors.json").then((r2) => r2.json());
+  function updateDIDs(_0) {
+    return __async(this, arguments, function* ({
+      readFile
+    }) {
+      const startCursorFileEntry = yield readFile("/dids/cursors.json");
+      const startCursorsJSON = JSON.parse(
+        startCursorFileEntry.content
+      );
       const populatedDIDs = {
         /** @type {string[]} */
         shortDIDs: [],
@@ -65120,19 +65132,23 @@ if (cid) {
         currentErrorRetryTime: 0,
         reachedEnd: false
       };
+      beginFetchingDIDs();
       return __spreadProps(__spreadValues({}, startCursorsJSON), {
-        beginFetchingDIDs,
         populatedDIDs,
         verifyGitHubAuth
       });
+      function patchBskyAgent2(atClient2) {
+        atClient2.com.atproto.sync._service.xrpc.baseClient.lex.assertValidXrpcOutput = function(lexUri, value, ...rest) {
+          return true;
+        };
+      }
       function beginFetchingDIDs() {
         return __async(this, null, function* () {
           const atClient2 = new import_api2.BskyAgent({
             // service: 'https://bsky.social/xrpc'
             service: "https://bsky.network/xrpc"
           });
-          atClient2.baseClient.lex.assertValidXrpcOutput = function() {
-          };
+          patchBskyAgent2(atClient2);
           let lastNormal = Date.now();
           while (true) {
             const startTime = Date.now();
@@ -65167,7 +65183,9 @@ if (cid) {
                   const shortDID = shortenDID(repo.did);
                   populatedDIDs.shortDIDs.push(shortDID);
                   const twoLetter = getKeyShortDID(shortDID);
-                  const bucket = populatedDIDs[twoLetter] || (populatedDIDs[twoLetter] = []);
+                  if (!twoLetter)
+                    continue;
+                  const bucket = populatedDIDs.buckets[twoLetter] || (populatedDIDs.buckets[twoLetter] = []);
                   bucket.push(shortDID);
                 }
               }
@@ -65199,7 +65217,7 @@ if (cid) {
   function AutocompleteInput({
     inputClassName,
     inputPlaceholderText,
-    executeCommand: executeCommand2
+    executeCommand
   }) {
     var _a2;
     const [text, setText] = (0, import_react2.useState)("");
@@ -65234,7 +65252,7 @@ if (cid) {
           e2.preventDefault();
           const commandText = (text || "").trim();
           if (commandText.lastIndexOf("/", 0) === 0) {
-            executeCommand2(commandText.slice(1));
+            executeCommand(commandText.slice(1));
           }
         },
         onChange: (e2) => {
@@ -65250,6 +65268,72 @@ if (cid) {
     )));
   }
 
+  // src/maintain/ui/maintain-panel.js
+  var import_react3 = __toESM(require_react());
+
+  // src/maintain/ui/shell-api.js
+  function createShellAPIs() {
+    const octokit = new Octokit();
+    return { readFile };
+    function readFile(filePath) {
+      return __async(this, null, function* () {
+        if (filePath.lastIndexOf("/dids/", 0) !== 0)
+          throw new Error("Only files within /dids can be read: " + JSON.stringify(filePath));
+        return readRepoFile("dids", filePath.slice("/dids/".length));
+      });
+    }
+    function readRepoFile(repo, path) {
+      return __async(this, null, function* () {
+        var _a2, _b;
+        const commitResponse = yield octokit.rest.repos.getCommit({
+          ref: "main",
+          owner: "colds-ky",
+          repo
+        });
+        const commit = Array.isArray(commitResponse.data) ? commitResponse.data[0] : commitResponse;
+        const result = yield octokit.rest.repos.getContent({
+          owner: "colds-ky",
+          repo,
+          path,
+          ref: commit.data.sha
+        });
+        if (Array.isArray(result.data))
+          throw new Error("Expected file, got directory: " + JSON.stringify(path));
+        if (result.data.type !== "file")
+          throw new Error("Expected file, got " + JSON.stringify(result.data.type) + ": " + JSON.stringify(path));
+        let content = result.data.content;
+        if (result.data.encoding === "base64")
+          content = atob(content);
+        const timestamp = ((_a2 = commit.data.commit.author) == null ? void 0 : _a2.date) ? new Date((_b = commit.data.commit.author) == null ? void 0 : _b.date).getTime() : 0;
+        return {
+          content,
+          commit: commit.data.sha,
+          timestamp
+        };
+      });
+    }
+  }
+
+  // src/maintain/ui/maintain-panel.js
+  var maintainStarted;
+  function MaintainPanel() {
+    if (!maintainStarted) {
+      const apis = createShellAPIs();
+      maintainStarted = updateDIDs(apis);
+    }
+    const [_, updateBuckets] = (0, import_react3.useState)(0);
+    const maintain = forAwait(void 0, maintainStarted);
+    (0, import_react3.useEffect)(() => {
+      const interval = setInterval(() => {
+        updateBuckets(maintain == null ? void 0 : maintain.populatedDIDs.shortDIDs.length);
+      }, 500);
+      return () => {
+        clearInterval(interval);
+      };
+    }, [maintain]);
+    return /* @__PURE__ */ import_react3.default.createElement("div", { className: "maintain-panel" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "maintain-panel-title" }, "Update DIDs"), !maintain ? "Loading..." : /* @__PURE__ */ import_react3.default.createElement(import_react3.default.Fragment, null, /* @__PURE__ */ import_react3.default.createElement("div", { className: "current-loading-values" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "did-count" }, maintain.populatedDIDs.shortDIDs.length.toLocaleString(), " DIDs"), /* @__PURE__ */ import_react3.default.createElement("span", { className: "cursor" }, " ", maintain.populatedDIDs.currentCursor, " cursor")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "buckets" }, Object.keys(maintain.populatedDIDs.buckets).map((twoLetter) => /* @__PURE__ */ import_react3.default.createElement("div", { key: twoLetter, className: "bucket" }, twoLetter, ": ", maintain.populatedDIDs.buckets[twoLetter].length.toLocaleString()))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "stats" }, /* @__PURE__ */ import_react3.default.createElement("span", null, maintain.populatedDIDs.requestCount.toLocaleString(), " requests"), /* @__PURE__ */ import_react3.default.createElement("span", null, " ", maintain.populatedDIDs.requestTime / 1e3, "s"))));
+  }
+
   // src/root-layout.js
   if (typeof window !== "undefined") {
     window["atproto"] = import_api5.default;
@@ -65261,35 +65345,116 @@ if (cid) {
     title,
     subtitle,
     inputClassName,
-    inputPlaceholderText,
-    autocompleteArea
+    inputPlaceholderText
   }) {
-    return /* @__PURE__ */ import_react3.default.createElement("table", { className: "top-table" }, /* @__PURE__ */ import_react3.default.createElement("tbody", null, /* @__PURE__ */ import_react3.default.createElement("tr", null, /* @__PURE__ */ import_react3.default.createElement("td", { valign: "middle", className: "td-main" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "div-outer" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "div-inner" }, /* @__PURE__ */ import_react3.default.createElement("h1", { className: "title" }, title != null ? title : "Cold Sky"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "subtitle" }, subtitle != null ? subtitle : "social media up there"), /* @__PURE__ */ import_react3.default.createElement(
+    const [showUpdateDIDs, setShowUpdateDIDs] = import_react4.default.useState(false);
+    return /* @__PURE__ */ import_react4.default.createElement("table", { className: "top-table" }, /* @__PURE__ */ import_react4.default.createElement("tbody", null, /* @__PURE__ */ import_react4.default.createElement("tr", null, /* @__PURE__ */ import_react4.default.createElement("td", { valign: "middle", className: "td-main" }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "div-outer" }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "div-inner" }, /* @__PURE__ */ import_react4.default.createElement("h1", { className: "title" }, title != null ? title : "Cold Sky"), /* @__PURE__ */ import_react4.default.createElement("div", { className: "subtitle" }, subtitle != null ? subtitle : "social media up there"), /* @__PURE__ */ import_react4.default.createElement(
       AutocompleteInput,
       {
         inputClassName,
         inputPlaceholderText,
         executeCommand
       }
-    ), autocompleteArea))))));
+    ), !showUpdateDIDs ? void 0 : /* @__PURE__ */ import_react4.default.createElement(MaintainPanel, null)))))));
+    function executeCommand(commandName) {
+      return __async(this, null, function* () {
+        if (commandName === "updateDIDs") {
+          setShowUpdateDIDs(true);
+          return;
+        }
+        const command = window["coldsky"][commandName];
+        let result = yield (
+          /** @type {*} */
+          command()
+        );
+        alert(
+          typeof result === "undefined" ? commandName + " OK" : commandName + " " + JSON.stringify(result, null, 2)
+        );
+      });
+    }
   }
-  function executeCommand(commandName) {
+
+  // src/maintain/node/shell-api.js
+  function createShellAPIs2() {
+    let req = function() {
+    };
+    if (Math.random() > -1)
+      req = __require;
+    const fs = req("fs");
+    const path = req("path");
+    const child_process = req("child_process");
+    return { readFile };
+    function readFile(filePath) {
+      return __async(this, null, function* () {
+        if (filePath.lastIndexOf("/dids/", 0) !== 0)
+          throw new Error("Only files within /dids can be read: " + JSON.stringify(filePath));
+        return readRepoFile("dids", filePath.slice("/dids/".length));
+      });
+    }
+    function readRepoFile(repo, localPath) {
+      const fullPath = path.resolve(
+        __dirname,
+        repo,
+        localPath
+      );
+      const content = fs.readFileSync(fullPath);
+      const commitHash = child_process.execSync(
+        "git rev-parse HEAD",
+        {
+          cwd: path.dirname(fullPath)
+        }
+      ).toString().trim();
+      const commitDate = child_process.execSync(
+        "git show -s --format=%ci HEAD",
+        {
+          cwd: path.dirname(fullPath)
+        }
+      ).toString().trim();
+      return {
+        content,
+        commit: commitHash,
+        timestamp: new Date(commitDate).getTime()
+      };
+    }
+  }
+
+  // src/maintain/node/index.js
+  function nodeRunUpdateDIDs() {
     return __async(this, null, function* () {
-      const command = window["coldsky"][commandName];
-      let result = yield (
-        /** @type {*} */
-        command()
-      );
-      alert(
-        typeof result === "undefined" ? commandName + " OK" : commandName + " " + JSON.stringify(result, null, 2)
-      );
+      console.log("Updating DIDs:");
+      const shellAPIs = createShellAPIs2();
+      const updating = yield updateDIDs(shellAPIs);
+      console.log("Start at: " + updating.listRepos.cursor);
+      while (!updating.populatedDIDs.reachedEnd) {
+        yield new Promise((resolve) => setTimeout(resolve, 1e4));
+        if (updating.populatedDIDs.reachedEnd)
+          break;
+        const bucketEntries = Object.entries(updating.populatedDIDs.buckets).map(([twoLetter, bucket]) => (
+          /** @type {const} */
+          [twoLetter, bucket.length]
+        )).sort((a2, b) => b[1] - a2[1]).slice(0, 5);
+        const buckets2 = {};
+        for (const [twoLetter, count] of bucketEntries) {
+          buckets2[twoLetter] = count;
+        }
+        buckets2.count = Object.keys(updating.populatedDIDs.buckets).length;
+        console.log(
+          "Updated: ",
+          __spreadProps(__spreadValues({}, updating), {
+            populatedDIDs: __spreadProps(__spreadValues({}, updating.populatedDIDs), {
+              shortDIDs: updating.populatedDIDs.shortDIDs.length,
+              buckets: buckets2
+            })
+          })
+        );
+      }
     });
   }
 
   // src/app.js
-  var App3 = class extends import_react4.default.Component {
+  var App3 = class extends import_react5.default.Component {
     render() {
-      return /* @__PURE__ */ import_react4.default.createElement(RootLayout, null);
+      return /* @__PURE__ */ import_react5.default.createElement(RootLayout, null);
     }
   };
   function bootBrowser() {
@@ -65299,10 +65464,12 @@ if (cid) {
     document.body.appendChild(reactRoot);
     preloadedTable == null ? void 0 : preloadedTable.remove();
     const root = (0, import_client.createRoot)(reactRoot);
-    root.render(/* @__PURE__ */ import_react4.default.createElement(App3, null));
+    root.render(/* @__PURE__ */ import_react5.default.createElement(App3, null));
   }
   if (typeof window !== "undefined" && window)
     bootBrowser();
+  else if (typeof __require === "function" && typeof process !== "undefined")
+    nodeRunUpdateDIDs();
 })();
 /*! Bundled license information:
 

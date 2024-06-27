@@ -3,7 +3,6 @@
 import { Octokit } from 'octokit';
 
 /**
- * 
  * @returns {{
  *  readFile: Parameters<typeof import('../updateDIDs').updateDIDs>[0]['readFile']
  * }}

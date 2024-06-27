@@ -93,8 +93,9 @@ export async function updateDIDs({
           const shortDID = shortenDID(repo.did);
           populatedDIDs.shortDIDs.push(shortDID);
           const twoLetter = getKeyShortDID(shortDID);
-          const bucket = populatedDIDs[twoLetter] || (
-            populatedDIDs[twoLetter] = []
+          if (!twoLetter) continue;
+          const bucket = populatedDIDs.buckets[twoLetter] || (
+            populatedDIDs.buckets[twoLetter] = []
           );
           bucket.push(shortDID);
         }
