@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { breakFeedUri, breakPostURL } from '../../../../coldsky/lib';
+import { breakFeedURIPostOnly, breakPostURL } from '../../../../coldsky/lib';
 import { localise } from '../../../localise';
 import { PostFrame } from '../post';
 import { EmbedImages } from './embed-images';
@@ -26,7 +26,7 @@ export function PostEmbedsSection({ compact, post, allowEmbedDepth }) {
   const dummies = [];
 
   for (const embed of post.embeds) {
-    const parsedURL = breakFeedUri(embed.url) || breakPostURL(embed.url);
+    const parsedURL = breakFeedURIPostOnly(embed.url) || breakPostURL(embed.url);
     if (parsedURL) {
       posts.push({ parsedURL, embed });
     } else if (embed.url) {

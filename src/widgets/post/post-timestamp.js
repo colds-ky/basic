@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { FormatTime } from '../format-time';
 import { useDB } from '../..';
 import { forAwait } from '../../../coldsky/src/api/forAwait';
-import { breakFeedUri } from '../../../coldsky/lib';
+import { breakFeedURIPostOnly } from '../../../coldsky/lib';
 
 /**
  * @param {{
@@ -24,7 +24,7 @@ export function PostTimestamp({ className, post, since, linkTimestamp }) {
  const db = useDB();
  const profile = forAwait(post.shortDID, () => db.getProfileIncrementally(post.shortDID));
 
- const parsedURI = breakFeedUri(post.uri);
+ const parsedURI = breakFeedURIPostOnly(post.uri);
 
  return (
    <Link

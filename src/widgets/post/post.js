@@ -5,19 +5,16 @@ import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useDB } from '../..';
-import { breakFeedUri, breakPostURL } from '../../../coldsky/lib';
+import { breakFeedURIPostOnly, breakPostURL } from '../../../coldsky/lib';
 import { forAwait } from '../../../coldsky/src/api/forAwait';
 import { localise } from '../../localise';
-import { AccountLabel } from '../account';
 import { AccountChip } from '../account/account-chip';
-import { FormatTime } from '../format-time';
-import { PreFormatted } from '../preformatted';
 import { PostEmbedsSection } from './embedded';
 import { PostTextContent } from './post-text-content';
-
-import './post.css';
 import { PostTimestamp } from './post-timestamp';
 import { PostTopLine } from './post-top-line';
+
+import './post.css';
 
 /**
  * @typedef {import('../../../coldsky/lib').MatchCompactPost} MatchCompactPost
@@ -109,7 +106,7 @@ function LoadingPostInProgress({ uri, ...rest }) {
       />
     );
   }
-  const parsedURL = breakFeedUri(uri) || breakPostURL(uri);
+  const parsedURL = breakFeedURIPostOnly(uri) || breakPostURL(uri);
 
   return (
     <Link

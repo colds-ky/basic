@@ -7,7 +7,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useDB } from '..';
 import { AccountLabel } from '../widgets/account';
 import { forAwait } from '../../coldsky/src/api/forAwait';
-import { breakFeedUri } from '../../coldsky/lib';
+import { breakFeedURIPostOnly } from '../../coldsky/lib';
 
 /**
  * @param {{
@@ -142,7 +142,7 @@ function AccountCompletionLink({ account }) {
 function PostCompletionLink({ post }) {
   const db = useDB();
   const profile = forAwait(post.shortDID, () => db.getProfileIncrementally(post.shortDID));
-  const parsedURL = breakFeedUri(post.uri);
+  const parsedURL = breakFeedURIPostOnly(post.uri);
   return (
     <Link
       to={`/${profile?.handle || post.shortDID}/${parsedURL?.postID}`}
