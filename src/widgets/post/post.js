@@ -135,11 +135,29 @@ function LoadedPost({ post, compact, linkTimestamp, linkAuthor, allowEmbedDepth 
         <span className='post-author-right-overlay'></span>
         <PostTimestamp post={post} linkTimestamp={linkTimestamp} />
       </div>
-      <PreFormatted className='post-content' text={post.text} />
+      <PreFormatted
+        className='post-content'
+        text={post.text}
+        charClass={(offset, wholeString, ch) => {
+          post.matches;
+          if (!post.facets?.length) return null;
+          for (const facet of post.facets) {
+            if (offset >= facet.start && offset < facet.start + facet.length) {
+              return 'facet-' + (
+                facet.tag ? facet.tag :
+                  facet.mention ? 'mention' :
+                    facet.url ? 'url' :
+                      'other'
+              );
+            }
+          }
+        }}
+      />
       <PostEmbedsSection
         post={post}
         compact={compact}
         allowEmbedDepth={allowEmbedDepth}
+        matches={post.matches}
       />
       <div className='post-likes'>
         <FavoriteBorder />

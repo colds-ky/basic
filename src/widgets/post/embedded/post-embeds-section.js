@@ -11,6 +11,7 @@ import { PostFrame } from '../post';
  * @param {{
  *  post: import('../../../../coldsky/lib').CompactPost,
  *  compact?: boolean,
+ *  matches?: import('../post').MatchCompactPost['matches'],
  *  allowEmbedDepth?: number
  * }} _
  */

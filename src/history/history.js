@@ -31,9 +31,6 @@ function HistoryCore() {
   const db = useDB();
   let { handle, post } = useParams();
 
-  const [searchText, setSearchText] = React.useState('');
-  const [forceShowSearch, setForceShowSearch] = React.useState(false);
-
   /** @type {import('../../coldsky/lib').CompactProfile & { placeholder?: boolean }} */
   const resolved = forAwait(handle, () => db.getProfileIncrementally(handle)) ||
   {
@@ -64,15 +61,20 @@ function HistoryCore() {
     }
   }, [handle]);
 
-  const showSearch = !!(forceShowSearch || searchText);
+  const [searchQuery, setSearchQuery] = React.useState('');
 
   return (
     <HistoryLayout
       profile={resolved}
+      hideSearch={!!post}
+      onSearchQueryChanged={setSearchQuery}
     >
       {
         resolved.placeholder ? undefined :
-          !post ? <Timeline shortDID={resolved.shortDID} /> :
+          !post ?
+            <Timeline
+              shortDID={resolved.shortDID}
+              searchQuery={searchQuery} /> :
             <Thread
               uri={makeFeedUri(resolved.shortDID, post)}
               linkAuthor
@@ -81,90 +83,4 @@ function HistoryCore() {
       }
     </HistoryLayout>
   );
-
-  return (
-    <div className='history-view'>
-
-      <div
-        className={suffixClassWhenEmpty('history-account-banner-bg', resolved.banner, resolved)}
-        style={!resolved.banner ? undefined : { backgroundImage: `url(${resolved.banner})` }}>
-      </div>
-
-      <div
-        className='history-account-avatar-bg' />
-      <div
-        className={suffixClassWhenEmpty('history-account-avatar', resolved.avatar, resolved)}
-        style={!resolved.avatar ? undefined : { backgroundImage: `url(${resolved.avatar})` }}>
-      </div>
-
-
-      <div className={suffixClassWhenEmpty('history-account-displayName-and-handle', resolved.displayName, resolved)}>
-        <span className={suffixClassWhenEmpty('history-account-displayName', resolved.displayName, resolved)}>
-          <span className='history-account-displayName-stroke'>
-            {resolved.displayName}
-          </span>
-          <span className='history-account-displayName-inner'>
-            {resolved.displayName}
-          </span>
-        </span>
-
-        <div className='history-account-handle'>
-          <span className='at-sign'>@</span><FullHandle shortHandle={resolved.handle} />
-        </div>
-      </div>
-
-      <div className='sticky-header-background'></div>
-      <div className='sticky-header-background-cover'></div>
-
-      {
-        post ? undefined :
-          <div className={
-            showSearch ?
-              'history-search-bar history-search-bar-expanded' :
-              'history-search-bar history-search-bar-collapsed' }>
-            {
-              !showSearch ? undefined :
-              <input
-                id='history-search-input'
-                value={searchText}
-                onChange={e => setSearchText(e.target.value)}
-              />
-            }
-            <SearchIcon className='history-search-icon' onClick={() => {
-              setForceShowSearch(true);
-              setTimeout(() => {
-                document.getElementById('history-search-input')?.focus();
-              }, 1);
-            }} />
-          </div>
-      }
-
-      <PreFormatted
-      text={resolved.description}
-      className={suffixClassWhenEmpty('history-account-description', resolved.description, resolved)} />
-
-      <div className='timeline-container'>
-        {
-          resolved.placeholder ? undefined :
-            !post ? <Timeline shortDID={resolved.shortDID} /> :
-              <Thread
-                uri={makeFeedUri(resolved.shortDID, post)}
-                linkAuthor
-                linkTimestamp
-              />
-        }
-      </div>
-
-    </div>
-  );
-}
-
-/**
- * @param {string} className
- * @param {any} value
- * @param {{ placeholder?: boolean } | undefined} hasPlaceholder
- */
-function suffixClassWhenEmpty(className, value, hasPlaceholder) {
-  const withEmpty = value ? className : className + ' ' + className + '-empty';
-  return hasPlaceholder?.placeholder ? withEmpty + ' ' + className + '-placeholder' : withEmpty;
 }

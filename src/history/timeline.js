@@ -8,17 +8,20 @@ import { ThreadView } from '../widgets/post/thread';
 import { Visible } from '../widgets/visible';
 
 import './timeline.css';
-import { Visibility } from '@mui/icons-material';
 
 /**
  * @param {{
- *  shortDID: string
+ *  shortDID: string,
+ *  searchQuery?: string,
  * }} _
  */
-export function Timeline({ shortDID }) {
+export function Timeline({ shortDID, searchQuery }) {
   const db = useDB();
 
-  const [retrieved, next] = useForAwait(shortDID, getTimeline);
+  const [retrieved, next] = useForAwait(
+    shortDID + '\n' + searchQuery,
+    () => getTimeline(shortDID, searchQuery));
+
   let anyPlaceholder = false;
   for (const postThread of retrieved?.timeline || []) {
     if (postThread.current.placeholder || postThread.root.placeholder) {
@@ -76,7 +79,11 @@ export function Timeline({ shortDID }) {
   );
 
 
-  async function* getTimeline(didOrHandle) {
+  /**
+   * @param {string} didOrHandle
+   * @param {string | undefined} searchQuery
+   */
+  async function* getTimeline(didOrHandle, searchQuery) {
     try {
       let shortDID;
       for await (const profile of db.getProfileIncrementally(didOrHandle)) {
@@ -93,7 +100,7 @@ export function Timeline({ shortDID }) {
       /** @type {Set<string>} */
       const seenPosts = new Set();
 
-      for await (const entries of db.searchPostsIncrementally(shortDID, undefined)) {
+      for await (const entries of db.searchPostsIncrementally(shortDID, searchQuery)) {
         if (!entries?.length) continue;
 
         entries.sort((p1, p2) => (p2.asOf || 0) - (p1.asOf || 0));

@@ -13,10 +13,18 @@ import './history-layout.css';
  * @param {{
  *  className?: string,
  *  profile: import('../../coldsky/lib').CompactProfile & { placeholder?: boolean },
+ *  hideSearch?: boolean,
+ *  onSearchQueryChanged?: (searchText: string) => void,
  *  children?: React.ReactNode,
  * }} Props
  */
-export function HistoryLayout({ className, profile, children }) {
+export function HistoryLayout({
+  className,
+  profile,
+  hideSearch,
+  onSearchQueryChanged,
+  children,
+}) {
   const [forceShowSearch, setForceShowSearch] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -31,14 +39,13 @@ export function HistoryLayout({ className, profile, children }) {
     timeout.searchText = searchText;
     if (!/\S/.test(searchText)) {
       setSearchParams({});
-      //setSearchProfileResults([]);
+      onSearchQueryChanged?.('');
       return;
     }
 
     timeout.timeout = /** @type {*} */(setTimeout(async () => {
       setSearchParams({ q: searchText });
-      //startSearchProfiles();
-      //startSearchPosts();
+      onSearchQueryChanged?.(searchText);
     }, 400));
   }
 
@@ -78,6 +85,7 @@ export function HistoryLayout({ className, profile, children }) {
       <div className='sticky-header-background-cover'></div>
 
       {
+        hideSearch ? undefined :
         <div className={
           showSearch ?
             'history-search-bar history-search-bar-expanded' :
