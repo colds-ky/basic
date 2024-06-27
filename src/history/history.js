@@ -18,6 +18,7 @@ import { Timeline } from './timeline';
 
 
 import './history.css';
+import { TextField } from '@mui/material';
 
 export function History() {
   return (
@@ -65,7 +66,7 @@ function HistoryCore() {
     }
   }, [handle]);
 
-  console.log('profile ', resolved, resolved.banner);
+  const showSearch = !!(forceShowSearch || searchText);
 
   return (
     <div className='history-view'>
@@ -103,8 +104,24 @@ function HistoryCore() {
 
       {
         post ? undefined :
-          <div className='history-search-bar'>
-            <SearchIcon className='history-search-icon' />
+          <div className={
+            showSearch ?
+              'history-search-bar history-search-bar-expanded' :
+              'history-search-bar history-search-bar-collapsed' }>
+            {
+              !showSearch ? undefined :
+              <input
+                id='history-search-input'
+                value={searchText}
+                onChange={e => setSearchText(e.target.value)}
+              />
+            }
+            <SearchIcon className='history-search-icon' onClick={() => {
+              setForceShowSearch(true);
+              setTimeout(() => {
+                document.getElementById('history-search-input')?.focus();
+              }, 1);
+            }} />
           </div>
       }
 

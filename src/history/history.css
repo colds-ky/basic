@@ -168,11 +168,33 @@ html.account body {
 .history-view .history-search-bar {
   position: absolute;
   top: 14vmax;
-  right: 1em;
+  right: 0;
+  padding-right: 1.6em;
   z-index: 10;
+  display: flex;
+  align-items: center;
+}
+
+.history-view .history-search-bar-expanded {
+  background: #13671e;
+  border: solid 1px silver;
+  box-shadow: 0 0.1em 0.5em #00000054;
+  width: 100%;
 }
 
 .history-view .history-search-bar .history-search-icon {
+  color: white;
+  stroke: #13671e;
+  stroke-width: 0.7px;
+  font-size: 200%;
+  cursor: pointer;
+}
+
+.history-view .history-search-bar #history-search-input {
+  border: none;
+  outline: none;
+  font-size: 110%;
+  background: transparent;
   color: white;
 }
 
