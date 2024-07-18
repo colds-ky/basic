@@ -14,6 +14,8 @@
 }
 
 .landing .landing-handle-band {
+  z-index: 10;
+
   grid-row: 3;
   background: linear-gradient(to right, #ffdf4ad9, #ffd8008f);
   border-top: solid 1.5px #dcca78;

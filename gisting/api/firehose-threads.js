@@ -65,7 +65,7 @@ export function firehoseThreads(db) {
        */
       async function handleLike(msg) {
         const thread = await getPostThreadCached(msg.subject.uri);
-        if (!thread || thread.blocked || thread.notFound) return;
+        if (!thread) return;
         yieldThread(thread);
       }
 
@@ -74,7 +74,7 @@ export function firehoseThreads(db) {
        */
       async function handlePost(msg) {
         const thread = await getPostThreadCached('at://' + msg.repo + '/' + msg.path);
-        if (!thread || thread.blocked || thread.notFound) return;
+        if (!thread) return;
         yieldThread(thread);
       }
 
@@ -83,7 +83,7 @@ export function firehoseThreads(db) {
        */
       async function handleRepost(msg) {
         const thread = await getPostThreadCached(msg.subject.uri);
-        if (!thread || thread.blocked || thread.notFound) return;
+        if (!thread) return;
         yieldThread(thread);
       }
 

@@ -10,10 +10,13 @@ import { SearchArea } from './search-area';
 import { version } from '../../package.json';
 
 import './landing.css';
+import { AtlasComponent } from '../atlas';
 
 export const uppercase_GIST = localise('𝓖𝓘𝓢𝓣', { uk: '𝓷𝓮𝓹𝓮𝓬𝔂𝓰' });
 
 export function Landing() {
+  const [showAtlas, setShowAtlas] = React.useState(false);
+
   useEffect(() => {
     document.documentElement.classList.remove('account');
     document.title = uppercase_GIST;
@@ -31,11 +34,15 @@ export function Landing() {
         autoCompletionAreaClassName='landing-auto-completion-area'
       />
 
-      <div className='landing-bottom-bar'>
+      <div className='landing-bottom-bar' onClick={() => setShowAtlas(!showAtlas)}>
         v{version}
       </div>
 
-      <FunBackground />
+      {
+        showAtlas ?
+          <AtlasComponent /> :
+          <FunBackground />
+      }
     </div>
   );
 }

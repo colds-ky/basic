@@ -30,7 +30,7 @@ async function rollupBuilder() {
         browser: true
       }),
       json(),
-      commonjs(),
+      commonjs({ exclude: ['**/*three*/**'] }),
       babel({
       })
     ],

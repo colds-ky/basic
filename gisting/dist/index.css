@@ -676,6 +676,7 @@ a.account-label.account-handle {
   padding: 0.2em;
 }
 .landing .landing-handle-band {
+  z-index: 10;
   grid-row: 3;
   background:
     linear-gradient(

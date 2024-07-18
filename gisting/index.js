@@ -24,12 +24,13 @@ const DBContext = React.createContext(/** @type {DBAccess} */(/** @type {*} */(n
 
 export const useDB = () => React.useContext(DBContext);
 
+export function getGlobalCachedStore() {
+  return db || (db = defineCachedStore({ dbName: DB_NAME }));
+}
 
 function runApp() {
 
-  if (!db) {
-    db = defineCachedStore({ dbName: DB_NAME });
-  }
+  getGlobalCachedStore();
 
   const basename =
     /file/i.test(location.protocol) ? undefined :

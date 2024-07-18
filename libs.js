@@ -963,8 +963,8 @@
 	  value: true
 	});
 	ZodError$1.ZodError = ZodError$1.quotelessJson = ZodError$1.ZodIssueCode = void 0;
-	const util_1$U = util$7;
-	ZodError$1.ZodIssueCode = util_1$U.util.arrayToEnum(["invalid_type", "invalid_literal", "custom", "invalid_union", "invalid_union_discriminator", "invalid_enum_value", "unrecognized_keys", "invalid_arguments", "invalid_return_type", "invalid_date", "invalid_string", "too_small", "too_big", "invalid_intersection_types", "not_multiple_of", "not_finite"]);
+	const util_1$W = util$7;
+	ZodError$1.ZodIssueCode = util_1$W.util.arrayToEnum(["invalid_type", "invalid_literal", "custom", "invalid_union", "invalid_union_discriminator", "invalid_enum_value", "unrecognized_keys", "invalid_arguments", "invalid_return_type", "invalid_date", "invalid_string", "too_small", "too_big", "invalid_intersection_types", "not_multiple_of", "not_finite"]);
 	const quotelessJson = obj => {
 	  const json = JSON.stringify(obj, null, 2);
 	  return json.replace(/"([^"]+)":/g, "$1:");
@@ -1051,7 +1051,7 @@
 	    return this.message;
 	  }
 	  get message() {
-	    return JSON.stringify(this.issues, util_1$U.util.jsonStringifyReplacer, 2);
+	    return JSON.stringify(this.issues, util_1$W.util.jsonStringifyReplacer, 2);
 	  }
 	  get isEmpty() {
 	    return this.issues.length === 0;
@@ -1085,32 +1085,32 @@
 	Object.defineProperty(en, "__esModule", {
 	  value: true
 	});
-	const util_1$T = util$7;
+	const util_1$V = util$7;
 	const ZodError_1 = ZodError$1;
 	const errorMap = (issue, _ctx) => {
 	  let message;
 	  switch (issue.code) {
 	    case ZodError_1.ZodIssueCode.invalid_type:
-	      if (issue.received === util_1$T.ZodParsedType.undefined) {
+	      if (issue.received === util_1$V.ZodParsedType.undefined) {
 	        message = "Required";
 	      } else {
 	        message = `Expected ${issue.expected}, received ${issue.received}`;
 	      }
 	      break;
 	    case ZodError_1.ZodIssueCode.invalid_literal:
-	      message = `Invalid literal value, expected ${JSON.stringify(issue.expected, util_1$T.util.jsonStringifyReplacer)}`;
+	      message = `Invalid literal value, expected ${JSON.stringify(issue.expected, util_1$V.util.jsonStringifyReplacer)}`;
 	      break;
 	    case ZodError_1.ZodIssueCode.unrecognized_keys:
-	      message = `Unrecognized key(s) in object: ${util_1$T.util.joinValues(issue.keys, ", ")}`;
+	      message = `Unrecognized key(s) in object: ${util_1$V.util.joinValues(issue.keys, ", ")}`;
 	      break;
 	    case ZodError_1.ZodIssueCode.invalid_union:
 	      message = `Invalid input`;
 	      break;
 	    case ZodError_1.ZodIssueCode.invalid_union_discriminator:
-	      message = `Invalid discriminator value. Expected ${util_1$T.util.joinValues(issue.options)}`;
+	      message = `Invalid discriminator value. Expected ${util_1$V.util.joinValues(issue.options)}`;
 	      break;
 	    case ZodError_1.ZodIssueCode.invalid_enum_value:
-	      message = `Invalid enum value. Expected ${util_1$T.util.joinValues(issue.options)}, received '${issue.received}'`;
+	      message = `Invalid enum value. Expected ${util_1$V.util.joinValues(issue.options)}, received '${issue.received}'`;
 	      break;
 	    case ZodError_1.ZodIssueCode.invalid_arguments:
 	      message = `Invalid function arguments`;
@@ -1133,7 +1133,7 @@
 	        } else if ("endsWith" in issue.validation) {
 	          message = `Invalid input: must end with "${issue.validation.endsWith}"`;
 	        } else {
-	          util_1$T.util.assertNever(issue.validation);
+	          util_1$V.util.assertNever(issue.validation);
 	        }
 	      } else if (issue.validation !== "regex") {
 	        message = `Invalid ${issue.validation}`;
@@ -1161,7 +1161,7 @@
 	      break;
 	    default:
 	      message = _ctx.defaultError;
-	      util_1$T.util.assertNever(issue);
+	      util_1$V.util.assertNever(issue);
 	  }
 	  return {
 	    message
@@ -1169,7 +1169,7 @@
 	};
 	en.default = errorMap;
 
-	var __importDefault$4 = commonjsGlobal && commonjsGlobal.__importDefault || function (mod) {
+	var __importDefault$5 = commonjsGlobal && commonjsGlobal.__importDefault || function (mod) {
 	  return mod && mod.__esModule ? mod : {
 	    "default": mod
 	  };
@@ -1178,7 +1178,7 @@
 	  value: true
 	});
 	errors.getErrorMap = errors.setErrorMap = errors.defaultErrorMap = void 0;
-	const en_1 = __importDefault$4(en);
+	const en_1 = __importDefault$5(en);
 	errors.defaultErrorMap = en_1.default;
 	let overrideErrorMap = en_1.default;
 	function setErrorMap(map) {
@@ -5539,7 +5539,7 @@
 	  value: true
 	});
 	tid.TID = void 0;
-	const util_1$S = util$5;
+	const util_1$U = util$5;
 	const TID_LEN = 13;
 	let lastTimestamp = 0;
 	let timestampCount = 0;
@@ -5587,7 +5587,7 @@
 	  }
 	  static fromTime(timestamp, clockid) {
 	    // base32 encode with encoding variant sort (s32)
-	    const str = `${(0, util_1$S.s32encode)(timestamp)}${(0, util_1$S.s32encode)(clockid).padStart(2, '2')}`;
+	    const str = `${(0, util_1$U.s32encode)(timestamp)}${(0, util_1$U.s32encode)(clockid).padStart(2, '2')}`;
 	    return new TID(str);
 	  }
 	  static fromStr(str) {
@@ -5603,10 +5603,10 @@
 	    return dedash(str).length === TID_LEN;
 	  }
 	  timestamp() {
-	    return (0, util_1$S.s32decode)(this.str.slice(0, 11));
+	    return (0, util_1$U.s32decode)(this.str.slice(0, 11));
 	  }
 	  clockid() {
-	    return (0, util_1$S.s32decode)(this.str.slice(11, 13));
+	    return (0, util_1$U.s32decode)(this.str.slice(11, 13));
 	  }
 	  formatted() {
 	    const str = this.toString();
@@ -7303,7 +7303,7 @@ if (cid) {
 	  value: true
 	});
 	retry$1.backoffMs = retry$1.retry = void 0;
-	const util_1$R = util$5;
+	const util_1$T = util$5;
 	async function retry(fn, opts = {}) {
 	  const {
 	    maxRetries = 3,
@@ -7321,7 +7321,7 @@ if (cid) {
 	      if (willRetry) {
 	        retries += 1;
 	        if (waitMs !== 0) {
-	          await (0, util_1$R.wait)(waitMs);
+	          await (0, util_1$T.wait)(waitMs);
 	        }
 	      } else {
 	        doneError = err;
@@ -7665,7 +7665,7 @@ if (cid) {
 	}
 	GraphemerIterator$1.default = GraphemerIterator;
 
-	var __importDefault$3=commonjsGlobal&&commonjsGlobal.__importDefault||function(mod){return mod&&mod.__esModule?mod:{"default":mod};};Object.defineProperty(Graphemer$1,"__esModule",{value:true});const boundaries_1=boundaries;const GraphemerHelper_1=__importDefault$3(GraphemerHelper$1);const GraphemerIterator_1=__importDefault$3(GraphemerIterator$1);class Graphemer{/**
+	var __importDefault$4=commonjsGlobal&&commonjsGlobal.__importDefault||function(mod){return mod&&mod.__esModule?mod:{"default":mod};};Object.defineProperty(Graphemer$1,"__esModule",{value:true});const boundaries_1=boundaries;const GraphemerHelper_1=__importDefault$4(GraphemerHelper$1);const GraphemerIterator_1=__importDefault$4(GraphemerIterator$1);class Graphemer{/**
 	     * Returns the next grapheme break in the string after the given index
 	     * @param string {string}
 	     * @param index {number}
@@ -9605,7 +9605,7 @@ if (cid) {
 	if(0x1fc00<=code&&code<=0x1fffd){return boundaries_1.EXTENDED_PICTOGRAPHIC;}}}}}}}}// unlisted code points are treated as a break property of "Other"
 	return boundaries_1.CLUSTER_BREAK.OTHER;}}Graphemer$1.default=Graphemer;
 
-	var __importDefault$2 = commonjsGlobal && commonjsGlobal.__importDefault || function (mod) {
+	var __importDefault$3 = commonjsGlobal && commonjsGlobal.__importDefault || function (mod) {
 	  return mod && mod.__esModule ? mod : {
 	    "default": mod
 	  };
@@ -9613,7 +9613,7 @@ if (cid) {
 	Object.defineProperty(lib, "__esModule", {
 	  value: true
 	});
-	const Graphemer_1 = __importDefault$2(Graphemer$1);
+	const Graphemer_1 = __importDefault$3(Graphemer$1);
 	lib.default = Graphemer_1.default;
 
 	var __createBinding$4 = commonjsGlobal && commonjsGlobal.__createBinding || (Object.create ? function (o, m, k, k2) {
@@ -9647,7 +9647,7 @@ if (cid) {
 	  __setModuleDefault$4(result, mod);
 	  return result;
 	};
-	var __importDefault$1 = commonjsGlobal && commonjsGlobal.__importDefault || function (mod) {
+	var __importDefault$2 = commonjsGlobal && commonjsGlobal.__importDefault || function (mod) {
 	  return mod && mod.__esModule ? mod : {
 	    "default": mod
 	  };
@@ -9656,7 +9656,7 @@ if (cid) {
 	  value: true
 	});
 	strings.validateLanguage = strings.parseLanguage = strings.b64UrlToUtf8 = strings.utf8ToB64Url = strings.graphemeLen = strings.utf8Len = void 0;
-	const graphemer_1 = __importDefault$1(lib);
+	const graphemer_1 = __importDefault$2(lib);
 	const ui8 = __importStar$4(require$$1$1);
 	// counts the number of bytes in a utf8 string
 	const utf8Len = str => {
@@ -10727,72 +10727,78 @@ if (cid) {
 
 	var dist$1 = {};
 
-	(function (exports) {
-	  (() => {
+	var hasRequiredDist;
+	function requireDist() {
+	  if (hasRequiredDist) return dist$1;
+	  hasRequiredDist = 1;
+	  (function (exports) {
+	    (() => {
 
-	    var e = {
-	        d: (t, r) => {
-	          for (var n in r) e.o(r, n) && !e.o(t, n) && Object.defineProperty(t, n, {
-	            enumerable: !0,
-	            get: r[n]
-	          });
+	      var e = {
+	          d: (t, r) => {
+	            for (var n in r) e.o(r, n) && !e.o(t, n) && Object.defineProperty(t, n, {
+	              enumerable: !0,
+	              get: r[n]
+	            });
+	          },
+	          o: (e, t) => Object.prototype.hasOwnProperty.call(e, t),
+	          r: e => {
+	            "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {
+	              value: "Module"
+	            }), Object.defineProperty(e, "__esModule", {
+	              value: !0
+	            });
+	          }
 	        },
-	        o: (e, t) => Object.prototype.hasOwnProperty.call(e, t),
-	        r: e => {
-	          "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {
-	            value: "Module"
-	          }), Object.defineProperty(e, "__esModule", {
-	            value: !0
-	          });
-	        }
-	      },
-	      t = {};
-	    function r(e, t) {
-	      return void 0 === t && (t = "-"), new RegExp("^(?!0{4}" + t + "0{2}" + t + "0{2})((?=[0-9]{4}" + t + "(((0[^2])|1[0-2])|02(?=" + t + "(([0-1][0-9])|2[0-8])))" + t + "[0-9]{2})|(?=((([13579][26])|([2468][048])|(0[48]))0{2})|([0-9]{2}((((0|[2468])[48])|[2468][048])|([13579][26])))" + t + "02" + t + "29))([0-9]{4})" + t + "(?!((0[469])|11)" + t + "31)((0[1,3-9]|1[0-2])|(02(?!" + t + "3)))" + t + "(0[1-9]|[1-2][0-9]|3[0-1])$").test(e);
-	    }
-	    function n(e) {
-	      var t = /\D/.exec(e);
-	      return t ? t[0] : "";
-	    }
-	    function i(e, t, r) {
-	      void 0 === t && (t = ":"), void 0 === r && (r = !1);
-	      var i = new RegExp("^([0-1]|2(?=([0-3])|4" + t + "00))[0-9]" + t + "[0-5][0-9](" + t + "([0-5]|6(?=0))[0-9])?(.[0-9]{1,9})?$");
-	      if (!r || !/[Z+\-]/.test(e)) return i.test(e);
-	      if (/Z$/.test(e)) return i.test(e.replace("Z", ""));
-	      var o = e.includes("+"),
-	        a = e.split(/[+-]/),
-	        u = a[0],
-	        d = a[1];
-	      return i.test(u) && function (e, t, r) {
-	        return void 0 === r && (r = ":"), new RegExp(t ? "^(0(?!(2" + r + "4)|0" + r + "3)|1(?=([0-1]|2(?=" + r + "[04])|[34](?=" + r + "0))))([03469](?=" + r + "[03])|[17](?=" + r + "0)|2(?=" + r + "[04])|5(?=" + r + "[034])|8(?=" + r + "[04]))" + r + "([03](?=0)|4(?=5))[05]$" : "^(0(?=[^0])|1(?=[0-2]))([39](?=" + r + "[03])|[0-24-8](?=" + r + "00))" + r + "[03]0$").test(e);
-	      }(d, o, n(d));
-	    }
-	    function o(e) {
-	      var t = e.split("T"),
-	        o = t[0],
-	        a = t[1],
-	        u = r(o, n(o));
-	      if (!a) return !1;
-	      var d,
-	        s = (d = a.match(/([^Z+\-\d])(?=\d+\1)/), Array.isArray(d) ? d[0] : "");
-	      return u && i(a, s, !0);
-	    }
-	    function a(e, t) {
-	      return void 0 === t && (t = "-"), new RegExp("^[0-9]{4}" + t + "(0(?=[^0])|1(?=[0-2]))[0-9]$").test(e);
-	    }
-	    e.r(t), e.d(t, {
-	      isValidDate: () => r,
-	      isValidISODateString: () => o,
-	      isValidTime: () => i,
-	      isValidYearMonth: () => a
-	    });
-	    var u = exports;
-	    for (var d in t) u[d] = t[d];
-	    t.__esModule && Object.defineProperty(u, "__esModule", {
-	      value: !0
-	    });
-	  })();
-	})(dist$1);
+	        t = {};
+	      function r(e, t) {
+	        return void 0 === t && (t = "-"), new RegExp("^(?!0{4}" + t + "0{2}" + t + "0{2})((?=[0-9]{4}" + t + "(((0[^2])|1[0-2])|02(?=" + t + "(([0-1][0-9])|2[0-8])))" + t + "[0-9]{2})|(?=((([13579][26])|([2468][048])|(0[48]))0{2})|([0-9]{2}((((0|[2468])[48])|[2468][048])|([13579][26])))" + t + "02" + t + "29))([0-9]{4})" + t + "(?!((0[469])|11)" + t + "31)((0[1,3-9]|1[0-2])|(02(?!" + t + "3)))" + t + "(0[1-9]|[1-2][0-9]|3[0-1])$").test(e);
+	      }
+	      function n(e) {
+	        var t = /\D/.exec(e);
+	        return t ? t[0] : "";
+	      }
+	      function i(e, t, r) {
+	        void 0 === t && (t = ":"), void 0 === r && (r = !1);
+	        var i = new RegExp("^([0-1]|2(?=([0-3])|4" + t + "00))[0-9]" + t + "[0-5][0-9](" + t + "([0-5]|6(?=0))[0-9])?(.[0-9]{1,9})?$");
+	        if (!r || !/[Z+\-]/.test(e)) return i.test(e);
+	        if (/Z$/.test(e)) return i.test(e.replace("Z", ""));
+	        var o = e.includes("+"),
+	          a = e.split(/[+-]/),
+	          u = a[0],
+	          d = a[1];
+	        return i.test(u) && function (e, t, r) {
+	          return void 0 === r && (r = ":"), new RegExp(t ? "^(0(?!(2" + r + "4)|0" + r + "3)|1(?=([0-1]|2(?=" + r + "[04])|[34](?=" + r + "0))))([03469](?=" + r + "[03])|[17](?=" + r + "0)|2(?=" + r + "[04])|5(?=" + r + "[034])|8(?=" + r + "[04]))" + r + "([03](?=0)|4(?=5))[05]$" : "^(0(?=[^0])|1(?=[0-2]))([39](?=" + r + "[03])|[0-24-8](?=" + r + "00))" + r + "[03]0$").test(e);
+	        }(d, o, n(d));
+	      }
+	      function o(e) {
+	        var t = e.split("T"),
+	          o = t[0],
+	          a = t[1],
+	          u = r(o, n(o));
+	        if (!a) return !1;
+	        var d,
+	          s = (d = a.match(/([^Z+\-\d])(?=\d+\1)/), Array.isArray(d) ? d[0] : "");
+	        return u && i(a, s, !0);
+	      }
+	      function a(e, t) {
+	        return void 0 === t && (t = "-"), new RegExp("^[0-9]{4}" + t + "(0(?=[^0])|1(?=[0-2]))[0-9]$").test(e);
+	      }
+	      e.r(t), e.d(t, {
+	        isValidDate: () => r,
+	        isValidISODateString: () => o,
+	        isValidTime: () => i,
+	        isValidYearMonth: () => a
+	      });
+	      var u = exports;
+	      for (var d in t) u[d] = t[d];
+	      t.__esModule && Object.defineProperty(u, "__esModule", {
+	        value: !0
+	      });
+	    })();
+	  })(dist$1);
+	  return dist$1;
+	}
 
 	var hasRequiredFormats;
 	function requireFormats() {
@@ -10802,7 +10808,7 @@ if (cid) {
 	    value: true
 	  });
 	  formats.language = formats.cid = formats.nsid = formats.atIdentifier = formats.handle = formats.did = formats.atUri = formats.uri = formats.datetime = void 0;
-	  const iso_datestring_validator_1 = dist$1;
+	  const iso_datestring_validator_1 = requireDist();
 	  const cid_1 = require$$1;
 	  const types_1 = requireTypes();
 	  const syntax_1 = dist$4;
@@ -12117,7 +12123,7 @@ if (cid) {
 	  value: true
 	});
 	validation.assertValidXrpcMessage = validation.assertValidXrpcOutput = validation.assertValidXrpcInput = validation.assertValidXrpcParams = validation.assertValidRecord = void 0;
-	const util_1$Q = requireUtil();
+	const util_1$S = requireUtil();
 	const ComplexValidators$1 = __importStar$2(requireComplex());
 	const XrpcValidators = __importStar$2(xrpc);
 	function assertValidRecord(lexicons, def, value) {
@@ -12137,21 +12143,21 @@ if (cid) {
 	function assertValidXrpcInput(lexicons, def, value) {
 	  if (def.input?.schema) {
 	    // loop: all input schema definitions
-	    return (0, util_1$Q.assertValidOneOf)(lexicons, 'Input', def.input.schema, value, true);
+	    return (0, util_1$S.assertValidOneOf)(lexicons, 'Input', def.input.schema, value, true);
 	  }
 	}
 	validation.assertValidXrpcInput = assertValidXrpcInput;
 	function assertValidXrpcOutput(lexicons, def, value) {
 	  if (def.output?.schema) {
 	    // loop: all output schema definitions
-	    return (0, util_1$Q.assertValidOneOf)(lexicons, 'Output', def.output.schema, value, true);
+	    return (0, util_1$S.assertValidOneOf)(lexicons, 'Output', def.output.schema, value, true);
 	  }
 	}
 	validation.assertValidXrpcOutput = assertValidXrpcOutput;
 	function assertValidXrpcMessage(lexicons, def, value) {
 	  if (def.message?.schema) {
 	    // loop: all output schema definitions
-	    return (0, util_1$Q.assertValidOneOf)(lexicons, 'Message', def.message.schema, value, true);
+	    return (0, util_1$S.assertValidOneOf)(lexicons, 'Message', def.message.schema, value, true);
 	  }
 	}
 	validation.assertValidXrpcMessage = assertValidXrpcMessage;
@@ -12193,7 +12199,7 @@ if (cid) {
 	lexicons$1.Lexicons = void 0;
 	const types_1$3 = requireTypes();
 	const validation_1 = validation;
-	const util_1$P = requireUtil();
+	const util_1$R = requireUtil();
 	const ComplexValidators = __importStar$1(requireComplex());
 	/**
 	 * A collection of compiled lexicons.
@@ -12222,7 +12228,7 @@ if (cid) {
 	   * Add a lexicon doc.
 	   */
 	  add(doc) {
-	    const uri = (0, util_1$P.toLexUri)(doc.id);
+	    const uri = (0, util_1$R.toLexUri)(doc.id);
 	    if (this.docs.has(uri)) {
 	      throw new Error(`${uri} has already been registered`);
 	    }
@@ -12239,7 +12245,7 @@ if (cid) {
 	   * Remove a lexicon doc.
 	   */
 	  remove(uri) {
-	    uri = (0, util_1$P.toLexUri)(uri);
+	    uri = (0, util_1$R.toLexUri)(uri);
 	    const doc = this.docs.get(uri);
 	    if (!doc) {
 	      throw new Error(`Unable to remove "${uri}": does not exist`);
@@ -12253,14 +12259,14 @@ if (cid) {
 	   * Get a lexicon doc.
 	   */
 	  get(uri) {
-	    uri = (0, util_1$P.toLexUri)(uri);
+	    uri = (0, util_1$R.toLexUri)(uri);
 	    return this.docs.get(uri);
 	  }
 	  /**
 	   * Get a definition.
 	   */
 	  getDef(uri) {
-	    uri = (0, util_1$P.toLexUri)(uri);
+	    uri = (0, util_1$R.toLexUri)(uri);
 	    return this.defs.get(uri);
 	  }
 	  getDefOrThrow(uri, types) {
@@ -12277,7 +12283,7 @@ if (cid) {
 	   * Validate a record or object.
 	   */
 	  validate(lexUri, value) {
-	    lexUri = (0, util_1$P.toLexUri)(lexUri);
+	    lexUri = (0, util_1$R.toLexUri)(lexUri);
 	    const def = this.getDefOrThrow(lexUri, ['record', 'object']);
 	    if (!(0, types_1$3.isObj)(value)) {
 	      throw new types_1$3.ValidationError(`Value must be an object`);
@@ -12295,7 +12301,7 @@ if (cid) {
 	   * Validate a record and throw on any error.
 	   */
 	  assertValidRecord(lexUri, value) {
-	    lexUri = (0, util_1$P.toLexUri)(lexUri);
+	    lexUri = (0, util_1$R.toLexUri)(lexUri);
 	    const def = this.getDefOrThrow(lexUri, ['record']);
 	    if (!(0, types_1$3.isObj)(value)) {
 	      throw new types_1$3.ValidationError(`Record must be an object`);
@@ -12304,7 +12310,7 @@ if (cid) {
 	      throw new types_1$3.ValidationError(`Record/$type must be a string`);
 	    }
 	    const $type = value.$type || '';
-	    if ((0, util_1$P.toLexUri)($type) !== lexUri) {
+	    if ((0, util_1$R.toLexUri)($type) !== lexUri) {
 	      throw new types_1$3.ValidationError(`Invalid $type: must be ${lexUri}, got ${$type}`);
 	    }
 	    return (0, validation_1.assertValidRecord)(this, def, value);
@@ -12313,7 +12319,7 @@ if (cid) {
 	   * Validate xrpc query params and throw on any error.
 	   */
 	  assertValidXrpcParams(lexUri, value) {
-	    lexUri = (0, util_1$P.toLexUri)(lexUri);
+	    lexUri = (0, util_1$R.toLexUri)(lexUri);
 	    const def = this.getDefOrThrow(lexUri, ['query', 'procedure', 'subscription']);
 	    return (0, validation_1.assertValidXrpcParams)(this, def, value);
 	  }
@@ -12321,7 +12327,7 @@ if (cid) {
 	   * Validate xrpc input body and throw on any error.
 	   */
 	  assertValidXrpcInput(lexUri, value) {
-	    lexUri = (0, util_1$P.toLexUri)(lexUri);
+	    lexUri = (0, util_1$R.toLexUri)(lexUri);
 	    const def = this.getDefOrThrow(lexUri, ['procedure']);
 	    return (0, validation_1.assertValidXrpcInput)(this, def, value);
 	  }
@@ -12329,7 +12335,7 @@ if (cid) {
 	   * Validate xrpc output body and throw on any error.
 	   */
 	  assertValidXrpcOutput(lexUri, value) {
-	    lexUri = (0, util_1$P.toLexUri)(lexUri);
+	    lexUri = (0, util_1$R.toLexUri)(lexUri);
 	    const def = this.getDefOrThrow(lexUri, ['query', 'procedure']);
 	    return (0, validation_1.assertValidXrpcOutput)(this, def, value);
 	  }
@@ -12337,7 +12343,7 @@ if (cid) {
 	   * Validate xrpc subscription message and throw on any error.
 	   */
 	  assertValidXrpcMessage(lexUri, value) {
-	    lexUri = (0, util_1$P.toLexUri)(lexUri);
+	    lexUri = (0, util_1$R.toLexUri)(lexUri);
 	    const def = this.getDefOrThrow(lexUri, ['subscription']);
 	    return (0, validation_1.assertValidXrpcMessage)(this, def, value);
 	  }
@@ -12345,8 +12351,8 @@ if (cid) {
 	   * Resolve a lex uri given a ref
 	   */
 	  resolveLexUri(lexUri, ref) {
-	    lexUri = (0, util_1$P.toLexUri)(lexUri);
-	    return (0, util_1$P.toLexUri)(ref, lexUri);
+	    lexUri = (0, util_1$R.toLexUri)(lexUri);
+	    return (0, util_1$R.toLexUri)(ref, lexUri);
 	  }
 	}
 	lexicons$1.Lexicons = Lexicons;
@@ -12364,13 +12370,13 @@ if (cid) {
 	function resolveRefUris(obj, baseUri) {
 	  for (const k in obj) {
 	    if (obj.type === 'ref') {
-	      obj.ref = (0, util_1$P.toLexUri)(obj.ref, baseUri);
+	      obj.ref = (0, util_1$R.toLexUri)(obj.ref, baseUri);
 	    } else if (obj.type === 'union') {
-	      obj.refs = obj.refs.map(ref => (0, util_1$P.toLexUri)(ref, baseUri));
+	      obj.refs = obj.refs.map(ref => (0, util_1$R.toLexUri)(ref, baseUri));
 	    } else if (Array.isArray(obj[k])) {
 	      obj[k] = obj[k].map(item => {
 	        if (typeof item === 'string') {
-	          return item.startsWith('#') ? (0, util_1$P.toLexUri)(item, baseUri) : item;
+	          return item.startsWith('#') ? (0, util_1$R.toLexUri)(item, baseUri) : item;
 	        } else if (item && typeof item === 'object') {
 	          return resolveRefUris(item, baseUri);
 	        }
@@ -12871,7 +12877,7 @@ if (cid) {
 	});
 	client.defaultFetchHandler = client.ServiceClient = client.Client = void 0;
 	const lexicon_1 = dist$3;
-	const util_1$O = util$3;
+	const util_1$Q = util$3;
 	const types_1$1 = types$1;
 	class Client {
 	  constructor() {
@@ -12945,9 +12951,9 @@ if (cid) {
 	    if (!def || def.type !== 'query' && def.type !== 'procedure') {
 	      throw new Error(`Invalid lexicon: ${methodNsid}. Must be a query or procedure.`);
 	    }
-	    const httpMethod = (0, util_1$O.getMethodSchemaHTTPMethod)(def);
-	    const httpUri = (0, util_1$O.constructMethodCallUri)(methodNsid, def, this.uri, params);
-	    const httpHeaders = (0, util_1$O.constructMethodCallHeaders)(def, data, {
+	    const httpMethod = (0, util_1$Q.getMethodSchemaHTTPMethod)(def);
+	    const httpUri = (0, util_1$Q.constructMethodCallUri)(methodNsid, def, this.uri, params);
+	    const httpHeaders = (0, util_1$Q.constructMethodCallHeaders)(def, data, {
 	      headers: {
 	        ...this.headers,
 	        ...opts?.headers
@@ -12955,7 +12961,7 @@ if (cid) {
 	      encoding: opts?.encoding
 	    });
 	    const res = await this.baseClient.fetch(httpUri, httpMethod, httpHeaders, data);
-	    const resCode = (0, util_1$O.httpResponseCodeToEnum)(res.status);
+	    const resCode = (0, util_1$Q.httpResponseCodeToEnum)(res.status);
 	    if (resCode === types_1$1.ResponseType.Success) {
 	      try {
 	        this.baseClient.lex.assertValidXrpcOutput(methodNsid, res.body);
@@ -12981,11 +12987,11 @@ if (cid) {
 	  try {
 	    // The duplex field is now required for streaming bodies, but not yet reflected
 	    // anywhere in docs or types. See whatwg/fetch#1438, nodejs/node#46221.
-	    const headers = (0, util_1$O.normalizeHeaders)(httpHeaders);
+	    const headers = (0, util_1$Q.normalizeHeaders)(httpHeaders);
 	    const reqInit = {
 	      method: httpMethod,
 	      headers,
-	      body: (0, util_1$O.encodeMethodCallBody)(headers, httpReqBody),
+	      body: (0, util_1$Q.encodeMethodCallBody)(headers, httpReqBody),
 	      duplex: 'half'
 	    };
 	    const res = await fetch(httpUri, reqInit);
@@ -12993,7 +12999,7 @@ if (cid) {
 	    return {
 	      status: res.status,
 	      headers: Object.fromEntries(res.headers.entries()),
-	      body: (0, util_1$O.httpResponseBodyParse)(res.headers.get('content-type'), resBody)
+	      body: (0, util_1$Q.httpResponseBodyParse)(res.headers.get('content-type'), resBody)
 	    };
 	  } catch (e) {
 	    throw new types_1$1.XRPCError(types_1$1.ResponseType.Unknown, String(e));
@@ -16125,7 +16131,7 @@ if (cid) {
 	      defs: {
 	        main: {
 	          type: 'query',
-	          description: 'List blob CIDso for an account, since some repo revision. Does not require auth; implemented by PDS.',
+	          description: 'List blob CIDs for an account, since some repo revision. Does not require auth; implemented by PDS.',
 	          parameters: {
 	            type: 'params',
 	            required: ['did'],
@@ -16667,6 +16673,10 @@ if (cid) {
 	                type: 'ref',
 	                ref: 'lex:com.atproto.label.defs#label'
 	              }
+	            },
+	            createdAt: {
+	              type: 'string',
+	              format: 'datetime'
 	            }
 	          }
 	        },
@@ -16701,6 +16711,10 @@ if (cid) {
 	              ref: 'lex:app.bsky.actor.defs#profileAssociated'
 	            },
 	            indexedAt: {
+	              type: 'string',
+	              format: 'datetime'
+	            },
+	            createdAt: {
 	              type: 'string',
 	              format: 'datetime'
 	            },
@@ -16760,7 +16774,15 @@ if (cid) {
 	              type: 'ref',
 	              ref: 'lex:app.bsky.actor.defs#profileAssociated'
 	            },
+	            joinedViaStarterPack: {
+	              type: 'ref',
+	              ref: 'lex:app.bsky.graph.defs#starterPackViewBasic'
+	            },
 	            indexedAt: {
+	              type: 'string',
+	              format: 'datetime'
+	            },
+	            createdAt: {
 	              type: 'string',
 	              format: 'datetime'
 	            },
@@ -16784,6 +16806,9 @@ if (cid) {
 	              type: 'integer'
 	            },
 	            feedgens: {
+	              type: 'integer'
+	            },
+	            starterPacks: {
 	              type: 'integer'
 	            },
 	            labeler: {
@@ -16864,7 +16889,7 @@ if (cid) {
 	          type: 'array',
 	          items: {
 	            type: 'union',
-	            refs: ['lex:app.bsky.actor.defs#adultContentPref', 'lex:app.bsky.actor.defs#contentLabelPref', 'lex:app.bsky.actor.defs#savedFeedsPref', 'lex:app.bsky.actor.defs#savedFeedsPrefV2', 'lex:app.bsky.actor.defs#personalDetailsPref', 'lex:app.bsky.actor.defs#feedViewPref', 'lex:app.bsky.actor.defs#threadViewPref', 'lex:app.bsky.actor.defs#interestsPref', 'lex:app.bsky.actor.defs#mutedWordsPref', 'lex:app.bsky.actor.defs#hiddenPostsPref']
+	            refs: ['lex:app.bsky.actor.defs#adultContentPref', 'lex:app.bsky.actor.defs#contentLabelPref', 'lex:app.bsky.actor.defs#savedFeedsPref', 'lex:app.bsky.actor.defs#savedFeedsPrefV2', 'lex:app.bsky.actor.defs#personalDetailsPref', 'lex:app.bsky.actor.defs#feedViewPref', 'lex:app.bsky.actor.defs#threadViewPref', 'lex:app.bsky.actor.defs#interestsPref', 'lex:app.bsky.actor.defs#mutedWordsPref', 'lex:app.bsky.actor.defs#hiddenPostsPref', 'lex:app.bsky.actor.defs#bskyAppStatePref', 'lex:app.bsky.actor.defs#labelersPref']
 	          }
 	        },
 	        adultContentPref: {
@@ -17098,6 +17123,36 @@ if (cid) {
 	              format: 'did'
 	            }
 	          }
+	        },
+	        bskyAppStatePref: {
+	          description: "A grab bag of state that's specific to the bsky.app program. Third-party apps shouldn't use this.",
+	          type: 'object',
+	          properties: {
+	            activeProgressGuide: {
+	              type: 'ref',
+	              ref: 'lex:app.bsky.actor.defs#bskyAppProgressGuide'
+	            },
+	            queuedNudges: {
+	              description: 'An array of tokens which identify nudges (modals, popups, tours, highlight dots) that should be shown to the user.',
+	              type: 'array',
+	              maxLength: 1000,
+	              items: {
+	                type: 'string',
+	                maxLength: 100
+	              }
+	            }
+	          }
+	        },
+	        bskyAppProgressGuide: {
+	          description: 'If set, an active progress guide. Once completed, can be set to undefined. Should have unspecced fields tracking progress.',
+	          type: 'object',
+	          required: ['guide'],
+	          properties: {
+	            guide: {
+	              type: 'string',
+	              maxLength: 100
+	            }
+	          }
 	        }
 	      }
 	    },
@@ -17277,6 +17332,14 @@ if (cid) {
 	                type: 'union',
 	                description: 'Self-label values, specific to the Bluesky application, on the overall account.',
 	                refs: ['lex:com.atproto.label.defs#selfLabels']
+	              },
+	              joinedViaStarterPack: {
+	                type: 'ref',
+	                ref: 'lex:com.atproto.repo.strongRef'
+	              },
+	              createdAt: {
+	                type: 'string',
+	                format: 'datetime'
 	              }
 	            }
 	          }
@@ -17584,7 +17647,7 @@ if (cid) {
 	          properties: {
 	            record: {
 	              type: 'union',
-	              refs: ['lex:app.bsky.embed.record#viewRecord', 'lex:app.bsky.embed.record#viewNotFound', 'lex:app.bsky.embed.record#viewBlocked', 'lex:app.bsky.feed.defs#generatorView', 'lex:app.bsky.graph.defs#listView', 'lex:app.bsky.labeler.defs#labelerView']
+	              refs: ['lex:app.bsky.embed.record#viewRecord', 'lex:app.bsky.embed.record#viewNotFound', 'lex:app.bsky.embed.record#viewBlocked', 'lex:app.bsky.feed.defs#generatorView', 'lex:app.bsky.graph.defs#listView', 'lex:app.bsky.labeler.defs#labelerView', 'lex:app.bsky.graph.defs#starterPackViewBasic']
 	            }
 	          }
 	        },
@@ -19348,6 +19411,10 @@ if (cid) {
 	              type: 'string',
 	              format: 'uri'
 	            },
+	            listItemCount: {
+	              type: 'integer',
+	              minimum: 0
+	            },
 	            labels: {
 	              type: 'array',
 	              items: {
@@ -19406,6 +19473,10 @@ if (cid) {
 	              type: 'string',
 	              format: 'uri'
 	            },
+	            listItemCount: {
+	              type: 'integer',
+	              minimum: 0
+	            },
 	            labels: {
 	              type: 'array',
 	              items: {
@@ -19437,9 +19508,113 @@ if (cid) {
 	            }
 	          }
 	        },
+	        starterPackView: {
+	          type: 'object',
+	          required: ['uri', 'cid', 'record', 'creator', 'indexedAt'],
+	          properties: {
+	            uri: {
+	              type: 'string',
+	              format: 'at-uri'
+	            },
+	            cid: {
+	              type: 'string',
+	              format: 'cid'
+	            },
+	            record: {
+	              type: 'unknown'
+	            },
+	            creator: {
+	              type: 'ref',
+	              ref: 'lex:app.bsky.actor.defs#profileViewBasic'
+	            },
+	            list: {
+	              type: 'ref',
+	              ref: 'lex:app.bsky.graph.defs#listViewBasic'
+	            },
+	            listItemsSample: {
+	              type: 'array',
+	              maxLength: 12,
+	              items: {
+	                type: 'ref',
+	                ref: 'lex:app.bsky.graph.defs#listItemView'
+	              }
+	            },
+	            feeds: {
+	              type: 'array',
+	              maxLength: 3,
+	              items: {
+	                type: 'ref',
+	                ref: 'lex:app.bsky.feed.defs#generatorView'
+	              }
+	            },
+	            joinedWeekCount: {
+	              type: 'integer',
+	              minimum: 0
+	            },
+	            joinedAllTimeCount: {
+	              type: 'integer',
+	              minimum: 0
+	            },
+	            labels: {
+	              type: 'array',
+	              items: {
+	                type: 'ref',
+	                ref: 'lex:com.atproto.label.defs#label'
+	              }
+	            },
+	            indexedAt: {
+	              type: 'string',
+	              format: 'datetime'
+	            }
+	          }
+	        },
+	        starterPackViewBasic: {
+	          type: 'object',
+	          required: ['uri', 'cid', 'record', 'creator', 'indexedAt'],
+	          properties: {
+	            uri: {
+	              type: 'string',
+	              format: 'at-uri'
+	            },
+	            cid: {
+	              type: 'string',
+	              format: 'cid'
+	            },
+	            record: {
+	              type: 'unknown'
+	            },
+	            creator: {
+	              type: 'ref',
+	              ref: 'lex:app.bsky.actor.defs#profileViewBasic'
+	            },
+	            listItemCount: {
+	              type: 'integer',
+	              minimum: 0
+	            },
+	            joinedWeekCount: {
+	              type: 'integer',
+	              minimum: 0
+	            },
+	            joinedAllTimeCount: {
+	              type: 'integer',
+	              minimum: 0
+	            },
+	            labels: {
+	              type: 'array',
+	              items: {
+	                type: 'ref',
+	                ref: 'lex:com.atproto.label.defs#label'
+	              }
+	            },
+	            indexedAt: {
+	              type: 'string',
+	              format: 'datetime'
+	            }
+	          }
+	        },
 	        listPurpose: {
 	          type: 'string',
-	          knownValues: ['app.bsky.graph.defs#modlist', 'app.bsky.graph.defs#curatelist']
+	          knownValues: ['app.bsky.graph.defs#modlist', 'app.bsky.graph.defs#curatelist', 'app.bsky.graph.defs#referencelist']
 	        },
 	        modlist: {
 	          type: 'token',
@@ -19448,6 +19623,10 @@ if (cid) {
 	        curatelist: {
 	          type: 'token',
 	          description: 'A list of actors used for curation purposes such as list feeds or interaction gating.'
+	        },
+	        referencelist: {
+	          type: 'token',
+	          description: 'A list of actors used for only for reference purposes such as within a starter pack.'
 	        },
 	        listViewerState: {
 	          type: 'object',
@@ -19518,6 +19697,54 @@ if (cid) {
 	              createdAt: {
 	                type: 'string',
 	                format: 'datetime'
+	              }
+	            }
+	          }
+	        }
+	      }
+	    },
+	    AppBskyGraphGetActorStarterPacks: {
+	      lexicon: 1,
+	      id: 'app.bsky.graph.getActorStarterPacks',
+	      defs: {
+	        main: {
+	          type: 'query',
+	          description: 'Get a list of starter packs created by the actor.',
+	          parameters: {
+	            type: 'params',
+	            required: ['actor'],
+	            properties: {
+	              actor: {
+	                type: 'string',
+	                format: 'at-identifier'
+	              },
+	              limit: {
+	                type: 'integer',
+	                minimum: 1,
+	                maximum: 100,
+	                default: 50
+	              },
+	              cursor: {
+	                type: 'string'
+	              }
+	            }
+	          },
+	          output: {
+	            encoding: 'application/json',
+	            schema: {
+	              type: 'object',
+	              required: ['starterPacks'],
+	              properties: {
+	                cursor: {
+	                  type: 'string'
+	                },
+	                starterPacks: {
+	                  type: 'array',
+	                  items: {
+	                    type: 'ref',
+	                    ref: 'lex:app.bsky.graph.defs#starterPackViewBasic'
+	                  }
+	                }
 	              }
 	            }
 	          }
@@ -20008,6 +20235,80 @@ if (cid) {
 	        }
 	      }
 	    },
+	    AppBskyGraphGetStarterPack: {
+	      lexicon: 1,
+	      id: 'app.bsky.graph.getStarterPack',
+	      defs: {
+	        main: {
+	          type: 'query',
+	          description: 'Gets a view of a starter pack.',
+	          parameters: {
+	            type: 'params',
+	            required: ['starterPack'],
+	            properties: {
+	              starterPack: {
+	                type: 'string',
+	                format: 'at-uri',
+	                description: 'Reference (AT-URI) of the starter pack record.'
+	              }
+	            }
+	          },
+	          output: {
+	            encoding: 'application/json',
+	            schema: {
+	              type: 'object',
+	              required: ['starterPack'],
+	              properties: {
+	                starterPack: {
+	                  type: 'ref',
+	                  ref: 'lex:app.bsky.graph.defs#starterPackView'
+	                }
+	              }
+	            }
+	          }
+	        }
+	      }
+	    },
+	    AppBskyGraphGetStarterPacks: {
+	      lexicon: 1,
+	      id: 'app.bsky.graph.getStarterPacks',
+	      defs: {
+	        main: {
+	          type: 'query',
+	          description: 'Get views for a list of starter packs.',
+	          parameters: {
+	            type: 'params',
+	            required: ['uris'],
+	            properties: {
+	              uris: {
+	                type: 'array',
+	                items: {
+	                  type: 'string',
+	                  format: 'at-uri'
+	                },
+	                maxLength: 25
+	              }
+	            }
+	          },
+	          output: {
+	            encoding: 'application/json',
+	            schema: {
+	              type: 'object',
+	              required: ['starterPacks'],
+	              properties: {
+	                starterPacks: {
+	                  type: 'array',
+	                  items: {
+	                    type: 'ref',
+	                    ref: 'lex:app.bsky.graph.defs#starterPackViewBasic'
+	                  }
+	                }
+	              }
+	            }
+	          }
+	        }
+	      }
+	    },
 	    AppBskyGraphGetSuggestedFollowsByActor: {
 	      lexicon: 1,
 	      id: 'app.bsky.graph.getSuggestedFollowsByActor',
@@ -20218,6 +20519,69 @@ if (cid) {
 	                  format: 'at-uri'
 	                }
 	              }
+	            }
+	          }
+	        }
+	      }
+	    },
+	    AppBskyGraphStarterpack: {
+	      lexicon: 1,
+	      id: 'app.bsky.graph.starterpack',
+	      defs: {
+	        main: {
+	          type: 'record',
+	          description: 'Record defining a starter pack of actors and feeds for new users.',
+	          key: 'tid',
+	          record: {
+	            type: 'object',
+	            required: ['name', 'list', 'createdAt'],
+	            properties: {
+	              name: {
+	                type: 'string',
+	                maxGraphemes: 50,
+	                maxLength: 500,
+	                minLength: 1,
+	                description: 'Display name for starter pack; can not be empty.'
+	              },
+	              description: {
+	                type: 'string',
+	                maxGraphemes: 300,
+	                maxLength: 3000
+	              },
+	              descriptionFacets: {
+	                type: 'array',
+	                items: {
+	                  type: 'ref',
+	                  ref: 'lex:app.bsky.richtext.facet'
+	                }
+	              },
+	              list: {
+	                type: 'string',
+	                format: 'at-uri',
+	                description: 'Reference (AT-URI) to the list record.'
+	              },
+	              feeds: {
+	                type: 'array',
+	                maxLength: 3,
+	                items: {
+	                  type: 'ref',
+	                  ref: 'lex:app.bsky.graph.starterpack#feedItem'
+	                }
+	              },
+	              createdAt: {
+	                type: 'string',
+	                format: 'datetime'
+	              }
+	            }
+	          }
+	        },
+	        feedItem: {
+	          type: 'object',
+	          required: ['uri'],
+	          properties: {
+	            uri: {
+	              type: 'string',
+	              format: 'at-uri'
 	            }
 	          }
 	        }
@@ -20577,8 +20941,8 @@ if (cid) {
 	            },
 	            reason: {
 	              type: 'string',
-	              description: "Expected values are 'like', 'repost', 'follow', 'mention', 'reply', and 'quote'.",
-	              knownValues: ['like', 'repost', 'follow', 'mention', 'reply', 'quote']
+	              description: "Expected values are 'like', 'repost', 'follow', 'mention', 'reply', 'quote', and 'starterpack-joined'.",
+	              knownValues: ['like', 'repost', 'follow', 'mention', 'reply', 'quote', 'starterpack-joined']
 	            },
 	            reasonSubject: {
 	              type: 'string',
@@ -20829,6 +21193,11 @@ if (cid) {
 	              },
 	              cursor: {
 	                type: 'string'
+	              },
+	              relativeToDid: {
+	                type: 'string',
+	                format: 'did',
+	                description: 'DID of the account to get suggestions relative to. If not provided, suggestions will be based on the viewer.'
 	              }
 	            }
 	          },
@@ -22149,7 +22518,7 @@ if (cid) {
 	            },
 	            event: {
 	              type: 'union',
-	              refs: ['lex:tools.ozone.moderation.defs#modEventTakedown', 'lex:tools.ozone.moderation.defs#modEventReverseTakedown', 'lex:tools.ozone.moderation.defs#modEventComment', 'lex:tools.ozone.moderation.defs#modEventReport', 'lex:tools.ozone.moderation.defs#modEventLabel', 'lex:tools.ozone.moderation.defs#modEventAcknowledge', 'lex:tools.ozone.moderation.defs#modEventEscalate', 'lex:tools.ozone.moderation.defs#modEventMute', 'lex:tools.ozone.moderation.defs#modEventUnmute', 'lex:tools.ozone.moderation.defs#modEventMuteReporter', 'lex:tools.ozone.moderation.defs#modEventUnmuteReporter', 'lex:tools.ozone.moderation.defs#modEventEmail', 'lex:tools.ozone.moderation.defs#modEventResolveAppeal', 'lex:tools.ozone.moderation.defs#modEventDivert']
+	              refs: ['lex:tools.ozone.moderation.defs#modEventTakedown', 'lex:tools.ozone.moderation.defs#modEventReverseTakedown', 'lex:tools.ozone.moderation.defs#modEventComment', 'lex:tools.ozone.moderation.defs#modEventReport', 'lex:tools.ozone.moderation.defs#modEventLabel', 'lex:tools.ozone.moderation.defs#modEventAcknowledge', 'lex:tools.ozone.moderation.defs#modEventEscalate', 'lex:tools.ozone.moderation.defs#modEventMute', 'lex:tools.ozone.moderation.defs#modEventUnmute', 'lex:tools.ozone.moderation.defs#modEventMuteReporter', 'lex:tools.ozone.moderation.defs#modEventUnmuteReporter', 'lex:tools.ozone.moderation.defs#modEventEmail', 'lex:tools.ozone.moderation.defs#modEventResolveAppeal', 'lex:tools.ozone.moderation.defs#modEventDivert', 'lex:tools.ozone.moderation.defs#modEventTag']
 	            },
 	            subject: {
 	              type: 'union',
@@ -22186,7 +22555,7 @@ if (cid) {
 	            },
 	            event: {
 	              type: 'union',
-	              refs: ['lex:tools.ozone.moderation.defs#modEventTakedown', 'lex:tools.ozone.moderation.defs#modEventReverseTakedown', 'lex:tools.ozone.moderation.defs#modEventComment', 'lex:tools.ozone.moderation.defs#modEventReport', 'lex:tools.ozone.moderation.defs#modEventLabel', 'lex:tools.ozone.moderation.defs#modEventAcknowledge', 'lex:tools.ozone.moderation.defs#modEventEscalate', 'lex:tools.ozone.moderation.defs#modEventMute', 'lex:tools.ozone.moderation.defs#modEventUnmute', 'lex:tools.ozone.moderation.defs#modEventMuteReporter', 'lex:tools.ozone.moderation.defs#modEventUnmuteReporter', 'lex:tools.ozone.moderation.defs#modEventEmail', 'lex:tools.ozone.moderation.defs#modEventResolveAppeal', 'lex:tools.ozone.moderation.defs#modEventDivert']
+	              refs: ['lex:tools.ozone.moderation.defs#modEventTakedown', 'lex:tools.ozone.moderation.defs#modEventReverseTakedown', 'lex:tools.ozone.moderation.defs#modEventComment', 'lex:tools.ozone.moderation.defs#modEventReport', 'lex:tools.ozone.moderation.defs#modEventLabel', 'lex:tools.ozone.moderation.defs#modEventAcknowledge', 'lex:tools.ozone.moderation.defs#modEventEscalate', 'lex:tools.ozone.moderation.defs#modEventMute', 'lex:tools.ozone.moderation.defs#modEventUnmute', 'lex:tools.ozone.moderation.defs#modEventMuteReporter', 'lex:tools.ozone.moderation.defs#modEventUnmuteReporter', 'lex:tools.ozone.moderation.defs#modEventEmail', 'lex:tools.ozone.moderation.defs#modEventResolveAppeal', 'lex:tools.ozone.moderation.defs#modEventDivert', 'lex:tools.ozone.moderation.defs#modEventTag']
 	            },
 	            subject: {
 	              type: 'union',
@@ -23287,6 +23656,208 @@ if (cid) {
 	          }
 	        }
 	      }
+	    },
+	    ToolsOzoneTeamAddMember: {
+	      lexicon: 1,
+	      id: 'tools.ozone.team.addMember',
+	      defs: {
+	        main: {
+	          type: 'procedure',
+	          description: 'Add a member to the ozone team. Requires admin role.',
+	          input: {
+	            encoding: 'application/json',
+	            schema: {
+	              type: 'object',
+	              required: ['did', 'role'],
+	              properties: {
+	                did: {
+	                  type: 'string',
+	                  format: 'did'
+	                },
+	                role: {
+	                  type: 'string',
+	                  knownValues: ['tools.ozone.team.defs#roleAdmin', 'tools.ozone.team.defs#roleModerator', 'tools.ozone.team.defs#roleTriage']
+	                }
+	              }
+	            }
+	          },
+	          output: {
+	            encoding: 'application/json',
+	            schema: {
+	              type: 'ref',
+	              ref: 'lex:tools.ozone.team.defs#member'
+	            }
+	          },
+	          errors: [{
+	            name: 'MemberAlreadyExists',
+	            description: 'Member already exists in the team.'
+	          }]
+	        }
+	      }
+	    },
+	    ToolsOzoneTeamDefs: {
+	      lexicon: 1,
+	      id: 'tools.ozone.team.defs',
+	      defs: {
+	        member: {
+	          type: 'object',
+	          required: ['did', 'role'],
+	          properties: {
+	            did: {
+	              type: 'string',
+	              format: 'did'
+	            },
+	            disabled: {
+	              type: 'boolean'
+	            },
+	            profile: {
+	              type: 'ref',
+	              ref: 'lex:app.bsky.actor.defs#profileViewDetailed'
+	            },
+	            createdAt: {
+	              type: 'string',
+	              format: 'datetime'
+	            },
+	            updatedAt: {
+	              type: 'string',
+	              format: 'datetime'
+	            },
+	            lastUpdatedBy: {
+	              type: 'string'
+	            },
+	            role: {
+	              type: 'string',
+	              knownValues: ['lex:tools.ozone.team.defs#roleAdmin', 'lex:tools.ozone.team.defs#roleModerator', 'lex:tools.ozone.team.defs#roleTriage']
+	            }
+	          }
+	        },
+	        roleAdmin: {
+	          type: 'token',
+	          description: 'Admin role. Highest level of access, can perform all actions.'
+	        },
+	        roleModerator: {
+	          type: 'token',
+	          description: 'Moderator role. Can perform most actions.'
+	        },
+	        roleTriage: {
+	          type: 'token',
+	          description: 'Triage role. Mostly intended for monitoring and escalating issues.'
+	        }
+	      }
+	    },
+	    ToolsOzoneTeamDeleteMember: {
+	      lexicon: 1,
+	      id: 'tools.ozone.team.deleteMember',
+	      defs: {
+	        main: {
+	          type: 'procedure',
+	          description: 'Delete a member from ozone team. Requires admin role.',
+	          input: {
+	            encoding: 'application/json',
+	            schema: {
+	              type: 'object',
+	              required: ['did'],
+	              properties: {
+	                did: {
+	                  type: 'string',
+	                  format: 'did'
+	                }
+	              }
+	            }
+	          },
+	          errors: [{
+	            name: 'MemberNotFound',
+	            description: 'The member being deleted does not exist'
+	          }, {
+	            name: 'CannotDeleteSelf',
+	            description: 'You can not delete yourself from the team'
+	          }]
+	        }
+	      }
+	    },
+	    ToolsOzoneTeamListMembers: {
+	      lexicon: 1,
+	      id: 'tools.ozone.team.listMembers',
+	      defs: {
+	        main: {
+	          type: 'query',
+	          description: 'List all members with access to the ozone service.',
+	          parameters: {
+	            type: 'params',
+	            properties: {
+	              limit: {
+	                type: 'integer',
+	                minimum: 1,
+	                maximum: 100,
+	                default: 50
+	              },
+	              cursor: {
+	                type: 'string'
+	              }
+	            }
+	          },
+	          output: {
+	            encoding: 'application/json',
+	            schema: {
+	              type: 'object',
+	              required: ['members'],
+	              properties: {
+	                cursor: {
+	                  type: 'string'
+	                },
+	                members: {
+	                  type: 'array',
+	                  items: {
+	                    type: 'ref',
+	                    ref: 'lex:tools.ozone.team.defs#member'
+	                  }
+	                }
+	              }
+	            }
+	          }
+	        }
+	      }
+	    },
+	    ToolsOzoneTeamUpdateMember: {
+	      lexicon: 1,
+	      id: 'tools.ozone.team.updateMember',
+	      defs: {
+	        main: {
+	          type: 'procedure',
+	          description: 'Update a member in the ozone service. Requires admin role.',
+	          input: {
+	            encoding: 'application/json',
+	            schema: {
+	              type: 'object',
+	              required: ['did'],
+	              properties: {
+	                did: {
+	                  type: 'string',
+	                  format: 'did'
+	                },
+	                disabled: {
+	                  type: 'boolean'
+	                },
+	                role: {
+	                  type: 'string',
+	                  knownValues: ['tools.ozone.team.defs#roleAdmin', 'tools.ozone.team.defs#roleModerator', 'tools.ozone.team.defs#roleTriage']
+	                }
+	              }
+	            }
+	          },
+	          output: {
+	            encoding: 'application/json',
+	            schema: {
+	              type: 'ref',
+	              ref: 'lex:tools.ozone.team.defs#member'
+	            }
+	          },
+	          errors: [{
+	            name: 'MemberNotFound',
+	            description: 'The member being updated does not exist in the team'
+	          }]
+	        }
+	      }
 	    }
 	  };
 	  exports.schemas = Object.values(exports.schemaDict);
@@ -23410,6 +23981,7 @@ if (cid) {
 	    AppBskyGraphBlock: 'app.bsky.graph.block',
 	    AppBskyGraphDefs: 'app.bsky.graph.defs',
 	    AppBskyGraphFollow: 'app.bsky.graph.follow',
+	    AppBskyGraphGetActorStarterPacks: 'app.bsky.graph.getActorStarterPacks',
 	    AppBskyGraphGetBlocks: 'app.bsky.graph.getBlocks',
 	    AppBskyGraphGetFollowers: 'app.bsky.graph.getFollowers',
 	    AppBskyGraphGetFollows: 'app.bsky.graph.getFollows',
@@ -23420,6 +23992,8 @@ if (cid) {
 	    AppBskyGraphGetLists: 'app.bsky.graph.getLists',
 	    AppBskyGraphGetMutes: 'app.bsky.graph.getMutes',
 	    AppBskyGraphGetRelationships: 'app.bsky.graph.getRelationships',
+	    AppBskyGraphGetStarterPack: 'app.bsky.graph.getStarterPack',
+	    AppBskyGraphGetStarterPacks: 'app.bsky.graph.getStarterPacks',
 	    AppBskyGraphGetSuggestedFollowsByActor: 'app.bsky.graph.getSuggestedFollowsByActor',
 	    AppBskyGraphList: 'app.bsky.graph.list',
 	    AppBskyGraphListblock: 'app.bsky.graph.listblock',
@@ -23427,6 +24001,7 @@ if (cid) {
 	    AppBskyGraphMuteActor: 'app.bsky.graph.muteActor',
 	    AppBskyGraphMuteActorList: 'app.bsky.graph.muteActorList',
 	    AppBskyGraphMuteThread: 'app.bsky.graph.muteThread',
+	    AppBskyGraphStarterpack: 'app.bsky.graph.starterpack',
 	    AppBskyGraphUnmuteActor: 'app.bsky.graph.unmuteActor',
 	    AppBskyGraphUnmuteActorList: 'app.bsky.graph.unmuteActorList',
 	    AppBskyGraphUnmuteThread: 'app.bsky.graph.unmuteThread',
@@ -23477,7 +24052,12 @@ if (cid) {
 	    ToolsOzoneModerationQueryEvents: 'tools.ozone.moderation.queryEvents',
 	    ToolsOzoneModerationQueryStatuses: 'tools.ozone.moderation.queryStatuses',
 	    ToolsOzoneModerationSearchRepos: 'tools.ozone.moderation.searchRepos',
-	    ToolsOzoneServerGetConfig: 'tools.ozone.server.getConfig'
+	    ToolsOzoneServerGetConfig: 'tools.ozone.server.getConfig',
+	    ToolsOzoneTeamAddMember: 'tools.ozone.team.addMember',
+	    ToolsOzoneTeamDefs: 'tools.ozone.team.defs',
+	    ToolsOzoneTeamDeleteMember: 'tools.ozone.team.deleteMember',
+	    ToolsOzoneTeamListMembers: 'tools.ozone.team.listMembers',
+	    ToolsOzoneTeamUpdateMember: 'tools.ozone.team.updateMember'
 	  };
 	})(lexicons);
 
@@ -23490,12 +24070,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2p = dist;
-	function toKnownErr$2n(e) {
-	  if (e instanceof xrpc_1$2p.XRPCError) ;
+	const xrpc_1$2w = dist;
+	function toKnownErr$2u(e) {
+	  if (e instanceof xrpc_1$2w.XRPCError) ;
 	  return e;
 	}
-	deleteAccount$2.toKnownErr = toKnownErr$2n;
+	deleteAccount$2.toKnownErr = toKnownErr$2u;
 
 	var disableAccountInvites = {};
 
@@ -23506,12 +24086,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2o = dist;
-	function toKnownErr$2m(e) {
-	  if (e instanceof xrpc_1$2o.XRPCError) ;
+	const xrpc_1$2v = dist;
+	function toKnownErr$2t(e) {
+	  if (e instanceof xrpc_1$2v.XRPCError) ;
 	  return e;
 	}
-	disableAccountInvites.toKnownErr = toKnownErr$2m;
+	disableAccountInvites.toKnownErr = toKnownErr$2t;
 
 	var disableInviteCodes = {};
 
@@ -23522,12 +24102,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2n = dist;
-	function toKnownErr$2l(e) {
-	  if (e instanceof xrpc_1$2n.XRPCError) ;
+	const xrpc_1$2u = dist;
+	function toKnownErr$2s(e) {
+	  if (e instanceof xrpc_1$2u.XRPCError) ;
 	  return e;
 	}
-	disableInviteCodes.toKnownErr = toKnownErr$2l;
+	disableInviteCodes.toKnownErr = toKnownErr$2s;
 
 	var enableAccountInvites = {};
 
@@ -23538,12 +24118,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2m = dist;
-	function toKnownErr$2k(e) {
-	  if (e instanceof xrpc_1$2m.XRPCError) ;
+	const xrpc_1$2t = dist;
+	function toKnownErr$2r(e) {
+	  if (e instanceof xrpc_1$2t.XRPCError) ;
 	  return e;
 	}
-	enableAccountInvites.toKnownErr = toKnownErr$2k;
+	enableAccountInvites.toKnownErr = toKnownErr$2r;
 
 	var getAccountInfo = {};
 
@@ -23554,12 +24134,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2l = dist;
-	function toKnownErr$2j(e) {
-	  if (e instanceof xrpc_1$2l.XRPCError) ;
+	const xrpc_1$2s = dist;
+	function toKnownErr$2q(e) {
+	  if (e instanceof xrpc_1$2s.XRPCError) ;
 	  return e;
 	}
-	getAccountInfo.toKnownErr = toKnownErr$2j;
+	getAccountInfo.toKnownErr = toKnownErr$2q;
 
 	var getAccountInfos = {};
 
@@ -23570,12 +24150,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2k = dist;
-	function toKnownErr$2i(e) {
-	  if (e instanceof xrpc_1$2k.XRPCError) ;
+	const xrpc_1$2r = dist;
+	function toKnownErr$2p(e) {
+	  if (e instanceof xrpc_1$2r.XRPCError) ;
 	  return e;
 	}
-	getAccountInfos.toKnownErr = toKnownErr$2i;
+	getAccountInfos.toKnownErr = toKnownErr$2p;
 
 	var getInviteCodes = {};
 
@@ -23586,12 +24166,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2j = dist;
-	function toKnownErr$2h(e) {
-	  if (e instanceof xrpc_1$2j.XRPCError) ;
+	const xrpc_1$2q = dist;
+	function toKnownErr$2o(e) {
+	  if (e instanceof xrpc_1$2q.XRPCError) ;
 	  return e;
 	}
-	getInviteCodes.toKnownErr = toKnownErr$2h;
+	getInviteCodes.toKnownErr = toKnownErr$2o;
 
 	var getSubjectStatus = {};
 
@@ -23602,12 +24182,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2i = dist;
-	function toKnownErr$2g(e) {
-	  if (e instanceof xrpc_1$2i.XRPCError) ;
+	const xrpc_1$2p = dist;
+	function toKnownErr$2n(e) {
+	  if (e instanceof xrpc_1$2p.XRPCError) ;
 	  return e;
 	}
-	getSubjectStatus.toKnownErr = toKnownErr$2g;
+	getSubjectStatus.toKnownErr = toKnownErr$2n;
 
 	var searchAccounts = {};
 
@@ -23618,12 +24198,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2h = dist;
-	function toKnownErr$2f(e) {
-	  if (e instanceof xrpc_1$2h.XRPCError) ;
+	const xrpc_1$2o = dist;
+	function toKnownErr$2m(e) {
+	  if (e instanceof xrpc_1$2o.XRPCError) ;
 	  return e;
 	}
-	searchAccounts.toKnownErr = toKnownErr$2f;
+	searchAccounts.toKnownErr = toKnownErr$2m;
 
 	var sendEmail = {};
 
@@ -23634,12 +24214,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2g = dist;
-	function toKnownErr$2e(e) {
-	  if (e instanceof xrpc_1$2g.XRPCError) ;
+	const xrpc_1$2n = dist;
+	function toKnownErr$2l(e) {
+	  if (e instanceof xrpc_1$2n.XRPCError) ;
 	  return e;
 	}
-	sendEmail.toKnownErr = toKnownErr$2e;
+	sendEmail.toKnownErr = toKnownErr$2l;
 
 	var updateAccountEmail = {};
 
@@ -23650,12 +24230,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2f = dist;
-	function toKnownErr$2d(e) {
-	  if (e instanceof xrpc_1$2f.XRPCError) ;
+	const xrpc_1$2m = dist;
+	function toKnownErr$2k(e) {
+	  if (e instanceof xrpc_1$2m.XRPCError) ;
 	  return e;
 	}
-	updateAccountEmail.toKnownErr = toKnownErr$2d;
+	updateAccountEmail.toKnownErr = toKnownErr$2k;
 
 	var updateAccountHandle = {};
 
@@ -23666,12 +24246,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2e = dist;
-	function toKnownErr$2c(e) {
-	  if (e instanceof xrpc_1$2e.XRPCError) ;
+	const xrpc_1$2l = dist;
+	function toKnownErr$2j(e) {
+	  if (e instanceof xrpc_1$2l.XRPCError) ;
 	  return e;
 	}
-	updateAccountHandle.toKnownErr = toKnownErr$2c;
+	updateAccountHandle.toKnownErr = toKnownErr$2j;
 
 	var updateAccountPassword = {};
 
@@ -23682,12 +24262,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2d = dist;
-	function toKnownErr$2b(e) {
-	  if (e instanceof xrpc_1$2d.XRPCError) ;
+	const xrpc_1$2k = dist;
+	function toKnownErr$2i(e) {
+	  if (e instanceof xrpc_1$2k.XRPCError) ;
 	  return e;
 	}
-	updateAccountPassword.toKnownErr = toKnownErr$2b;
+	updateAccountPassword.toKnownErr = toKnownErr$2i;
 
 	var updateSubjectStatus = {};
 
@@ -23698,12 +24278,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2c = dist;
-	function toKnownErr$2a(e) {
-	  if (e instanceof xrpc_1$2c.XRPCError) ;
+	const xrpc_1$2j = dist;
+	function toKnownErr$2h(e) {
+	  if (e instanceof xrpc_1$2j.XRPCError) ;
 	  return e;
 	}
-	updateSubjectStatus.toKnownErr = toKnownErr$2a;
+	updateSubjectStatus.toKnownErr = toKnownErr$2h;
 
 	var getRecommendedDidCredentials = {};
 
@@ -23714,12 +24294,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2b = dist;
-	function toKnownErr$29(e) {
-	  if (e instanceof xrpc_1$2b.XRPCError) ;
+	const xrpc_1$2i = dist;
+	function toKnownErr$2g(e) {
+	  if (e instanceof xrpc_1$2i.XRPCError) ;
 	  return e;
 	}
-	getRecommendedDidCredentials.toKnownErr = toKnownErr$29;
+	getRecommendedDidCredentials.toKnownErr = toKnownErr$2g;
 
 	var requestPlcOperationSignature = {};
 
@@ -23730,12 +24310,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2a = dist;
-	function toKnownErr$28(e) {
-	  if (e instanceof xrpc_1$2a.XRPCError) ;
+	const xrpc_1$2h = dist;
+	function toKnownErr$2f(e) {
+	  if (e instanceof xrpc_1$2h.XRPCError) ;
 	  return e;
 	}
-	requestPlcOperationSignature.toKnownErr = toKnownErr$28;
+	requestPlcOperationSignature.toKnownErr = toKnownErr$2f;
 
 	var resolveHandle = {};
 
@@ -23746,12 +24326,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$29 = dist;
-	function toKnownErr$27(e) {
-	  if (e instanceof xrpc_1$29.XRPCError) ;
+	const xrpc_1$2g = dist;
+	function toKnownErr$2e(e) {
+	  if (e instanceof xrpc_1$2g.XRPCError) ;
 	  return e;
 	}
-	resolveHandle.toKnownErr = toKnownErr$27;
+	resolveHandle.toKnownErr = toKnownErr$2e;
 
 	var signPlcOperation = {};
 
@@ -23762,12 +24342,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$28 = dist;
-	function toKnownErr$26(e) {
-	  if (e instanceof xrpc_1$28.XRPCError) ;
+	const xrpc_1$2f = dist;
+	function toKnownErr$2d(e) {
+	  if (e instanceof xrpc_1$2f.XRPCError) ;
 	  return e;
 	}
-	signPlcOperation.toKnownErr = toKnownErr$26;
+	signPlcOperation.toKnownErr = toKnownErr$2d;
 
 	var submitPlcOperation = {};
 
@@ -23778,12 +24358,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$27 = dist;
-	function toKnownErr$25(e) {
-	  if (e instanceof xrpc_1$27.XRPCError) ;
+	const xrpc_1$2e = dist;
+	function toKnownErr$2c(e) {
+	  if (e instanceof xrpc_1$2e.XRPCError) ;
 	  return e;
 	}
-	submitPlcOperation.toKnownErr = toKnownErr$25;
+	submitPlcOperation.toKnownErr = toKnownErr$2c;
 
 	var updateHandle = {};
 
@@ -23794,12 +24374,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$26 = dist;
-	function toKnownErr$24(e) {
-	  if (e instanceof xrpc_1$26.XRPCError) ;
+	const xrpc_1$2d = dist;
+	function toKnownErr$2b(e) {
+	  if (e instanceof xrpc_1$2d.XRPCError) ;
 	  return e;
 	}
-	updateHandle.toKnownErr = toKnownErr$24;
+	updateHandle.toKnownErr = toKnownErr$2b;
 
 	var queryLabels = {};
 
@@ -23810,12 +24390,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$25 = dist;
-	function toKnownErr$23(e) {
-	  if (e instanceof xrpc_1$25.XRPCError) ;
+	const xrpc_1$2c = dist;
+	function toKnownErr$2a(e) {
+	  if (e instanceof xrpc_1$2c.XRPCError) ;
 	  return e;
 	}
-	queryLabels.toKnownErr = toKnownErr$23;
+	queryLabels.toKnownErr = toKnownErr$2a;
 
 	var createReport = {};
 
@@ -23826,12 +24406,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$24 = dist;
-	function toKnownErr$22(e) {
-	  if (e instanceof xrpc_1$24.XRPCError) ;
+	const xrpc_1$2b = dist;
+	function toKnownErr$29(e) {
+	  if (e instanceof xrpc_1$2b.XRPCError) ;
 	  return e;
 	}
-	createReport.toKnownErr = toKnownErr$22;
+	createReport.toKnownErr = toKnownErr$29;
 
 	var applyWrites = {};
 
@@ -23860,44 +24440,44 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$23 = dist;
-	const util_1$N = util$2;
-	const lexicons_1$M = lexicons;
-	let InvalidSwapError$3 = class InvalidSwapError extends xrpc_1$23.XRPCError {
+	const xrpc_1$2a = dist;
+	const util_1$P = util$2;
+	const lexicons_1$O = lexicons;
+	let InvalidSwapError$3 = class InvalidSwapError extends xrpc_1$2a.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	applyWrites.InvalidSwapError = InvalidSwapError$3;
-	function toKnownErr$21(e) {
-	  if (e instanceof xrpc_1$23.XRPCError) {
+	function toKnownErr$28(e) {
+	  if (e instanceof xrpc_1$2a.XRPCError) {
 	    if (e.error === 'InvalidSwap') return new InvalidSwapError$3(e);
 	  }
 	  return e;
 	}
-	applyWrites.toKnownErr = toKnownErr$21;
+	applyWrites.toKnownErr = toKnownErr$28;
 	function isCreate(v) {
-	  return (0, util_1$N.isObj)(v) && (0, util_1$N.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#create';
+	  return (0, util_1$P.isObj)(v) && (0, util_1$P.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#create';
 	}
 	applyWrites.isCreate = isCreate;
 	function validateCreate(v) {
-	  return lexicons_1$M.lexicons.validate('com.atproto.repo.applyWrites#create', v);
+	  return lexicons_1$O.lexicons.validate('com.atproto.repo.applyWrites#create', v);
 	}
 	applyWrites.validateCreate = validateCreate;
 	function isUpdate(v) {
-	  return (0, util_1$N.isObj)(v) && (0, util_1$N.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#update';
+	  return (0, util_1$P.isObj)(v) && (0, util_1$P.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#update';
 	}
 	applyWrites.isUpdate = isUpdate;
 	function validateUpdate(v) {
-	  return lexicons_1$M.lexicons.validate('com.atproto.repo.applyWrites#update', v);
+	  return lexicons_1$O.lexicons.validate('com.atproto.repo.applyWrites#update', v);
 	}
 	applyWrites.validateUpdate = validateUpdate;
 	function isDelete(v) {
-	  return (0, util_1$N.isObj)(v) && (0, util_1$N.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#delete';
+	  return (0, util_1$P.isObj)(v) && (0, util_1$P.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#delete';
 	}
 	applyWrites.isDelete = isDelete;
 	function validateDelete(v) {
-	  return lexicons_1$M.lexicons.validate('com.atproto.repo.applyWrites#delete', v);
+	  return lexicons_1$O.lexicons.validate('com.atproto.repo.applyWrites#delete', v);
 	}
 	applyWrites.validateDelete = validateDelete;
 
@@ -23910,20 +24490,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$22 = dist;
-	let InvalidSwapError$2 = class InvalidSwapError extends xrpc_1$22.XRPCError {
+	const xrpc_1$29 = dist;
+	let InvalidSwapError$2 = class InvalidSwapError extends xrpc_1$29.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	createRecord.InvalidSwapError = InvalidSwapError$2;
-	function toKnownErr$20(e) {
-	  if (e instanceof xrpc_1$22.XRPCError) {
+	function toKnownErr$27(e) {
+	  if (e instanceof xrpc_1$29.XRPCError) {
 	    if (e.error === 'InvalidSwap') return new InvalidSwapError$2(e);
 	  }
 	  return e;
 	}
-	createRecord.toKnownErr = toKnownErr$20;
+	createRecord.toKnownErr = toKnownErr$27;
 
 	var deleteRecord = {};
 
@@ -23934,20 +24514,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$21 = dist;
-	let InvalidSwapError$1 = class InvalidSwapError extends xrpc_1$21.XRPCError {
+	const xrpc_1$28 = dist;
+	let InvalidSwapError$1 = class InvalidSwapError extends xrpc_1$28.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	deleteRecord.InvalidSwapError = InvalidSwapError$1;
-	function toKnownErr$1$(e) {
-	  if (e instanceof xrpc_1$21.XRPCError) {
+	function toKnownErr$26(e) {
+	  if (e instanceof xrpc_1$28.XRPCError) {
 	    if (e.error === 'InvalidSwap') return new InvalidSwapError$1(e);
 	  }
 	  return e;
 	}
-	deleteRecord.toKnownErr = toKnownErr$1$;
+	deleteRecord.toKnownErr = toKnownErr$26;
 
 	var describeRepo = {};
 
@@ -23958,12 +24538,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$20 = dist;
-	function toKnownErr$1_(e) {
-	  if (e instanceof xrpc_1$20.XRPCError) ;
+	const xrpc_1$27 = dist;
+	function toKnownErr$25(e) {
+	  if (e instanceof xrpc_1$27.XRPCError) ;
 	  return e;
 	}
-	describeRepo.toKnownErr = toKnownErr$1_;
+	describeRepo.toKnownErr = toKnownErr$25;
 
 	var getRecord$2 = {};
 
@@ -23974,12 +24554,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1$ = dist;
-	function toKnownErr$1Z(e) {
-	  if (e instanceof xrpc_1$1$.XRPCError) ;
+	const xrpc_1$26 = dist;
+	function toKnownErr$24(e) {
+	  if (e instanceof xrpc_1$26.XRPCError) ;
 	  return e;
 	}
-	getRecord$2.toKnownErr = toKnownErr$1Z;
+	getRecord$2.toKnownErr = toKnownErr$24;
 
 	var importRepo = {};
 
@@ -23990,12 +24570,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1_ = dist;
-	function toKnownErr$1Y(e) {
-	  if (e instanceof xrpc_1$1_.XRPCError) ;
+	const xrpc_1$25 = dist;
+	function toKnownErr$23(e) {
+	  if (e instanceof xrpc_1$25.XRPCError) ;
 	  return e;
 	}
-	importRepo.toKnownErr = toKnownErr$1Y;
+	importRepo.toKnownErr = toKnownErr$23;
 
 	var listMissingBlobs = {};
 
@@ -24006,20 +24586,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1Z = dist;
-	const util_1$M = util$2;
-	const lexicons_1$L = lexicons;
-	function toKnownErr$1X(e) {
-	  if (e instanceof xrpc_1$1Z.XRPCError) ;
+	const xrpc_1$24 = dist;
+	const util_1$O = util$2;
+	const lexicons_1$N = lexicons;
+	function toKnownErr$22(e) {
+	  if (e instanceof xrpc_1$24.XRPCError) ;
 	  return e;
 	}
-	listMissingBlobs.toKnownErr = toKnownErr$1X;
+	listMissingBlobs.toKnownErr = toKnownErr$22;
 	function isRecordBlob(v) {
-	  return (0, util_1$M.isObj)(v) && (0, util_1$M.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.listMissingBlobs#recordBlob';
+	  return (0, util_1$O.isObj)(v) && (0, util_1$O.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.listMissingBlobs#recordBlob';
 	}
 	listMissingBlobs.isRecordBlob = isRecordBlob;
 	function validateRecordBlob(v) {
-	  return lexicons_1$L.lexicons.validate('com.atproto.repo.listMissingBlobs#recordBlob', v);
+	  return lexicons_1$N.lexicons.validate('com.atproto.repo.listMissingBlobs#recordBlob', v);
 	}
 	listMissingBlobs.validateRecordBlob = validateRecordBlob;
 
@@ -24032,22 +24612,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1Y = dist;
-	const util_1$L = util$2;
-	const lexicons_1$K = lexicons;
-	function toKnownErr$1W(e) {
-	  if (e instanceof xrpc_1$1Y.XRPCError) ;
+	const xrpc_1$23 = dist;
+	const util_1$N = util$2;
+	const lexicons_1$M = lexicons;
+	function toKnownErr$21(e) {
+	  if (e instanceof xrpc_1$23.XRPCError) ;
 	  return e;
 	}
-	listRecords.toKnownErr = toKnownErr$1W;
-	function isRecord$d(v) {
-	  return (0, util_1$L.isObj)(v) && (0, util_1$L.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.listRecords#record';
+	listRecords.toKnownErr = toKnownErr$21;
+	function isRecord$e(v) {
+	  return (0, util_1$N.isObj)(v) && (0, util_1$N.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.listRecords#record';
 	}
-	listRecords.isRecord = isRecord$d;
-	function validateRecord$d(v) {
-	  return lexicons_1$K.lexicons.validate('com.atproto.repo.listRecords#record', v);
+	listRecords.isRecord = isRecord$e;
+	function validateRecord$e(v) {
+	  return lexicons_1$M.lexicons.validate('com.atproto.repo.listRecords#record', v);
 	}
-	listRecords.validateRecord = validateRecord$d;
+	listRecords.validateRecord = validateRecord$e;
 
 	var putRecord = {};
 
@@ -24058,20 +24638,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1X = dist;
-	class InvalidSwapError extends xrpc_1$1X.XRPCError {
+	const xrpc_1$22 = dist;
+	class InvalidSwapError extends xrpc_1$22.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	putRecord.InvalidSwapError = InvalidSwapError;
-	function toKnownErr$1V(e) {
-	  if (e instanceof xrpc_1$1X.XRPCError) {
+	function toKnownErr$20(e) {
+	  if (e instanceof xrpc_1$22.XRPCError) {
 	    if (e.error === 'InvalidSwap') return new InvalidSwapError(e);
 	  }
 	  return e;
 	}
-	putRecord.toKnownErr = toKnownErr$1V;
+	putRecord.toKnownErr = toKnownErr$20;
 
 	var uploadBlob = {};
 
@@ -24082,12 +24662,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1W = dist;
-	function toKnownErr$1U(e) {
-	  if (e instanceof xrpc_1$1W.XRPCError) ;
+	const xrpc_1$21 = dist;
+	function toKnownErr$1$(e) {
+	  if (e instanceof xrpc_1$21.XRPCError) ;
 	  return e;
 	}
-	uploadBlob.toKnownErr = toKnownErr$1U;
+	uploadBlob.toKnownErr = toKnownErr$1$;
 
 	var activateAccount = {};
 
@@ -24098,12 +24678,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1V = dist;
-	function toKnownErr$1T(e) {
-	  if (e instanceof xrpc_1$1V.XRPCError) ;
+	const xrpc_1$20 = dist;
+	function toKnownErr$1_(e) {
+	  if (e instanceof xrpc_1$20.XRPCError) ;
 	  return e;
 	}
-	activateAccount.toKnownErr = toKnownErr$1T;
+	activateAccount.toKnownErr = toKnownErr$1_;
 
 	var checkAccountStatus = {};
 
@@ -24114,12 +24694,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1U = dist;
-	function toKnownErr$1S(e) {
-	  if (e instanceof xrpc_1$1U.XRPCError) ;
+	const xrpc_1$1$ = dist;
+	function toKnownErr$1Z(e) {
+	  if (e instanceof xrpc_1$1$.XRPCError) ;
 	  return e;
 	}
-	checkAccountStatus.toKnownErr = toKnownErr$1S;
+	checkAccountStatus.toKnownErr = toKnownErr$1Z;
 
 	var confirmEmail = {};
 
@@ -24130,33 +24710,33 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1T = dist;
-	class AccountNotFoundError extends xrpc_1$1T.XRPCError {
+	const xrpc_1$1_ = dist;
+	class AccountNotFoundError extends xrpc_1$1_.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	confirmEmail.AccountNotFoundError = AccountNotFoundError;
-	let ExpiredTokenError$3 = class ExpiredTokenError extends xrpc_1$1T.XRPCError {
+	let ExpiredTokenError$3 = class ExpiredTokenError extends xrpc_1$1_.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	confirmEmail.ExpiredTokenError = ExpiredTokenError$3;
-	let InvalidTokenError$3 = class InvalidTokenError extends xrpc_1$1T.XRPCError {
+	let InvalidTokenError$3 = class InvalidTokenError extends xrpc_1$1_.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	confirmEmail.InvalidTokenError = InvalidTokenError$3;
-	class InvalidEmailError extends xrpc_1$1T.XRPCError {
+	class InvalidEmailError extends xrpc_1$1_.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	confirmEmail.InvalidEmailError = InvalidEmailError;
-	function toKnownErr$1R(e) {
-	  if (e instanceof xrpc_1$1T.XRPCError) {
+	function toKnownErr$1Y(e) {
+	  if (e instanceof xrpc_1$1_.XRPCError) {
 	    if (e.error === 'AccountNotFound') return new AccountNotFoundError(e);
 	    if (e.error === 'ExpiredToken') return new ExpiredTokenError$3(e);
 	    if (e.error === 'InvalidToken') return new InvalidTokenError$3(e);
@@ -24164,7 +24744,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	confirmEmail.toKnownErr = toKnownErr$1R;
+	confirmEmail.toKnownErr = toKnownErr$1Y;
 
 	var createAccount = {};
 
@@ -24175,51 +24755,51 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1S = dist;
-	class InvalidHandleError extends xrpc_1$1S.XRPCError {
+	const xrpc_1$1Z = dist;
+	class InvalidHandleError extends xrpc_1$1Z.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.InvalidHandleError = InvalidHandleError;
-	class InvalidPasswordError extends xrpc_1$1S.XRPCError {
+	class InvalidPasswordError extends xrpc_1$1Z.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.InvalidPasswordError = InvalidPasswordError;
-	class InvalidInviteCodeError extends xrpc_1$1S.XRPCError {
+	class InvalidInviteCodeError extends xrpc_1$1Z.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.InvalidInviteCodeError = InvalidInviteCodeError;
-	class HandleNotAvailableError extends xrpc_1$1S.XRPCError {
+	class HandleNotAvailableError extends xrpc_1$1Z.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.HandleNotAvailableError = HandleNotAvailableError;
-	class UnsupportedDomainError extends xrpc_1$1S.XRPCError {
+	class UnsupportedDomainError extends xrpc_1$1Z.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.UnsupportedDomainError = UnsupportedDomainError;
-	class UnresolvableDidError extends xrpc_1$1S.XRPCError {
+	class UnresolvableDidError extends xrpc_1$1Z.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.UnresolvableDidError = UnresolvableDidError;
-	class IncompatibleDidDocError extends xrpc_1$1S.XRPCError {
+	class IncompatibleDidDocError extends xrpc_1$1Z.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createAccount.IncompatibleDidDocError = IncompatibleDidDocError;
-	function toKnownErr$1Q(e) {
-	  if (e instanceof xrpc_1$1S.XRPCError) {
+	function toKnownErr$1X(e) {
+	  if (e instanceof xrpc_1$1Z.XRPCError) {
 	    if (e.error === 'InvalidHandle') return new InvalidHandleError(e);
 	    if (e.error === 'InvalidPassword') return new InvalidPasswordError(e);
 	    if (e.error === 'InvalidInviteCode') return new InvalidInviteCodeError(e);
@@ -24230,7 +24810,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	createAccount.toKnownErr = toKnownErr$1Q;
+	createAccount.toKnownErr = toKnownErr$1X;
 
 	var createAppPassword = {};
 
@@ -24241,28 +24821,28 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1R = dist;
-	const util_1$K = util$2;
-	const lexicons_1$J = lexicons;
-	let AccountTakedownError$3 = class AccountTakedownError extends xrpc_1$1R.XRPCError {
+	const xrpc_1$1Y = dist;
+	const util_1$M = util$2;
+	const lexicons_1$L = lexicons;
+	let AccountTakedownError$3 = class AccountTakedownError extends xrpc_1$1Y.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	createAppPassword.AccountTakedownError = AccountTakedownError$3;
-	function toKnownErr$1P(e) {
-	  if (e instanceof xrpc_1$1R.XRPCError) {
+	function toKnownErr$1W(e) {
+	  if (e instanceof xrpc_1$1Y.XRPCError) {
 	    if (e.error === 'AccountTakedown') return new AccountTakedownError$3(e);
 	  }
 	  return e;
 	}
-	createAppPassword.toKnownErr = toKnownErr$1P;
+	createAppPassword.toKnownErr = toKnownErr$1W;
 	function isAppPassword$1(v) {
-	  return (0, util_1$K.isObj)(v) && (0, util_1$K.hasProp)(v, '$type') && v.$type === 'com.atproto.server.createAppPassword#appPassword';
+	  return (0, util_1$M.isObj)(v) && (0, util_1$M.hasProp)(v, '$type') && v.$type === 'com.atproto.server.createAppPassword#appPassword';
 	}
 	createAppPassword.isAppPassword = isAppPassword$1;
 	function validateAppPassword$1(v) {
-	  return lexicons_1$J.lexicons.validate('com.atproto.server.createAppPassword#appPassword', v);
+	  return lexicons_1$L.lexicons.validate('com.atproto.server.createAppPassword#appPassword', v);
 	}
 	createAppPassword.validateAppPassword = validateAppPassword$1;
 
@@ -24275,12 +24855,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1Q = dist;
-	function toKnownErr$1O(e) {
-	  if (e instanceof xrpc_1$1Q.XRPCError) ;
+	const xrpc_1$1X = dist;
+	function toKnownErr$1V(e) {
+	  if (e instanceof xrpc_1$1X.XRPCError) ;
 	  return e;
 	}
-	createInviteCode.toKnownErr = toKnownErr$1O;
+	createInviteCode.toKnownErr = toKnownErr$1V;
 
 	var createInviteCodes = {};
 
@@ -24291,20 +24871,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1P = dist;
-	const util_1$J = util$2;
-	const lexicons_1$I = lexicons;
-	function toKnownErr$1N(e) {
-	  if (e instanceof xrpc_1$1P.XRPCError) ;
+	const xrpc_1$1W = dist;
+	const util_1$L = util$2;
+	const lexicons_1$K = lexicons;
+	function toKnownErr$1U(e) {
+	  if (e instanceof xrpc_1$1W.XRPCError) ;
 	  return e;
 	}
-	createInviteCodes.toKnownErr = toKnownErr$1N;
+	createInviteCodes.toKnownErr = toKnownErr$1U;
 	function isAccountCodes(v) {
-	  return (0, util_1$J.isObj)(v) && (0, util_1$J.hasProp)(v, '$type') && v.$type === 'com.atproto.server.createInviteCodes#accountCodes';
+	  return (0, util_1$L.isObj)(v) && (0, util_1$L.hasProp)(v, '$type') && v.$type === 'com.atproto.server.createInviteCodes#accountCodes';
 	}
 	createInviteCodes.isAccountCodes = isAccountCodes;
 	function validateAccountCodes(v) {
-	  return lexicons_1$I.lexicons.validate('com.atproto.server.createInviteCodes#accountCodes', v);
+	  return lexicons_1$K.lexicons.validate('com.atproto.server.createInviteCodes#accountCodes', v);
 	}
 	createInviteCodes.validateAccountCodes = validateAccountCodes;
 
@@ -24317,27 +24897,27 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1O = dist;
-	let AccountTakedownError$2 = class AccountTakedownError extends xrpc_1$1O.XRPCError {
+	const xrpc_1$1V = dist;
+	let AccountTakedownError$2 = class AccountTakedownError extends xrpc_1$1V.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	createSession.AccountTakedownError = AccountTakedownError$2;
-	class AuthFactorTokenRequiredError extends xrpc_1$1O.XRPCError {
+	class AuthFactorTokenRequiredError extends xrpc_1$1V.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	createSession.AuthFactorTokenRequiredError = AuthFactorTokenRequiredError;
-	function toKnownErr$1M(e) {
-	  if (e instanceof xrpc_1$1O.XRPCError) {
+	function toKnownErr$1T(e) {
+	  if (e instanceof xrpc_1$1V.XRPCError) {
 	    if (e.error === 'AccountTakedown') return new AccountTakedownError$2(e);
 	    if (e.error === 'AuthFactorTokenRequired') return new AuthFactorTokenRequiredError(e);
 	  }
 	  return e;
 	}
-	createSession.toKnownErr = toKnownErr$1M;
+	createSession.toKnownErr = toKnownErr$1T;
 
 	var deactivateAccount = {};
 
@@ -24348,12 +24928,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1N = dist;
-	function toKnownErr$1L(e) {
-	  if (e instanceof xrpc_1$1N.XRPCError) ;
+	const xrpc_1$1U = dist;
+	function toKnownErr$1S(e) {
+	  if (e instanceof xrpc_1$1U.XRPCError) ;
 	  return e;
 	}
-	deactivateAccount.toKnownErr = toKnownErr$1L;
+	deactivateAccount.toKnownErr = toKnownErr$1S;
 
 	var deleteAccount$1 = {};
 
@@ -24364,27 +24944,27 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1M = dist;
-	let ExpiredTokenError$2 = class ExpiredTokenError extends xrpc_1$1M.XRPCError {
+	const xrpc_1$1T = dist;
+	let ExpiredTokenError$2 = class ExpiredTokenError extends xrpc_1$1T.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	deleteAccount$1.ExpiredTokenError = ExpiredTokenError$2;
-	let InvalidTokenError$2 = class InvalidTokenError extends xrpc_1$1M.XRPCError {
+	let InvalidTokenError$2 = class InvalidTokenError extends xrpc_1$1T.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	deleteAccount$1.InvalidTokenError = InvalidTokenError$2;
-	function toKnownErr$1K(e) {
-	  if (e instanceof xrpc_1$1M.XRPCError) {
+	function toKnownErr$1R(e) {
+	  if (e instanceof xrpc_1$1T.XRPCError) {
 	    if (e.error === 'ExpiredToken') return new ExpiredTokenError$2(e);
 	    if (e.error === 'InvalidToken') return new InvalidTokenError$2(e);
 	  }
 	  return e;
 	}
-	deleteAccount$1.toKnownErr = toKnownErr$1K;
+	deleteAccount$1.toKnownErr = toKnownErr$1R;
 
 	var deleteSession = {};
 
@@ -24395,12 +24975,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1L = dist;
-	function toKnownErr$1J(e) {
-	  if (e instanceof xrpc_1$1L.XRPCError) ;
+	const xrpc_1$1S = dist;
+	function toKnownErr$1Q(e) {
+	  if (e instanceof xrpc_1$1S.XRPCError) ;
 	  return e;
 	}
-	deleteSession.toKnownErr = toKnownErr$1J;
+	deleteSession.toKnownErr = toKnownErr$1Q;
 
 	var describeServer = {};
 
@@ -24411,28 +24991,28 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1K = dist;
-	const util_1$I = util$2;
-	const lexicons_1$H = lexicons;
-	function toKnownErr$1I(e) {
-	  if (e instanceof xrpc_1$1K.XRPCError) ;
+	const xrpc_1$1R = dist;
+	const util_1$K = util$2;
+	const lexicons_1$J = lexicons;
+	function toKnownErr$1P(e) {
+	  if (e instanceof xrpc_1$1R.XRPCError) ;
 	  return e;
 	}
-	describeServer.toKnownErr = toKnownErr$1I;
+	describeServer.toKnownErr = toKnownErr$1P;
 	function isLinks$1(v) {
-	  return (0, util_1$I.isObj)(v) && (0, util_1$I.hasProp)(v, '$type') && v.$type === 'com.atproto.server.describeServer#links';
+	  return (0, util_1$K.isObj)(v) && (0, util_1$K.hasProp)(v, '$type') && v.$type === 'com.atproto.server.describeServer#links';
 	}
 	describeServer.isLinks = isLinks$1;
 	function validateLinks$1(v) {
-	  return lexicons_1$H.lexicons.validate('com.atproto.server.describeServer#links', v);
+	  return lexicons_1$J.lexicons.validate('com.atproto.server.describeServer#links', v);
 	}
 	describeServer.validateLinks = validateLinks$1;
 	function isContact(v) {
-	  return (0, util_1$I.isObj)(v) && (0, util_1$I.hasProp)(v, '$type') && v.$type === 'com.atproto.server.describeServer#contact';
+	  return (0, util_1$K.isObj)(v) && (0, util_1$K.hasProp)(v, '$type') && v.$type === 'com.atproto.server.describeServer#contact';
 	}
 	describeServer.isContact = isContact;
 	function validateContact(v) {
-	  return lexicons_1$H.lexicons.validate('com.atproto.server.describeServer#contact', v);
+	  return lexicons_1$J.lexicons.validate('com.atproto.server.describeServer#contact', v);
 	}
 	describeServer.validateContact = validateContact;
 
@@ -24445,20 +25025,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1J = dist;
-	class DuplicateCreateError extends xrpc_1$1J.XRPCError {
+	const xrpc_1$1Q = dist;
+	class DuplicateCreateError extends xrpc_1$1Q.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getAccountInviteCodes.DuplicateCreateError = DuplicateCreateError;
-	function toKnownErr$1H(e) {
-	  if (e instanceof xrpc_1$1J.XRPCError) {
+	function toKnownErr$1O(e) {
+	  if (e instanceof xrpc_1$1Q.XRPCError) {
 	    if (e.error === 'DuplicateCreate') return new DuplicateCreateError(e);
 	  }
 	  return e;
 	}
-	getAccountInviteCodes.toKnownErr = toKnownErr$1H;
+	getAccountInviteCodes.toKnownErr = toKnownErr$1O;
 
 	var getServiceAuth = {};
 
@@ -24469,12 +25049,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1I = dist;
-	function toKnownErr$1G(e) {
-	  if (e instanceof xrpc_1$1I.XRPCError) ;
+	const xrpc_1$1P = dist;
+	function toKnownErr$1N(e) {
+	  if (e instanceof xrpc_1$1P.XRPCError) ;
 	  return e;
 	}
-	getServiceAuth.toKnownErr = toKnownErr$1G;
+	getServiceAuth.toKnownErr = toKnownErr$1N;
 
 	var getSession = {};
 
@@ -24485,12 +25065,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1H = dist;
-	function toKnownErr$1F(e) {
-	  if (e instanceof xrpc_1$1H.XRPCError) ;
+	const xrpc_1$1O = dist;
+	function toKnownErr$1M(e) {
+	  if (e instanceof xrpc_1$1O.XRPCError) ;
 	  return e;
 	}
-	getSession.toKnownErr = toKnownErr$1F;
+	getSession.toKnownErr = toKnownErr$1M;
 
 	var listAppPasswords = {};
 
@@ -24501,28 +25081,28 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1G = dist;
-	const util_1$H = util$2;
-	const lexicons_1$G = lexicons;
-	let AccountTakedownError$1 = class AccountTakedownError extends xrpc_1$1G.XRPCError {
+	const xrpc_1$1N = dist;
+	const util_1$J = util$2;
+	const lexicons_1$I = lexicons;
+	let AccountTakedownError$1 = class AccountTakedownError extends xrpc_1$1N.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	listAppPasswords.AccountTakedownError = AccountTakedownError$1;
-	function toKnownErr$1E(e) {
-	  if (e instanceof xrpc_1$1G.XRPCError) {
+	function toKnownErr$1L(e) {
+	  if (e instanceof xrpc_1$1N.XRPCError) {
 	    if (e.error === 'AccountTakedown') return new AccountTakedownError$1(e);
 	  }
 	  return e;
 	}
-	listAppPasswords.toKnownErr = toKnownErr$1E;
+	listAppPasswords.toKnownErr = toKnownErr$1L;
 	function isAppPassword(v) {
-	  return (0, util_1$H.isObj)(v) && (0, util_1$H.hasProp)(v, '$type') && v.$type === 'com.atproto.server.listAppPasswords#appPassword';
+	  return (0, util_1$J.isObj)(v) && (0, util_1$J.hasProp)(v, '$type') && v.$type === 'com.atproto.server.listAppPasswords#appPassword';
 	}
 	listAppPasswords.isAppPassword = isAppPassword;
 	function validateAppPassword(v) {
-	  return lexicons_1$G.lexicons.validate('com.atproto.server.listAppPasswords#appPassword', v);
+	  return lexicons_1$I.lexicons.validate('com.atproto.server.listAppPasswords#appPassword', v);
 	}
 	listAppPasswords.validateAppPassword = validateAppPassword;
 
@@ -24535,20 +25115,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1F = dist;
-	class AccountTakedownError extends xrpc_1$1F.XRPCError {
+	const xrpc_1$1M = dist;
+	class AccountTakedownError extends xrpc_1$1M.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	refreshSession.AccountTakedownError = AccountTakedownError;
-	function toKnownErr$1D(e) {
-	  if (e instanceof xrpc_1$1F.XRPCError) {
+	function toKnownErr$1K(e) {
+	  if (e instanceof xrpc_1$1M.XRPCError) {
 	    if (e.error === 'AccountTakedown') return new AccountTakedownError(e);
 	  }
 	  return e;
 	}
-	refreshSession.toKnownErr = toKnownErr$1D;
+	refreshSession.toKnownErr = toKnownErr$1K;
 
 	var requestAccountDelete = {};
 
@@ -24559,12 +25139,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1E = dist;
-	function toKnownErr$1C(e) {
-	  if (e instanceof xrpc_1$1E.XRPCError) ;
+	const xrpc_1$1L = dist;
+	function toKnownErr$1J(e) {
+	  if (e instanceof xrpc_1$1L.XRPCError) ;
 	  return e;
 	}
-	requestAccountDelete.toKnownErr = toKnownErr$1C;
+	requestAccountDelete.toKnownErr = toKnownErr$1J;
 
 	var requestEmailConfirmation = {};
 
@@ -24575,12 +25155,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1D = dist;
-	function toKnownErr$1B(e) {
-	  if (e instanceof xrpc_1$1D.XRPCError) ;
+	const xrpc_1$1K = dist;
+	function toKnownErr$1I(e) {
+	  if (e instanceof xrpc_1$1K.XRPCError) ;
 	  return e;
 	}
-	requestEmailConfirmation.toKnownErr = toKnownErr$1B;
+	requestEmailConfirmation.toKnownErr = toKnownErr$1I;
 
 	var requestEmailUpdate = {};
 
@@ -24591,12 +25171,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1C = dist;
-	function toKnownErr$1A(e) {
-	  if (e instanceof xrpc_1$1C.XRPCError) ;
+	const xrpc_1$1J = dist;
+	function toKnownErr$1H(e) {
+	  if (e instanceof xrpc_1$1J.XRPCError) ;
 	  return e;
 	}
-	requestEmailUpdate.toKnownErr = toKnownErr$1A;
+	requestEmailUpdate.toKnownErr = toKnownErr$1H;
 
 	var requestPasswordReset = {};
 
@@ -24607,12 +25187,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1B = dist;
-	function toKnownErr$1z(e) {
-	  if (e instanceof xrpc_1$1B.XRPCError) ;
+	const xrpc_1$1I = dist;
+	function toKnownErr$1G(e) {
+	  if (e instanceof xrpc_1$1I.XRPCError) ;
 	  return e;
 	}
-	requestPasswordReset.toKnownErr = toKnownErr$1z;
+	requestPasswordReset.toKnownErr = toKnownErr$1G;
 
 	var reserveSigningKey = {};
 
@@ -24623,12 +25203,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1A = dist;
-	function toKnownErr$1y(e) {
-	  if (e instanceof xrpc_1$1A.XRPCError) ;
+	const xrpc_1$1H = dist;
+	function toKnownErr$1F(e) {
+	  if (e instanceof xrpc_1$1H.XRPCError) ;
 	  return e;
 	}
-	reserveSigningKey.toKnownErr = toKnownErr$1y;
+	reserveSigningKey.toKnownErr = toKnownErr$1F;
 
 	var resetPassword = {};
 
@@ -24639,27 +25219,27 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1z = dist;
-	let ExpiredTokenError$1 = class ExpiredTokenError extends xrpc_1$1z.XRPCError {
+	const xrpc_1$1G = dist;
+	let ExpiredTokenError$1 = class ExpiredTokenError extends xrpc_1$1G.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	resetPassword.ExpiredTokenError = ExpiredTokenError$1;
-	let InvalidTokenError$1 = class InvalidTokenError extends xrpc_1$1z.XRPCError {
+	let InvalidTokenError$1 = class InvalidTokenError extends xrpc_1$1G.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	resetPassword.InvalidTokenError = InvalidTokenError$1;
-	function toKnownErr$1x(e) {
-	  if (e instanceof xrpc_1$1z.XRPCError) {
+	function toKnownErr$1E(e) {
+	  if (e instanceof xrpc_1$1G.XRPCError) {
 	    if (e.error === 'ExpiredToken') return new ExpiredTokenError$1(e);
 	    if (e.error === 'InvalidToken') return new InvalidTokenError$1(e);
 	  }
 	  return e;
 	}
-	resetPassword.toKnownErr = toKnownErr$1x;
+	resetPassword.toKnownErr = toKnownErr$1E;
 
 	var revokeAppPassword = {};
 
@@ -24670,12 +25250,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1y = dist;
-	function toKnownErr$1w(e) {
-	  if (e instanceof xrpc_1$1y.XRPCError) ;
+	const xrpc_1$1F = dist;
+	function toKnownErr$1D(e) {
+	  if (e instanceof xrpc_1$1F.XRPCError) ;
 	  return e;
 	}
-	revokeAppPassword.toKnownErr = toKnownErr$1w;
+	revokeAppPassword.toKnownErr = toKnownErr$1D;
 
 	var updateEmail = {};
 
@@ -24686,34 +25266,34 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1x = dist;
-	class ExpiredTokenError extends xrpc_1$1x.XRPCError {
+	const xrpc_1$1E = dist;
+	class ExpiredTokenError extends xrpc_1$1E.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	updateEmail.ExpiredTokenError = ExpiredTokenError;
-	class InvalidTokenError extends xrpc_1$1x.XRPCError {
+	class InvalidTokenError extends xrpc_1$1E.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	updateEmail.InvalidTokenError = InvalidTokenError;
-	class TokenRequiredError extends xrpc_1$1x.XRPCError {
+	class TokenRequiredError extends xrpc_1$1E.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	updateEmail.TokenRequiredError = TokenRequiredError;
-	function toKnownErr$1v(e) {
-	  if (e instanceof xrpc_1$1x.XRPCError) {
+	function toKnownErr$1C(e) {
+	  if (e instanceof xrpc_1$1E.XRPCError) {
 	    if (e.error === 'ExpiredToken') return new ExpiredTokenError(e);
 	    if (e.error === 'InvalidToken') return new InvalidTokenError(e);
 	    if (e.error === 'TokenRequired') return new TokenRequiredError(e);
 	  }
 	  return e;
 	}
-	updateEmail.toKnownErr = toKnownErr$1v;
+	updateEmail.toKnownErr = toKnownErr$1C;
 
 	var getBlob = {};
 
@@ -24724,39 +25304,39 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1w = dist;
-	class BlobNotFoundError extends xrpc_1$1w.XRPCError {
+	const xrpc_1$1D = dist;
+	class BlobNotFoundError extends xrpc_1$1D.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getBlob.BlobNotFoundError = BlobNotFoundError;
-	let RepoNotFoundError$7 = class RepoNotFoundError extends xrpc_1$1w.XRPCError {
+	let RepoNotFoundError$7 = class RepoNotFoundError extends xrpc_1$1D.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getBlob.RepoNotFoundError = RepoNotFoundError$7;
-	let RepoTakendownError$5 = class RepoTakendownError extends xrpc_1$1w.XRPCError {
+	let RepoTakendownError$5 = class RepoTakendownError extends xrpc_1$1D.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getBlob.RepoTakendownError = RepoTakendownError$5;
-	let RepoSuspendedError$5 = class RepoSuspendedError extends xrpc_1$1w.XRPCError {
+	let RepoSuspendedError$5 = class RepoSuspendedError extends xrpc_1$1D.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getBlob.RepoSuspendedError = RepoSuspendedError$5;
-	let RepoDeactivatedError$5 = class RepoDeactivatedError extends xrpc_1$1w.XRPCError {
+	let RepoDeactivatedError$5 = class RepoDeactivatedError extends xrpc_1$1D.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getBlob.RepoDeactivatedError = RepoDeactivatedError$5;
-	function toKnownErr$1u(e) {
-	  if (e instanceof xrpc_1$1w.XRPCError) {
+	function toKnownErr$1B(e) {
+	  if (e instanceof xrpc_1$1D.XRPCError) {
 	    if (e.error === 'BlobNotFound') return new BlobNotFoundError(e);
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$7(e);
 	    if (e.error === 'RepoTakendown') return new RepoTakendownError$5(e);
@@ -24765,7 +25345,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	getBlob.toKnownErr = toKnownErr$1u;
+	getBlob.toKnownErr = toKnownErr$1B;
 
 	var getBlocks$1 = {};
 
@@ -24776,39 +25356,39 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1v = dist;
-	class BlockNotFoundError extends xrpc_1$1v.XRPCError {
+	const xrpc_1$1C = dist;
+	class BlockNotFoundError extends xrpc_1$1C.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getBlocks$1.BlockNotFoundError = BlockNotFoundError;
-	let RepoNotFoundError$6 = class RepoNotFoundError extends xrpc_1$1v.XRPCError {
+	let RepoNotFoundError$6 = class RepoNotFoundError extends xrpc_1$1C.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getBlocks$1.RepoNotFoundError = RepoNotFoundError$6;
-	let RepoTakendownError$4 = class RepoTakendownError extends xrpc_1$1v.XRPCError {
+	let RepoTakendownError$4 = class RepoTakendownError extends xrpc_1$1C.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getBlocks$1.RepoTakendownError = RepoTakendownError$4;
-	let RepoSuspendedError$4 = class RepoSuspendedError extends xrpc_1$1v.XRPCError {
+	let RepoSuspendedError$4 = class RepoSuspendedError extends xrpc_1$1C.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getBlocks$1.RepoSuspendedError = RepoSuspendedError$4;
-	let RepoDeactivatedError$4 = class RepoDeactivatedError extends xrpc_1$1v.XRPCError {
+	let RepoDeactivatedError$4 = class RepoDeactivatedError extends xrpc_1$1C.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getBlocks$1.RepoDeactivatedError = RepoDeactivatedError$4;
-	function toKnownErr$1t(e) {
-	  if (e instanceof xrpc_1$1v.XRPCError) {
+	function toKnownErr$1A(e) {
+	  if (e instanceof xrpc_1$1C.XRPCError) {
 	    if (e.error === 'BlockNotFound') return new BlockNotFoundError(e);
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$6(e);
 	    if (e.error === 'RepoTakendown') return new RepoTakendownError$4(e);
@@ -24817,7 +25397,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	getBlocks$1.toKnownErr = toKnownErr$1t;
+	getBlocks$1.toKnownErr = toKnownErr$1A;
 
 	var getCheckout = {};
 
@@ -24828,12 +25408,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1u = dist;
-	function toKnownErr$1s(e) {
-	  if (e instanceof xrpc_1$1u.XRPCError) ;
+	const xrpc_1$1B = dist;
+	function toKnownErr$1z(e) {
+	  if (e instanceof xrpc_1$1B.XRPCError) ;
 	  return e;
 	}
-	getCheckout.toKnownErr = toKnownErr$1s;
+	getCheckout.toKnownErr = toKnownErr$1z;
 
 	var getHead = {};
 
@@ -24844,20 +25424,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1t = dist;
-	class HeadNotFoundError extends xrpc_1$1t.XRPCError {
+	const xrpc_1$1A = dist;
+	class HeadNotFoundError extends xrpc_1$1A.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getHead.HeadNotFoundError = HeadNotFoundError;
-	function toKnownErr$1r(e) {
-	  if (e instanceof xrpc_1$1t.XRPCError) {
+	function toKnownErr$1y(e) {
+	  if (e instanceof xrpc_1$1A.XRPCError) {
 	    if (e.error === 'HeadNotFound') return new HeadNotFoundError(e);
 	  }
 	  return e;
 	}
-	getHead.toKnownErr = toKnownErr$1r;
+	getHead.toKnownErr = toKnownErr$1y;
 
 	var getLatestCommit = {};
 
@@ -24868,33 +25448,33 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1s = dist;
-	let RepoNotFoundError$5 = class RepoNotFoundError extends xrpc_1$1s.XRPCError {
+	const xrpc_1$1z = dist;
+	let RepoNotFoundError$5 = class RepoNotFoundError extends xrpc_1$1z.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getLatestCommit.RepoNotFoundError = RepoNotFoundError$5;
-	let RepoTakendownError$3 = class RepoTakendownError extends xrpc_1$1s.XRPCError {
+	let RepoTakendownError$3 = class RepoTakendownError extends xrpc_1$1z.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getLatestCommit.RepoTakendownError = RepoTakendownError$3;
-	let RepoSuspendedError$3 = class RepoSuspendedError extends xrpc_1$1s.XRPCError {
+	let RepoSuspendedError$3 = class RepoSuspendedError extends xrpc_1$1z.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getLatestCommit.RepoSuspendedError = RepoSuspendedError$3;
-	let RepoDeactivatedError$3 = class RepoDeactivatedError extends xrpc_1$1s.XRPCError {
+	let RepoDeactivatedError$3 = class RepoDeactivatedError extends xrpc_1$1z.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getLatestCommit.RepoDeactivatedError = RepoDeactivatedError$3;
-	function toKnownErr$1q(e) {
-	  if (e instanceof xrpc_1$1s.XRPCError) {
+	function toKnownErr$1x(e) {
+	  if (e instanceof xrpc_1$1z.XRPCError) {
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$5(e);
 	    if (e.error === 'RepoTakendown') return new RepoTakendownError$3(e);
 	    if (e.error === 'RepoSuspended') return new RepoSuspendedError$3(e);
@@ -24902,7 +25482,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	getLatestCommit.toKnownErr = toKnownErr$1q;
+	getLatestCommit.toKnownErr = toKnownErr$1x;
 
 	var getRecord$1 = {};
 
@@ -24913,39 +25493,39 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1r = dist;
-	let RecordNotFoundError$1 = class RecordNotFoundError extends xrpc_1$1r.XRPCError {
+	const xrpc_1$1y = dist;
+	let RecordNotFoundError$1 = class RecordNotFoundError extends xrpc_1$1y.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRecord$1.RecordNotFoundError = RecordNotFoundError$1;
-	let RepoNotFoundError$4 = class RepoNotFoundError extends xrpc_1$1r.XRPCError {
+	let RepoNotFoundError$4 = class RepoNotFoundError extends xrpc_1$1y.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRecord$1.RepoNotFoundError = RepoNotFoundError$4;
-	let RepoTakendownError$2 = class RepoTakendownError extends xrpc_1$1r.XRPCError {
+	let RepoTakendownError$2 = class RepoTakendownError extends xrpc_1$1y.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRecord$1.RepoTakendownError = RepoTakendownError$2;
-	let RepoSuspendedError$2 = class RepoSuspendedError extends xrpc_1$1r.XRPCError {
+	let RepoSuspendedError$2 = class RepoSuspendedError extends xrpc_1$1y.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRecord$1.RepoSuspendedError = RepoSuspendedError$2;
-	let RepoDeactivatedError$2 = class RepoDeactivatedError extends xrpc_1$1r.XRPCError {
+	let RepoDeactivatedError$2 = class RepoDeactivatedError extends xrpc_1$1y.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRecord$1.RepoDeactivatedError = RepoDeactivatedError$2;
-	function toKnownErr$1p(e) {
-	  if (e instanceof xrpc_1$1r.XRPCError) {
+	function toKnownErr$1w(e) {
+	  if (e instanceof xrpc_1$1y.XRPCError) {
 	    if (e.error === 'RecordNotFound') return new RecordNotFoundError$1(e);
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$4(e);
 	    if (e.error === 'RepoTakendown') return new RepoTakendownError$2(e);
@@ -24954,7 +25534,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	getRecord$1.toKnownErr = toKnownErr$1p;
+	getRecord$1.toKnownErr = toKnownErr$1w;
 
 	var getRepo$1 = {};
 
@@ -24965,33 +25545,33 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1q = dist;
-	let RepoNotFoundError$3 = class RepoNotFoundError extends xrpc_1$1q.XRPCError {
+	const xrpc_1$1x = dist;
+	let RepoNotFoundError$3 = class RepoNotFoundError extends xrpc_1$1x.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRepo$1.RepoNotFoundError = RepoNotFoundError$3;
-	let RepoTakendownError$1 = class RepoTakendownError extends xrpc_1$1q.XRPCError {
+	let RepoTakendownError$1 = class RepoTakendownError extends xrpc_1$1x.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRepo$1.RepoTakendownError = RepoTakendownError$1;
-	let RepoSuspendedError$1 = class RepoSuspendedError extends xrpc_1$1q.XRPCError {
+	let RepoSuspendedError$1 = class RepoSuspendedError extends xrpc_1$1x.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRepo$1.RepoSuspendedError = RepoSuspendedError$1;
-	let RepoDeactivatedError$1 = class RepoDeactivatedError extends xrpc_1$1q.XRPCError {
+	let RepoDeactivatedError$1 = class RepoDeactivatedError extends xrpc_1$1x.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRepo$1.RepoDeactivatedError = RepoDeactivatedError$1;
-	function toKnownErr$1o(e) {
-	  if (e instanceof xrpc_1$1q.XRPCError) {
+	function toKnownErr$1v(e) {
+	  if (e instanceof xrpc_1$1x.XRPCError) {
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$3(e);
 	    if (e.error === 'RepoTakendown') return new RepoTakendownError$1(e);
 	    if (e.error === 'RepoSuspended') return new RepoSuspendedError$1(e);
@@ -24999,7 +25579,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	getRepo$1.toKnownErr = toKnownErr$1o;
+	getRepo$1.toKnownErr = toKnownErr$1v;
 
 	var getRepoStatus = {};
 
@@ -25010,20 +25590,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1p = dist;
-	let RepoNotFoundError$2 = class RepoNotFoundError extends xrpc_1$1p.XRPCError {
+	const xrpc_1$1w = dist;
+	let RepoNotFoundError$2 = class RepoNotFoundError extends xrpc_1$1w.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getRepoStatus.RepoNotFoundError = RepoNotFoundError$2;
-	function toKnownErr$1n(e) {
-	  if (e instanceof xrpc_1$1p.XRPCError) {
+	function toKnownErr$1u(e) {
+	  if (e instanceof xrpc_1$1w.XRPCError) {
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$2(e);
 	  }
 	  return e;
 	}
-	getRepoStatus.toKnownErr = toKnownErr$1n;
+	getRepoStatus.toKnownErr = toKnownErr$1u;
 
 	var listBlobs = {};
 
@@ -25034,33 +25614,33 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1o = dist;
-	let RepoNotFoundError$1 = class RepoNotFoundError extends xrpc_1$1o.XRPCError {
+	const xrpc_1$1v = dist;
+	let RepoNotFoundError$1 = class RepoNotFoundError extends xrpc_1$1v.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	listBlobs.RepoNotFoundError = RepoNotFoundError$1;
-	class RepoTakendownError extends xrpc_1$1o.XRPCError {
+	class RepoTakendownError extends xrpc_1$1v.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	listBlobs.RepoTakendownError = RepoTakendownError;
-	class RepoSuspendedError extends xrpc_1$1o.XRPCError {
+	class RepoSuspendedError extends xrpc_1$1v.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	listBlobs.RepoSuspendedError = RepoSuspendedError;
-	class RepoDeactivatedError extends xrpc_1$1o.XRPCError {
+	class RepoDeactivatedError extends xrpc_1$1v.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	listBlobs.RepoDeactivatedError = RepoDeactivatedError;
-	function toKnownErr$1m(e) {
-	  if (e instanceof xrpc_1$1o.XRPCError) {
+	function toKnownErr$1t(e) {
+	  if (e instanceof xrpc_1$1v.XRPCError) {
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$1(e);
 	    if (e.error === 'RepoTakendown') return new RepoTakendownError(e);
 	    if (e.error === 'RepoSuspended') return new RepoSuspendedError(e);
@@ -25068,7 +25648,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	listBlobs.toKnownErr = toKnownErr$1m;
+	listBlobs.toKnownErr = toKnownErr$1t;
 
 	var listRepos = {};
 
@@ -25079,20 +25659,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1n = dist;
-	const util_1$G = util$2;
-	const lexicons_1$F = lexicons;
-	function toKnownErr$1l(e) {
-	  if (e instanceof xrpc_1$1n.XRPCError) ;
+	const xrpc_1$1u = dist;
+	const util_1$I = util$2;
+	const lexicons_1$H = lexicons;
+	function toKnownErr$1s(e) {
+	  if (e instanceof xrpc_1$1u.XRPCError) ;
 	  return e;
 	}
-	listRepos.toKnownErr = toKnownErr$1l;
+	listRepos.toKnownErr = toKnownErr$1s;
 	function isRepo(v) {
-	  return (0, util_1$G.isObj)(v) && (0, util_1$G.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.listRepos#repo';
+	  return (0, util_1$I.isObj)(v) && (0, util_1$I.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.listRepos#repo';
 	}
 	listRepos.isRepo = isRepo;
 	function validateRepo(v) {
-	  return lexicons_1$F.lexicons.validate('com.atproto.sync.listRepos#repo', v);
+	  return lexicons_1$H.lexicons.validate('com.atproto.sync.listRepos#repo', v);
 	}
 	listRepos.validateRepo = validateRepo;
 
@@ -25105,12 +25685,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1m = dist;
-	function toKnownErr$1k(e) {
-	  if (e instanceof xrpc_1$1m.XRPCError) ;
+	const xrpc_1$1t = dist;
+	function toKnownErr$1r(e) {
+	  if (e instanceof xrpc_1$1t.XRPCError) ;
 	  return e;
 	}
-	notifyOfUpdate.toKnownErr = toKnownErr$1k;
+	notifyOfUpdate.toKnownErr = toKnownErr$1r;
 
 	var requestCrawl = {};
 
@@ -25121,12 +25701,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1l = dist;
-	function toKnownErr$1j(e) {
-	  if (e instanceof xrpc_1$1l.XRPCError) ;
+	const xrpc_1$1s = dist;
+	function toKnownErr$1q(e) {
+	  if (e instanceof xrpc_1$1s.XRPCError) ;
 	  return e;
 	}
-	requestCrawl.toKnownErr = toKnownErr$1j;
+	requestCrawl.toKnownErr = toKnownErr$1q;
 
 	var checkSignupQueue = {};
 
@@ -25137,12 +25717,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1k = dist;
-	function toKnownErr$1i(e) {
-	  if (e instanceof xrpc_1$1k.XRPCError) ;
+	const xrpc_1$1r = dist;
+	function toKnownErr$1p(e) {
+	  if (e instanceof xrpc_1$1r.XRPCError) ;
 	  return e;
 	}
-	checkSignupQueue.toKnownErr = toKnownErr$1i;
+	checkSignupQueue.toKnownErr = toKnownErr$1p;
 
 	var fetchLabels = {};
 
@@ -25153,12 +25733,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1j = dist;
-	function toKnownErr$1h(e) {
-	  if (e instanceof xrpc_1$1j.XRPCError) ;
+	const xrpc_1$1q = dist;
+	function toKnownErr$1o(e) {
+	  if (e instanceof xrpc_1$1q.XRPCError) ;
 	  return e;
 	}
-	fetchLabels.toKnownErr = toKnownErr$1h;
+	fetchLabels.toKnownErr = toKnownErr$1o;
 
 	var requestPhoneVerification = {};
 
@@ -25169,12 +25749,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1i = dist;
-	function toKnownErr$1g(e) {
-	  if (e instanceof xrpc_1$1i.XRPCError) ;
+	const xrpc_1$1p = dist;
+	function toKnownErr$1n(e) {
+	  if (e instanceof xrpc_1$1p.XRPCError) ;
 	  return e;
 	}
-	requestPhoneVerification.toKnownErr = toKnownErr$1g;
+	requestPhoneVerification.toKnownErr = toKnownErr$1n;
 
 	var getPreferences = {};
 
@@ -25185,12 +25765,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1h = dist;
-	function toKnownErr$1f(e) {
-	  if (e instanceof xrpc_1$1h.XRPCError) ;
+	const xrpc_1$1o = dist;
+	function toKnownErr$1m(e) {
+	  if (e instanceof xrpc_1$1o.XRPCError) ;
 	  return e;
 	}
-	getPreferences.toKnownErr = toKnownErr$1f;
+	getPreferences.toKnownErr = toKnownErr$1m;
 
 	var getProfile = {};
 
@@ -25201,12 +25781,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1g = dist;
-	function toKnownErr$1e(e) {
-	  if (e instanceof xrpc_1$1g.XRPCError) ;
+	const xrpc_1$1n = dist;
+	function toKnownErr$1l(e) {
+	  if (e instanceof xrpc_1$1n.XRPCError) ;
 	  return e;
 	}
-	getProfile.toKnownErr = toKnownErr$1e;
+	getProfile.toKnownErr = toKnownErr$1l;
 
 	var getProfiles = {};
 
@@ -25217,12 +25797,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1f = dist;
-	function toKnownErr$1d(e) {
-	  if (e instanceof xrpc_1$1f.XRPCError) ;
+	const xrpc_1$1m = dist;
+	function toKnownErr$1k(e) {
+	  if (e instanceof xrpc_1$1m.XRPCError) ;
 	  return e;
 	}
-	getProfiles.toKnownErr = toKnownErr$1d;
+	getProfiles.toKnownErr = toKnownErr$1k;
 
 	var getSuggestions = {};
 
@@ -25233,12 +25813,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1e = dist;
-	function toKnownErr$1c(e) {
-	  if (e instanceof xrpc_1$1e.XRPCError) ;
+	const xrpc_1$1l = dist;
+	function toKnownErr$1j(e) {
+	  if (e instanceof xrpc_1$1l.XRPCError) ;
 	  return e;
 	}
-	getSuggestions.toKnownErr = toKnownErr$1c;
+	getSuggestions.toKnownErr = toKnownErr$1j;
 
 	var putPreferences = {};
 
@@ -25249,12 +25829,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1d = dist;
-	function toKnownErr$1b(e) {
-	  if (e instanceof xrpc_1$1d.XRPCError) ;
+	const xrpc_1$1k = dist;
+	function toKnownErr$1i(e) {
+	  if (e instanceof xrpc_1$1k.XRPCError) ;
 	  return e;
 	}
-	putPreferences.toKnownErr = toKnownErr$1b;
+	putPreferences.toKnownErr = toKnownErr$1i;
 
 	var searchActors = {};
 
@@ -25265,12 +25845,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1c = dist;
-	function toKnownErr$1a(e) {
-	  if (e instanceof xrpc_1$1c.XRPCError) ;
+	const xrpc_1$1j = dist;
+	function toKnownErr$1h(e) {
+	  if (e instanceof xrpc_1$1j.XRPCError) ;
 	  return e;
 	}
-	searchActors.toKnownErr = toKnownErr$1a;
+	searchActors.toKnownErr = toKnownErr$1h;
 
 	var searchActorsTypeahead = {};
 
@@ -25281,12 +25861,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1b = dist;
-	function toKnownErr$19(e) {
-	  if (e instanceof xrpc_1$1b.XRPCError) ;
+	const xrpc_1$1i = dist;
+	function toKnownErr$1g(e) {
+	  if (e instanceof xrpc_1$1i.XRPCError) ;
 	  return e;
 	}
-	searchActorsTypeahead.toKnownErr = toKnownErr$19;
+	searchActorsTypeahead.toKnownErr = toKnownErr$1g;
 
 	var describeFeedGenerator = {};
 
@@ -25297,28 +25877,28 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1a = dist;
-	const util_1$F = util$2;
-	const lexicons_1$E = lexicons;
-	function toKnownErr$18(e) {
-	  if (e instanceof xrpc_1$1a.XRPCError) ;
+	const xrpc_1$1h = dist;
+	const util_1$H = util$2;
+	const lexicons_1$G = lexicons;
+	function toKnownErr$1f(e) {
+	  if (e instanceof xrpc_1$1h.XRPCError) ;
 	  return e;
 	}
-	describeFeedGenerator.toKnownErr = toKnownErr$18;
+	describeFeedGenerator.toKnownErr = toKnownErr$1f;
 	function isFeed(v) {
-	  return (0, util_1$F.isObj)(v) && (0, util_1$F.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.describeFeedGenerator#feed';
+	  return (0, util_1$H.isObj)(v) && (0, util_1$H.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.describeFeedGenerator#feed';
 	}
 	describeFeedGenerator.isFeed = isFeed;
 	function validateFeed(v) {
-	  return lexicons_1$E.lexicons.validate('app.bsky.feed.describeFeedGenerator#feed', v);
+	  return lexicons_1$G.lexicons.validate('app.bsky.feed.describeFeedGenerator#feed', v);
 	}
 	describeFeedGenerator.validateFeed = validateFeed;
 	function isLinks(v) {
-	  return (0, util_1$F.isObj)(v) && (0, util_1$F.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.describeFeedGenerator#links';
+	  return (0, util_1$H.isObj)(v) && (0, util_1$H.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.describeFeedGenerator#links';
 	}
 	describeFeedGenerator.isLinks = isLinks;
 	function validateLinks(v) {
-	  return lexicons_1$E.lexicons.validate('app.bsky.feed.describeFeedGenerator#links', v);
+	  return lexicons_1$G.lexicons.validate('app.bsky.feed.describeFeedGenerator#links', v);
 	}
 	describeFeedGenerator.validateLinks = validateLinks;
 
@@ -25331,12 +25911,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$19 = dist;
-	function toKnownErr$17(e) {
-	  if (e instanceof xrpc_1$19.XRPCError) ;
+	const xrpc_1$1g = dist;
+	function toKnownErr$1e(e) {
+	  if (e instanceof xrpc_1$1g.XRPCError) ;
 	  return e;
 	}
-	getActorFeeds.toKnownErr = toKnownErr$17;
+	getActorFeeds.toKnownErr = toKnownErr$1e;
 
 	var getActorLikes = {};
 
@@ -25347,27 +25927,27 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$18 = dist;
-	let BlockedActorError$1 = class BlockedActorError extends xrpc_1$18.XRPCError {
+	const xrpc_1$1f = dist;
+	let BlockedActorError$1 = class BlockedActorError extends xrpc_1$1f.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getActorLikes.BlockedActorError = BlockedActorError$1;
-	let BlockedByActorError$1 = class BlockedByActorError extends xrpc_1$18.XRPCError {
+	let BlockedByActorError$1 = class BlockedByActorError extends xrpc_1$1f.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getActorLikes.BlockedByActorError = BlockedByActorError$1;
-	function toKnownErr$16(e) {
-	  if (e instanceof xrpc_1$18.XRPCError) {
+	function toKnownErr$1d(e) {
+	  if (e instanceof xrpc_1$1f.XRPCError) {
 	    if (e.error === 'BlockedActor') return new BlockedActorError$1(e);
 	    if (e.error === 'BlockedByActor') return new BlockedByActorError$1(e);
 	  }
 	  return e;
 	}
-	getActorLikes.toKnownErr = toKnownErr$16;
+	getActorLikes.toKnownErr = toKnownErr$1d;
 
 	var getAuthorFeed = {};
 
@@ -25378,27 +25958,27 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$17 = dist;
-	class BlockedActorError extends xrpc_1$17.XRPCError {
+	const xrpc_1$1e = dist;
+	class BlockedActorError extends xrpc_1$1e.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getAuthorFeed.BlockedActorError = BlockedActorError;
-	class BlockedByActorError extends xrpc_1$17.XRPCError {
+	class BlockedByActorError extends xrpc_1$1e.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getAuthorFeed.BlockedByActorError = BlockedByActorError;
-	function toKnownErr$15(e) {
-	  if (e instanceof xrpc_1$17.XRPCError) {
+	function toKnownErr$1c(e) {
+	  if (e instanceof xrpc_1$1e.XRPCError) {
 	    if (e.error === 'BlockedActor') return new BlockedActorError(e);
 	    if (e.error === 'BlockedByActor') return new BlockedByActorError(e);
 	  }
 	  return e;
 	}
-	getAuthorFeed.toKnownErr = toKnownErr$15;
+	getAuthorFeed.toKnownErr = toKnownErr$1c;
 
 	var getFeed = {};
 
@@ -25409,20 +25989,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$16 = dist;
-	let UnknownFeedError$1 = class UnknownFeedError extends xrpc_1$16.XRPCError {
+	const xrpc_1$1d = dist;
+	let UnknownFeedError$1 = class UnknownFeedError extends xrpc_1$1d.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	getFeed.UnknownFeedError = UnknownFeedError$1;
-	function toKnownErr$14(e) {
-	  if (e instanceof xrpc_1$16.XRPCError) {
+	function toKnownErr$1b(e) {
+	  if (e instanceof xrpc_1$1d.XRPCError) {
 	    if (e.error === 'UnknownFeed') return new UnknownFeedError$1(e);
 	  }
 	  return e;
 	}
-	getFeed.toKnownErr = toKnownErr$14;
+	getFeed.toKnownErr = toKnownErr$1b;
 
 	var getFeedGenerator = {};
 
@@ -25433,12 +26013,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$15 = dist;
-	function toKnownErr$13(e) {
-	  if (e instanceof xrpc_1$15.XRPCError) ;
+	const xrpc_1$1c = dist;
+	function toKnownErr$1a(e) {
+	  if (e instanceof xrpc_1$1c.XRPCError) ;
 	  return e;
 	}
-	getFeedGenerator.toKnownErr = toKnownErr$13;
+	getFeedGenerator.toKnownErr = toKnownErr$1a;
 
 	var getFeedGenerators = {};
 
@@ -25449,12 +26029,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$14 = dist;
-	function toKnownErr$12(e) {
-	  if (e instanceof xrpc_1$14.XRPCError) ;
+	const xrpc_1$1b = dist;
+	function toKnownErr$19(e) {
+	  if (e instanceof xrpc_1$1b.XRPCError) ;
 	  return e;
 	}
-	getFeedGenerators.toKnownErr = toKnownErr$12;
+	getFeedGenerators.toKnownErr = toKnownErr$19;
 
 	var getFeedSkeleton = {};
 
@@ -25465,20 +26045,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$13 = dist;
-	class UnknownFeedError extends xrpc_1$13.XRPCError {
+	const xrpc_1$1a = dist;
+	class UnknownFeedError extends xrpc_1$1a.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getFeedSkeleton.UnknownFeedError = UnknownFeedError;
-	function toKnownErr$11(e) {
-	  if (e instanceof xrpc_1$13.XRPCError) {
+	function toKnownErr$18(e) {
+	  if (e instanceof xrpc_1$1a.XRPCError) {
 	    if (e.error === 'UnknownFeed') return new UnknownFeedError(e);
 	  }
 	  return e;
 	}
-	getFeedSkeleton.toKnownErr = toKnownErr$11;
+	getFeedSkeleton.toKnownErr = toKnownErr$18;
 
 	var getLikes = {};
 
@@ -25489,20 +26069,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$12 = dist;
-	const util_1$E = util$2;
-	const lexicons_1$D = lexicons;
-	function toKnownErr$10(e) {
-	  if (e instanceof xrpc_1$12.XRPCError) ;
+	const xrpc_1$19 = dist;
+	const util_1$G = util$2;
+	const lexicons_1$F = lexicons;
+	function toKnownErr$17(e) {
+	  if (e instanceof xrpc_1$19.XRPCError) ;
 	  return e;
 	}
-	getLikes.toKnownErr = toKnownErr$10;
+	getLikes.toKnownErr = toKnownErr$17;
 	function isLike(v) {
-	  return (0, util_1$E.isObj)(v) && (0, util_1$E.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.getLikes#like';
+	  return (0, util_1$G.isObj)(v) && (0, util_1$G.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.getLikes#like';
 	}
 	getLikes.isLike = isLike;
 	function validateLike(v) {
-	  return lexicons_1$D.lexicons.validate('app.bsky.feed.getLikes#like', v);
+	  return lexicons_1$F.lexicons.validate('app.bsky.feed.getLikes#like', v);
 	}
 	getLikes.validateLike = validateLike;
 
@@ -25515,20 +26095,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$11 = dist;
-	class UnknownListError extends xrpc_1$11.XRPCError {
+	const xrpc_1$18 = dist;
+	class UnknownListError extends xrpc_1$18.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getListFeed.UnknownListError = UnknownListError;
-	function toKnownErr$$(e) {
-	  if (e instanceof xrpc_1$11.XRPCError) {
+	function toKnownErr$16(e) {
+	  if (e instanceof xrpc_1$18.XRPCError) {
 	    if (e.error === 'UnknownList') return new UnknownListError(e);
 	  }
 	  return e;
 	}
-	getListFeed.toKnownErr = toKnownErr$$;
+	getListFeed.toKnownErr = toKnownErr$16;
 
 	var getPostThread = {};
 
@@ -25539,20 +26119,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$10 = dist;
-	class NotFoundError extends xrpc_1$10.XRPCError {
+	const xrpc_1$17 = dist;
+	class NotFoundError extends xrpc_1$17.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getPostThread.NotFoundError = NotFoundError;
-	function toKnownErr$_(e) {
-	  if (e instanceof xrpc_1$10.XRPCError) {
+	function toKnownErr$15(e) {
+	  if (e instanceof xrpc_1$17.XRPCError) {
 	    if (e.error === 'NotFound') return new NotFoundError(e);
 	  }
 	  return e;
 	}
-	getPostThread.toKnownErr = toKnownErr$_;
+	getPostThread.toKnownErr = toKnownErr$15;
 
 	var getPosts = {};
 
@@ -25563,12 +26143,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$$ = dist;
-	function toKnownErr$Z(e) {
-	  if (e instanceof xrpc_1$$.XRPCError) ;
+	const xrpc_1$16 = dist;
+	function toKnownErr$14(e) {
+	  if (e instanceof xrpc_1$16.XRPCError) ;
 	  return e;
 	}
-	getPosts.toKnownErr = toKnownErr$Z;
+	getPosts.toKnownErr = toKnownErr$14;
 
 	var getRepostedBy = {};
 
@@ -25579,12 +26159,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$_ = dist;
-	function toKnownErr$Y(e) {
-	  if (e instanceof xrpc_1$_.XRPCError) ;
+	const xrpc_1$15 = dist;
+	function toKnownErr$13(e) {
+	  if (e instanceof xrpc_1$15.XRPCError) ;
 	  return e;
 	}
-	getRepostedBy.toKnownErr = toKnownErr$Y;
+	getRepostedBy.toKnownErr = toKnownErr$13;
 
 	var getSuggestedFeeds = {};
 
@@ -25595,12 +26175,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$Z = dist;
-	function toKnownErr$X(e) {
-	  if (e instanceof xrpc_1$Z.XRPCError) ;
+	const xrpc_1$14 = dist;
+	function toKnownErr$12(e) {
+	  if (e instanceof xrpc_1$14.XRPCError) ;
 	  return e;
 	}
-	getSuggestedFeeds.toKnownErr = toKnownErr$X;
+	getSuggestedFeeds.toKnownErr = toKnownErr$12;
 
 	var getTimeline = {};
 
@@ -25611,12 +26191,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$Y = dist;
-	function toKnownErr$W(e) {
-	  if (e instanceof xrpc_1$Y.XRPCError) ;
+	const xrpc_1$13 = dist;
+	function toKnownErr$11(e) {
+	  if (e instanceof xrpc_1$13.XRPCError) ;
 	  return e;
 	}
-	getTimeline.toKnownErr = toKnownErr$W;
+	getTimeline.toKnownErr = toKnownErr$11;
 
 	var searchPosts = {};
 
@@ -25627,20 +26207,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$X = dist;
-	let BadQueryStringError$2 = class BadQueryStringError extends xrpc_1$X.XRPCError {
+	const xrpc_1$12 = dist;
+	let BadQueryStringError$2 = class BadQueryStringError extends xrpc_1$12.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	searchPosts.BadQueryStringError = BadQueryStringError$2;
-	function toKnownErr$V(e) {
-	  if (e instanceof xrpc_1$X.XRPCError) {
+	function toKnownErr$10(e) {
+	  if (e instanceof xrpc_1$12.XRPCError) {
 	    if (e.error === 'BadQueryString') return new BadQueryStringError$2(e);
 	  }
 	  return e;
 	}
-	searchPosts.toKnownErr = toKnownErr$V;
+	searchPosts.toKnownErr = toKnownErr$10;
 
 	var sendInteractions = {};
 
@@ -25651,12 +26231,28 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$W = dist;
-	function toKnownErr$U(e) {
-	  if (e instanceof xrpc_1$W.XRPCError) ;
+	const xrpc_1$11 = dist;
+	function toKnownErr$$(e) {
+	  if (e instanceof xrpc_1$11.XRPCError) ;
 	  return e;
 	}
-	sendInteractions.toKnownErr = toKnownErr$U;
+	sendInteractions.toKnownErr = toKnownErr$$;
+
+	var getActorStarterPacks = {};
+
+	Object.defineProperty(getActorStarterPacks, "__esModule", {
+	  value: true
+	});
+	getActorStarterPacks.toKnownErr = void 0;
+	/**
+	 * GENERATED CODE - DO NOT MODIFY
+	 */
+	const xrpc_1$10 = dist;
+	function toKnownErr$_(e) {
+	  if (e instanceof xrpc_1$10.XRPCError) ;
+	  return e;
+	}
+	getActorStarterPacks.toKnownErr = toKnownErr$_;
 
 	var getBlocks = {};
 
@@ -25667,12 +26263,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$V = dist;
-	function toKnownErr$T(e) {
-	  if (e instanceof xrpc_1$V.XRPCError) ;
+	const xrpc_1$$ = dist;
+	function toKnownErr$Z(e) {
+	  if (e instanceof xrpc_1$$.XRPCError) ;
 	  return e;
 	}
-	getBlocks.toKnownErr = toKnownErr$T;
+	getBlocks.toKnownErr = toKnownErr$Z;
 
 	var getFollowers = {};
 
@@ -25683,12 +26279,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$U = dist;
-	function toKnownErr$S(e) {
-	  if (e instanceof xrpc_1$U.XRPCError) ;
+	const xrpc_1$_ = dist;
+	function toKnownErr$Y(e) {
+	  if (e instanceof xrpc_1$_.XRPCError) ;
 	  return e;
 	}
-	getFollowers.toKnownErr = toKnownErr$S;
+	getFollowers.toKnownErr = toKnownErr$Y;
 
 	var getFollows = {};
 
@@ -25699,12 +26295,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$T = dist;
-	function toKnownErr$R(e) {
-	  if (e instanceof xrpc_1$T.XRPCError) ;
+	const xrpc_1$Z = dist;
+	function toKnownErr$X(e) {
+	  if (e instanceof xrpc_1$Z.XRPCError) ;
 	  return e;
 	}
-	getFollows.toKnownErr = toKnownErr$R;
+	getFollows.toKnownErr = toKnownErr$X;
 
 	var getKnownFollowers = {};
 
@@ -25715,12 +26311,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$S = dist;
-	function toKnownErr$Q(e) {
-	  if (e instanceof xrpc_1$S.XRPCError) ;
+	const xrpc_1$Y = dist;
+	function toKnownErr$W(e) {
+	  if (e instanceof xrpc_1$Y.XRPCError) ;
 	  return e;
 	}
-	getKnownFollowers.toKnownErr = toKnownErr$Q;
+	getKnownFollowers.toKnownErr = toKnownErr$W;
 
 	var getList = {};
 
@@ -25731,12 +26327,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$R = dist;
-	function toKnownErr$P(e) {
-	  if (e instanceof xrpc_1$R.XRPCError) ;
+	const xrpc_1$X = dist;
+	function toKnownErr$V(e) {
+	  if (e instanceof xrpc_1$X.XRPCError) ;
 	  return e;
 	}
-	getList.toKnownErr = toKnownErr$P;
+	getList.toKnownErr = toKnownErr$V;
 
 	var getListBlocks = {};
 
@@ -25747,12 +26343,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$Q = dist;
-	function toKnownErr$O(e) {
-	  if (e instanceof xrpc_1$Q.XRPCError) ;
+	const xrpc_1$W = dist;
+	function toKnownErr$U(e) {
+	  if (e instanceof xrpc_1$W.XRPCError) ;
 	  return e;
 	}
-	getListBlocks.toKnownErr = toKnownErr$O;
+	getListBlocks.toKnownErr = toKnownErr$U;
 
 	var getListMutes = {};
 
@@ -25763,12 +26359,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$P = dist;
-	function toKnownErr$N(e) {
-	  if (e instanceof xrpc_1$P.XRPCError) ;
+	const xrpc_1$V = dist;
+	function toKnownErr$T(e) {
+	  if (e instanceof xrpc_1$V.XRPCError) ;
 	  return e;
 	}
-	getListMutes.toKnownErr = toKnownErr$N;
+	getListMutes.toKnownErr = toKnownErr$T;
 
 	var getLists = {};
 
@@ -25779,12 +26375,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$O = dist;
-	function toKnownErr$M(e) {
-	  if (e instanceof xrpc_1$O.XRPCError) ;
+	const xrpc_1$U = dist;
+	function toKnownErr$S(e) {
+	  if (e instanceof xrpc_1$U.XRPCError) ;
 	  return e;
 	}
-	getLists.toKnownErr = toKnownErr$M;
+	getLists.toKnownErr = toKnownErr$S;
 
 	var getMutes = {};
 
@@ -25795,12 +26391,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$N = dist;
-	function toKnownErr$L(e) {
-	  if (e instanceof xrpc_1$N.XRPCError) ;
+	const xrpc_1$T = dist;
+	function toKnownErr$R(e) {
+	  if (e instanceof xrpc_1$T.XRPCError) ;
 	  return e;
 	}
-	getMutes.toKnownErr = toKnownErr$L;
+	getMutes.toKnownErr = toKnownErr$R;
 
 	var getRelationships = {};
 
@@ -25811,20 +26407,52 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$M = dist;
-	class ActorNotFoundError extends xrpc_1$M.XRPCError {
+	const xrpc_1$S = dist;
+	class ActorNotFoundError extends xrpc_1$S.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getRelationships.ActorNotFoundError = ActorNotFoundError;
-	function toKnownErr$K(e) {
-	  if (e instanceof xrpc_1$M.XRPCError) {
+	function toKnownErr$Q(e) {
+	  if (e instanceof xrpc_1$S.XRPCError) {
 	    if (e.error === 'ActorNotFound') return new ActorNotFoundError(e);
 	  }
 	  return e;
 	}
-	getRelationships.toKnownErr = toKnownErr$K;
+	getRelationships.toKnownErr = toKnownErr$Q;
+
+	var getStarterPack = {};
+
+	Object.defineProperty(getStarterPack, "__esModule", {
+	  value: true
+	});
+	getStarterPack.toKnownErr = void 0;
+	/**
+	 * GENERATED CODE - DO NOT MODIFY
+	 */
+	const xrpc_1$R = dist;
+	function toKnownErr$P(e) {
+	  if (e instanceof xrpc_1$R.XRPCError) ;
+	  return e;
+	}
+	getStarterPack.toKnownErr = toKnownErr$P;
+
+	var getStarterPacks = {};
+
+	Object.defineProperty(getStarterPacks, "__esModule", {
+	  value: true
+	});
+	getStarterPacks.toKnownErr = void 0;
+	/**
+	 * GENERATED CODE - DO NOT MODIFY
+	 */
+	const xrpc_1$Q = dist;
+	function toKnownErr$O(e) {
+	  if (e instanceof xrpc_1$Q.XRPCError) ;
+	  return e;
+	}
+	getStarterPacks.toKnownErr = toKnownErr$O;
 
 	var getSuggestedFollowsByActor = {};
 
@@ -25835,12 +26463,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$L = dist;
-	function toKnownErr$J(e) {
-	  if (e instanceof xrpc_1$L.XRPCError) ;
+	const xrpc_1$P = dist;
+	function toKnownErr$N(e) {
+	  if (e instanceof xrpc_1$P.XRPCError) ;
 	  return e;
 	}
-	getSuggestedFollowsByActor.toKnownErr = toKnownErr$J;
+	getSuggestedFollowsByActor.toKnownErr = toKnownErr$N;
 
 	var muteActor = {};
 
@@ -25851,12 +26479,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$K = dist;
-	function toKnownErr$I(e) {
-	  if (e instanceof xrpc_1$K.XRPCError) ;
+	const xrpc_1$O = dist;
+	function toKnownErr$M(e) {
+	  if (e instanceof xrpc_1$O.XRPCError) ;
 	  return e;
 	}
-	muteActor.toKnownErr = toKnownErr$I;
+	muteActor.toKnownErr = toKnownErr$M;
 
 	var muteActorList = {};
 
@@ -25867,12 +26495,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$J = dist;
-	function toKnownErr$H(e) {
-	  if (e instanceof xrpc_1$J.XRPCError) ;
+	const xrpc_1$N = dist;
+	function toKnownErr$L(e) {
+	  if (e instanceof xrpc_1$N.XRPCError) ;
 	  return e;
 	}
-	muteActorList.toKnownErr = toKnownErr$H;
+	muteActorList.toKnownErr = toKnownErr$L;
 
 	var muteThread = {};
 
@@ -25883,12 +26511,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$I = dist;
-	function toKnownErr$G(e) {
-	  if (e instanceof xrpc_1$I.XRPCError) ;
+	const xrpc_1$M = dist;
+	function toKnownErr$K(e) {
+	  if (e instanceof xrpc_1$M.XRPCError) ;
 	  return e;
 	}
-	muteThread.toKnownErr = toKnownErr$G;
+	muteThread.toKnownErr = toKnownErr$K;
 
 	var unmuteActor = {};
 
@@ -25899,12 +26527,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$H = dist;
-	function toKnownErr$F(e) {
-	  if (e instanceof xrpc_1$H.XRPCError) ;
+	const xrpc_1$L = dist;
+	function toKnownErr$J(e) {
+	  if (e instanceof xrpc_1$L.XRPCError) ;
 	  return e;
 	}
-	unmuteActor.toKnownErr = toKnownErr$F;
+	unmuteActor.toKnownErr = toKnownErr$J;
 
 	var unmuteActorList = {};
 
@@ -25915,12 +26543,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$G = dist;
-	function toKnownErr$E(e) {
-	  if (e instanceof xrpc_1$G.XRPCError) ;
+	const xrpc_1$K = dist;
+	function toKnownErr$I(e) {
+	  if (e instanceof xrpc_1$K.XRPCError) ;
 	  return e;
 	}
-	unmuteActorList.toKnownErr = toKnownErr$E;
+	unmuteActorList.toKnownErr = toKnownErr$I;
 
 	var unmuteThread = {};
 
@@ -25931,12 +26559,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$F = dist;
-	function toKnownErr$D(e) {
-	  if (e instanceof xrpc_1$F.XRPCError) ;
+	const xrpc_1$J = dist;
+	function toKnownErr$H(e) {
+	  if (e instanceof xrpc_1$J.XRPCError) ;
 	  return e;
 	}
-	unmuteThread.toKnownErr = toKnownErr$D;
+	unmuteThread.toKnownErr = toKnownErr$H;
 
 	var getServices = {};
 
@@ -25947,12 +26575,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$E = dist;
-	function toKnownErr$C(e) {
-	  if (e instanceof xrpc_1$E.XRPCError) ;
+	const xrpc_1$I = dist;
+	function toKnownErr$G(e) {
+	  if (e instanceof xrpc_1$I.XRPCError) ;
 	  return e;
 	}
-	getServices.toKnownErr = toKnownErr$C;
+	getServices.toKnownErr = toKnownErr$G;
 
 	var getUnreadCount = {};
 
@@ -25963,12 +26591,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$D = dist;
-	function toKnownErr$B(e) {
-	  if (e instanceof xrpc_1$D.XRPCError) ;
+	const xrpc_1$H = dist;
+	function toKnownErr$F(e) {
+	  if (e instanceof xrpc_1$H.XRPCError) ;
 	  return e;
 	}
-	getUnreadCount.toKnownErr = toKnownErr$B;
+	getUnreadCount.toKnownErr = toKnownErr$F;
 
 	var listNotifications = {};
 
@@ -25979,20 +26607,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$C = dist;
-	const util_1$D = util$2;
-	const lexicons_1$C = lexicons;
-	function toKnownErr$A(e) {
-	  if (e instanceof xrpc_1$C.XRPCError) ;
+	const xrpc_1$G = dist;
+	const util_1$F = util$2;
+	const lexicons_1$E = lexicons;
+	function toKnownErr$E(e) {
+	  if (e instanceof xrpc_1$G.XRPCError) ;
 	  return e;
 	}
-	listNotifications.toKnownErr = toKnownErr$A;
+	listNotifications.toKnownErr = toKnownErr$E;
 	function isNotification(v) {
-	  return (0, util_1$D.isObj)(v) && (0, util_1$D.hasProp)(v, '$type') && v.$type === 'app.bsky.notification.listNotifications#notification';
+	  return (0, util_1$F.isObj)(v) && (0, util_1$F.hasProp)(v, '$type') && v.$type === 'app.bsky.notification.listNotifications#notification';
 	}
 	listNotifications.isNotification = isNotification;
 	function validateNotification(v) {
-	  return lexicons_1$C.lexicons.validate('app.bsky.notification.listNotifications#notification', v);
+	  return lexicons_1$E.lexicons.validate('app.bsky.notification.listNotifications#notification', v);
 	}
 	listNotifications.validateNotification = validateNotification;
 
@@ -26005,12 +26633,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$B = dist;
-	function toKnownErr$z(e) {
-	  if (e instanceof xrpc_1$B.XRPCError) ;
+	const xrpc_1$F = dist;
+	function toKnownErr$D(e) {
+	  if (e instanceof xrpc_1$F.XRPCError) ;
 	  return e;
 	}
-	registerPush.toKnownErr = toKnownErr$z;
+	registerPush.toKnownErr = toKnownErr$D;
 
 	var updateSeen = {};
 
@@ -26021,12 +26649,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$A = dist;
-	function toKnownErr$y(e) {
-	  if (e instanceof xrpc_1$A.XRPCError) ;
+	const xrpc_1$E = dist;
+	function toKnownErr$C(e) {
+	  if (e instanceof xrpc_1$E.XRPCError) ;
 	  return e;
 	}
-	updateSeen.toKnownErr = toKnownErr$y;
+	updateSeen.toKnownErr = toKnownErr$C;
 
 	var getPopularFeedGenerators = {};
 
@@ -26037,12 +26665,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$z = dist;
-	function toKnownErr$x(e) {
-	  if (e instanceof xrpc_1$z.XRPCError) ;
+	const xrpc_1$D = dist;
+	function toKnownErr$B(e) {
+	  if (e instanceof xrpc_1$D.XRPCError) ;
 	  return e;
 	}
-	getPopularFeedGenerators.toKnownErr = toKnownErr$x;
+	getPopularFeedGenerators.toKnownErr = toKnownErr$B;
 
 	var getSuggestionsSkeleton = {};
 
@@ -26053,12 +26681,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$y = dist;
-	function toKnownErr$w(e) {
-	  if (e instanceof xrpc_1$y.XRPCError) ;
+	const xrpc_1$C = dist;
+	function toKnownErr$A(e) {
+	  if (e instanceof xrpc_1$C.XRPCError) ;
 	  return e;
 	}
-	getSuggestionsSkeleton.toKnownErr = toKnownErr$w;
+	getSuggestionsSkeleton.toKnownErr = toKnownErr$A;
 
 	var getTaggedSuggestions = {};
 
@@ -26069,20 +26697,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$x = dist;
-	const util_1$C = util$2;
-	const lexicons_1$B = lexicons;
-	function toKnownErr$v(e) {
-	  if (e instanceof xrpc_1$x.XRPCError) ;
+	const xrpc_1$B = dist;
+	const util_1$E = util$2;
+	const lexicons_1$D = lexicons;
+	function toKnownErr$z(e) {
+	  if (e instanceof xrpc_1$B.XRPCError) ;
 	  return e;
 	}
-	getTaggedSuggestions.toKnownErr = toKnownErr$v;
+	getTaggedSuggestions.toKnownErr = toKnownErr$z;
 	function isSuggestion(v) {
-	  return (0, util_1$C.isObj)(v) && (0, util_1$C.hasProp)(v, '$type') && v.$type === 'app.bsky.unspecced.getTaggedSuggestions#suggestion';
+	  return (0, util_1$E.isObj)(v) && (0, util_1$E.hasProp)(v, '$type') && v.$type === 'app.bsky.unspecced.getTaggedSuggestions#suggestion';
 	}
 	getTaggedSuggestions.isSuggestion = isSuggestion;
 	function validateSuggestion(v) {
-	  return lexicons_1$B.lexicons.validate('app.bsky.unspecced.getTaggedSuggestions#suggestion', v);
+	  return lexicons_1$D.lexicons.validate('app.bsky.unspecced.getTaggedSuggestions#suggestion', v);
 	}
 	getTaggedSuggestions.validateSuggestion = validateSuggestion;
 
@@ -26095,20 +26723,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$w = dist;
-	let BadQueryStringError$1 = class BadQueryStringError extends xrpc_1$w.XRPCError {
+	const xrpc_1$A = dist;
+	let BadQueryStringError$1 = class BadQueryStringError extends xrpc_1$A.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	};
 	searchActorsSkeleton.BadQueryStringError = BadQueryStringError$1;
-	function toKnownErr$u(e) {
-	  if (e instanceof xrpc_1$w.XRPCError) {
+	function toKnownErr$y(e) {
+	  if (e instanceof xrpc_1$A.XRPCError) {
 	    if (e.error === 'BadQueryString') return new BadQueryStringError$1(e);
 	  }
 	  return e;
 	}
-	searchActorsSkeleton.toKnownErr = toKnownErr$u;
+	searchActorsSkeleton.toKnownErr = toKnownErr$y;
 
 	var searchPostsSkeleton = {};
 
@@ -26119,20 +26747,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$v = dist;
-	class BadQueryStringError extends xrpc_1$v.XRPCError {
+	const xrpc_1$z = dist;
+	class BadQueryStringError extends xrpc_1$z.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	searchPostsSkeleton.BadQueryStringError = BadQueryStringError;
-	function toKnownErr$t(e) {
-	  if (e instanceof xrpc_1$v.XRPCError) {
+	function toKnownErr$x(e) {
+	  if (e instanceof xrpc_1$z.XRPCError) {
 	    if (e.error === 'BadQueryString') return new BadQueryStringError(e);
 	  }
 	  return e;
 	}
-	searchPostsSkeleton.toKnownErr = toKnownErr$t;
+	searchPostsSkeleton.toKnownErr = toKnownErr$x;
 
 	var deleteAccount = {};
 
@@ -26143,12 +26771,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$u = dist;
-	function toKnownErr$s(e) {
-	  if (e instanceof xrpc_1$u.XRPCError) ;
+	const xrpc_1$y = dist;
+	function toKnownErr$w(e) {
+	  if (e instanceof xrpc_1$y.XRPCError) ;
 	  return e;
 	}
-	deleteAccount.toKnownErr = toKnownErr$s;
+	deleteAccount.toKnownErr = toKnownErr$w;
 
 	var exportAccountData = {};
 
@@ -26159,12 +26787,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$t = dist;
-	function toKnownErr$r(e) {
-	  if (e instanceof xrpc_1$t.XRPCError) ;
+	const xrpc_1$x = dist;
+	function toKnownErr$v(e) {
+	  if (e instanceof xrpc_1$x.XRPCError) ;
 	  return e;
 	}
-	exportAccountData.toKnownErr = toKnownErr$r;
+	exportAccountData.toKnownErr = toKnownErr$v;
 
 	var deleteMessageForSelf = {};
 
@@ -26175,12 +26803,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$s = dist;
-	function toKnownErr$q(e) {
-	  if (e instanceof xrpc_1$s.XRPCError) ;
+	const xrpc_1$w = dist;
+	function toKnownErr$u(e) {
+	  if (e instanceof xrpc_1$w.XRPCError) ;
 	  return e;
 	}
-	deleteMessageForSelf.toKnownErr = toKnownErr$q;
+	deleteMessageForSelf.toKnownErr = toKnownErr$u;
 
 	var getConvo = {};
 
@@ -26191,12 +26819,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$r = dist;
-	function toKnownErr$p(e) {
-	  if (e instanceof xrpc_1$r.XRPCError) ;
+	const xrpc_1$v = dist;
+	function toKnownErr$t(e) {
+	  if (e instanceof xrpc_1$v.XRPCError) ;
 	  return e;
 	}
-	getConvo.toKnownErr = toKnownErr$p;
+	getConvo.toKnownErr = toKnownErr$t;
 
 	var getConvoForMembers = {};
 
@@ -26207,12 +26835,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$q = dist;
-	function toKnownErr$o(e) {
-	  if (e instanceof xrpc_1$q.XRPCError) ;
+	const xrpc_1$u = dist;
+	function toKnownErr$s(e) {
+	  if (e instanceof xrpc_1$u.XRPCError) ;
 	  return e;
 	}
-	getConvoForMembers.toKnownErr = toKnownErr$o;
+	getConvoForMembers.toKnownErr = toKnownErr$s;
 
 	var getLog = {};
 
@@ -26223,12 +26851,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$p = dist;
-	function toKnownErr$n(e) {
-	  if (e instanceof xrpc_1$p.XRPCError) ;
+	const xrpc_1$t = dist;
+	function toKnownErr$r(e) {
+	  if (e instanceof xrpc_1$t.XRPCError) ;
 	  return e;
 	}
-	getLog.toKnownErr = toKnownErr$n;
+	getLog.toKnownErr = toKnownErr$r;
 
 	var getMessages = {};
 
@@ -26239,12 +26867,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$o = dist;
-	function toKnownErr$m(e) {
-	  if (e instanceof xrpc_1$o.XRPCError) ;
+	const xrpc_1$s = dist;
+	function toKnownErr$q(e) {
+	  if (e instanceof xrpc_1$s.XRPCError) ;
 	  return e;
 	}
-	getMessages.toKnownErr = toKnownErr$m;
+	getMessages.toKnownErr = toKnownErr$q;
 
 	var leaveConvo = {};
 
@@ -26255,12 +26883,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$n = dist;
-	function toKnownErr$l(e) {
-	  if (e instanceof xrpc_1$n.XRPCError) ;
+	const xrpc_1$r = dist;
+	function toKnownErr$p(e) {
+	  if (e instanceof xrpc_1$r.XRPCError) ;
 	  return e;
 	}
-	leaveConvo.toKnownErr = toKnownErr$l;
+	leaveConvo.toKnownErr = toKnownErr$p;
 
 	var listConvos = {};
 
@@ -26271,12 +26899,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$m = dist;
-	function toKnownErr$k(e) {
-	  if (e instanceof xrpc_1$m.XRPCError) ;
+	const xrpc_1$q = dist;
+	function toKnownErr$o(e) {
+	  if (e instanceof xrpc_1$q.XRPCError) ;
 	  return e;
 	}
-	listConvos.toKnownErr = toKnownErr$k;
+	listConvos.toKnownErr = toKnownErr$o;
 
 	var muteConvo = {};
 
@@ -26287,12 +26915,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$l = dist;
-	function toKnownErr$j(e) {
-	  if (e instanceof xrpc_1$l.XRPCError) ;
+	const xrpc_1$p = dist;
+	function toKnownErr$n(e) {
+	  if (e instanceof xrpc_1$p.XRPCError) ;
 	  return e;
 	}
-	muteConvo.toKnownErr = toKnownErr$j;
+	muteConvo.toKnownErr = toKnownErr$n;
 
 	var sendMessage = {};
 
@@ -26303,12 +26931,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$k = dist;
-	function toKnownErr$i(e) {
-	  if (e instanceof xrpc_1$k.XRPCError) ;
+	const xrpc_1$o = dist;
+	function toKnownErr$m(e) {
+	  if (e instanceof xrpc_1$o.XRPCError) ;
 	  return e;
 	}
-	sendMessage.toKnownErr = toKnownErr$i;
+	sendMessage.toKnownErr = toKnownErr$m;
 
 	var sendMessageBatch = {};
 
@@ -26319,20 +26947,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$j = dist;
-	const util_1$B = util$2;
-	const lexicons_1$A = lexicons;
-	function toKnownErr$h(e) {
-	  if (e instanceof xrpc_1$j.XRPCError) ;
+	const xrpc_1$n = dist;
+	const util_1$D = util$2;
+	const lexicons_1$C = lexicons;
+	function toKnownErr$l(e) {
+	  if (e instanceof xrpc_1$n.XRPCError) ;
 	  return e;
 	}
-	sendMessageBatch.toKnownErr = toKnownErr$h;
+	sendMessageBatch.toKnownErr = toKnownErr$l;
 	function isBatchItem(v) {
-	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.sendMessageBatch#batchItem';
+	  return (0, util_1$D.isObj)(v) && (0, util_1$D.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.sendMessageBatch#batchItem';
 	}
 	sendMessageBatch.isBatchItem = isBatchItem;
 	function validateBatchItem(v) {
-	  return lexicons_1$A.lexicons.validate('chat.bsky.convo.sendMessageBatch#batchItem', v);
+	  return lexicons_1$C.lexicons.validate('chat.bsky.convo.sendMessageBatch#batchItem', v);
 	}
 	sendMessageBatch.validateBatchItem = validateBatchItem;
 
@@ -26345,12 +26973,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$i = dist;
-	function toKnownErr$g(e) {
-	  if (e instanceof xrpc_1$i.XRPCError) ;
+	const xrpc_1$m = dist;
+	function toKnownErr$k(e) {
+	  if (e instanceof xrpc_1$m.XRPCError) ;
 	  return e;
 	}
-	unmuteConvo.toKnownErr = toKnownErr$g;
+	unmuteConvo.toKnownErr = toKnownErr$k;
 
 	var updateRead = {};
 
@@ -26361,12 +26989,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$h = dist;
-	function toKnownErr$f(e) {
-	  if (e instanceof xrpc_1$h.XRPCError) ;
+	const xrpc_1$l = dist;
+	function toKnownErr$j(e) {
+	  if (e instanceof xrpc_1$l.XRPCError) ;
 	  return e;
 	}
-	updateRead.toKnownErr = toKnownErr$f;
+	updateRead.toKnownErr = toKnownErr$j;
 
 	var getActorMetadata = {};
 
@@ -26377,20 +27005,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$g = dist;
-	const util_1$A = util$2;
-	const lexicons_1$z = lexicons;
-	function toKnownErr$e(e) {
-	  if (e instanceof xrpc_1$g.XRPCError) ;
+	const xrpc_1$k = dist;
+	const util_1$C = util$2;
+	const lexicons_1$B = lexicons;
+	function toKnownErr$i(e) {
+	  if (e instanceof xrpc_1$k.XRPCError) ;
 	  return e;
 	}
-	getActorMetadata.toKnownErr = toKnownErr$e;
+	getActorMetadata.toKnownErr = toKnownErr$i;
 	function isMetadata(v) {
-	  return (0, util_1$A.isObj)(v) && (0, util_1$A.hasProp)(v, '$type') && v.$type === 'chat.bsky.moderation.getActorMetadata#metadata';
+	  return (0, util_1$C.isObj)(v) && (0, util_1$C.hasProp)(v, '$type') && v.$type === 'chat.bsky.moderation.getActorMetadata#metadata';
 	}
 	getActorMetadata.isMetadata = isMetadata;
 	function validateMetadata(v) {
-	  return lexicons_1$z.lexicons.validate('chat.bsky.moderation.getActorMetadata#metadata', v);
+	  return lexicons_1$B.lexicons.validate('chat.bsky.moderation.getActorMetadata#metadata', v);
 	}
 	getActorMetadata.validateMetadata = validateMetadata;
 
@@ -26403,12 +27031,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$f = dist;
-	function toKnownErr$d(e) {
-	  if (e instanceof xrpc_1$f.XRPCError) ;
+	const xrpc_1$j = dist;
+	function toKnownErr$h(e) {
+	  if (e instanceof xrpc_1$j.XRPCError) ;
 	  return e;
 	}
-	getMessageContext.toKnownErr = toKnownErr$d;
+	getMessageContext.toKnownErr = toKnownErr$h;
 
 	var updateActorAccess = {};
 
@@ -26419,12 +27047,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$e = dist;
-	function toKnownErr$c(e) {
-	  if (e instanceof xrpc_1$e.XRPCError) ;
+	const xrpc_1$i = dist;
+	function toKnownErr$g(e) {
+	  if (e instanceof xrpc_1$i.XRPCError) ;
 	  return e;
 	}
-	updateActorAccess.toKnownErr = toKnownErr$c;
+	updateActorAccess.toKnownErr = toKnownErr$g;
 
 	var createTemplate = {};
 
@@ -26435,12 +27063,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$d = dist;
-	function toKnownErr$b(e) {
-	  if (e instanceof xrpc_1$d.XRPCError) ;
+	const xrpc_1$h = dist;
+	function toKnownErr$f(e) {
+	  if (e instanceof xrpc_1$h.XRPCError) ;
 	  return e;
 	}
-	createTemplate.toKnownErr = toKnownErr$b;
+	createTemplate.toKnownErr = toKnownErr$f;
 
 	var deleteTemplate = {};
 
@@ -26451,12 +27079,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$c = dist;
-	function toKnownErr$a(e) {
-	  if (e instanceof xrpc_1$c.XRPCError) ;
+	const xrpc_1$g = dist;
+	function toKnownErr$e(e) {
+	  if (e instanceof xrpc_1$g.XRPCError) ;
 	  return e;
 	}
-	deleteTemplate.toKnownErr = toKnownErr$a;
+	deleteTemplate.toKnownErr = toKnownErr$e;
 
 	var listTemplates = {};
 
@@ -26467,12 +27095,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$b = dist;
-	function toKnownErr$9(e) {
-	  if (e instanceof xrpc_1$b.XRPCError) ;
+	const xrpc_1$f = dist;
+	function toKnownErr$d(e) {
+	  if (e instanceof xrpc_1$f.XRPCError) ;
 	  return e;
 	}
-	listTemplates.toKnownErr = toKnownErr$9;
+	listTemplates.toKnownErr = toKnownErr$d;
 
 	var updateTemplate = {};
 
@@ -26483,12 +27111,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$a = dist;
-	function toKnownErr$8(e) {
-	  if (e instanceof xrpc_1$a.XRPCError) ;
+	const xrpc_1$e = dist;
+	function toKnownErr$c(e) {
+	  if (e instanceof xrpc_1$e.XRPCError) ;
 	  return e;
 	}
-	updateTemplate.toKnownErr = toKnownErr$8;
+	updateTemplate.toKnownErr = toKnownErr$c;
 
 	var emitEvent = {};
 
@@ -26499,20 +27127,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$9 = dist;
-	class SubjectHasActionError extends xrpc_1$9.XRPCError {
+	const xrpc_1$d = dist;
+	class SubjectHasActionError extends xrpc_1$d.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	emitEvent.SubjectHasActionError = SubjectHasActionError;
-	function toKnownErr$7(e) {
-	  if (e instanceof xrpc_1$9.XRPCError) {
+	function toKnownErr$b(e) {
+	  if (e instanceof xrpc_1$d.XRPCError) {
 	    if (e.error === 'SubjectHasAction') return new SubjectHasActionError(e);
 	  }
 	  return e;
 	}
-	emitEvent.toKnownErr = toKnownErr$7;
+	emitEvent.toKnownErr = toKnownErr$b;
 
 	var getEvent = {};
 
@@ -26523,12 +27151,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$8 = dist;
-	function toKnownErr$6(e) {
-	  if (e instanceof xrpc_1$8.XRPCError) ;
+	const xrpc_1$c = dist;
+	function toKnownErr$a(e) {
+	  if (e instanceof xrpc_1$c.XRPCError) ;
 	  return e;
 	}
-	getEvent.toKnownErr = toKnownErr$6;
+	getEvent.toKnownErr = toKnownErr$a;
 
 	var getRecord = {};
 
@@ -26539,20 +27167,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$7 = dist;
-	class RecordNotFoundError extends xrpc_1$7.XRPCError {
+	const xrpc_1$b = dist;
+	class RecordNotFoundError extends xrpc_1$b.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getRecord.RecordNotFoundError = RecordNotFoundError;
-	function toKnownErr$5(e) {
-	  if (e instanceof xrpc_1$7.XRPCError) {
+	function toKnownErr$9(e) {
+	  if (e instanceof xrpc_1$b.XRPCError) {
 	    if (e.error === 'RecordNotFound') return new RecordNotFoundError(e);
 	  }
 	  return e;
 	}
-	getRecord.toKnownErr = toKnownErr$5;
+	getRecord.toKnownErr = toKnownErr$9;
 
 	var getRepo = {};
 
@@ -26563,20 +27191,20 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$6 = dist;
-	class RepoNotFoundError extends xrpc_1$6.XRPCError {
+	const xrpc_1$a = dist;
+	class RepoNotFoundError extends xrpc_1$a.XRPCError {
 	  constructor(src) {
 	    super(src.status, src.error, src.message, src.headers);
 	  }
 	}
 	getRepo.RepoNotFoundError = RepoNotFoundError;
-	function toKnownErr$4(e) {
-	  if (e instanceof xrpc_1$6.XRPCError) {
+	function toKnownErr$8(e) {
+	  if (e instanceof xrpc_1$a.XRPCError) {
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError(e);
 	  }
 	  return e;
 	}
-	getRepo.toKnownErr = toKnownErr$4;
+	getRepo.toKnownErr = toKnownErr$8;
 
 	var queryEvents = {};
 
@@ -26587,12 +27215,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$5 = dist;
-	function toKnownErr$3(e) {
-	  if (e instanceof xrpc_1$5.XRPCError) ;
+	const xrpc_1$9 = dist;
+	function toKnownErr$7(e) {
+	  if (e instanceof xrpc_1$9.XRPCError) ;
 	  return e;
 	}
-	queryEvents.toKnownErr = toKnownErr$3;
+	queryEvents.toKnownErr = toKnownErr$7;
 
 	var queryStatuses = {};
 
@@ -26603,12 +27231,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$4 = dist;
-	function toKnownErr$2(e) {
-	  if (e instanceof xrpc_1$4.XRPCError) ;
+	const xrpc_1$8 = dist;
+	function toKnownErr$6(e) {
+	  if (e instanceof xrpc_1$8.XRPCError) ;
 	  return e;
 	}
-	queryStatuses.toKnownErr = toKnownErr$2;
+	queryStatuses.toKnownErr = toKnownErr$6;
 
 	var searchRepos = {};
 
@@ -26619,12 +27247,12 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$3 = dist;
-	function toKnownErr$1(e) {
-	  if (e instanceof xrpc_1$3.XRPCError) ;
+	const xrpc_1$7 = dist;
+	function toKnownErr$5(e) {
+	  if (e instanceof xrpc_1$7.XRPCError) ;
 	  return e;
 	}
-	searchRepos.toKnownErr = toKnownErr$1;
+	searchRepos.toKnownErr = toKnownErr$5;
 
 	var getConfig = {};
 
@@ -26635,120 +27263,215 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2 = dist;
-	const util_1$z = util$2;
-	const lexicons_1$y = lexicons;
-	function toKnownErr(e) {
-	  if (e instanceof xrpc_1$2.XRPCError) ;
+	const xrpc_1$6 = dist;
+	const util_1$B = util$2;
+	const lexicons_1$A = lexicons;
+	function toKnownErr$4(e) {
+	  if (e instanceof xrpc_1$6.XRPCError) ;
 	  return e;
 	}
-	getConfig.toKnownErr = toKnownErr;
+	getConfig.toKnownErr = toKnownErr$4;
 	function isServiceConfig(v) {
-	  return (0, util_1$z.isObj)(v) && (0, util_1$z.hasProp)(v, '$type') && v.$type === 'tools.ozone.server.getConfig#serviceConfig';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'tools.ozone.server.getConfig#serviceConfig';
 	}
 	getConfig.isServiceConfig = isServiceConfig;
 	function validateServiceConfig(v) {
-	  return lexicons_1$y.lexicons.validate('tools.ozone.server.getConfig#serviceConfig', v);
+	  return lexicons_1$A.lexicons.validate('tools.ozone.server.getConfig#serviceConfig', v);
 	}
 	getConfig.validateServiceConfig = validateServiceConfig;
 	function isViewerConfig(v) {
-	  return (0, util_1$z.isObj)(v) && (0, util_1$z.hasProp)(v, '$type') && v.$type === 'tools.ozone.server.getConfig#viewerConfig';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'tools.ozone.server.getConfig#viewerConfig';
 	}
 	getConfig.isViewerConfig = isViewerConfig;
 	function validateViewerConfig(v) {
-	  return lexicons_1$y.lexicons.validate('tools.ozone.server.getConfig#viewerConfig', v);
+	  return lexicons_1$A.lexicons.validate('tools.ozone.server.getConfig#viewerConfig', v);
 	}
 	getConfig.validateViewerConfig = validateViewerConfig;
+
+	var addMember = {};
+
+	Object.defineProperty(addMember, "__esModule", {
+	  value: true
+	});
+	addMember.toKnownErr = addMember.MemberAlreadyExistsError = void 0;
+	/**
+	 * GENERATED CODE - DO NOT MODIFY
+	 */
+	const xrpc_1$5 = dist;
+	class MemberAlreadyExistsError extends xrpc_1$5.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	}
+	addMember.MemberAlreadyExistsError = MemberAlreadyExistsError;
+	function toKnownErr$3(e) {
+	  if (e instanceof xrpc_1$5.XRPCError) {
+	    if (e.error === 'MemberAlreadyExists') return new MemberAlreadyExistsError(e);
+	  }
+	  return e;
+	}
+	addMember.toKnownErr = toKnownErr$3;
+
+	var deleteMember = {};
+
+	Object.defineProperty(deleteMember, "__esModule", {
+	  value: true
+	});
+	deleteMember.toKnownErr = deleteMember.CannotDeleteSelfError = deleteMember.MemberNotFoundError = void 0;
+	/**
+	 * GENERATED CODE - DO NOT MODIFY
+	 */
+	const xrpc_1$4 = dist;
+	let MemberNotFoundError$1 = class MemberNotFoundError extends xrpc_1$4.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	};
+	deleteMember.MemberNotFoundError = MemberNotFoundError$1;
+	class CannotDeleteSelfError extends xrpc_1$4.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	}
+	deleteMember.CannotDeleteSelfError = CannotDeleteSelfError;
+	function toKnownErr$2(e) {
+	  if (e instanceof xrpc_1$4.XRPCError) {
+	    if (e.error === 'MemberNotFound') return new MemberNotFoundError$1(e);
+	    if (e.error === 'CannotDeleteSelf') return new CannotDeleteSelfError(e);
+	  }
+	  return e;
+	}
+	deleteMember.toKnownErr = toKnownErr$2;
+
+	var listMembers = {};
+
+	Object.defineProperty(listMembers, "__esModule", {
+	  value: true
+	});
+	listMembers.toKnownErr = void 0;
+	/**
+	 * GENERATED CODE - DO NOT MODIFY
+	 */
+	const xrpc_1$3 = dist;
+	function toKnownErr$1(e) {
+	  if (e instanceof xrpc_1$3.XRPCError) ;
+	  return e;
+	}
+	listMembers.toKnownErr = toKnownErr$1;
+
+	var updateMember = {};
+
+	Object.defineProperty(updateMember, "__esModule", {
+	  value: true
+	});
+	updateMember.toKnownErr = updateMember.MemberNotFoundError = void 0;
+	/**
+	 * GENERATED CODE - DO NOT MODIFY
+	 */
+	const xrpc_1$2 = dist;
+	class MemberNotFoundError extends xrpc_1$2.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers);
+	  }
+	}
+	updateMember.MemberNotFoundError = MemberNotFoundError;
+	function toKnownErr(e) {
+	  if (e instanceof xrpc_1$2.XRPCError) {
+	    if (e.error === 'MemberNotFound') return new MemberNotFoundError(e);
+	  }
+	  return e;
+	}
+	updateMember.toKnownErr = toKnownErr;
+
+	var defs$d = {};
+
+	Object.defineProperty(defs$d, "__esModule", {
+	  value: true
+	});
+	defs$d.validateRepoBlobRef = defs$d.isRepoBlobRef = defs$d.validateRepoRef = defs$d.isRepoRef = defs$d.validateAccountView = defs$d.isAccountView = defs$d.validateStatusAttr = defs$d.isStatusAttr = void 0;
+	const util_1$A = util$2;
+	const lexicons_1$z = lexicons;
+	function isStatusAttr(v) {
+	  return (0, util_1$A.isObj)(v) && (0, util_1$A.hasProp)(v, '$type') && v.$type === 'com.atproto.admin.defs#statusAttr';
+	}
+	defs$d.isStatusAttr = isStatusAttr;
+	function validateStatusAttr(v) {
+	  return lexicons_1$z.lexicons.validate('com.atproto.admin.defs#statusAttr', v);
+	}
+	defs$d.validateStatusAttr = validateStatusAttr;
+	function isAccountView(v) {
+	  return (0, util_1$A.isObj)(v) && (0, util_1$A.hasProp)(v, '$type') && v.$type === 'com.atproto.admin.defs#accountView';
+	}
+	defs$d.isAccountView = isAccountView;
+	function validateAccountView(v) {
+	  return lexicons_1$z.lexicons.validate('com.atproto.admin.defs#accountView', v);
+	}
+	defs$d.validateAccountView = validateAccountView;
+	function isRepoRef(v) {
+	  return (0, util_1$A.isObj)(v) && (0, util_1$A.hasProp)(v, '$type') && v.$type === 'com.atproto.admin.defs#repoRef';
+	}
+	defs$d.isRepoRef = isRepoRef;
+	function validateRepoRef(v) {
+	  return lexicons_1$z.lexicons.validate('com.atproto.admin.defs#repoRef', v);
+	}
+	defs$d.validateRepoRef = validateRepoRef;
+	function isRepoBlobRef(v) {
+	  return (0, util_1$A.isObj)(v) && (0, util_1$A.hasProp)(v, '$type') && v.$type === 'com.atproto.admin.defs#repoBlobRef';
+	}
+	defs$d.isRepoBlobRef = isRepoBlobRef;
+	function validateRepoBlobRef(v) {
+	  return lexicons_1$z.lexicons.validate('com.atproto.admin.defs#repoBlobRef', v);
+	}
+	defs$d.validateRepoBlobRef = validateRepoBlobRef;
 
 	var defs$c = {};
 
 	Object.defineProperty(defs$c, "__esModule", {
 	  value: true
 	});
-	defs$c.validateRepoBlobRef = defs$c.isRepoBlobRef = defs$c.validateRepoRef = defs$c.isRepoRef = defs$c.validateAccountView = defs$c.isAccountView = defs$c.validateStatusAttr = defs$c.isStatusAttr = void 0;
-	const util_1$y = util$2;
-	const lexicons_1$x = lexicons;
-	function isStatusAttr(v) {
-	  return (0, util_1$y.isObj)(v) && (0, util_1$y.hasProp)(v, '$type') && v.$type === 'com.atproto.admin.defs#statusAttr';
-	}
-	defs$c.isStatusAttr = isStatusAttr;
-	function validateStatusAttr(v) {
-	  return lexicons_1$x.lexicons.validate('com.atproto.admin.defs#statusAttr', v);
-	}
-	defs$c.validateStatusAttr = validateStatusAttr;
-	function isAccountView(v) {
-	  return (0, util_1$y.isObj)(v) && (0, util_1$y.hasProp)(v, '$type') && v.$type === 'com.atproto.admin.defs#accountView';
-	}
-	defs$c.isAccountView = isAccountView;
-	function validateAccountView(v) {
-	  return lexicons_1$x.lexicons.validate('com.atproto.admin.defs#accountView', v);
-	}
-	defs$c.validateAccountView = validateAccountView;
-	function isRepoRef(v) {
-	  return (0, util_1$y.isObj)(v) && (0, util_1$y.hasProp)(v, '$type') && v.$type === 'com.atproto.admin.defs#repoRef';
-	}
-	defs$c.isRepoRef = isRepoRef;
-	function validateRepoRef(v) {
-	  return lexicons_1$x.lexicons.validate('com.atproto.admin.defs#repoRef', v);
-	}
-	defs$c.validateRepoRef = validateRepoRef;
-	function isRepoBlobRef(v) {
-	  return (0, util_1$y.isObj)(v) && (0, util_1$y.hasProp)(v, '$type') && v.$type === 'com.atproto.admin.defs#repoBlobRef';
-	}
-	defs$c.isRepoBlobRef = isRepoBlobRef;
-	function validateRepoBlobRef(v) {
-	  return lexicons_1$x.lexicons.validate('com.atproto.admin.defs#repoBlobRef', v);
-	}
-	defs$c.validateRepoBlobRef = validateRepoBlobRef;
-
-	var defs$b = {};
-
-	Object.defineProperty(defs$b, "__esModule", {
-	  value: true
-	});
-	defs$b.validateLabelValueDefinitionStrings = defs$b.isLabelValueDefinitionStrings = defs$b.validateLabelValueDefinition = defs$b.isLabelValueDefinition = defs$b.validateSelfLabel = defs$b.isSelfLabel = defs$b.validateSelfLabels = defs$b.isSelfLabels = defs$b.validateLabel = defs$b.isLabel = void 0;
-	const util_1$x = util$2;
-	const lexicons_1$w = lexicons;
+	defs$c.validateLabelValueDefinitionStrings = defs$c.isLabelValueDefinitionStrings = defs$c.validateLabelValueDefinition = defs$c.isLabelValueDefinition = defs$c.validateSelfLabel = defs$c.isSelfLabel = defs$c.validateSelfLabels = defs$c.isSelfLabels = defs$c.validateLabel = defs$c.isLabel = void 0;
+	const util_1$z = util$2;
+	const lexicons_1$y = lexicons;
 	function isLabel(v) {
-	  return (0, util_1$x.isObj)(v) && (0, util_1$x.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#label';
+	  return (0, util_1$z.isObj)(v) && (0, util_1$z.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#label';
 	}
-	defs$b.isLabel = isLabel;
+	defs$c.isLabel = isLabel;
 	function validateLabel(v) {
-	  return lexicons_1$w.lexicons.validate('com.atproto.label.defs#label', v);
+	  return lexicons_1$y.lexicons.validate('com.atproto.label.defs#label', v);
 	}
-	defs$b.validateLabel = validateLabel;
+	defs$c.validateLabel = validateLabel;
 	function isSelfLabels(v) {
-	  return (0, util_1$x.isObj)(v) && (0, util_1$x.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#selfLabels';
+	  return (0, util_1$z.isObj)(v) && (0, util_1$z.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#selfLabels';
 	}
-	defs$b.isSelfLabels = isSelfLabels;
+	defs$c.isSelfLabels = isSelfLabels;
 	function validateSelfLabels(v) {
-	  return lexicons_1$w.lexicons.validate('com.atproto.label.defs#selfLabels', v);
+	  return lexicons_1$y.lexicons.validate('com.atproto.label.defs#selfLabels', v);
 	}
-	defs$b.validateSelfLabels = validateSelfLabels;
+	defs$c.validateSelfLabels = validateSelfLabels;
 	function isSelfLabel(v) {
-	  return (0, util_1$x.isObj)(v) && (0, util_1$x.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#selfLabel';
+	  return (0, util_1$z.isObj)(v) && (0, util_1$z.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#selfLabel';
 	}
-	defs$b.isSelfLabel = isSelfLabel;
+	defs$c.isSelfLabel = isSelfLabel;
 	function validateSelfLabel(v) {
-	  return lexicons_1$w.lexicons.validate('com.atproto.label.defs#selfLabel', v);
+	  return lexicons_1$y.lexicons.validate('com.atproto.label.defs#selfLabel', v);
 	}
-	defs$b.validateSelfLabel = validateSelfLabel;
+	defs$c.validateSelfLabel = validateSelfLabel;
 	function isLabelValueDefinition(v) {
-	  return (0, util_1$x.isObj)(v) && (0, util_1$x.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#labelValueDefinition';
+	  return (0, util_1$z.isObj)(v) && (0, util_1$z.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#labelValueDefinition';
 	}
-	defs$b.isLabelValueDefinition = isLabelValueDefinition;
+	defs$c.isLabelValueDefinition = isLabelValueDefinition;
 	function validateLabelValueDefinition(v) {
-	  return lexicons_1$w.lexicons.validate('com.atproto.label.defs#labelValueDefinition', v);
+	  return lexicons_1$y.lexicons.validate('com.atproto.label.defs#labelValueDefinition', v);
 	}
-	defs$b.validateLabelValueDefinition = validateLabelValueDefinition;
+	defs$c.validateLabelValueDefinition = validateLabelValueDefinition;
 	function isLabelValueDefinitionStrings(v) {
-	  return (0, util_1$x.isObj)(v) && (0, util_1$x.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#labelValueDefinitionStrings';
+	  return (0, util_1$z.isObj)(v) && (0, util_1$z.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#labelValueDefinitionStrings';
 	}
-	defs$b.isLabelValueDefinitionStrings = isLabelValueDefinitionStrings;
+	defs$c.isLabelValueDefinitionStrings = isLabelValueDefinitionStrings;
 	function validateLabelValueDefinitionStrings(v) {
-	  return lexicons_1$w.lexicons.validate('com.atproto.label.defs#labelValueDefinitionStrings', v);
+	  return lexicons_1$y.lexicons.validate('com.atproto.label.defs#labelValueDefinitionStrings', v);
 	}
-	defs$b.validateLabelValueDefinitionStrings = validateLabelValueDefinitionStrings;
+	defs$c.validateLabelValueDefinitionStrings = validateLabelValueDefinitionStrings;
 
 	var subscribeLabels = {};
 
@@ -26756,45 +27479,45 @@ if (cid) {
 	  value: true
 	});
 	subscribeLabels.validateInfo = subscribeLabels.isInfo = subscribeLabels.validateLabels = subscribeLabels.isLabels = void 0;
-	const util_1$w = util$2;
-	const lexicons_1$v = lexicons;
+	const util_1$y = util$2;
+	const lexicons_1$x = lexicons;
 	function isLabels(v) {
-	  return (0, util_1$w.isObj)(v) && (0, util_1$w.hasProp)(v, '$type') && v.$type === 'com.atproto.label.subscribeLabels#labels';
+	  return (0, util_1$y.isObj)(v) && (0, util_1$y.hasProp)(v, '$type') && v.$type === 'com.atproto.label.subscribeLabels#labels';
 	}
 	subscribeLabels.isLabels = isLabels;
 	function validateLabels(v) {
-	  return lexicons_1$v.lexicons.validate('com.atproto.label.subscribeLabels#labels', v);
+	  return lexicons_1$x.lexicons.validate('com.atproto.label.subscribeLabels#labels', v);
 	}
 	subscribeLabels.validateLabels = validateLabels;
 	function isInfo$1(v) {
-	  return (0, util_1$w.isObj)(v) && (0, util_1$w.hasProp)(v, '$type') && v.$type === 'com.atproto.label.subscribeLabels#info';
+	  return (0, util_1$y.isObj)(v) && (0, util_1$y.hasProp)(v, '$type') && v.$type === 'com.atproto.label.subscribeLabels#info';
 	}
 	subscribeLabels.isInfo = isInfo$1;
 	function validateInfo$1(v) {
-	  return lexicons_1$v.lexicons.validate('com.atproto.label.subscribeLabels#info', v);
+	  return lexicons_1$x.lexicons.validate('com.atproto.label.subscribeLabels#info', v);
 	}
 	subscribeLabels.validateInfo = validateInfo$1;
 
-	var defs$a = {};
+	var defs$b = {};
 
-	Object.defineProperty(defs$a, "__esModule", {
+	Object.defineProperty(defs$b, "__esModule", {
 	  value: true
 	});
-	defs$a.REASONAPPEAL = defs$a.REASONOTHER = defs$a.REASONRUDE = defs$a.REASONSEXUAL = defs$a.REASONMISLEADING = defs$a.REASONVIOLATION = defs$a.REASONSPAM = void 0;
+	defs$b.REASONAPPEAL = defs$b.REASONOTHER = defs$b.REASONRUDE = defs$b.REASONSEXUAL = defs$b.REASONMISLEADING = defs$b.REASONVIOLATION = defs$b.REASONSPAM = void 0;
 	/** Spam: frequent unwanted promotion, replies, mentions */
-	defs$a.REASONSPAM = 'com.atproto.moderation.defs#reasonSpam';
+	defs$b.REASONSPAM = 'com.atproto.moderation.defs#reasonSpam';
 	/** Direct violation of server rules, laws, terms of service */
-	defs$a.REASONVIOLATION = 'com.atproto.moderation.defs#reasonViolation';
+	defs$b.REASONVIOLATION = 'com.atproto.moderation.defs#reasonViolation';
 	/** Misleading identity, affiliation, or content */
-	defs$a.REASONMISLEADING = 'com.atproto.moderation.defs#reasonMisleading';
+	defs$b.REASONMISLEADING = 'com.atproto.moderation.defs#reasonMisleading';
 	/** Unwanted or mislabeled sexual content */
-	defs$a.REASONSEXUAL = 'com.atproto.moderation.defs#reasonSexual';
+	defs$b.REASONSEXUAL = 'com.atproto.moderation.defs#reasonSexual';
 	/** Rude, harassing, explicit, or otherwise unwelcoming behavior */
-	defs$a.REASONRUDE = 'com.atproto.moderation.defs#reasonRude';
+	defs$b.REASONRUDE = 'com.atproto.moderation.defs#reasonRude';
 	/** Other: reports not falling under another report category */
-	defs$a.REASONOTHER = 'com.atproto.moderation.defs#reasonOther';
+	defs$b.REASONOTHER = 'com.atproto.moderation.defs#reasonOther';
 	/** Appeal: appeal a previously taken moderation action */
-	defs$a.REASONAPPEAL = 'com.atproto.moderation.defs#reasonAppeal';
+	defs$b.REASONAPPEAL = 'com.atproto.moderation.defs#reasonAppeal';
 
 	var strongRef = {};
 
@@ -26802,41 +27525,41 @@ if (cid) {
 	  value: true
 	});
 	strongRef.validateMain = strongRef.isMain = void 0;
-	const util_1$v = util$2;
-	const lexicons_1$u = lexicons;
+	const util_1$x = util$2;
+	const lexicons_1$w = lexicons;
 	function isMain$5(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && (v.$type === 'com.atproto.repo.strongRef#main' || v.$type === 'com.atproto.repo.strongRef');
+	  return (0, util_1$x.isObj)(v) && (0, util_1$x.hasProp)(v, '$type') && (v.$type === 'com.atproto.repo.strongRef#main' || v.$type === 'com.atproto.repo.strongRef');
 	}
 	strongRef.isMain = isMain$5;
 	function validateMain$5(v) {
-	  return lexicons_1$u.lexicons.validate('com.atproto.repo.strongRef#main', v);
+	  return lexicons_1$w.lexicons.validate('com.atproto.repo.strongRef#main', v);
 	}
 	strongRef.validateMain = validateMain$5;
 
-	var defs$9 = {};
+	var defs$a = {};
 
-	Object.defineProperty(defs$9, "__esModule", {
+	Object.defineProperty(defs$a, "__esModule", {
 	  value: true
 	});
-	defs$9.validateInviteCodeUse = defs$9.isInviteCodeUse = defs$9.validateInviteCode = defs$9.isInviteCode = void 0;
-	const util_1$u = util$2;
-	const lexicons_1$t = lexicons;
+	defs$a.validateInviteCodeUse = defs$a.isInviteCodeUse = defs$a.validateInviteCode = defs$a.isInviteCode = void 0;
+	const util_1$w = util$2;
+	const lexicons_1$v = lexicons;
 	function isInviteCode(v) {
-	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'com.atproto.server.defs#inviteCode';
+	  return (0, util_1$w.isObj)(v) && (0, util_1$w.hasProp)(v, '$type') && v.$type === 'com.atproto.server.defs#inviteCode';
 	}
-	defs$9.isInviteCode = isInviteCode;
+	defs$a.isInviteCode = isInviteCode;
 	function validateInviteCode(v) {
-	  return lexicons_1$t.lexicons.validate('com.atproto.server.defs#inviteCode', v);
+	  return lexicons_1$v.lexicons.validate('com.atproto.server.defs#inviteCode', v);
 	}
-	defs$9.validateInviteCode = validateInviteCode;
+	defs$a.validateInviteCode = validateInviteCode;
 	function isInviteCodeUse(v) {
-	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'com.atproto.server.defs#inviteCodeUse';
+	  return (0, util_1$w.isObj)(v) && (0, util_1$w.hasProp)(v, '$type') && v.$type === 'com.atproto.server.defs#inviteCodeUse';
 	}
-	defs$9.isInviteCodeUse = isInviteCodeUse;
+	defs$a.isInviteCodeUse = isInviteCodeUse;
 	function validateInviteCodeUse(v) {
-	  return lexicons_1$t.lexicons.validate('com.atproto.server.defs#inviteCodeUse', v);
+	  return lexicons_1$v.lexicons.validate('com.atproto.server.defs#inviteCodeUse', v);
 	}
-	defs$9.validateInviteCodeUse = validateInviteCodeUse;
+	defs$a.validateInviteCodeUse = validateInviteCodeUse;
 
 	var subscribeRepos = {};
 
@@ -26844,249 +27567,265 @@ if (cid) {
 	  value: true
 	});
 	subscribeRepos.validateRepoOp = subscribeRepos.isRepoOp = subscribeRepos.validateInfo = subscribeRepos.isInfo = subscribeRepos.validateTombstone = subscribeRepos.isTombstone = subscribeRepos.validateMigrate = subscribeRepos.isMigrate = subscribeRepos.validateHandle = subscribeRepos.isHandle = subscribeRepos.validateAccount = subscribeRepos.isAccount = subscribeRepos.validateIdentity = subscribeRepos.isIdentity = subscribeRepos.validateCommit = subscribeRepos.isCommit = void 0;
-	const util_1$t = util$2;
-	const lexicons_1$s = lexicons;
+	const util_1$v = util$2;
+	const lexicons_1$u = lexicons;
 	function isCommit(v) {
-	  return (0, util_1$t.isObj)(v) && (0, util_1$t.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#commit';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#commit';
 	}
 	subscribeRepos.isCommit = isCommit;
 	function validateCommit(v) {
-	  return lexicons_1$s.lexicons.validate('com.atproto.sync.subscribeRepos#commit', v);
+	  return lexicons_1$u.lexicons.validate('com.atproto.sync.subscribeRepos#commit', v);
 	}
 	subscribeRepos.validateCommit = validateCommit;
 	function isIdentity(v) {
-	  return (0, util_1$t.isObj)(v) && (0, util_1$t.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#identity';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#identity';
 	}
 	subscribeRepos.isIdentity = isIdentity;
 	function validateIdentity(v) {
-	  return lexicons_1$s.lexicons.validate('com.atproto.sync.subscribeRepos#identity', v);
+	  return lexicons_1$u.lexicons.validate('com.atproto.sync.subscribeRepos#identity', v);
 	}
 	subscribeRepos.validateIdentity = validateIdentity;
 	function isAccount(v) {
-	  return (0, util_1$t.isObj)(v) && (0, util_1$t.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#account';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#account';
 	}
 	subscribeRepos.isAccount = isAccount;
 	function validateAccount(v) {
-	  return lexicons_1$s.lexicons.validate('com.atproto.sync.subscribeRepos#account', v);
+	  return lexicons_1$u.lexicons.validate('com.atproto.sync.subscribeRepos#account', v);
 	}
 	subscribeRepos.validateAccount = validateAccount;
 	function isHandle(v) {
-	  return (0, util_1$t.isObj)(v) && (0, util_1$t.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#handle';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#handle';
 	}
 	subscribeRepos.isHandle = isHandle;
 	function validateHandle(v) {
-	  return lexicons_1$s.lexicons.validate('com.atproto.sync.subscribeRepos#handle', v);
+	  return lexicons_1$u.lexicons.validate('com.atproto.sync.subscribeRepos#handle', v);
 	}
 	subscribeRepos.validateHandle = validateHandle;
 	function isMigrate(v) {
-	  return (0, util_1$t.isObj)(v) && (0, util_1$t.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#migrate';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#migrate';
 	}
 	subscribeRepos.isMigrate = isMigrate;
 	function validateMigrate(v) {
-	  return lexicons_1$s.lexicons.validate('com.atproto.sync.subscribeRepos#migrate', v);
+	  return lexicons_1$u.lexicons.validate('com.atproto.sync.subscribeRepos#migrate', v);
 	}
 	subscribeRepos.validateMigrate = validateMigrate;
 	function isTombstone(v) {
-	  return (0, util_1$t.isObj)(v) && (0, util_1$t.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#tombstone';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#tombstone';
 	}
 	subscribeRepos.isTombstone = isTombstone;
 	function validateTombstone(v) {
-	  return lexicons_1$s.lexicons.validate('com.atproto.sync.subscribeRepos#tombstone', v);
+	  return lexicons_1$u.lexicons.validate('com.atproto.sync.subscribeRepos#tombstone', v);
 	}
 	subscribeRepos.validateTombstone = validateTombstone;
 	function isInfo(v) {
-	  return (0, util_1$t.isObj)(v) && (0, util_1$t.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#info';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#info';
 	}
 	subscribeRepos.isInfo = isInfo;
 	function validateInfo(v) {
-	  return lexicons_1$s.lexicons.validate('com.atproto.sync.subscribeRepos#info', v);
+	  return lexicons_1$u.lexicons.validate('com.atproto.sync.subscribeRepos#info', v);
 	}
 	subscribeRepos.validateInfo = validateInfo;
 	function isRepoOp(v) {
-	  return (0, util_1$t.isObj)(v) && (0, util_1$t.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#repoOp';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#repoOp';
 	}
 	subscribeRepos.isRepoOp = isRepoOp;
 	function validateRepoOp(v) {
-	  return lexicons_1$s.lexicons.validate('com.atproto.sync.subscribeRepos#repoOp', v);
+	  return lexicons_1$u.lexicons.validate('com.atproto.sync.subscribeRepos#repoOp', v);
 	}
 	subscribeRepos.validateRepoOp = validateRepoOp;
 
-	var defs$8 = {};
+	var defs$9 = {};
 
-	Object.defineProperty(defs$8, "__esModule", {
+	Object.defineProperty(defs$9, "__esModule", {
 	  value: true
 	});
-	defs$8.validateLabelerPrefItem = defs$8.isLabelerPrefItem = defs$8.validateLabelersPref = defs$8.isLabelersPref = defs$8.validateHiddenPostsPref = defs$8.isHiddenPostsPref = defs$8.validateMutedWordsPref = defs$8.isMutedWordsPref = defs$8.validateMutedWord = defs$8.isMutedWord = defs$8.validateInterestsPref = defs$8.isInterestsPref = defs$8.validateThreadViewPref = defs$8.isThreadViewPref = defs$8.validateFeedViewPref = defs$8.isFeedViewPref = defs$8.validatePersonalDetailsPref = defs$8.isPersonalDetailsPref = defs$8.validateSavedFeedsPref = defs$8.isSavedFeedsPref = defs$8.validateSavedFeedsPrefV2 = defs$8.isSavedFeedsPrefV2 = defs$8.validateSavedFeed = defs$8.isSavedFeed = defs$8.validateContentLabelPref = defs$8.isContentLabelPref = defs$8.validateAdultContentPref = defs$8.isAdultContentPref = defs$8.validateKnownFollowers = defs$8.isKnownFollowers = defs$8.validateViewerState = defs$8.isViewerState = defs$8.validateProfileAssociatedChat = defs$8.isProfileAssociatedChat = defs$8.validateProfileAssociated = defs$8.isProfileAssociated = defs$8.validateProfileViewDetailed = defs$8.isProfileViewDetailed = defs$8.validateProfileView = defs$8.isProfileView = defs$8.validateProfileViewBasic = defs$8.isProfileViewBasic = void 0;
-	const util_1$s = util$2;
-	const lexicons_1$r = lexicons;
+	defs$9.validateBskyAppProgressGuide = defs$9.isBskyAppProgressGuide = defs$9.validateBskyAppStatePref = defs$9.isBskyAppStatePref = defs$9.validateLabelerPrefItem = defs$9.isLabelerPrefItem = defs$9.validateLabelersPref = defs$9.isLabelersPref = defs$9.validateHiddenPostsPref = defs$9.isHiddenPostsPref = defs$9.validateMutedWordsPref = defs$9.isMutedWordsPref = defs$9.validateMutedWord = defs$9.isMutedWord = defs$9.validateInterestsPref = defs$9.isInterestsPref = defs$9.validateThreadViewPref = defs$9.isThreadViewPref = defs$9.validateFeedViewPref = defs$9.isFeedViewPref = defs$9.validatePersonalDetailsPref = defs$9.isPersonalDetailsPref = defs$9.validateSavedFeedsPref = defs$9.isSavedFeedsPref = defs$9.validateSavedFeedsPrefV2 = defs$9.isSavedFeedsPrefV2 = defs$9.validateSavedFeed = defs$9.isSavedFeed = defs$9.validateContentLabelPref = defs$9.isContentLabelPref = defs$9.validateAdultContentPref = defs$9.isAdultContentPref = defs$9.validateKnownFollowers = defs$9.isKnownFollowers = defs$9.validateViewerState = defs$9.isViewerState = defs$9.validateProfileAssociatedChat = defs$9.isProfileAssociatedChat = defs$9.validateProfileAssociated = defs$9.isProfileAssociated = defs$9.validateProfileViewDetailed = defs$9.isProfileViewDetailed = defs$9.validateProfileView = defs$9.isProfileView = defs$9.validateProfileViewBasic = defs$9.isProfileViewBasic = void 0;
+	const util_1$u = util$2;
+	const lexicons_1$t = lexicons;
 	function isProfileViewBasic$1(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileViewBasic';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileViewBasic';
 	}
-	defs$8.isProfileViewBasic = isProfileViewBasic$1;
+	defs$9.isProfileViewBasic = isProfileViewBasic$1;
 	function validateProfileViewBasic$1(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#profileViewBasic', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#profileViewBasic', v);
 	}
-	defs$8.validateProfileViewBasic = validateProfileViewBasic$1;
+	defs$9.validateProfileViewBasic = validateProfileViewBasic$1;
 	function isProfileView(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileView';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileView';
 	}
-	defs$8.isProfileView = isProfileView;
+	defs$9.isProfileView = isProfileView;
 	function validateProfileView(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#profileView', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#profileView', v);
 	}
-	defs$8.validateProfileView = validateProfileView;
+	defs$9.validateProfileView = validateProfileView;
 	function isProfileViewDetailed(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileViewDetailed';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileViewDetailed';
 	}
-	defs$8.isProfileViewDetailed = isProfileViewDetailed;
+	defs$9.isProfileViewDetailed = isProfileViewDetailed;
 	function validateProfileViewDetailed(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#profileViewDetailed', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#profileViewDetailed', v);
 	}
-	defs$8.validateProfileViewDetailed = validateProfileViewDetailed;
+	defs$9.validateProfileViewDetailed = validateProfileViewDetailed;
 	function isProfileAssociated(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileAssociated';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileAssociated';
 	}
-	defs$8.isProfileAssociated = isProfileAssociated;
+	defs$9.isProfileAssociated = isProfileAssociated;
 	function validateProfileAssociated(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#profileAssociated', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#profileAssociated', v);
 	}
-	defs$8.validateProfileAssociated = validateProfileAssociated;
+	defs$9.validateProfileAssociated = validateProfileAssociated;
 	function isProfileAssociatedChat(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileAssociatedChat';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileAssociatedChat';
 	}
-	defs$8.isProfileAssociatedChat = isProfileAssociatedChat;
+	defs$9.isProfileAssociatedChat = isProfileAssociatedChat;
 	function validateProfileAssociatedChat(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#profileAssociatedChat', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#profileAssociatedChat', v);
 	}
-	defs$8.validateProfileAssociatedChat = validateProfileAssociatedChat;
+	defs$9.validateProfileAssociatedChat = validateProfileAssociatedChat;
 	function isViewerState$1(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#viewerState';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#viewerState';
 	}
-	defs$8.isViewerState = isViewerState$1;
+	defs$9.isViewerState = isViewerState$1;
 	function validateViewerState$1(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#viewerState', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#viewerState', v);
 	}
-	defs$8.validateViewerState = validateViewerState$1;
+	defs$9.validateViewerState = validateViewerState$1;
 	function isKnownFollowers(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#knownFollowers';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#knownFollowers';
 	}
-	defs$8.isKnownFollowers = isKnownFollowers;
+	defs$9.isKnownFollowers = isKnownFollowers;
 	function validateKnownFollowers(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#knownFollowers', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#knownFollowers', v);
 	}
-	defs$8.validateKnownFollowers = validateKnownFollowers;
+	defs$9.validateKnownFollowers = validateKnownFollowers;
 	function isAdultContentPref(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#adultContentPref';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#adultContentPref';
 	}
-	defs$8.isAdultContentPref = isAdultContentPref;
+	defs$9.isAdultContentPref = isAdultContentPref;
 	function validateAdultContentPref(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#adultContentPref', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#adultContentPref', v);
 	}
-	defs$8.validateAdultContentPref = validateAdultContentPref;
+	defs$9.validateAdultContentPref = validateAdultContentPref;
 	function isContentLabelPref(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#contentLabelPref';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#contentLabelPref';
 	}
-	defs$8.isContentLabelPref = isContentLabelPref;
+	defs$9.isContentLabelPref = isContentLabelPref;
 	function validateContentLabelPref(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#contentLabelPref', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#contentLabelPref', v);
 	}
-	defs$8.validateContentLabelPref = validateContentLabelPref;
+	defs$9.validateContentLabelPref = validateContentLabelPref;
 	function isSavedFeed(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#savedFeed';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#savedFeed';
 	}
-	defs$8.isSavedFeed = isSavedFeed;
+	defs$9.isSavedFeed = isSavedFeed;
 	function validateSavedFeed(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#savedFeed', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#savedFeed', v);
 	}
-	defs$8.validateSavedFeed = validateSavedFeed;
+	defs$9.validateSavedFeed = validateSavedFeed;
 	function isSavedFeedsPrefV2(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#savedFeedsPrefV2';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#savedFeedsPrefV2';
 	}
-	defs$8.isSavedFeedsPrefV2 = isSavedFeedsPrefV2;
+	defs$9.isSavedFeedsPrefV2 = isSavedFeedsPrefV2;
 	function validateSavedFeedsPrefV2(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#savedFeedsPrefV2', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#savedFeedsPrefV2', v);
 	}
-	defs$8.validateSavedFeedsPrefV2 = validateSavedFeedsPrefV2;
+	defs$9.validateSavedFeedsPrefV2 = validateSavedFeedsPrefV2;
 	function isSavedFeedsPref(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#savedFeedsPref';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#savedFeedsPref';
 	}
-	defs$8.isSavedFeedsPref = isSavedFeedsPref;
+	defs$9.isSavedFeedsPref = isSavedFeedsPref;
 	function validateSavedFeedsPref(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#savedFeedsPref', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#savedFeedsPref', v);
 	}
-	defs$8.validateSavedFeedsPref = validateSavedFeedsPref;
+	defs$9.validateSavedFeedsPref = validateSavedFeedsPref;
 	function isPersonalDetailsPref(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#personalDetailsPref';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#personalDetailsPref';
 	}
-	defs$8.isPersonalDetailsPref = isPersonalDetailsPref;
+	defs$9.isPersonalDetailsPref = isPersonalDetailsPref;
 	function validatePersonalDetailsPref(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#personalDetailsPref', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#personalDetailsPref', v);
 	}
-	defs$8.validatePersonalDetailsPref = validatePersonalDetailsPref;
+	defs$9.validatePersonalDetailsPref = validatePersonalDetailsPref;
 	function isFeedViewPref(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#feedViewPref';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#feedViewPref';
 	}
-	defs$8.isFeedViewPref = isFeedViewPref;
+	defs$9.isFeedViewPref = isFeedViewPref;
 	function validateFeedViewPref(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#feedViewPref', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#feedViewPref', v);
 	}
-	defs$8.validateFeedViewPref = validateFeedViewPref;
+	defs$9.validateFeedViewPref = validateFeedViewPref;
 	function isThreadViewPref(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#threadViewPref';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#threadViewPref';
 	}
-	defs$8.isThreadViewPref = isThreadViewPref;
+	defs$9.isThreadViewPref = isThreadViewPref;
 	function validateThreadViewPref(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#threadViewPref', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#threadViewPref', v);
 	}
-	defs$8.validateThreadViewPref = validateThreadViewPref;
+	defs$9.validateThreadViewPref = validateThreadViewPref;
 	function isInterestsPref(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#interestsPref';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#interestsPref';
 	}
-	defs$8.isInterestsPref = isInterestsPref;
+	defs$9.isInterestsPref = isInterestsPref;
 	function validateInterestsPref(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#interestsPref', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#interestsPref', v);
 	}
-	defs$8.validateInterestsPref = validateInterestsPref;
+	defs$9.validateInterestsPref = validateInterestsPref;
 	function isMutedWord(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#mutedWord';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#mutedWord';
 	}
-	defs$8.isMutedWord = isMutedWord;
+	defs$9.isMutedWord = isMutedWord;
 	function validateMutedWord(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#mutedWord', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#mutedWord', v);
 	}
-	defs$8.validateMutedWord = validateMutedWord;
+	defs$9.validateMutedWord = validateMutedWord;
 	function isMutedWordsPref(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#mutedWordsPref';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#mutedWordsPref';
 	}
-	defs$8.isMutedWordsPref = isMutedWordsPref;
+	defs$9.isMutedWordsPref = isMutedWordsPref;
 	function validateMutedWordsPref(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#mutedWordsPref', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#mutedWordsPref', v);
 	}
-	defs$8.validateMutedWordsPref = validateMutedWordsPref;
+	defs$9.validateMutedWordsPref = validateMutedWordsPref;
 	function isHiddenPostsPref(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#hiddenPostsPref';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#hiddenPostsPref';
 	}
-	defs$8.isHiddenPostsPref = isHiddenPostsPref;
+	defs$9.isHiddenPostsPref = isHiddenPostsPref;
 	function validateHiddenPostsPref(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#hiddenPostsPref', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#hiddenPostsPref', v);
 	}
-	defs$8.validateHiddenPostsPref = validateHiddenPostsPref;
+	defs$9.validateHiddenPostsPref = validateHiddenPostsPref;
 	function isLabelersPref(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#labelersPref';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#labelersPref';
 	}
-	defs$8.isLabelersPref = isLabelersPref;
+	defs$9.isLabelersPref = isLabelersPref;
 	function validateLabelersPref(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#labelersPref', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#labelersPref', v);
 	}
-	defs$8.validateLabelersPref = validateLabelersPref;
+	defs$9.validateLabelersPref = validateLabelersPref;
 	function isLabelerPrefItem(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#labelerPrefItem';
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#labelerPrefItem';
 	}
-	defs$8.isLabelerPrefItem = isLabelerPrefItem;
+	defs$9.isLabelerPrefItem = isLabelerPrefItem;
 	function validateLabelerPrefItem(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.actor.defs#labelerPrefItem', v);
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#labelerPrefItem', v);
 	}
-	defs$8.validateLabelerPrefItem = validateLabelerPrefItem;
+	defs$9.validateLabelerPrefItem = validateLabelerPrefItem;
+	function isBskyAppStatePref(v) {
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#bskyAppStatePref';
+	}
+	defs$9.isBskyAppStatePref = isBskyAppStatePref;
+	function validateBskyAppStatePref(v) {
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#bskyAppStatePref', v);
+	}
+	defs$9.validateBskyAppStatePref = validateBskyAppStatePref;
+	function isBskyAppProgressGuide(v) {
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#bskyAppProgressGuide';
+	}
+	defs$9.isBskyAppProgressGuide = isBskyAppProgressGuide;
+	function validateBskyAppProgressGuide(v) {
+	  return lexicons_1$t.lexicons.validate('app.bsky.actor.defs#bskyAppProgressGuide', v);
+	}
+	defs$9.validateBskyAppProgressGuide = validateBskyAppProgressGuide;
 
 	var profile$1 = {};
 
@@ -27094,16 +27833,16 @@ if (cid) {
 	  value: true
 	});
 	profile$1.validateRecord = profile$1.isRecord = void 0;
-	const util_1$r = util$2;
-	const lexicons_1$q = lexicons;
-	function isRecord$c(v) {
-	  return (0, util_1$r.isObj)(v) && (0, util_1$r.hasProp)(v, '$type') && (v.$type === 'app.bsky.actor.profile#main' || v.$type === 'app.bsky.actor.profile');
+	const util_1$t = util$2;
+	const lexicons_1$s = lexicons;
+	function isRecord$d(v) {
+	  return (0, util_1$t.isObj)(v) && (0, util_1$t.hasProp)(v, '$type') && (v.$type === 'app.bsky.actor.profile#main' || v.$type === 'app.bsky.actor.profile');
 	}
-	profile$1.isRecord = isRecord$c;
-	function validateRecord$c(v) {
-	  return lexicons_1$q.lexicons.validate('app.bsky.actor.profile#main', v);
+	profile$1.isRecord = isRecord$d;
+	function validateRecord$d(v) {
+	  return lexicons_1$s.lexicons.validate('app.bsky.actor.profile#main', v);
 	}
-	profile$1.validateRecord = validateRecord$c;
+	profile$1.validateRecord = validateRecord$d;
 
 	var external = {};
 
@@ -27111,38 +27850,38 @@ if (cid) {
 	  value: true
 	});
 	external.validateViewExternal = external.isViewExternal = external.validateView = external.isView = external.validateExternal = external.isExternal = external.validateMain = external.isMain = void 0;
-	const util_1$q = util$2;
-	const lexicons_1$p = lexicons;
+	const util_1$s = util$2;
+	const lexicons_1$r = lexicons;
 	function isMain$4(v) {
-	  return (0, util_1$q.isObj)(v) && (0, util_1$q.hasProp)(v, '$type') && (v.$type === 'app.bsky.embed.external#main' || v.$type === 'app.bsky.embed.external');
+	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && (v.$type === 'app.bsky.embed.external#main' || v.$type === 'app.bsky.embed.external');
 	}
 	external.isMain = isMain$4;
 	function validateMain$4(v) {
-	  return lexicons_1$p.lexicons.validate('app.bsky.embed.external#main', v);
+	  return lexicons_1$r.lexicons.validate('app.bsky.embed.external#main', v);
 	}
 	external.validateMain = validateMain$4;
 	function isExternal(v) {
-	  return (0, util_1$q.isObj)(v) && (0, util_1$q.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.external#external';
+	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.external#external';
 	}
 	external.isExternal = isExternal;
 	function validateExternal(v) {
-	  return lexicons_1$p.lexicons.validate('app.bsky.embed.external#external', v);
+	  return lexicons_1$r.lexicons.validate('app.bsky.embed.external#external', v);
 	}
 	external.validateExternal = validateExternal;
 	function isView$3(v) {
-	  return (0, util_1$q.isObj)(v) && (0, util_1$q.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.external#view';
+	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.external#view';
 	}
 	external.isView = isView$3;
 	function validateView$3(v) {
-	  return lexicons_1$p.lexicons.validate('app.bsky.embed.external#view', v);
+	  return lexicons_1$r.lexicons.validate('app.bsky.embed.external#view', v);
 	}
 	external.validateView = validateView$3;
 	function isViewExternal(v) {
-	  return (0, util_1$q.isObj)(v) && (0, util_1$q.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.external#viewExternal';
+	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.external#viewExternal';
 	}
 	external.isViewExternal = isViewExternal;
 	function validateViewExternal(v) {
-	  return lexicons_1$p.lexicons.validate('app.bsky.embed.external#viewExternal', v);
+	  return lexicons_1$r.lexicons.validate('app.bsky.embed.external#viewExternal', v);
 	}
 	external.validateViewExternal = validateViewExternal;
 
@@ -27152,46 +27891,46 @@ if (cid) {
 	  value: true
 	});
 	images.validateViewImage = images.isViewImage = images.validateView = images.isView = images.validateAspectRatio = images.isAspectRatio = images.validateImage = images.isImage = images.validateMain = images.isMain = void 0;
-	const util_1$p = util$2;
-	const lexicons_1$o = lexicons;
+	const util_1$r = util$2;
+	const lexicons_1$q = lexicons;
 	function isMain$3(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && (v.$type === 'app.bsky.embed.images#main' || v.$type === 'app.bsky.embed.images');
+	  return (0, util_1$r.isObj)(v) && (0, util_1$r.hasProp)(v, '$type') && (v.$type === 'app.bsky.embed.images#main' || v.$type === 'app.bsky.embed.images');
 	}
 	images.isMain = isMain$3;
 	function validateMain$3(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.embed.images#main', v);
+	  return lexicons_1$q.lexicons.validate('app.bsky.embed.images#main', v);
 	}
 	images.validateMain = validateMain$3;
 	function isImage(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.images#image';
+	  return (0, util_1$r.isObj)(v) && (0, util_1$r.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.images#image';
 	}
 	images.isImage = isImage;
 	function validateImage(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.embed.images#image', v);
+	  return lexicons_1$q.lexicons.validate('app.bsky.embed.images#image', v);
 	}
 	images.validateImage = validateImage;
 	function isAspectRatio(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.images#aspectRatio';
+	  return (0, util_1$r.isObj)(v) && (0, util_1$r.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.images#aspectRatio';
 	}
 	images.isAspectRatio = isAspectRatio;
 	function validateAspectRatio(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.embed.images#aspectRatio', v);
+	  return lexicons_1$q.lexicons.validate('app.bsky.embed.images#aspectRatio', v);
 	}
 	images.validateAspectRatio = validateAspectRatio;
 	function isView$2(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.images#view';
+	  return (0, util_1$r.isObj)(v) && (0, util_1$r.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.images#view';
 	}
 	images.isView = isView$2;
 	function validateView$2(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.embed.images#view', v);
+	  return lexicons_1$q.lexicons.validate('app.bsky.embed.images#view', v);
 	}
 	images.validateView = validateView$2;
 	function isViewImage(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.images#viewImage';
+	  return (0, util_1$r.isObj)(v) && (0, util_1$r.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.images#viewImage';
 	}
 	images.isViewImage = isViewImage;
 	function validateViewImage(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.embed.images#viewImage', v);
+	  return lexicons_1$q.lexicons.validate('app.bsky.embed.images#viewImage', v);
 	}
 	images.validateViewImage = validateViewImage;
 
@@ -27201,46 +27940,46 @@ if (cid) {
 	  value: true
 	});
 	record.validateViewBlocked = record.isViewBlocked = record.validateViewNotFound = record.isViewNotFound = record.validateViewRecord = record.isViewRecord = record.validateView = record.isView = record.validateMain = record.isMain = void 0;
-	const util_1$o = util$2;
-	const lexicons_1$n = lexicons;
+	const util_1$q = util$2;
+	const lexicons_1$p = lexicons;
 	function isMain$2(v) {
-	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && (v.$type === 'app.bsky.embed.record#main' || v.$type === 'app.bsky.embed.record');
+	  return (0, util_1$q.isObj)(v) && (0, util_1$q.hasProp)(v, '$type') && (v.$type === 'app.bsky.embed.record#main' || v.$type === 'app.bsky.embed.record');
 	}
 	record.isMain = isMain$2;
 	function validateMain$2(v) {
-	  return lexicons_1$n.lexicons.validate('app.bsky.embed.record#main', v);
+	  return lexicons_1$p.lexicons.validate('app.bsky.embed.record#main', v);
 	}
 	record.validateMain = validateMain$2;
 	function isView$1(v) {
-	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.record#view';
+	  return (0, util_1$q.isObj)(v) && (0, util_1$q.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.record#view';
 	}
 	record.isView = isView$1;
 	function validateView$1(v) {
-	  return lexicons_1$n.lexicons.validate('app.bsky.embed.record#view', v);
+	  return lexicons_1$p.lexicons.validate('app.bsky.embed.record#view', v);
 	}
 	record.validateView = validateView$1;
 	function isViewRecord(v) {
-	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.record#viewRecord';
+	  return (0, util_1$q.isObj)(v) && (0, util_1$q.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.record#viewRecord';
 	}
 	record.isViewRecord = isViewRecord;
 	function validateViewRecord(v) {
-	  return lexicons_1$n.lexicons.validate('app.bsky.embed.record#viewRecord', v);
+	  return lexicons_1$p.lexicons.validate('app.bsky.embed.record#viewRecord', v);
 	}
 	record.validateViewRecord = validateViewRecord;
 	function isViewNotFound(v) {
-	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.record#viewNotFound';
+	  return (0, util_1$q.isObj)(v) && (0, util_1$q.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.record#viewNotFound';
 	}
 	record.isViewNotFound = isViewNotFound;
 	function validateViewNotFound(v) {
-	  return lexicons_1$n.lexicons.validate('app.bsky.embed.record#viewNotFound', v);
+	  return lexicons_1$p.lexicons.validate('app.bsky.embed.record#viewNotFound', v);
 	}
 	record.validateViewNotFound = validateViewNotFound;
 	function isViewBlocked(v) {
-	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.record#viewBlocked';
+	  return (0, util_1$q.isObj)(v) && (0, util_1$q.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.record#viewBlocked';
 	}
 	record.isViewBlocked = isViewBlocked;
 	function validateViewBlocked(v) {
-	  return lexicons_1$n.lexicons.validate('app.bsky.embed.record#viewBlocked', v);
+	  return lexicons_1$p.lexicons.validate('app.bsky.embed.record#viewBlocked', v);
 	}
 	record.validateViewBlocked = validateViewBlocked;
 
@@ -27250,177 +27989,177 @@ if (cid) {
 	  value: true
 	});
 	recordWithMedia.validateView = recordWithMedia.isView = recordWithMedia.validateMain = recordWithMedia.isMain = void 0;
-	const util_1$n = util$2;
-	const lexicons_1$m = lexicons;
+	const util_1$p = util$2;
+	const lexicons_1$o = lexicons;
 	function isMain$1(v) {
-	  return (0, util_1$n.isObj)(v) && (0, util_1$n.hasProp)(v, '$type') && (v.$type === 'app.bsky.embed.recordWithMedia#main' || v.$type === 'app.bsky.embed.recordWithMedia');
+	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && (v.$type === 'app.bsky.embed.recordWithMedia#main' || v.$type === 'app.bsky.embed.recordWithMedia');
 	}
 	recordWithMedia.isMain = isMain$1;
 	function validateMain$1(v) {
-	  return lexicons_1$m.lexicons.validate('app.bsky.embed.recordWithMedia#main', v);
+	  return lexicons_1$o.lexicons.validate('app.bsky.embed.recordWithMedia#main', v);
 	}
 	recordWithMedia.validateMain = validateMain$1;
 	function isView(v) {
-	  return (0, util_1$n.isObj)(v) && (0, util_1$n.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.recordWithMedia#view';
+	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.recordWithMedia#view';
 	}
 	recordWithMedia.isView = isView;
 	function validateView(v) {
-	  return lexicons_1$m.lexicons.validate('app.bsky.embed.recordWithMedia#view', v);
+	  return lexicons_1$o.lexicons.validate('app.bsky.embed.recordWithMedia#view', v);
 	}
 	recordWithMedia.validateView = validateView;
 
-	var defs$7 = {};
+	var defs$8 = {};
 
-	Object.defineProperty(defs$7, "__esModule", {
+	Object.defineProperty(defs$8, "__esModule", {
 	  value: true
 	});
-	defs$7.INTERACTIONSHARE = defs$7.INTERACTIONQUOTE = defs$7.INTERACTIONREPLY = defs$7.INTERACTIONREPOST = defs$7.INTERACTIONLIKE = defs$7.INTERACTIONSEEN = defs$7.CLICKTHROUGHEMBED = defs$7.CLICKTHROUGHREPOSTER = defs$7.CLICKTHROUGHAUTHOR = defs$7.CLICKTHROUGHITEM = defs$7.REQUESTMORE = defs$7.REQUESTLESS = defs$7.validateInteraction = defs$7.isInteraction = defs$7.validateThreadgateView = defs$7.isThreadgateView = defs$7.validateSkeletonReasonRepost = defs$7.isSkeletonReasonRepost = defs$7.validateSkeletonFeedPost = defs$7.isSkeletonFeedPost = defs$7.validateGeneratorViewerState = defs$7.isGeneratorViewerState = defs$7.validateGeneratorView = defs$7.isGeneratorView = defs$7.validateBlockedAuthor = defs$7.isBlockedAuthor = defs$7.validateBlockedPost = defs$7.isBlockedPost = defs$7.validateNotFoundPost = defs$7.isNotFoundPost = defs$7.validateThreadViewPost = defs$7.isThreadViewPost = defs$7.validateReasonRepost = defs$7.isReasonRepost = defs$7.validateReplyRef = defs$7.isReplyRef = defs$7.validateFeedViewPost = defs$7.isFeedViewPost = defs$7.validateViewerState = defs$7.isViewerState = defs$7.validatePostView = defs$7.isPostView = void 0;
-	const util_1$m = util$2;
-	const lexicons_1$l = lexicons;
+	defs$8.INTERACTIONSHARE = defs$8.INTERACTIONQUOTE = defs$8.INTERACTIONREPLY = defs$8.INTERACTIONREPOST = defs$8.INTERACTIONLIKE = defs$8.INTERACTIONSEEN = defs$8.CLICKTHROUGHEMBED = defs$8.CLICKTHROUGHREPOSTER = defs$8.CLICKTHROUGHAUTHOR = defs$8.CLICKTHROUGHITEM = defs$8.REQUESTMORE = defs$8.REQUESTLESS = defs$8.validateInteraction = defs$8.isInteraction = defs$8.validateThreadgateView = defs$8.isThreadgateView = defs$8.validateSkeletonReasonRepost = defs$8.isSkeletonReasonRepost = defs$8.validateSkeletonFeedPost = defs$8.isSkeletonFeedPost = defs$8.validateGeneratorViewerState = defs$8.isGeneratorViewerState = defs$8.validateGeneratorView = defs$8.isGeneratorView = defs$8.validateBlockedAuthor = defs$8.isBlockedAuthor = defs$8.validateBlockedPost = defs$8.isBlockedPost = defs$8.validateNotFoundPost = defs$8.isNotFoundPost = defs$8.validateThreadViewPost = defs$8.isThreadViewPost = defs$8.validateReasonRepost = defs$8.isReasonRepost = defs$8.validateReplyRef = defs$8.isReplyRef = defs$8.validateFeedViewPost = defs$8.isFeedViewPost = defs$8.validateViewerState = defs$8.isViewerState = defs$8.validatePostView = defs$8.isPostView = void 0;
+	const util_1$o = util$2;
+	const lexicons_1$n = lexicons;
 	function isPostView(v) {
-	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#postView';
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#postView';
 	}
-	defs$7.isPostView = isPostView;
+	defs$8.isPostView = isPostView;
 	function validatePostView(v) {
-	  return lexicons_1$l.lexicons.validate('app.bsky.feed.defs#postView', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.defs#postView', v);
 	}
-	defs$7.validatePostView = validatePostView;
+	defs$8.validatePostView = validatePostView;
 	function isViewerState(v) {
-	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#viewerState';
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#viewerState';
 	}
-	defs$7.isViewerState = isViewerState;
+	defs$8.isViewerState = isViewerState;
 	function validateViewerState(v) {
-	  return lexicons_1$l.lexicons.validate('app.bsky.feed.defs#viewerState', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.defs#viewerState', v);
 	}
-	defs$7.validateViewerState = validateViewerState;
+	defs$8.validateViewerState = validateViewerState;
 	function isFeedViewPost(v) {
-	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#feedViewPost';
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#feedViewPost';
 	}
-	defs$7.isFeedViewPost = isFeedViewPost;
+	defs$8.isFeedViewPost = isFeedViewPost;
 	function validateFeedViewPost(v) {
-	  return lexicons_1$l.lexicons.validate('app.bsky.feed.defs#feedViewPost', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.defs#feedViewPost', v);
 	}
-	defs$7.validateFeedViewPost = validateFeedViewPost;
+	defs$8.validateFeedViewPost = validateFeedViewPost;
 	function isReplyRef$1(v) {
-	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#replyRef';
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#replyRef';
 	}
-	defs$7.isReplyRef = isReplyRef$1;
+	defs$8.isReplyRef = isReplyRef$1;
 	function validateReplyRef$1(v) {
-	  return lexicons_1$l.lexicons.validate('app.bsky.feed.defs#replyRef', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.defs#replyRef', v);
 	}
-	defs$7.validateReplyRef = validateReplyRef$1;
+	defs$8.validateReplyRef = validateReplyRef$1;
 	function isReasonRepost(v) {
-	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#reasonRepost';
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#reasonRepost';
 	}
-	defs$7.isReasonRepost = isReasonRepost;
+	defs$8.isReasonRepost = isReasonRepost;
 	function validateReasonRepost(v) {
-	  return lexicons_1$l.lexicons.validate('app.bsky.feed.defs#reasonRepost', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.defs#reasonRepost', v);
 	}
-	defs$7.validateReasonRepost = validateReasonRepost;
+	defs$8.validateReasonRepost = validateReasonRepost;
 	function isThreadViewPost(v) {
-	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#threadViewPost';
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#threadViewPost';
 	}
-	defs$7.isThreadViewPost = isThreadViewPost;
+	defs$8.isThreadViewPost = isThreadViewPost;
 	function validateThreadViewPost(v) {
-	  return lexicons_1$l.lexicons.validate('app.bsky.feed.defs#threadViewPost', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.defs#threadViewPost', v);
 	}
-	defs$7.validateThreadViewPost = validateThreadViewPost;
+	defs$8.validateThreadViewPost = validateThreadViewPost;
 	function isNotFoundPost(v) {
-	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#notFoundPost';
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#notFoundPost';
 	}
-	defs$7.isNotFoundPost = isNotFoundPost;
+	defs$8.isNotFoundPost = isNotFoundPost;
 	function validateNotFoundPost(v) {
-	  return lexicons_1$l.lexicons.validate('app.bsky.feed.defs#notFoundPost', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.defs#notFoundPost', v);
 	}
-	defs$7.validateNotFoundPost = validateNotFoundPost;
+	defs$8.validateNotFoundPost = validateNotFoundPost;
 	function isBlockedPost(v) {
-	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#blockedPost';
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#blockedPost';
 	}
-	defs$7.isBlockedPost = isBlockedPost;
+	defs$8.isBlockedPost = isBlockedPost;
 	function validateBlockedPost(v) {
-	  return lexicons_1$l.lexicons.validate('app.bsky.feed.defs#blockedPost', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.defs#blockedPost', v);
 	}
-	defs$7.validateBlockedPost = validateBlockedPost;
+	defs$8.validateBlockedPost = validateBlockedPost;
 	function isBlockedAuthor(v) {
-	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#blockedAuthor';
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#blockedAuthor';
 	}
-	defs$7.isBlockedAuthor = isBlockedAuthor;
+	defs$8.isBlockedAuthor = isBlockedAuthor;
 	function validateBlockedAuthor(v) {
-	  return lexicons_1$l.lexicons.validate('app.bsky.feed.defs#blockedAuthor', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.defs#blockedAuthor', v);
 	}
-	defs$7.validateBlockedAuthor = validateBlockedAuthor;
+	defs$8.validateBlockedAuthor = validateBlockedAuthor;
 	function isGeneratorView(v) {
-	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#generatorView';
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#generatorView';
 	}
-	defs$7.isGeneratorView = isGeneratorView;
+	defs$8.isGeneratorView = isGeneratorView;
 	function validateGeneratorView(v) {
-	  return lexicons_1$l.lexicons.validate('app.bsky.feed.defs#generatorView', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.defs#generatorView', v);
 	}
-	defs$7.validateGeneratorView = validateGeneratorView;
+	defs$8.validateGeneratorView = validateGeneratorView;
 	function isGeneratorViewerState(v) {
-	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#generatorViewerState';
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#generatorViewerState';
 	}
-	defs$7.isGeneratorViewerState = isGeneratorViewerState;
+	defs$8.isGeneratorViewerState = isGeneratorViewerState;
 	function validateGeneratorViewerState(v) {
-	  return lexicons_1$l.lexicons.validate('app.bsky.feed.defs#generatorViewerState', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.defs#generatorViewerState', v);
 	}
-	defs$7.validateGeneratorViewerState = validateGeneratorViewerState;
+	defs$8.validateGeneratorViewerState = validateGeneratorViewerState;
 	function isSkeletonFeedPost(v) {
-	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#skeletonFeedPost';
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#skeletonFeedPost';
 	}
-	defs$7.isSkeletonFeedPost = isSkeletonFeedPost;
+	defs$8.isSkeletonFeedPost = isSkeletonFeedPost;
 	function validateSkeletonFeedPost(v) {
-	  return lexicons_1$l.lexicons.validate('app.bsky.feed.defs#skeletonFeedPost', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.defs#skeletonFeedPost', v);
 	}
-	defs$7.validateSkeletonFeedPost = validateSkeletonFeedPost;
+	defs$8.validateSkeletonFeedPost = validateSkeletonFeedPost;
 	function isSkeletonReasonRepost(v) {
-	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#skeletonReasonRepost';
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#skeletonReasonRepost';
 	}
-	defs$7.isSkeletonReasonRepost = isSkeletonReasonRepost;
+	defs$8.isSkeletonReasonRepost = isSkeletonReasonRepost;
 	function validateSkeletonReasonRepost(v) {
-	  return lexicons_1$l.lexicons.validate('app.bsky.feed.defs#skeletonReasonRepost', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.defs#skeletonReasonRepost', v);
 	}
-	defs$7.validateSkeletonReasonRepost = validateSkeletonReasonRepost;
+	defs$8.validateSkeletonReasonRepost = validateSkeletonReasonRepost;
 	function isThreadgateView(v) {
-	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#threadgateView';
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#threadgateView';
 	}
-	defs$7.isThreadgateView = isThreadgateView;
+	defs$8.isThreadgateView = isThreadgateView;
 	function validateThreadgateView(v) {
-	  return lexicons_1$l.lexicons.validate('app.bsky.feed.defs#threadgateView', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.defs#threadgateView', v);
 	}
-	defs$7.validateThreadgateView = validateThreadgateView;
+	defs$8.validateThreadgateView = validateThreadgateView;
 	function isInteraction(v) {
-	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#interaction';
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#interaction';
 	}
-	defs$7.isInteraction = isInteraction;
+	defs$8.isInteraction = isInteraction;
 	function validateInteraction(v) {
-	  return lexicons_1$l.lexicons.validate('app.bsky.feed.defs#interaction', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.defs#interaction', v);
 	}
-	defs$7.validateInteraction = validateInteraction;
+	defs$8.validateInteraction = validateInteraction;
 	/** Request that less content like the given feed item be shown in the feed */
-	defs$7.REQUESTLESS = 'app.bsky.feed.defs#requestLess';
+	defs$8.REQUESTLESS = 'app.bsky.feed.defs#requestLess';
 	/** Request that more content like the given feed item be shown in the feed */
-	defs$7.REQUESTMORE = 'app.bsky.feed.defs#requestMore';
+	defs$8.REQUESTMORE = 'app.bsky.feed.defs#requestMore';
 	/** User clicked through to the feed item */
-	defs$7.CLICKTHROUGHITEM = 'app.bsky.feed.defs#clickthroughItem';
+	defs$8.CLICKTHROUGHITEM = 'app.bsky.feed.defs#clickthroughItem';
 	/** User clicked through to the author of the feed item */
-	defs$7.CLICKTHROUGHAUTHOR = 'app.bsky.feed.defs#clickthroughAuthor';
+	defs$8.CLICKTHROUGHAUTHOR = 'app.bsky.feed.defs#clickthroughAuthor';
 	/** User clicked through to the reposter of the feed item */
-	defs$7.CLICKTHROUGHREPOSTER = 'app.bsky.feed.defs#clickthroughReposter';
+	defs$8.CLICKTHROUGHREPOSTER = 'app.bsky.feed.defs#clickthroughReposter';
 	/** User clicked through to the embedded content of the feed item */
-	defs$7.CLICKTHROUGHEMBED = 'app.bsky.feed.defs#clickthroughEmbed';
+	defs$8.CLICKTHROUGHEMBED = 'app.bsky.feed.defs#clickthroughEmbed';
 	/** Feed item was seen by user */
-	defs$7.INTERACTIONSEEN = 'app.bsky.feed.defs#interactionSeen';
+	defs$8.INTERACTIONSEEN = 'app.bsky.feed.defs#interactionSeen';
 	/** User liked the feed item */
-	defs$7.INTERACTIONLIKE = 'app.bsky.feed.defs#interactionLike';
+	defs$8.INTERACTIONLIKE = 'app.bsky.feed.defs#interactionLike';
 	/** User reposted the feed item */
-	defs$7.INTERACTIONREPOST = 'app.bsky.feed.defs#interactionRepost';
+	defs$8.INTERACTIONREPOST = 'app.bsky.feed.defs#interactionRepost';
 	/** User replied to the feed item */
-	defs$7.INTERACTIONREPLY = 'app.bsky.feed.defs#interactionReply';
+	defs$8.INTERACTIONREPLY = 'app.bsky.feed.defs#interactionReply';
 	/** User quoted the feed item */
-	defs$7.INTERACTIONQUOTE = 'app.bsky.feed.defs#interactionQuote';
+	defs$8.INTERACTIONQUOTE = 'app.bsky.feed.defs#interactionQuote';
 	/** User shared the feed item */
-	defs$7.INTERACTIONSHARE = 'app.bsky.feed.defs#interactionShare';
+	defs$8.INTERACTIONSHARE = 'app.bsky.feed.defs#interactionShare';
 
 	var generator = {};
 
@@ -27428,16 +28167,16 @@ if (cid) {
 	  value: true
 	});
 	generator.validateRecord = generator.isRecord = void 0;
-	const util_1$l = util$2;
-	const lexicons_1$k = lexicons;
-	function isRecord$b(v) {
-	  return (0, util_1$l.isObj)(v) && (0, util_1$l.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.generator#main' || v.$type === 'app.bsky.feed.generator');
+	const util_1$n = util$2;
+	const lexicons_1$m = lexicons;
+	function isRecord$c(v) {
+	  return (0, util_1$n.isObj)(v) && (0, util_1$n.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.generator#main' || v.$type === 'app.bsky.feed.generator');
 	}
-	generator.isRecord = isRecord$b;
-	function validateRecord$b(v) {
-	  return lexicons_1$k.lexicons.validate('app.bsky.feed.generator#main', v);
+	generator.isRecord = isRecord$c;
+	function validateRecord$c(v) {
+	  return lexicons_1$m.lexicons.validate('app.bsky.feed.generator#main', v);
 	}
-	generator.validateRecord = validateRecord$b;
+	generator.validateRecord = validateRecord$c;
 
 	var like = {};
 
@@ -27445,16 +28184,16 @@ if (cid) {
 	  value: true
 	});
 	like.validateRecord = like.isRecord = void 0;
-	const util_1$k = util$2;
-	const lexicons_1$j = lexicons;
-	function isRecord$a(v) {
-	  return (0, util_1$k.isObj)(v) && (0, util_1$k.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.like#main' || v.$type === 'app.bsky.feed.like');
+	const util_1$m = util$2;
+	const lexicons_1$l = lexicons;
+	function isRecord$b(v) {
+	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.like#main' || v.$type === 'app.bsky.feed.like');
 	}
-	like.isRecord = isRecord$a;
-	function validateRecord$a(v) {
-	  return lexicons_1$j.lexicons.validate('app.bsky.feed.like#main', v);
+	like.isRecord = isRecord$b;
+	function validateRecord$b(v) {
+	  return lexicons_1$l.lexicons.validate('app.bsky.feed.like#main', v);
 	}
-	like.validateRecord = validateRecord$a;
+	like.validateRecord = validateRecord$b;
 
 	var post$1 = {};
 
@@ -27462,38 +28201,38 @@ if (cid) {
 	  value: true
 	});
 	post$1.validateTextSlice = post$1.isTextSlice = post$1.validateEntity = post$1.isEntity = post$1.validateReplyRef = post$1.isReplyRef = post$1.validateRecord = post$1.isRecord = void 0;
-	const util_1$j = util$2;
-	const lexicons_1$i = lexicons;
-	function isRecord$9(v) {
-	  return (0, util_1$j.isObj)(v) && (0, util_1$j.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.post#main' || v.$type === 'app.bsky.feed.post');
+	const util_1$l = util$2;
+	const lexicons_1$k = lexicons;
+	function isRecord$a(v) {
+	  return (0, util_1$l.isObj)(v) && (0, util_1$l.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.post#main' || v.$type === 'app.bsky.feed.post');
 	}
-	post$1.isRecord = isRecord$9;
-	function validateRecord$9(v) {
-	  return lexicons_1$i.lexicons.validate('app.bsky.feed.post#main', v);
+	post$1.isRecord = isRecord$a;
+	function validateRecord$a(v) {
+	  return lexicons_1$k.lexicons.validate('app.bsky.feed.post#main', v);
 	}
-	post$1.validateRecord = validateRecord$9;
+	post$1.validateRecord = validateRecord$a;
 	function isReplyRef(v) {
-	  return (0, util_1$j.isObj)(v) && (0, util_1$j.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.post#replyRef';
+	  return (0, util_1$l.isObj)(v) && (0, util_1$l.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.post#replyRef';
 	}
 	post$1.isReplyRef = isReplyRef;
 	function validateReplyRef(v) {
-	  return lexicons_1$i.lexicons.validate('app.bsky.feed.post#replyRef', v);
+	  return lexicons_1$k.lexicons.validate('app.bsky.feed.post#replyRef', v);
 	}
 	post$1.validateReplyRef = validateReplyRef;
 	function isEntity(v) {
-	  return (0, util_1$j.isObj)(v) && (0, util_1$j.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.post#entity';
+	  return (0, util_1$l.isObj)(v) && (0, util_1$l.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.post#entity';
 	}
 	post$1.isEntity = isEntity;
 	function validateEntity(v) {
-	  return lexicons_1$i.lexicons.validate('app.bsky.feed.post#entity', v);
+	  return lexicons_1$k.lexicons.validate('app.bsky.feed.post#entity', v);
 	}
 	post$1.validateEntity = validateEntity;
 	function isTextSlice(v) {
-	  return (0, util_1$j.isObj)(v) && (0, util_1$j.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.post#textSlice';
+	  return (0, util_1$l.isObj)(v) && (0, util_1$l.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.post#textSlice';
 	}
 	post$1.isTextSlice = isTextSlice;
 	function validateTextSlice(v) {
-	  return lexicons_1$i.lexicons.validate('app.bsky.feed.post#textSlice', v);
+	  return lexicons_1$k.lexicons.validate('app.bsky.feed.post#textSlice', v);
 	}
 	post$1.validateTextSlice = validateTextSlice;
 
@@ -27503,16 +28242,16 @@ if (cid) {
 	  value: true
 	});
 	repost.validateRecord = repost.isRecord = void 0;
-	const util_1$i = util$2;
-	const lexicons_1$h = lexicons;
-	function isRecord$8(v) {
-	  return (0, util_1$i.isObj)(v) && (0, util_1$i.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.repost#main' || v.$type === 'app.bsky.feed.repost');
+	const util_1$k = util$2;
+	const lexicons_1$j = lexicons;
+	function isRecord$9(v) {
+	  return (0, util_1$k.isObj)(v) && (0, util_1$k.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.repost#main' || v.$type === 'app.bsky.feed.repost');
 	}
-	repost.isRecord = isRecord$8;
-	function validateRecord$8(v) {
-	  return lexicons_1$h.lexicons.validate('app.bsky.feed.repost#main', v);
+	repost.isRecord = isRecord$9;
+	function validateRecord$9(v) {
+	  return lexicons_1$j.lexicons.validate('app.bsky.feed.repost#main', v);
 	}
-	repost.validateRecord = validateRecord$8;
+	repost.validateRecord = validateRecord$9;
 
 	var threadgate = {};
 
@@ -27520,38 +28259,38 @@ if (cid) {
 	  value: true
 	});
 	threadgate.validateListRule = threadgate.isListRule = threadgate.validateFollowingRule = threadgate.isFollowingRule = threadgate.validateMentionRule = threadgate.isMentionRule = threadgate.validateRecord = threadgate.isRecord = void 0;
-	const util_1$h = util$2;
-	const lexicons_1$g = lexicons;
-	function isRecord$7(v) {
-	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.threadgate#main' || v.$type === 'app.bsky.feed.threadgate');
+	const util_1$j = util$2;
+	const lexicons_1$i = lexicons;
+	function isRecord$8(v) {
+	  return (0, util_1$j.isObj)(v) && (0, util_1$j.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.threadgate#main' || v.$type === 'app.bsky.feed.threadgate');
 	}
-	threadgate.isRecord = isRecord$7;
-	function validateRecord$7(v) {
-	  return lexicons_1$g.lexicons.validate('app.bsky.feed.threadgate#main', v);
+	threadgate.isRecord = isRecord$8;
+	function validateRecord$8(v) {
+	  return lexicons_1$i.lexicons.validate('app.bsky.feed.threadgate#main', v);
 	}
-	threadgate.validateRecord = validateRecord$7;
+	threadgate.validateRecord = validateRecord$8;
 	function isMentionRule(v) {
-	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.threadgate#mentionRule';
+	  return (0, util_1$j.isObj)(v) && (0, util_1$j.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.threadgate#mentionRule';
 	}
 	threadgate.isMentionRule = isMentionRule;
 	function validateMentionRule(v) {
-	  return lexicons_1$g.lexicons.validate('app.bsky.feed.threadgate#mentionRule', v);
+	  return lexicons_1$i.lexicons.validate('app.bsky.feed.threadgate#mentionRule', v);
 	}
 	threadgate.validateMentionRule = validateMentionRule;
 	function isFollowingRule(v) {
-	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.threadgate#followingRule';
+	  return (0, util_1$j.isObj)(v) && (0, util_1$j.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.threadgate#followingRule';
 	}
 	threadgate.isFollowingRule = isFollowingRule;
 	function validateFollowingRule(v) {
-	  return lexicons_1$g.lexicons.validate('app.bsky.feed.threadgate#followingRule', v);
+	  return lexicons_1$i.lexicons.validate('app.bsky.feed.threadgate#followingRule', v);
 	}
 	threadgate.validateFollowingRule = validateFollowingRule;
 	function isListRule(v) {
-	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.threadgate#listRule';
+	  return (0, util_1$j.isObj)(v) && (0, util_1$j.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.threadgate#listRule';
 	}
 	threadgate.isListRule = isListRule;
 	function validateListRule(v) {
-	  return lexicons_1$g.lexicons.validate('app.bsky.feed.threadgate#listRule', v);
+	  return lexicons_1$i.lexicons.validate('app.bsky.feed.threadgate#listRule', v);
 	}
 	threadgate.validateListRule = validateListRule;
 
@@ -27561,77 +28300,95 @@ if (cid) {
 	  value: true
 	});
 	block.validateRecord = block.isRecord = void 0;
-	const util_1$g = util$2;
-	const lexicons_1$f = lexicons;
-	function isRecord$6(v) {
-	  return (0, util_1$g.isObj)(v) && (0, util_1$g.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.block#main' || v.$type === 'app.bsky.graph.block');
+	const util_1$i = util$2;
+	const lexicons_1$h = lexicons;
+	function isRecord$7(v) {
+	  return (0, util_1$i.isObj)(v) && (0, util_1$i.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.block#main' || v.$type === 'app.bsky.graph.block');
 	}
-	block.isRecord = isRecord$6;
-	function validateRecord$6(v) {
-	  return lexicons_1$f.lexicons.validate('app.bsky.graph.block#main', v);
+	block.isRecord = isRecord$7;
+	function validateRecord$7(v) {
+	  return lexicons_1$h.lexicons.validate('app.bsky.graph.block#main', v);
 	}
-	block.validateRecord = validateRecord$6;
+	block.validateRecord = validateRecord$7;
 
-	var defs$6 = {};
+	var defs$7 = {};
 
-	Object.defineProperty(defs$6, "__esModule", {
+	Object.defineProperty(defs$7, "__esModule", {
 	  value: true
 	});
-	defs$6.validateRelationship = defs$6.isRelationship = defs$6.validateNotFoundActor = defs$6.isNotFoundActor = defs$6.validateListViewerState = defs$6.isListViewerState = defs$6.CURATELIST = defs$6.MODLIST = defs$6.validateListItemView = defs$6.isListItemView = defs$6.validateListView = defs$6.isListView = defs$6.validateListViewBasic = defs$6.isListViewBasic = void 0;
-	const util_1$f = util$2;
-	const lexicons_1$e = lexicons;
+	defs$7.validateRelationship = defs$7.isRelationship = defs$7.validateNotFoundActor = defs$7.isNotFoundActor = defs$7.validateListViewerState = defs$7.isListViewerState = defs$7.REFERENCELIST = defs$7.CURATELIST = defs$7.MODLIST = defs$7.validateStarterPackViewBasic = defs$7.isStarterPackViewBasic = defs$7.validateStarterPackView = defs$7.isStarterPackView = defs$7.validateListItemView = defs$7.isListItemView = defs$7.validateListView = defs$7.isListView = defs$7.validateListViewBasic = defs$7.isListViewBasic = void 0;
+	const util_1$h = util$2;
+	const lexicons_1$g = lexicons;
 	function isListViewBasic(v) {
-	  return (0, util_1$f.isObj)(v) && (0, util_1$f.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#listViewBasic';
+	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#listViewBasic';
 	}
-	defs$6.isListViewBasic = isListViewBasic;
+	defs$7.isListViewBasic = isListViewBasic;
 	function validateListViewBasic(v) {
-	  return lexicons_1$e.lexicons.validate('app.bsky.graph.defs#listViewBasic', v);
+	  return lexicons_1$g.lexicons.validate('app.bsky.graph.defs#listViewBasic', v);
 	}
-	defs$6.validateListViewBasic = validateListViewBasic;
+	defs$7.validateListViewBasic = validateListViewBasic;
 	function isListView(v) {
-	  return (0, util_1$f.isObj)(v) && (0, util_1$f.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#listView';
+	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#listView';
 	}
-	defs$6.isListView = isListView;
+	defs$7.isListView = isListView;
 	function validateListView(v) {
-	  return lexicons_1$e.lexicons.validate('app.bsky.graph.defs#listView', v);
+	  return lexicons_1$g.lexicons.validate('app.bsky.graph.defs#listView', v);
 	}
-	defs$6.validateListView = validateListView;
+	defs$7.validateListView = validateListView;
 	function isListItemView(v) {
-	  return (0, util_1$f.isObj)(v) && (0, util_1$f.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#listItemView';
+	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#listItemView';
 	}
-	defs$6.isListItemView = isListItemView;
+	defs$7.isListItemView = isListItemView;
 	function validateListItemView(v) {
-	  return lexicons_1$e.lexicons.validate('app.bsky.graph.defs#listItemView', v);
+	  return lexicons_1$g.lexicons.validate('app.bsky.graph.defs#listItemView', v);
 	}
-	defs$6.validateListItemView = validateListItemView;
+	defs$7.validateListItemView = validateListItemView;
+	function isStarterPackView(v) {
+	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#starterPackView';
+	}
+	defs$7.isStarterPackView = isStarterPackView;
+	function validateStarterPackView(v) {
+	  return lexicons_1$g.lexicons.validate('app.bsky.graph.defs#starterPackView', v);
+	}
+	defs$7.validateStarterPackView = validateStarterPackView;
+	function isStarterPackViewBasic(v) {
+	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#starterPackViewBasic';
+	}
+	defs$7.isStarterPackViewBasic = isStarterPackViewBasic;
+	function validateStarterPackViewBasic(v) {
+	  return lexicons_1$g.lexicons.validate('app.bsky.graph.defs#starterPackViewBasic', v);
+	}
+	defs$7.validateStarterPackViewBasic = validateStarterPackViewBasic;
 	/** A list of actors to apply an aggregate moderation action (mute/block) on. */
-	defs$6.MODLIST = 'app.bsky.graph.defs#modlist';
+	defs$7.MODLIST = 'app.bsky.graph.defs#modlist';
 	/** A list of actors used for curation purposes such as list feeds or interaction gating. */
-	defs$6.CURATELIST = 'app.bsky.graph.defs#curatelist';
+	defs$7.CURATELIST = 'app.bsky.graph.defs#curatelist';
+	/** A list of actors used for only for reference purposes such as within a starter pack. */
+	defs$7.REFERENCELIST = 'app.bsky.graph.defs#referencelist';
 	function isListViewerState(v) {
-	  return (0, util_1$f.isObj)(v) && (0, util_1$f.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#listViewerState';
+	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#listViewerState';
 	}
-	defs$6.isListViewerState = isListViewerState;
+	defs$7.isListViewerState = isListViewerState;
 	function validateListViewerState(v) {
-	  return lexicons_1$e.lexicons.validate('app.bsky.graph.defs#listViewerState', v);
+	  return lexicons_1$g.lexicons.validate('app.bsky.graph.defs#listViewerState', v);
 	}
-	defs$6.validateListViewerState = validateListViewerState;
+	defs$7.validateListViewerState = validateListViewerState;
 	function isNotFoundActor(v) {
-	  return (0, util_1$f.isObj)(v) && (0, util_1$f.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#notFoundActor';
+	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#notFoundActor';
 	}
-	defs$6.isNotFoundActor = isNotFoundActor;
+	defs$7.isNotFoundActor = isNotFoundActor;
 	function validateNotFoundActor(v) {
-	  return lexicons_1$e.lexicons.validate('app.bsky.graph.defs#notFoundActor', v);
+	  return lexicons_1$g.lexicons.validate('app.bsky.graph.defs#notFoundActor', v);
 	}
-	defs$6.validateNotFoundActor = validateNotFoundActor;
+	defs$7.validateNotFoundActor = validateNotFoundActor;
 	function isRelationship(v) {
-	  return (0, util_1$f.isObj)(v) && (0, util_1$f.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#relationship';
+	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#relationship';
 	}
-	defs$6.isRelationship = isRelationship;
+	defs$7.isRelationship = isRelationship;
 	function validateRelationship(v) {
-	  return lexicons_1$e.lexicons.validate('app.bsky.graph.defs#relationship', v);
+	  return lexicons_1$g.lexicons.validate('app.bsky.graph.defs#relationship', v);
 	}
-	defs$6.validateRelationship = validateRelationship;
+	defs$7.validateRelationship = validateRelationship;
 
 	var follow = {};
 
@@ -27639,16 +28396,16 @@ if (cid) {
 	  value: true
 	});
 	follow.validateRecord = follow.isRecord = void 0;
-	const util_1$e = util$2;
-	const lexicons_1$d = lexicons;
-	function isRecord$5(v) {
-	  return (0, util_1$e.isObj)(v) && (0, util_1$e.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.follow#main' || v.$type === 'app.bsky.graph.follow');
+	const util_1$g = util$2;
+	const lexicons_1$f = lexicons;
+	function isRecord$6(v) {
+	  return (0, util_1$g.isObj)(v) && (0, util_1$g.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.follow#main' || v.$type === 'app.bsky.graph.follow');
 	}
-	follow.isRecord = isRecord$5;
-	function validateRecord$5(v) {
-	  return lexicons_1$d.lexicons.validate('app.bsky.graph.follow#main', v);
+	follow.isRecord = isRecord$6;
+	function validateRecord$6(v) {
+	  return lexicons_1$f.lexicons.validate('app.bsky.graph.follow#main', v);
 	}
-	follow.validateRecord = validateRecord$5;
+	follow.validateRecord = validateRecord$6;
 
 	var list = {};
 
@@ -27656,16 +28413,16 @@ if (cid) {
 	  value: true
 	});
 	list.validateRecord = list.isRecord = void 0;
-	const util_1$d = util$2;
-	const lexicons_1$c = lexicons;
-	function isRecord$4(v) {
-	  return (0, util_1$d.isObj)(v) && (0, util_1$d.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.list#main' || v.$type === 'app.bsky.graph.list');
+	const util_1$f = util$2;
+	const lexicons_1$e = lexicons;
+	function isRecord$5(v) {
+	  return (0, util_1$f.isObj)(v) && (0, util_1$f.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.list#main' || v.$type === 'app.bsky.graph.list');
 	}
-	list.isRecord = isRecord$4;
-	function validateRecord$4(v) {
-	  return lexicons_1$c.lexicons.validate('app.bsky.graph.list#main', v);
+	list.isRecord = isRecord$5;
+	function validateRecord$5(v) {
+	  return lexicons_1$e.lexicons.validate('app.bsky.graph.list#main', v);
 	}
-	list.validateRecord = validateRecord$4;
+	list.validateRecord = validateRecord$5;
 
 	var listblock = {};
 
@@ -27673,16 +28430,16 @@ if (cid) {
 	  value: true
 	});
 	listblock.validateRecord = listblock.isRecord = void 0;
-	const util_1$c = util$2;
-	const lexicons_1$b = lexicons;
-	function isRecord$3(v) {
-	  return (0, util_1$c.isObj)(v) && (0, util_1$c.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.listblock#main' || v.$type === 'app.bsky.graph.listblock');
+	const util_1$e = util$2;
+	const lexicons_1$d = lexicons;
+	function isRecord$4(v) {
+	  return (0, util_1$e.isObj)(v) && (0, util_1$e.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.listblock#main' || v.$type === 'app.bsky.graph.listblock');
 	}
-	listblock.isRecord = isRecord$3;
-	function validateRecord$3(v) {
-	  return lexicons_1$b.lexicons.validate('app.bsky.graph.listblock#main', v);
+	listblock.isRecord = isRecord$4;
+	function validateRecord$4(v) {
+	  return lexicons_1$d.lexicons.validate('app.bsky.graph.listblock#main', v);
 	}
-	listblock.validateRecord = validateRecord$3;
+	listblock.validateRecord = validateRecord$4;
 
 	var listitem = {};
 
@@ -27690,57 +28447,82 @@ if (cid) {
 	  value: true
 	});
 	listitem.validateRecord = listitem.isRecord = void 0;
-	const util_1$b = util$2;
-	const lexicons_1$a = lexicons;
-	function isRecord$2(v) {
-	  return (0, util_1$b.isObj)(v) && (0, util_1$b.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.listitem#main' || v.$type === 'app.bsky.graph.listitem');
+	const util_1$d = util$2;
+	const lexicons_1$c = lexicons;
+	function isRecord$3(v) {
+	  return (0, util_1$d.isObj)(v) && (0, util_1$d.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.listitem#main' || v.$type === 'app.bsky.graph.listitem');
 	}
-	listitem.isRecord = isRecord$2;
-	function validateRecord$2(v) {
-	  return lexicons_1$a.lexicons.validate('app.bsky.graph.listitem#main', v);
+	listitem.isRecord = isRecord$3;
+	function validateRecord$3(v) {
+	  return lexicons_1$c.lexicons.validate('app.bsky.graph.listitem#main', v);
 	}
-	listitem.validateRecord = validateRecord$2;
+	listitem.validateRecord = validateRecord$3;
 
-	var defs$5 = {};
+	var starterpack = {};
 
-	Object.defineProperty(defs$5, "__esModule", {
+	Object.defineProperty(starterpack, "__esModule", {
 	  value: true
 	});
-	defs$5.validateLabelerPolicies = defs$5.isLabelerPolicies = defs$5.validateLabelerViewerState = defs$5.isLabelerViewerState = defs$5.validateLabelerViewDetailed = defs$5.isLabelerViewDetailed = defs$5.validateLabelerView = defs$5.isLabelerView = void 0;
-	const util_1$a = util$2;
-	const lexicons_1$9 = lexicons;
+	starterpack.validateFeedItem = starterpack.isFeedItem = starterpack.validateRecord = starterpack.isRecord = void 0;
+	const util_1$c = util$2;
+	const lexicons_1$b = lexicons;
+	function isRecord$2(v) {
+	  return (0, util_1$c.isObj)(v) && (0, util_1$c.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.starterpack#main' || v.$type === 'app.bsky.graph.starterpack');
+	}
+	starterpack.isRecord = isRecord$2;
+	function validateRecord$2(v) {
+	  return lexicons_1$b.lexicons.validate('app.bsky.graph.starterpack#main', v);
+	}
+	starterpack.validateRecord = validateRecord$2;
+	function isFeedItem(v) {
+	  return (0, util_1$c.isObj)(v) && (0, util_1$c.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.starterpack#feedItem';
+	}
+	starterpack.isFeedItem = isFeedItem;
+	function validateFeedItem(v) {
+	  return lexicons_1$b.lexicons.validate('app.bsky.graph.starterpack#feedItem', v);
+	}
+	starterpack.validateFeedItem = validateFeedItem;
+
+	var defs$6 = {};
+
+	Object.defineProperty(defs$6, "__esModule", {
+	  value: true
+	});
+	defs$6.validateLabelerPolicies = defs$6.isLabelerPolicies = defs$6.validateLabelerViewerState = defs$6.isLabelerViewerState = defs$6.validateLabelerViewDetailed = defs$6.isLabelerViewDetailed = defs$6.validateLabelerView = defs$6.isLabelerView = void 0;
+	const util_1$b = util$2;
+	const lexicons_1$a = lexicons;
 	function isLabelerView(v) {
-	  return (0, util_1$a.isObj)(v) && (0, util_1$a.hasProp)(v, '$type') && v.$type === 'app.bsky.labeler.defs#labelerView';
+	  return (0, util_1$b.isObj)(v) && (0, util_1$b.hasProp)(v, '$type') && v.$type === 'app.bsky.labeler.defs#labelerView';
 	}
-	defs$5.isLabelerView = isLabelerView;
+	defs$6.isLabelerView = isLabelerView;
 	function validateLabelerView(v) {
-	  return lexicons_1$9.lexicons.validate('app.bsky.labeler.defs#labelerView', v);
+	  return lexicons_1$a.lexicons.validate('app.bsky.labeler.defs#labelerView', v);
 	}
-	defs$5.validateLabelerView = validateLabelerView;
+	defs$6.validateLabelerView = validateLabelerView;
 	function isLabelerViewDetailed(v) {
-	  return (0, util_1$a.isObj)(v) && (0, util_1$a.hasProp)(v, '$type') && v.$type === 'app.bsky.labeler.defs#labelerViewDetailed';
+	  return (0, util_1$b.isObj)(v) && (0, util_1$b.hasProp)(v, '$type') && v.$type === 'app.bsky.labeler.defs#labelerViewDetailed';
 	}
-	defs$5.isLabelerViewDetailed = isLabelerViewDetailed;
+	defs$6.isLabelerViewDetailed = isLabelerViewDetailed;
 	function validateLabelerViewDetailed(v) {
-	  return lexicons_1$9.lexicons.validate('app.bsky.labeler.defs#labelerViewDetailed', v);
+	  return lexicons_1$a.lexicons.validate('app.bsky.labeler.defs#labelerViewDetailed', v);
 	}
-	defs$5.validateLabelerViewDetailed = validateLabelerViewDetailed;
+	defs$6.validateLabelerViewDetailed = validateLabelerViewDetailed;
 	function isLabelerViewerState(v) {
-	  return (0, util_1$a.isObj)(v) && (0, util_1$a.hasProp)(v, '$type') && v.$type === 'app.bsky.labeler.defs#labelerViewerState';
+	  return (0, util_1$b.isObj)(v) && (0, util_1$b.hasProp)(v, '$type') && v.$type === 'app.bsky.labeler.defs#labelerViewerState';
 	}
-	defs$5.isLabelerViewerState = isLabelerViewerState;
+	defs$6.isLabelerViewerState = isLabelerViewerState;
 	function validateLabelerViewerState(v) {
-	  return lexicons_1$9.lexicons.validate('app.bsky.labeler.defs#labelerViewerState', v);
+	  return lexicons_1$a.lexicons.validate('app.bsky.labeler.defs#labelerViewerState', v);
 	}
-	defs$5.validateLabelerViewerState = validateLabelerViewerState;
+	defs$6.validateLabelerViewerState = validateLabelerViewerState;
 	function isLabelerPolicies(v) {
-	  return (0, util_1$a.isObj)(v) && (0, util_1$a.hasProp)(v, '$type') && v.$type === 'app.bsky.labeler.defs#labelerPolicies';
+	  return (0, util_1$b.isObj)(v) && (0, util_1$b.hasProp)(v, '$type') && v.$type === 'app.bsky.labeler.defs#labelerPolicies';
 	}
-	defs$5.isLabelerPolicies = isLabelerPolicies;
+	defs$6.isLabelerPolicies = isLabelerPolicies;
 	function validateLabelerPolicies(v) {
-	  return lexicons_1$9.lexicons.validate('app.bsky.labeler.defs#labelerPolicies', v);
+	  return lexicons_1$a.lexicons.validate('app.bsky.labeler.defs#labelerPolicies', v);
 	}
-	defs$5.validateLabelerPolicies = validateLabelerPolicies;
+	defs$6.validateLabelerPolicies = validateLabelerPolicies;
 
 	var service = {};
 
@@ -27748,14 +28530,14 @@ if (cid) {
 	  value: true
 	});
 	service.validateRecord = service.isRecord = void 0;
-	const util_1$9 = util$2;
-	const lexicons_1$8 = lexicons;
+	const util_1$a = util$2;
+	const lexicons_1$9 = lexicons;
 	function isRecord$1(v) {
-	  return (0, util_1$9.isObj)(v) && (0, util_1$9.hasProp)(v, '$type') && (v.$type === 'app.bsky.labeler.service#main' || v.$type === 'app.bsky.labeler.service');
+	  return (0, util_1$a.isObj)(v) && (0, util_1$a.hasProp)(v, '$type') && (v.$type === 'app.bsky.labeler.service#main' || v.$type === 'app.bsky.labeler.service');
 	}
 	service.isRecord = isRecord$1;
 	function validateRecord$1(v) {
-	  return lexicons_1$8.lexicons.validate('app.bsky.labeler.service#main', v);
+	  return lexicons_1$9.lexicons.validate('app.bsky.labeler.service#main', v);
 	}
 	service.validateRecord = validateRecord$1;
 
@@ -27765,73 +28547,73 @@ if (cid) {
 	  value: true
 	});
 	facet.validateByteSlice = facet.isByteSlice = facet.validateTag = facet.isTag = facet.validateLink = facet.isLink = facet.validateMention = facet.isMention = facet.validateMain = facet.isMain = void 0;
-	const util_1$8 = util$2;
-	const lexicons_1$7 = lexicons;
+	const util_1$9 = util$2;
+	const lexicons_1$8 = lexicons;
 	function isMain(v) {
-	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && (v.$type === 'app.bsky.richtext.facet#main' || v.$type === 'app.bsky.richtext.facet');
+	  return (0, util_1$9.isObj)(v) && (0, util_1$9.hasProp)(v, '$type') && (v.$type === 'app.bsky.richtext.facet#main' || v.$type === 'app.bsky.richtext.facet');
 	}
 	facet.isMain = isMain;
 	function validateMain(v) {
-	  return lexicons_1$7.lexicons.validate('app.bsky.richtext.facet#main', v);
+	  return lexicons_1$8.lexicons.validate('app.bsky.richtext.facet#main', v);
 	}
 	facet.validateMain = validateMain;
 	function isMention(v) {
-	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && v.$type === 'app.bsky.richtext.facet#mention';
+	  return (0, util_1$9.isObj)(v) && (0, util_1$9.hasProp)(v, '$type') && v.$type === 'app.bsky.richtext.facet#mention';
 	}
 	facet.isMention = isMention;
 	function validateMention(v) {
-	  return lexicons_1$7.lexicons.validate('app.bsky.richtext.facet#mention', v);
+	  return lexicons_1$8.lexicons.validate('app.bsky.richtext.facet#mention', v);
 	}
 	facet.validateMention = validateMention;
 	function isLink(v) {
-	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && v.$type === 'app.bsky.richtext.facet#link';
+	  return (0, util_1$9.isObj)(v) && (0, util_1$9.hasProp)(v, '$type') && v.$type === 'app.bsky.richtext.facet#link';
 	}
 	facet.isLink = isLink;
 	function validateLink(v) {
-	  return lexicons_1$7.lexicons.validate('app.bsky.richtext.facet#link', v);
+	  return lexicons_1$8.lexicons.validate('app.bsky.richtext.facet#link', v);
 	}
 	facet.validateLink = validateLink;
 	function isTag(v) {
-	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && v.$type === 'app.bsky.richtext.facet#tag';
+	  return (0, util_1$9.isObj)(v) && (0, util_1$9.hasProp)(v, '$type') && v.$type === 'app.bsky.richtext.facet#tag';
 	}
 	facet.isTag = isTag;
 	function validateTag(v) {
-	  return lexicons_1$7.lexicons.validate('app.bsky.richtext.facet#tag', v);
+	  return lexicons_1$8.lexicons.validate('app.bsky.richtext.facet#tag', v);
 	}
 	facet.validateTag = validateTag;
 	function isByteSlice(v) {
-	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && v.$type === 'app.bsky.richtext.facet#byteSlice';
+	  return (0, util_1$9.isObj)(v) && (0, util_1$9.hasProp)(v, '$type') && v.$type === 'app.bsky.richtext.facet#byteSlice';
 	}
 	facet.isByteSlice = isByteSlice;
 	function validateByteSlice(v) {
-	  return lexicons_1$7.lexicons.validate('app.bsky.richtext.facet#byteSlice', v);
+	  return lexicons_1$8.lexicons.validate('app.bsky.richtext.facet#byteSlice', v);
 	}
 	facet.validateByteSlice = validateByteSlice;
 
-	var defs$4 = {};
+	var defs$5 = {};
 
-	Object.defineProperty(defs$4, "__esModule", {
+	Object.defineProperty(defs$5, "__esModule", {
 	  value: true
 	});
-	defs$4.validateSkeletonSearchActor = defs$4.isSkeletonSearchActor = defs$4.validateSkeletonSearchPost = defs$4.isSkeletonSearchPost = void 0;
-	const util_1$7 = util$2;
-	const lexicons_1$6 = lexicons;
+	defs$5.validateSkeletonSearchActor = defs$5.isSkeletonSearchActor = defs$5.validateSkeletonSearchPost = defs$5.isSkeletonSearchPost = void 0;
+	const util_1$8 = util$2;
+	const lexicons_1$7 = lexicons;
 	function isSkeletonSearchPost(v) {
-	  return (0, util_1$7.isObj)(v) && (0, util_1$7.hasProp)(v, '$type') && v.$type === 'app.bsky.unspecced.defs#skeletonSearchPost';
+	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && v.$type === 'app.bsky.unspecced.defs#skeletonSearchPost';
 	}
-	defs$4.isSkeletonSearchPost = isSkeletonSearchPost;
+	defs$5.isSkeletonSearchPost = isSkeletonSearchPost;
 	function validateSkeletonSearchPost(v) {
-	  return lexicons_1$6.lexicons.validate('app.bsky.unspecced.defs#skeletonSearchPost', v);
+	  return lexicons_1$7.lexicons.validate('app.bsky.unspecced.defs#skeletonSearchPost', v);
 	}
-	defs$4.validateSkeletonSearchPost = validateSkeletonSearchPost;
+	defs$5.validateSkeletonSearchPost = validateSkeletonSearchPost;
 	function isSkeletonSearchActor(v) {
-	  return (0, util_1$7.isObj)(v) && (0, util_1$7.hasProp)(v, '$type') && v.$type === 'app.bsky.unspecced.defs#skeletonSearchActor';
+	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && v.$type === 'app.bsky.unspecced.defs#skeletonSearchActor';
 	}
-	defs$4.isSkeletonSearchActor = isSkeletonSearchActor;
+	defs$5.isSkeletonSearchActor = isSkeletonSearchActor;
 	function validateSkeletonSearchActor(v) {
-	  return lexicons_1$6.lexicons.validate('app.bsky.unspecced.defs#skeletonSearchActor', v);
+	  return lexicons_1$7.lexicons.validate('app.bsky.unspecced.defs#skeletonSearchActor', v);
 	}
-	defs$4.validateSkeletonSearchActor = validateSkeletonSearchActor;
+	defs$5.validateSkeletonSearchActor = validateSkeletonSearchActor;
 
 	var declaration = {};
 
@@ -27839,389 +28621,412 @@ if (cid) {
 	  value: true
 	});
 	declaration.validateRecord = declaration.isRecord = void 0;
-	const util_1$6 = util$2;
-	const lexicons_1$5 = lexicons;
+	const util_1$7 = util$2;
+	const lexicons_1$6 = lexicons;
 	function isRecord(v) {
-	  return (0, util_1$6.isObj)(v) && (0, util_1$6.hasProp)(v, '$type') && (v.$type === 'chat.bsky.actor.declaration#main' || v.$type === 'chat.bsky.actor.declaration');
+	  return (0, util_1$7.isObj)(v) && (0, util_1$7.hasProp)(v, '$type') && (v.$type === 'chat.bsky.actor.declaration#main' || v.$type === 'chat.bsky.actor.declaration');
 	}
 	declaration.isRecord = isRecord;
 	function validateRecord(v) {
-	  return lexicons_1$5.lexicons.validate('chat.bsky.actor.declaration#main', v);
+	  return lexicons_1$6.lexicons.validate('chat.bsky.actor.declaration#main', v);
 	}
 	declaration.validateRecord = validateRecord;
+
+	var defs$4 = {};
+
+	Object.defineProperty(defs$4, "__esModule", {
+	  value: true
+	});
+	defs$4.validateProfileViewBasic = defs$4.isProfileViewBasic = void 0;
+	const util_1$6 = util$2;
+	const lexicons_1$5 = lexicons;
+	function isProfileViewBasic(v) {
+	  return (0, util_1$6.isObj)(v) && (0, util_1$6.hasProp)(v, '$type') && v.$type === 'chat.bsky.actor.defs#profileViewBasic';
+	}
+	defs$4.isProfileViewBasic = isProfileViewBasic;
+	function validateProfileViewBasic(v) {
+	  return lexicons_1$5.lexicons.validate('chat.bsky.actor.defs#profileViewBasic', v);
+	}
+	defs$4.validateProfileViewBasic = validateProfileViewBasic;
 
 	var defs$3 = {};
 
 	Object.defineProperty(defs$3, "__esModule", {
 	  value: true
 	});
-	defs$3.validateProfileViewBasic = defs$3.isProfileViewBasic = void 0;
+	defs$3.validateLogDeleteMessage = defs$3.isLogDeleteMessage = defs$3.validateLogCreateMessage = defs$3.isLogCreateMessage = defs$3.validateLogLeaveConvo = defs$3.isLogLeaveConvo = defs$3.validateLogBeginConvo = defs$3.isLogBeginConvo = defs$3.validateConvoView = defs$3.isConvoView = defs$3.validateMessageViewSender = defs$3.isMessageViewSender = defs$3.validateDeletedMessageView = defs$3.isDeletedMessageView = defs$3.validateMessageView = defs$3.isMessageView = defs$3.validateMessageInput = defs$3.isMessageInput = defs$3.validateMessageRef = defs$3.isMessageRef = void 0;
 	const util_1$5 = util$2;
 	const lexicons_1$4 = lexicons;
-	function isProfileViewBasic(v) {
-	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.actor.defs#profileViewBasic';
+	function isMessageRef(v) {
+	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#messageRef';
 	}
-	defs$3.isProfileViewBasic = isProfileViewBasic;
-	function validateProfileViewBasic(v) {
-	  return lexicons_1$4.lexicons.validate('chat.bsky.actor.defs#profileViewBasic', v);
+	defs$3.isMessageRef = isMessageRef;
+	function validateMessageRef(v) {
+	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#messageRef', v);
 	}
-	defs$3.validateProfileViewBasic = validateProfileViewBasic;
+	defs$3.validateMessageRef = validateMessageRef;
+	function isMessageInput(v) {
+	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#messageInput';
+	}
+	defs$3.isMessageInput = isMessageInput;
+	function validateMessageInput(v) {
+	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#messageInput', v);
+	}
+	defs$3.validateMessageInput = validateMessageInput;
+	function isMessageView(v) {
+	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#messageView';
+	}
+	defs$3.isMessageView = isMessageView;
+	function validateMessageView(v) {
+	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#messageView', v);
+	}
+	defs$3.validateMessageView = validateMessageView;
+	function isDeletedMessageView(v) {
+	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#deletedMessageView';
+	}
+	defs$3.isDeletedMessageView = isDeletedMessageView;
+	function validateDeletedMessageView(v) {
+	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#deletedMessageView', v);
+	}
+	defs$3.validateDeletedMessageView = validateDeletedMessageView;
+	function isMessageViewSender(v) {
+	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#messageViewSender';
+	}
+	defs$3.isMessageViewSender = isMessageViewSender;
+	function validateMessageViewSender(v) {
+	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#messageViewSender', v);
+	}
+	defs$3.validateMessageViewSender = validateMessageViewSender;
+	function isConvoView(v) {
+	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#convoView';
+	}
+	defs$3.isConvoView = isConvoView;
+	function validateConvoView(v) {
+	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#convoView', v);
+	}
+	defs$3.validateConvoView = validateConvoView;
+	function isLogBeginConvo(v) {
+	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#logBeginConvo';
+	}
+	defs$3.isLogBeginConvo = isLogBeginConvo;
+	function validateLogBeginConvo(v) {
+	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#logBeginConvo', v);
+	}
+	defs$3.validateLogBeginConvo = validateLogBeginConvo;
+	function isLogLeaveConvo(v) {
+	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#logLeaveConvo';
+	}
+	defs$3.isLogLeaveConvo = isLogLeaveConvo;
+	function validateLogLeaveConvo(v) {
+	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#logLeaveConvo', v);
+	}
+	defs$3.validateLogLeaveConvo = validateLogLeaveConvo;
+	function isLogCreateMessage(v) {
+	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#logCreateMessage';
+	}
+	defs$3.isLogCreateMessage = isLogCreateMessage;
+	function validateLogCreateMessage(v) {
+	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#logCreateMessage', v);
+	}
+	defs$3.validateLogCreateMessage = validateLogCreateMessage;
+	function isLogDeleteMessage(v) {
+	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#logDeleteMessage';
+	}
+	defs$3.isLogDeleteMessage = isLogDeleteMessage;
+	function validateLogDeleteMessage(v) {
+	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#logDeleteMessage', v);
+	}
+	defs$3.validateLogDeleteMessage = validateLogDeleteMessage;
 
 	var defs$2 = {};
 
 	Object.defineProperty(defs$2, "__esModule", {
 	  value: true
 	});
-	defs$2.validateLogDeleteMessage = defs$2.isLogDeleteMessage = defs$2.validateLogCreateMessage = defs$2.isLogCreateMessage = defs$2.validateLogLeaveConvo = defs$2.isLogLeaveConvo = defs$2.validateLogBeginConvo = defs$2.isLogBeginConvo = defs$2.validateConvoView = defs$2.isConvoView = defs$2.validateMessageViewSender = defs$2.isMessageViewSender = defs$2.validateDeletedMessageView = defs$2.isDeletedMessageView = defs$2.validateMessageView = defs$2.isMessageView = defs$2.validateMessageInput = defs$2.isMessageInput = defs$2.validateMessageRef = defs$2.isMessageRef = void 0;
+	defs$2.validateTemplateView = defs$2.isTemplateView = void 0;
 	const util_1$4 = util$2;
 	const lexicons_1$3 = lexicons;
-	function isMessageRef(v) {
-	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#messageRef';
+	function isTemplateView(v) {
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.communication.defs#templateView';
 	}
-	defs$2.isMessageRef = isMessageRef;
-	function validateMessageRef(v) {
-	  return lexicons_1$3.lexicons.validate('chat.bsky.convo.defs#messageRef', v);
+	defs$2.isTemplateView = isTemplateView;
+	function validateTemplateView(v) {
+	  return lexicons_1$3.lexicons.validate('tools.ozone.communication.defs#templateView', v);
 	}
-	defs$2.validateMessageRef = validateMessageRef;
-	function isMessageInput(v) {
-	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#messageInput';
-	}
-	defs$2.isMessageInput = isMessageInput;
-	function validateMessageInput(v) {
-	  return lexicons_1$3.lexicons.validate('chat.bsky.convo.defs#messageInput', v);
-	}
-	defs$2.validateMessageInput = validateMessageInput;
-	function isMessageView(v) {
-	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#messageView';
-	}
-	defs$2.isMessageView = isMessageView;
-	function validateMessageView(v) {
-	  return lexicons_1$3.lexicons.validate('chat.bsky.convo.defs#messageView', v);
-	}
-	defs$2.validateMessageView = validateMessageView;
-	function isDeletedMessageView(v) {
-	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#deletedMessageView';
-	}
-	defs$2.isDeletedMessageView = isDeletedMessageView;
-	function validateDeletedMessageView(v) {
-	  return lexicons_1$3.lexicons.validate('chat.bsky.convo.defs#deletedMessageView', v);
-	}
-	defs$2.validateDeletedMessageView = validateDeletedMessageView;
-	function isMessageViewSender(v) {
-	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#messageViewSender';
-	}
-	defs$2.isMessageViewSender = isMessageViewSender;
-	function validateMessageViewSender(v) {
-	  return lexicons_1$3.lexicons.validate('chat.bsky.convo.defs#messageViewSender', v);
-	}
-	defs$2.validateMessageViewSender = validateMessageViewSender;
-	function isConvoView(v) {
-	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#convoView';
-	}
-	defs$2.isConvoView = isConvoView;
-	function validateConvoView(v) {
-	  return lexicons_1$3.lexicons.validate('chat.bsky.convo.defs#convoView', v);
-	}
-	defs$2.validateConvoView = validateConvoView;
-	function isLogBeginConvo(v) {
-	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#logBeginConvo';
-	}
-	defs$2.isLogBeginConvo = isLogBeginConvo;
-	function validateLogBeginConvo(v) {
-	  return lexicons_1$3.lexicons.validate('chat.bsky.convo.defs#logBeginConvo', v);
-	}
-	defs$2.validateLogBeginConvo = validateLogBeginConvo;
-	function isLogLeaveConvo(v) {
-	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#logLeaveConvo';
-	}
-	defs$2.isLogLeaveConvo = isLogLeaveConvo;
-	function validateLogLeaveConvo(v) {
-	  return lexicons_1$3.lexicons.validate('chat.bsky.convo.defs#logLeaveConvo', v);
-	}
-	defs$2.validateLogLeaveConvo = validateLogLeaveConvo;
-	function isLogCreateMessage(v) {
-	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#logCreateMessage';
-	}
-	defs$2.isLogCreateMessage = isLogCreateMessage;
-	function validateLogCreateMessage(v) {
-	  return lexicons_1$3.lexicons.validate('chat.bsky.convo.defs#logCreateMessage', v);
-	}
-	defs$2.validateLogCreateMessage = validateLogCreateMessage;
-	function isLogDeleteMessage(v) {
-	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#logDeleteMessage';
-	}
-	defs$2.isLogDeleteMessage = isLogDeleteMessage;
-	function validateLogDeleteMessage(v) {
-	  return lexicons_1$3.lexicons.validate('chat.bsky.convo.defs#logDeleteMessage', v);
-	}
-	defs$2.validateLogDeleteMessage = validateLogDeleteMessage;
+	defs$2.validateTemplateView = validateTemplateView;
 
 	var defs$1 = {};
 
 	Object.defineProperty(defs$1, "__esModule", {
 	  value: true
 	});
-	defs$1.validateTemplateView = defs$1.isTemplateView = void 0;
+	defs$1.validateRecordViewDetail = defs$1.isRecordViewDetail = defs$1.validateRecordView = defs$1.isRecordView = defs$1.validateRepoViewNotFound = defs$1.isRepoViewNotFound = defs$1.validateRepoViewDetail = defs$1.isRepoViewDetail = defs$1.validateRepoView = defs$1.isRepoView = defs$1.validateModEventTag = defs$1.isModEventTag = defs$1.validateModEventDivert = defs$1.isModEventDivert = defs$1.validateModEventEmail = defs$1.isModEventEmail = defs$1.validateModEventUnmuteReporter = defs$1.isModEventUnmuteReporter = defs$1.validateModEventMuteReporter = defs$1.isModEventMuteReporter = defs$1.validateModEventUnmute = defs$1.isModEventUnmute = defs$1.validateModEventMute = defs$1.isModEventMute = defs$1.validateModEventEscalate = defs$1.isModEventEscalate = defs$1.validateModEventAcknowledge = defs$1.isModEventAcknowledge = defs$1.validateModEventLabel = defs$1.isModEventLabel = defs$1.validateModEventReport = defs$1.isModEventReport = defs$1.validateModEventComment = defs$1.isModEventComment = defs$1.validateModEventResolveAppeal = defs$1.isModEventResolveAppeal = defs$1.validateModEventReverseTakedown = defs$1.isModEventReverseTakedown = defs$1.validateModEventTakedown = defs$1.isModEventTakedown = defs$1.REVIEWNONE = defs$1.REVIEWCLOSED = defs$1.REVIEWESCALATED = defs$1.REVIEWOPEN = defs$1.validateSubjectStatusView = defs$1.isSubjectStatusView = defs$1.validateModEventViewDetail = defs$1.isModEventViewDetail = defs$1.validateModEventView = defs$1.isModEventView = void 0;
+	defs$1.validateVideoDetails = defs$1.isVideoDetails = defs$1.validateImageDetails = defs$1.isImageDetails = defs$1.validateBlobView = defs$1.isBlobView = defs$1.validateModerationDetail = defs$1.isModerationDetail = defs$1.validateModeration = defs$1.isModeration = defs$1.validateRecordViewNotFound = defs$1.isRecordViewNotFound = void 0;
 	const util_1$3 = util$2;
 	const lexicons_1$2 = lexicons;
-	function isTemplateView(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.communication.defs#templateView';
+	function isModEventView(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventView';
 	}
-	defs$1.isTemplateView = isTemplateView;
-	function validateTemplateView(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.communication.defs#templateView', v);
+	defs$1.isModEventView = isModEventView;
+	function validateModEventView(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventView', v);
 	}
-	defs$1.validateTemplateView = validateTemplateView;
+	defs$1.validateModEventView = validateModEventView;
+	function isModEventViewDetail(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventViewDetail';
+	}
+	defs$1.isModEventViewDetail = isModEventViewDetail;
+	function validateModEventViewDetail(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventViewDetail', v);
+	}
+	defs$1.validateModEventViewDetail = validateModEventViewDetail;
+	function isSubjectStatusView(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#subjectStatusView';
+	}
+	defs$1.isSubjectStatusView = isSubjectStatusView;
+	function validateSubjectStatusView(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#subjectStatusView', v);
+	}
+	defs$1.validateSubjectStatusView = validateSubjectStatusView;
+	/** Moderator review status of a subject: Open. Indicates that the subject needs to be reviewed by a moderator */
+	defs$1.REVIEWOPEN = 'tools.ozone.moderation.defs#reviewOpen';
+	/** Moderator review status of a subject: Escalated. Indicates that the subject was escalated for review by a moderator */
+	defs$1.REVIEWESCALATED = 'tools.ozone.moderation.defs#reviewEscalated';
+	/** Moderator review status of a subject: Closed. Indicates that the subject was already reviewed and resolved by a moderator */
+	defs$1.REVIEWCLOSED = 'tools.ozone.moderation.defs#reviewClosed';
+	/** Moderator review status of a subject: Unnecessary. Indicates that the subject does not need a review at the moment but there is probably some moderation related metadata available for it */
+	defs$1.REVIEWNONE = 'tools.ozone.moderation.defs#reviewNone';
+	function isModEventTakedown(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventTakedown';
+	}
+	defs$1.isModEventTakedown = isModEventTakedown;
+	function validateModEventTakedown(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventTakedown', v);
+	}
+	defs$1.validateModEventTakedown = validateModEventTakedown;
+	function isModEventReverseTakedown(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventReverseTakedown';
+	}
+	defs$1.isModEventReverseTakedown = isModEventReverseTakedown;
+	function validateModEventReverseTakedown(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventReverseTakedown', v);
+	}
+	defs$1.validateModEventReverseTakedown = validateModEventReverseTakedown;
+	function isModEventResolveAppeal(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventResolveAppeal';
+	}
+	defs$1.isModEventResolveAppeal = isModEventResolveAppeal;
+	function validateModEventResolveAppeal(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventResolveAppeal', v);
+	}
+	defs$1.validateModEventResolveAppeal = validateModEventResolveAppeal;
+	function isModEventComment(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventComment';
+	}
+	defs$1.isModEventComment = isModEventComment;
+	function validateModEventComment(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventComment', v);
+	}
+	defs$1.validateModEventComment = validateModEventComment;
+	function isModEventReport(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventReport';
+	}
+	defs$1.isModEventReport = isModEventReport;
+	function validateModEventReport(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventReport', v);
+	}
+	defs$1.validateModEventReport = validateModEventReport;
+	function isModEventLabel(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventLabel';
+	}
+	defs$1.isModEventLabel = isModEventLabel;
+	function validateModEventLabel(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventLabel', v);
+	}
+	defs$1.validateModEventLabel = validateModEventLabel;
+	function isModEventAcknowledge(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventAcknowledge';
+	}
+	defs$1.isModEventAcknowledge = isModEventAcknowledge;
+	function validateModEventAcknowledge(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventAcknowledge', v);
+	}
+	defs$1.validateModEventAcknowledge = validateModEventAcknowledge;
+	function isModEventEscalate(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventEscalate';
+	}
+	defs$1.isModEventEscalate = isModEventEscalate;
+	function validateModEventEscalate(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventEscalate', v);
+	}
+	defs$1.validateModEventEscalate = validateModEventEscalate;
+	function isModEventMute(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventMute';
+	}
+	defs$1.isModEventMute = isModEventMute;
+	function validateModEventMute(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventMute', v);
+	}
+	defs$1.validateModEventMute = validateModEventMute;
+	function isModEventUnmute(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventUnmute';
+	}
+	defs$1.isModEventUnmute = isModEventUnmute;
+	function validateModEventUnmute(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventUnmute', v);
+	}
+	defs$1.validateModEventUnmute = validateModEventUnmute;
+	function isModEventMuteReporter(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventMuteReporter';
+	}
+	defs$1.isModEventMuteReporter = isModEventMuteReporter;
+	function validateModEventMuteReporter(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventMuteReporter', v);
+	}
+	defs$1.validateModEventMuteReporter = validateModEventMuteReporter;
+	function isModEventUnmuteReporter(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventUnmuteReporter';
+	}
+	defs$1.isModEventUnmuteReporter = isModEventUnmuteReporter;
+	function validateModEventUnmuteReporter(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventUnmuteReporter', v);
+	}
+	defs$1.validateModEventUnmuteReporter = validateModEventUnmuteReporter;
+	function isModEventEmail(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventEmail';
+	}
+	defs$1.isModEventEmail = isModEventEmail;
+	function validateModEventEmail(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventEmail', v);
+	}
+	defs$1.validateModEventEmail = validateModEventEmail;
+	function isModEventDivert(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventDivert';
+	}
+	defs$1.isModEventDivert = isModEventDivert;
+	function validateModEventDivert(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventDivert', v);
+	}
+	defs$1.validateModEventDivert = validateModEventDivert;
+	function isModEventTag(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventTag';
+	}
+	defs$1.isModEventTag = isModEventTag;
+	function validateModEventTag(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventTag', v);
+	}
+	defs$1.validateModEventTag = validateModEventTag;
+	function isRepoView(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#repoView';
+	}
+	defs$1.isRepoView = isRepoView;
+	function validateRepoView(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#repoView', v);
+	}
+	defs$1.validateRepoView = validateRepoView;
+	function isRepoViewDetail(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#repoViewDetail';
+	}
+	defs$1.isRepoViewDetail = isRepoViewDetail;
+	function validateRepoViewDetail(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#repoViewDetail', v);
+	}
+	defs$1.validateRepoViewDetail = validateRepoViewDetail;
+	function isRepoViewNotFound(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#repoViewNotFound';
+	}
+	defs$1.isRepoViewNotFound = isRepoViewNotFound;
+	function validateRepoViewNotFound(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#repoViewNotFound', v);
+	}
+	defs$1.validateRepoViewNotFound = validateRepoViewNotFound;
+	function isRecordView(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#recordView';
+	}
+	defs$1.isRecordView = isRecordView;
+	function validateRecordView(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#recordView', v);
+	}
+	defs$1.validateRecordView = validateRecordView;
+	function isRecordViewDetail(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#recordViewDetail';
+	}
+	defs$1.isRecordViewDetail = isRecordViewDetail;
+	function validateRecordViewDetail(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#recordViewDetail', v);
+	}
+	defs$1.validateRecordViewDetail = validateRecordViewDetail;
+	function isRecordViewNotFound(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#recordViewNotFound';
+	}
+	defs$1.isRecordViewNotFound = isRecordViewNotFound;
+	function validateRecordViewNotFound(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#recordViewNotFound', v);
+	}
+	defs$1.validateRecordViewNotFound = validateRecordViewNotFound;
+	function isModeration(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#moderation';
+	}
+	defs$1.isModeration = isModeration;
+	function validateModeration(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#moderation', v);
+	}
+	defs$1.validateModeration = validateModeration;
+	function isModerationDetail(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#moderationDetail';
+	}
+	defs$1.isModerationDetail = isModerationDetail;
+	function validateModerationDetail(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#moderationDetail', v);
+	}
+	defs$1.validateModerationDetail = validateModerationDetail;
+	function isBlobView(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#blobView';
+	}
+	defs$1.isBlobView = isBlobView;
+	function validateBlobView(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#blobView', v);
+	}
+	defs$1.validateBlobView = validateBlobView;
+	function isImageDetails(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#imageDetails';
+	}
+	defs$1.isImageDetails = isImageDetails;
+	function validateImageDetails(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#imageDetails', v);
+	}
+	defs$1.validateImageDetails = validateImageDetails;
+	function isVideoDetails(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#videoDetails';
+	}
+	defs$1.isVideoDetails = isVideoDetails;
+	function validateVideoDetails(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#videoDetails', v);
+	}
+	defs$1.validateVideoDetails = validateVideoDetails;
 
 	var defs = {};
 
 	Object.defineProperty(defs, "__esModule", {
 	  value: true
 	});
-	defs.validateRecordViewDetail = defs.isRecordViewDetail = defs.validateRecordView = defs.isRecordView = defs.validateRepoViewNotFound = defs.isRepoViewNotFound = defs.validateRepoViewDetail = defs.isRepoViewDetail = defs.validateRepoView = defs.isRepoView = defs.validateModEventTag = defs.isModEventTag = defs.validateModEventDivert = defs.isModEventDivert = defs.validateModEventEmail = defs.isModEventEmail = defs.validateModEventUnmuteReporter = defs.isModEventUnmuteReporter = defs.validateModEventMuteReporter = defs.isModEventMuteReporter = defs.validateModEventUnmute = defs.isModEventUnmute = defs.validateModEventMute = defs.isModEventMute = defs.validateModEventEscalate = defs.isModEventEscalate = defs.validateModEventAcknowledge = defs.isModEventAcknowledge = defs.validateModEventLabel = defs.isModEventLabel = defs.validateModEventReport = defs.isModEventReport = defs.validateModEventComment = defs.isModEventComment = defs.validateModEventResolveAppeal = defs.isModEventResolveAppeal = defs.validateModEventReverseTakedown = defs.isModEventReverseTakedown = defs.validateModEventTakedown = defs.isModEventTakedown = defs.REVIEWNONE = defs.REVIEWCLOSED = defs.REVIEWESCALATED = defs.REVIEWOPEN = defs.validateSubjectStatusView = defs.isSubjectStatusView = defs.validateModEventViewDetail = defs.isModEventViewDetail = defs.validateModEventView = defs.isModEventView = void 0;
-	defs.validateVideoDetails = defs.isVideoDetails = defs.validateImageDetails = defs.isImageDetails = defs.validateBlobView = defs.isBlobView = defs.validateModerationDetail = defs.isModerationDetail = defs.validateModeration = defs.isModeration = defs.validateRecordViewNotFound = defs.isRecordViewNotFound = void 0;
+	defs.ROLETRIAGE = defs.ROLEMODERATOR = defs.ROLEADMIN = defs.validateMember = defs.isMember = void 0;
 	const util_1$2 = util$2;
 	const lexicons_1$1 = lexicons;
-	function isModEventView(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventView';
+	function isMember(v) {
+	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.team.defs#member';
 	}
-	defs.isModEventView = isModEventView;
-	function validateModEventView(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#modEventView', v);
+	defs.isMember = isMember;
+	function validateMember(v) {
+	  return lexicons_1$1.lexicons.validate('tools.ozone.team.defs#member', v);
 	}
-	defs.validateModEventView = validateModEventView;
-	function isModEventViewDetail(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventViewDetail';
-	}
-	defs.isModEventViewDetail = isModEventViewDetail;
-	function validateModEventViewDetail(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#modEventViewDetail', v);
-	}
-	defs.validateModEventViewDetail = validateModEventViewDetail;
-	function isSubjectStatusView(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#subjectStatusView';
-	}
-	defs.isSubjectStatusView = isSubjectStatusView;
-	function validateSubjectStatusView(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#subjectStatusView', v);
-	}
-	defs.validateSubjectStatusView = validateSubjectStatusView;
-	/** Moderator review status of a subject: Open. Indicates that the subject needs to be reviewed by a moderator */
-	defs.REVIEWOPEN = 'tools.ozone.moderation.defs#reviewOpen';
-	/** Moderator review status of a subject: Escalated. Indicates that the subject was escalated for review by a moderator */
-	defs.REVIEWESCALATED = 'tools.ozone.moderation.defs#reviewEscalated';
-	/** Moderator review status of a subject: Closed. Indicates that the subject was already reviewed and resolved by a moderator */
-	defs.REVIEWCLOSED = 'tools.ozone.moderation.defs#reviewClosed';
-	/** Moderator review status of a subject: Unnecessary. Indicates that the subject does not need a review at the moment but there is probably some moderation related metadata available for it */
-	defs.REVIEWNONE = 'tools.ozone.moderation.defs#reviewNone';
-	function isModEventTakedown(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventTakedown';
-	}
-	defs.isModEventTakedown = isModEventTakedown;
-	function validateModEventTakedown(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#modEventTakedown', v);
-	}
-	defs.validateModEventTakedown = validateModEventTakedown;
-	function isModEventReverseTakedown(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventReverseTakedown';
-	}
-	defs.isModEventReverseTakedown = isModEventReverseTakedown;
-	function validateModEventReverseTakedown(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#modEventReverseTakedown', v);
-	}
-	defs.validateModEventReverseTakedown = validateModEventReverseTakedown;
-	function isModEventResolveAppeal(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventResolveAppeal';
-	}
-	defs.isModEventResolveAppeal = isModEventResolveAppeal;
-	function validateModEventResolveAppeal(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#modEventResolveAppeal', v);
-	}
-	defs.validateModEventResolveAppeal = validateModEventResolveAppeal;
-	function isModEventComment(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventComment';
-	}
-	defs.isModEventComment = isModEventComment;
-	function validateModEventComment(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#modEventComment', v);
-	}
-	defs.validateModEventComment = validateModEventComment;
-	function isModEventReport(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventReport';
-	}
-	defs.isModEventReport = isModEventReport;
-	function validateModEventReport(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#modEventReport', v);
-	}
-	defs.validateModEventReport = validateModEventReport;
-	function isModEventLabel(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventLabel';
-	}
-	defs.isModEventLabel = isModEventLabel;
-	function validateModEventLabel(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#modEventLabel', v);
-	}
-	defs.validateModEventLabel = validateModEventLabel;
-	function isModEventAcknowledge(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventAcknowledge';
-	}
-	defs.isModEventAcknowledge = isModEventAcknowledge;
-	function validateModEventAcknowledge(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#modEventAcknowledge', v);
-	}
-	defs.validateModEventAcknowledge = validateModEventAcknowledge;
-	function isModEventEscalate(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventEscalate';
-	}
-	defs.isModEventEscalate = isModEventEscalate;
-	function validateModEventEscalate(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#modEventEscalate', v);
-	}
-	defs.validateModEventEscalate = validateModEventEscalate;
-	function isModEventMute(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventMute';
-	}
-	defs.isModEventMute = isModEventMute;
-	function validateModEventMute(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#modEventMute', v);
-	}
-	defs.validateModEventMute = validateModEventMute;
-	function isModEventUnmute(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventUnmute';
-	}
-	defs.isModEventUnmute = isModEventUnmute;
-	function validateModEventUnmute(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#modEventUnmute', v);
-	}
-	defs.validateModEventUnmute = validateModEventUnmute;
-	function isModEventMuteReporter(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventMuteReporter';
-	}
-	defs.isModEventMuteReporter = isModEventMuteReporter;
-	function validateModEventMuteReporter(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#modEventMuteReporter', v);
-	}
-	defs.validateModEventMuteReporter = validateModEventMuteReporter;
-	function isModEventUnmuteReporter(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventUnmuteReporter';
-	}
-	defs.isModEventUnmuteReporter = isModEventUnmuteReporter;
-	function validateModEventUnmuteReporter(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#modEventUnmuteReporter', v);
-	}
-	defs.validateModEventUnmuteReporter = validateModEventUnmuteReporter;
-	function isModEventEmail(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventEmail';
-	}
-	defs.isModEventEmail = isModEventEmail;
-	function validateModEventEmail(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#modEventEmail', v);
-	}
-	defs.validateModEventEmail = validateModEventEmail;
-	function isModEventDivert(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventDivert';
-	}
-	defs.isModEventDivert = isModEventDivert;
-	function validateModEventDivert(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#modEventDivert', v);
-	}
-	defs.validateModEventDivert = validateModEventDivert;
-	function isModEventTag(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventTag';
-	}
-	defs.isModEventTag = isModEventTag;
-	function validateModEventTag(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#modEventTag', v);
-	}
-	defs.validateModEventTag = validateModEventTag;
-	function isRepoView(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#repoView';
-	}
-	defs.isRepoView = isRepoView;
-	function validateRepoView(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#repoView', v);
-	}
-	defs.validateRepoView = validateRepoView;
-	function isRepoViewDetail(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#repoViewDetail';
-	}
-	defs.isRepoViewDetail = isRepoViewDetail;
-	function validateRepoViewDetail(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#repoViewDetail', v);
-	}
-	defs.validateRepoViewDetail = validateRepoViewDetail;
-	function isRepoViewNotFound(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#repoViewNotFound';
-	}
-	defs.isRepoViewNotFound = isRepoViewNotFound;
-	function validateRepoViewNotFound(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#repoViewNotFound', v);
-	}
-	defs.validateRepoViewNotFound = validateRepoViewNotFound;
-	function isRecordView(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#recordView';
-	}
-	defs.isRecordView = isRecordView;
-	function validateRecordView(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#recordView', v);
-	}
-	defs.validateRecordView = validateRecordView;
-	function isRecordViewDetail(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#recordViewDetail';
-	}
-	defs.isRecordViewDetail = isRecordViewDetail;
-	function validateRecordViewDetail(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#recordViewDetail', v);
-	}
-	defs.validateRecordViewDetail = validateRecordViewDetail;
-	function isRecordViewNotFound(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#recordViewNotFound';
-	}
-	defs.isRecordViewNotFound = isRecordViewNotFound;
-	function validateRecordViewNotFound(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#recordViewNotFound', v);
-	}
-	defs.validateRecordViewNotFound = validateRecordViewNotFound;
-	function isModeration(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#moderation';
-	}
-	defs.isModeration = isModeration;
-	function validateModeration(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#moderation', v);
-	}
-	defs.validateModeration = validateModeration;
-	function isModerationDetail(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#moderationDetail';
-	}
-	defs.isModerationDetail = isModerationDetail;
-	function validateModerationDetail(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#moderationDetail', v);
-	}
-	defs.validateModerationDetail = validateModerationDetail;
-	function isBlobView(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#blobView';
-	}
-	defs.isBlobView = isBlobView;
-	function validateBlobView(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#blobView', v);
-	}
-	defs.validateBlobView = validateBlobView;
-	function isImageDetails(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#imageDetails';
-	}
-	defs.isImageDetails = isImageDetails;
-	function validateImageDetails(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#imageDetails', v);
-	}
-	defs.validateImageDetails = validateImageDetails;
-	function isVideoDetails(v) {
-	  return (0, util_1$2.isObj)(v) && (0, util_1$2.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#videoDetails';
-	}
-	defs.isVideoDetails = isVideoDetails;
-	function validateVideoDetails(v) {
-	  return lexicons_1$1.lexicons.validate('tools.ozone.moderation.defs#videoDetails', v);
-	}
-	defs.validateVideoDetails = validateVideoDetails;
+	defs.validateMember = validateMember;
+	/** Admin role. Highest level of access, can perform all actions. */
+	defs.ROLEADMIN = 'tools.ozone.team.defs#roleAdmin';
+	/** Moderator role. Can perform most actions. */
+	defs.ROLEMODERATOR = 'tools.ozone.team.defs#roleModerator';
+	/** Triage role. Mostly intended for monitoring and escalating issues. */
+	defs.ROLETRIAGE = 'tools.ozone.team.defs#roleTriage';
 
 	var __createBinding = commonjsGlobal && commonjsGlobal.__createBinding || (Object.create ? function (o, m, k, k2) {
 	  if (k2 === undefined) k2 = k;
@@ -28259,9 +29064,9 @@ if (cid) {
 	});
 	client$1.ComAtprotoServerDescribeServer = client$1.ComAtprotoServerDeleteSession = client$1.ComAtprotoServerDeleteAccount = client$1.ComAtprotoServerDefs = client$1.ComAtprotoServerDeactivateAccount = client$1.ComAtprotoServerCreateSession = client$1.ComAtprotoServerCreateInviteCodes = client$1.ComAtprotoServerCreateInviteCode = client$1.ComAtprotoServerCreateAppPassword = client$1.ComAtprotoServerCreateAccount = client$1.ComAtprotoServerConfirmEmail = client$1.ComAtprotoServerCheckAccountStatus = client$1.ComAtprotoServerActivateAccount = client$1.ComAtprotoRepoUploadBlob = client$1.ComAtprotoRepoStrongRef = client$1.ComAtprotoRepoPutRecord = client$1.ComAtprotoRepoListRecords = client$1.ComAtprotoRepoListMissingBlobs = client$1.ComAtprotoRepoImportRepo = client$1.ComAtprotoRepoGetRecord = client$1.ComAtprotoRepoDescribeRepo = client$1.ComAtprotoRepoDeleteRecord = client$1.ComAtprotoRepoCreateRecord = client$1.ComAtprotoRepoApplyWrites = client$1.ComAtprotoModerationDefs = client$1.ComAtprotoModerationCreateReport = client$1.ComAtprotoLabelSubscribeLabels = client$1.ComAtprotoLabelQueryLabels = client$1.ComAtprotoLabelDefs = client$1.ComAtprotoIdentityUpdateHandle = client$1.ComAtprotoIdentitySubmitPlcOperation = client$1.ComAtprotoIdentitySignPlcOperation = client$1.ComAtprotoIdentityResolveHandle = client$1.ComAtprotoIdentityRequestPlcOperationSignature = client$1.ComAtprotoIdentityGetRecommendedDidCredentials = client$1.ComAtprotoAdminUpdateSubjectStatus = client$1.ComAtprotoAdminUpdateAccountPassword = client$1.ComAtprotoAdminUpdateAccountHandle = client$1.ComAtprotoAdminUpdateAccountEmail = client$1.ComAtprotoAdminSendEmail = client$1.ComAtprotoAdminSearchAccounts = client$1.ComAtprotoAdminGetSubjectStatus = client$1.ComAtprotoAdminGetInviteCodes = client$1.ComAtprotoAdminGetAccountInfos = client$1.ComAtprotoAdminGetAccountInfo = client$1.ComAtprotoAdminEnableAccountInvites = client$1.ComAtprotoAdminDisableInviteCodes = client$1.ComAtprotoAdminDisableAccountInvites = client$1.ComAtprotoAdminDeleteAccount = client$1.ComAtprotoAdminDefs = void 0;
 	client$1.AppBskyFeedGetFeedGenerator = client$1.AppBskyFeedGetFeed = client$1.AppBskyFeedGetAuthorFeed = client$1.AppBskyFeedGetActorLikes = client$1.AppBskyFeedGetActorFeeds = client$1.AppBskyFeedGenerator = client$1.AppBskyFeedDescribeFeedGenerator = client$1.AppBskyFeedDefs = client$1.AppBskyEmbedRecordWithMedia = client$1.AppBskyEmbedRecord = client$1.AppBskyEmbedImages = client$1.AppBskyEmbedExternal = client$1.AppBskyActorSearchActorsTypeahead = client$1.AppBskyActorSearchActors = client$1.AppBskyActorPutPreferences = client$1.AppBskyActorProfile = client$1.AppBskyActorGetSuggestions = client$1.AppBskyActorGetProfiles = client$1.AppBskyActorGetProfile = client$1.AppBskyActorGetPreferences = client$1.AppBskyActorDefs = client$1.ComAtprotoTempRequestPhoneVerification = client$1.ComAtprotoTempFetchLabels = client$1.ComAtprotoTempCheckSignupQueue = client$1.ComAtprotoSyncSubscribeRepos = client$1.ComAtprotoSyncRequestCrawl = client$1.ComAtprotoSyncNotifyOfUpdate = client$1.ComAtprotoSyncListRepos = client$1.ComAtprotoSyncListBlobs = client$1.ComAtprotoSyncGetRepoStatus = client$1.ComAtprotoSyncGetRepo = client$1.ComAtprotoSyncGetRecord = client$1.ComAtprotoSyncGetLatestCommit = client$1.ComAtprotoSyncGetHead = client$1.ComAtprotoSyncGetCheckout = client$1.ComAtprotoSyncGetBlocks = client$1.ComAtprotoSyncGetBlob = client$1.ComAtprotoServerUpdateEmail = client$1.ComAtprotoServerRevokeAppPassword = client$1.ComAtprotoServerResetPassword = client$1.ComAtprotoServerReserveSigningKey = client$1.ComAtprotoServerRequestPasswordReset = client$1.ComAtprotoServerRequestEmailUpdate = client$1.ComAtprotoServerRequestEmailConfirmation = client$1.ComAtprotoServerRequestAccountDelete = client$1.ComAtprotoServerRefreshSession = client$1.ComAtprotoServerListAppPasswords = client$1.ComAtprotoServerGetSession = client$1.ComAtprotoServerGetServiceAuth = client$1.ComAtprotoServerGetAccountInviteCodes = void 0;
-	client$1.AppBskyUnspeccedGetTaggedSuggestions = client$1.AppBskyUnspeccedGetSuggestionsSkeleton = client$1.AppBskyUnspeccedGetPopularFeedGenerators = client$1.AppBskyUnspeccedDefs = client$1.AppBskyRichtextFacet = client$1.AppBskyNotificationUpdateSeen = client$1.AppBskyNotificationRegisterPush = client$1.AppBskyNotificationListNotifications = client$1.AppBskyNotificationGetUnreadCount = client$1.AppBskyLabelerService = client$1.AppBskyLabelerGetServices = client$1.AppBskyLabelerDefs = client$1.AppBskyGraphUnmuteThread = client$1.AppBskyGraphUnmuteActorList = client$1.AppBskyGraphUnmuteActor = client$1.AppBskyGraphMuteThread = client$1.AppBskyGraphMuteActorList = client$1.AppBskyGraphMuteActor = client$1.AppBskyGraphListitem = client$1.AppBskyGraphListblock = client$1.AppBskyGraphList = client$1.AppBskyGraphGetSuggestedFollowsByActor = client$1.AppBskyGraphGetRelationships = client$1.AppBskyGraphGetMutes = client$1.AppBskyGraphGetLists = client$1.AppBskyGraphGetListMutes = client$1.AppBskyGraphGetListBlocks = client$1.AppBskyGraphGetList = client$1.AppBskyGraphGetKnownFollowers = client$1.AppBskyGraphGetFollows = client$1.AppBskyGraphGetFollowers = client$1.AppBskyGraphGetBlocks = client$1.AppBskyGraphFollow = client$1.AppBskyGraphDefs = client$1.AppBskyGraphBlock = client$1.AppBskyFeedThreadgate = client$1.AppBskyFeedSendInteractions = client$1.AppBskyFeedSearchPosts = client$1.AppBskyFeedRepost = client$1.AppBskyFeedPost = client$1.AppBskyFeedLike = client$1.AppBskyFeedGetTimeline = client$1.AppBskyFeedGetSuggestedFeeds = client$1.AppBskyFeedGetRepostedBy = client$1.AppBskyFeedGetPosts = client$1.AppBskyFeedGetPostThread = client$1.AppBskyFeedGetListFeed = client$1.AppBskyFeedGetLikes = client$1.AppBskyFeedGetFeedSkeleton = client$1.AppBskyFeedGetFeedGenerators = void 0;
-	client$1.ComAtprotoServerNS = client$1.ComAtprotoRepoNS = client$1.ComAtprotoModerationNS = client$1.ComAtprotoLabelNS = client$1.ComAtprotoIdentityNS = client$1.ComAtprotoAdminNS = client$1.ComAtprotoNS = client$1.ComNS = client$1.AtpServiceClient = client$1.AtpBaseClient = client$1.TOOLS_OZONE_MODERATION = client$1.APP_BSKY_GRAPH = client$1.APP_BSKY_FEED = client$1.COM_ATPROTO_MODERATION = client$1.ToolsOzoneServerGetConfig = client$1.ToolsOzoneModerationSearchRepos = client$1.ToolsOzoneModerationQueryStatuses = client$1.ToolsOzoneModerationQueryEvents = client$1.ToolsOzoneModerationGetRepo = client$1.ToolsOzoneModerationGetRecord = client$1.ToolsOzoneModerationGetEvent = client$1.ToolsOzoneModerationEmitEvent = client$1.ToolsOzoneModerationDefs = client$1.ToolsOzoneCommunicationUpdateTemplate = client$1.ToolsOzoneCommunicationListTemplates = client$1.ToolsOzoneCommunicationDeleteTemplate = client$1.ToolsOzoneCommunicationDefs = client$1.ToolsOzoneCommunicationCreateTemplate = client$1.ChatBskyModerationUpdateActorAccess = client$1.ChatBskyModerationGetMessageContext = client$1.ChatBskyModerationGetActorMetadata = client$1.ChatBskyConvoUpdateRead = client$1.ChatBskyConvoUnmuteConvo = client$1.ChatBskyConvoSendMessageBatch = client$1.ChatBskyConvoSendMessage = client$1.ChatBskyConvoMuteConvo = client$1.ChatBskyConvoListConvos = client$1.ChatBskyConvoLeaveConvo = client$1.ChatBskyConvoGetMessages = client$1.ChatBskyConvoGetLog = client$1.ChatBskyConvoGetConvoForMembers = client$1.ChatBskyConvoGetConvo = client$1.ChatBskyConvoDeleteMessageForSelf = client$1.ChatBskyConvoDefs = client$1.ChatBskyActorExportAccountData = client$1.ChatBskyActorDeleteAccount = client$1.ChatBskyActorDefs = client$1.ChatBskyActorDeclaration = client$1.AppBskyUnspeccedSearchPostsSkeleton = client$1.AppBskyUnspeccedSearchActorsSkeleton = void 0;
-	client$1.ToolsOzoneServerNS = client$1.ToolsOzoneModerationNS = client$1.ToolsOzoneCommunicationNS = client$1.ToolsOzoneNS = client$1.ToolsNS = client$1.ChatBskyModerationNS = client$1.ChatBskyConvoNS = client$1.DeclarationRecord = client$1.ChatBskyActorNS = client$1.ChatBskyNS = client$1.ChatNS = client$1.AppBskyUnspeccedNS = client$1.AppBskyRichtextNS = client$1.AppBskyNotificationNS = client$1.ServiceRecord = client$1.AppBskyLabelerNS = client$1.ListitemRecord = client$1.ListblockRecord = client$1.ListRecord = client$1.FollowRecord = client$1.BlockRecord = client$1.AppBskyGraphNS = client$1.ThreadgateRecord = client$1.RepostRecord = client$1.PostRecord = client$1.LikeRecord = client$1.GeneratorRecord = client$1.AppBskyFeedNS = client$1.AppBskyEmbedNS = client$1.ProfileRecord = client$1.AppBskyActorNS = client$1.AppBskyNS = client$1.AppNS = client$1.ComAtprotoTempNS = client$1.ComAtprotoSyncNS = void 0;
+	client$1.AppBskyRichtextFacet = client$1.AppBskyNotificationUpdateSeen = client$1.AppBskyNotificationRegisterPush = client$1.AppBskyNotificationListNotifications = client$1.AppBskyNotificationGetUnreadCount = client$1.AppBskyLabelerService = client$1.AppBskyLabelerGetServices = client$1.AppBskyLabelerDefs = client$1.AppBskyGraphUnmuteThread = client$1.AppBskyGraphUnmuteActorList = client$1.AppBskyGraphUnmuteActor = client$1.AppBskyGraphStarterpack = client$1.AppBskyGraphMuteThread = client$1.AppBskyGraphMuteActorList = client$1.AppBskyGraphMuteActor = client$1.AppBskyGraphListitem = client$1.AppBskyGraphListblock = client$1.AppBskyGraphList = client$1.AppBskyGraphGetSuggestedFollowsByActor = client$1.AppBskyGraphGetStarterPacks = client$1.AppBskyGraphGetStarterPack = client$1.AppBskyGraphGetRelationships = client$1.AppBskyGraphGetMutes = client$1.AppBskyGraphGetLists = client$1.AppBskyGraphGetListMutes = client$1.AppBskyGraphGetListBlocks = client$1.AppBskyGraphGetList = client$1.AppBskyGraphGetKnownFollowers = client$1.AppBskyGraphGetFollows = client$1.AppBskyGraphGetFollowers = client$1.AppBskyGraphGetBlocks = client$1.AppBskyGraphGetActorStarterPacks = client$1.AppBskyGraphFollow = client$1.AppBskyGraphDefs = client$1.AppBskyGraphBlock = client$1.AppBskyFeedThreadgate = client$1.AppBskyFeedSendInteractions = client$1.AppBskyFeedSearchPosts = client$1.AppBskyFeedRepost = client$1.AppBskyFeedPost = client$1.AppBskyFeedLike = client$1.AppBskyFeedGetTimeline = client$1.AppBskyFeedGetSuggestedFeeds = client$1.AppBskyFeedGetRepostedBy = client$1.AppBskyFeedGetPosts = client$1.AppBskyFeedGetPostThread = client$1.AppBskyFeedGetListFeed = client$1.AppBskyFeedGetLikes = client$1.AppBskyFeedGetFeedSkeleton = client$1.AppBskyFeedGetFeedGenerators = void 0;
+	client$1.TOOLS_OZONE_TEAM = client$1.TOOLS_OZONE_MODERATION = client$1.APP_BSKY_GRAPH = client$1.APP_BSKY_FEED = client$1.COM_ATPROTO_MODERATION = client$1.ToolsOzoneTeamUpdateMember = client$1.ToolsOzoneTeamListMembers = client$1.ToolsOzoneTeamDeleteMember = client$1.ToolsOzoneTeamDefs = client$1.ToolsOzoneTeamAddMember = client$1.ToolsOzoneServerGetConfig = client$1.ToolsOzoneModerationSearchRepos = client$1.ToolsOzoneModerationQueryStatuses = client$1.ToolsOzoneModerationQueryEvents = client$1.ToolsOzoneModerationGetRepo = client$1.ToolsOzoneModerationGetRecord = client$1.ToolsOzoneModerationGetEvent = client$1.ToolsOzoneModerationEmitEvent = client$1.ToolsOzoneModerationDefs = client$1.ToolsOzoneCommunicationUpdateTemplate = client$1.ToolsOzoneCommunicationListTemplates = client$1.ToolsOzoneCommunicationDeleteTemplate = client$1.ToolsOzoneCommunicationDefs = client$1.ToolsOzoneCommunicationCreateTemplate = client$1.ChatBskyModerationUpdateActorAccess = client$1.ChatBskyModerationGetMessageContext = client$1.ChatBskyModerationGetActorMetadata = client$1.ChatBskyConvoUpdateRead = client$1.ChatBskyConvoUnmuteConvo = client$1.ChatBskyConvoSendMessageBatch = client$1.ChatBskyConvoSendMessage = client$1.ChatBskyConvoMuteConvo = client$1.ChatBskyConvoListConvos = client$1.ChatBskyConvoLeaveConvo = client$1.ChatBskyConvoGetMessages = client$1.ChatBskyConvoGetLog = client$1.ChatBskyConvoGetConvoForMembers = client$1.ChatBskyConvoGetConvo = client$1.ChatBskyConvoDeleteMessageForSelf = client$1.ChatBskyConvoDefs = client$1.ChatBskyActorExportAccountData = client$1.ChatBskyActorDeleteAccount = client$1.ChatBskyActorDefs = client$1.ChatBskyActorDeclaration = client$1.AppBskyUnspeccedSearchPostsSkeleton = client$1.AppBskyUnspeccedSearchActorsSkeleton = client$1.AppBskyUnspeccedGetTaggedSuggestions = client$1.AppBskyUnspeccedGetSuggestionsSkeleton = client$1.AppBskyUnspeccedGetPopularFeedGenerators = client$1.AppBskyUnspeccedDefs = void 0;
+	client$1.ToolsOzoneTeamNS = client$1.ToolsOzoneServerNS = client$1.ToolsOzoneModerationNS = client$1.ToolsOzoneCommunicationNS = client$1.ToolsOzoneNS = client$1.ToolsNS = client$1.ChatBskyModerationNS = client$1.ChatBskyConvoNS = client$1.DeclarationRecord = client$1.ChatBskyActorNS = client$1.ChatBskyNS = client$1.ChatNS = client$1.AppBskyUnspeccedNS = client$1.AppBskyRichtextNS = client$1.AppBskyNotificationNS = client$1.ServiceRecord = client$1.AppBskyLabelerNS = client$1.StarterpackRecord = client$1.ListitemRecord = client$1.ListblockRecord = client$1.ListRecord = client$1.FollowRecord = client$1.BlockRecord = client$1.AppBskyGraphNS = client$1.ThreadgateRecord = client$1.RepostRecord = client$1.PostRecord = client$1.LikeRecord = client$1.GeneratorRecord = client$1.AppBskyFeedNS = client$1.AppBskyEmbedNS = client$1.ProfileRecord = client$1.AppBskyActorNS = client$1.AppBskyNS = client$1.AppNS = client$1.ComAtprotoTempNS = client$1.ComAtprotoSyncNS = client$1.ComAtprotoServerNS = client$1.ComAtprotoRepoNS = client$1.ComAtprotoModerationNS = client$1.ComAtprotoLabelNS = client$1.ComAtprotoIdentityNS = client$1.ComAtprotoAdminNS = client$1.ComAtprotoNS = client$1.ComNS = client$1.AtpServiceClient = client$1.AtpBaseClient = void 0;
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
@@ -28363,6 +29168,7 @@ if (cid) {
 	const AppBskyFeedGetTimeline = __importStar(getTimeline);
 	const AppBskyFeedSearchPosts = __importStar(searchPosts);
 	const AppBskyFeedSendInteractions = __importStar(sendInteractions);
+	const AppBskyGraphGetActorStarterPacks = __importStar(getActorStarterPacks);
 	const AppBskyGraphGetBlocks = __importStar(getBlocks);
 	const AppBskyGraphGetFollowers = __importStar(getFollowers);
 	const AppBskyGraphGetFollows = __importStar(getFollows);
@@ -28373,6 +29179,8 @@ if (cid) {
 	const AppBskyGraphGetLists = __importStar(getLists);
 	const AppBskyGraphGetMutes = __importStar(getMutes);
 	const AppBskyGraphGetRelationships = __importStar(getRelationships);
+	const AppBskyGraphGetStarterPack = __importStar(getStarterPack);
+	const AppBskyGraphGetStarterPacks = __importStar(getStarterPacks);
 	const AppBskyGraphGetSuggestedFollowsByActor = __importStar(getSuggestedFollowsByActor);
 	const AppBskyGraphMuteActor = __importStar(muteActor);
 	const AppBskyGraphMuteActorList = __importStar(muteActorList);
@@ -28419,7 +29227,11 @@ if (cid) {
 	const ToolsOzoneModerationQueryStatuses = __importStar(queryStatuses);
 	const ToolsOzoneModerationSearchRepos = __importStar(searchRepos);
 	const ToolsOzoneServerGetConfig = __importStar(getConfig);
-	client$1.ComAtprotoAdminDefs = __importStar(defs$c);
+	const ToolsOzoneTeamAddMember = __importStar(addMember);
+	const ToolsOzoneTeamDeleteMember = __importStar(deleteMember);
+	const ToolsOzoneTeamListMembers = __importStar(listMembers);
+	const ToolsOzoneTeamUpdateMember = __importStar(updateMember);
+	client$1.ComAtprotoAdminDefs = __importStar(defs$d);
 	client$1.ComAtprotoAdminDeleteAccount = __importStar(deleteAccount$2);
 	client$1.ComAtprotoAdminDisableAccountInvites = __importStar(disableAccountInvites);
 	client$1.ComAtprotoAdminDisableInviteCodes = __importStar(disableInviteCodes);
@@ -28440,11 +29252,11 @@ if (cid) {
 	client$1.ComAtprotoIdentitySignPlcOperation = __importStar(signPlcOperation);
 	client$1.ComAtprotoIdentitySubmitPlcOperation = __importStar(submitPlcOperation);
 	client$1.ComAtprotoIdentityUpdateHandle = __importStar(updateHandle);
-	client$1.ComAtprotoLabelDefs = __importStar(defs$b);
+	client$1.ComAtprotoLabelDefs = __importStar(defs$c);
 	client$1.ComAtprotoLabelQueryLabels = __importStar(queryLabels);
 	client$1.ComAtprotoLabelSubscribeLabels = __importStar(subscribeLabels);
 	client$1.ComAtprotoModerationCreateReport = __importStar(createReport);
-	client$1.ComAtprotoModerationDefs = __importStar(defs$a);
+	client$1.ComAtprotoModerationDefs = __importStar(defs$b);
 	client$1.ComAtprotoRepoApplyWrites = __importStar(applyWrites);
 	client$1.ComAtprotoRepoCreateRecord = __importStar(createRecord);
 	client$1.ComAtprotoRepoDeleteRecord = __importStar(deleteRecord);
@@ -28465,7 +29277,7 @@ if (cid) {
 	client$1.ComAtprotoServerCreateInviteCodes = __importStar(createInviteCodes);
 	client$1.ComAtprotoServerCreateSession = __importStar(createSession);
 	client$1.ComAtprotoServerDeactivateAccount = __importStar(deactivateAccount);
-	client$1.ComAtprotoServerDefs = __importStar(defs$9);
+	client$1.ComAtprotoServerDefs = __importStar(defs$a);
 	client$1.ComAtprotoServerDeleteAccount = __importStar(deleteAccount$1);
 	client$1.ComAtprotoServerDeleteSession = __importStar(deleteSession);
 	client$1.ComAtprotoServerDescribeServer = __importStar(describeServer);
@@ -28498,7 +29310,7 @@ if (cid) {
 	client$1.ComAtprotoTempCheckSignupQueue = __importStar(checkSignupQueue);
 	client$1.ComAtprotoTempFetchLabels = __importStar(fetchLabels);
 	client$1.ComAtprotoTempRequestPhoneVerification = __importStar(requestPhoneVerification);
-	client$1.AppBskyActorDefs = __importStar(defs$8);
+	client$1.AppBskyActorDefs = __importStar(defs$9);
 	client$1.AppBskyActorGetPreferences = __importStar(getPreferences);
 	client$1.AppBskyActorGetProfile = __importStar(getProfile);
 	client$1.AppBskyActorGetProfiles = __importStar(getProfiles);
@@ -28511,7 +29323,7 @@ if (cid) {
 	client$1.AppBskyEmbedImages = __importStar(images);
 	client$1.AppBskyEmbedRecord = __importStar(record);
 	client$1.AppBskyEmbedRecordWithMedia = __importStar(recordWithMedia);
-	client$1.AppBskyFeedDefs = __importStar(defs$7);
+	client$1.AppBskyFeedDefs = __importStar(defs$8);
 	client$1.AppBskyFeedDescribeFeedGenerator = __importStar(describeFeedGenerator);
 	client$1.AppBskyFeedGenerator = __importStar(generator);
 	client$1.AppBskyFeedGetActorFeeds = __importStar(getActorFeeds);
@@ -28535,8 +29347,9 @@ if (cid) {
 	client$1.AppBskyFeedSendInteractions = __importStar(sendInteractions);
 	client$1.AppBskyFeedThreadgate = __importStar(threadgate);
 	client$1.AppBskyGraphBlock = __importStar(block);
-	client$1.AppBskyGraphDefs = __importStar(defs$6);
+	client$1.AppBskyGraphDefs = __importStar(defs$7);
 	client$1.AppBskyGraphFollow = __importStar(follow);
+	client$1.AppBskyGraphGetActorStarterPacks = __importStar(getActorStarterPacks);
 	client$1.AppBskyGraphGetBlocks = __importStar(getBlocks);
 	client$1.AppBskyGraphGetFollowers = __importStar(getFollowers);
 	client$1.AppBskyGraphGetFollows = __importStar(getFollows);
@@ -28547,6 +29360,8 @@ if (cid) {
 	client$1.AppBskyGraphGetLists = __importStar(getLists);
 	client$1.AppBskyGraphGetMutes = __importStar(getMutes);
 	client$1.AppBskyGraphGetRelationships = __importStar(getRelationships);
+	client$1.AppBskyGraphGetStarterPack = __importStar(getStarterPack);
+	client$1.AppBskyGraphGetStarterPacks = __importStar(getStarterPacks);
 	client$1.AppBskyGraphGetSuggestedFollowsByActor = __importStar(getSuggestedFollowsByActor);
 	client$1.AppBskyGraphList = __importStar(list);
 	client$1.AppBskyGraphListblock = __importStar(listblock);
@@ -28554,10 +29369,11 @@ if (cid) {
 	client$1.AppBskyGraphMuteActor = __importStar(muteActor);
 	client$1.AppBskyGraphMuteActorList = __importStar(muteActorList);
 	client$1.AppBskyGraphMuteThread = __importStar(muteThread);
+	client$1.AppBskyGraphStarterpack = __importStar(starterpack);
 	client$1.AppBskyGraphUnmuteActor = __importStar(unmuteActor);
 	client$1.AppBskyGraphUnmuteActorList = __importStar(unmuteActorList);
 	client$1.AppBskyGraphUnmuteThread = __importStar(unmuteThread);
-	client$1.AppBskyLabelerDefs = __importStar(defs$5);
+	client$1.AppBskyLabelerDefs = __importStar(defs$6);
 	client$1.AppBskyLabelerGetServices = __importStar(getServices);
 	client$1.AppBskyLabelerService = __importStar(service);
 	client$1.AppBskyNotificationGetUnreadCount = __importStar(getUnreadCount);
@@ -28565,17 +29381,17 @@ if (cid) {
 	client$1.AppBskyNotificationRegisterPush = __importStar(registerPush);
 	client$1.AppBskyNotificationUpdateSeen = __importStar(updateSeen);
 	client$1.AppBskyRichtextFacet = __importStar(facet);
-	client$1.AppBskyUnspeccedDefs = __importStar(defs$4);
+	client$1.AppBskyUnspeccedDefs = __importStar(defs$5);
 	client$1.AppBskyUnspeccedGetPopularFeedGenerators = __importStar(getPopularFeedGenerators);
 	client$1.AppBskyUnspeccedGetSuggestionsSkeleton = __importStar(getSuggestionsSkeleton);
 	client$1.AppBskyUnspeccedGetTaggedSuggestions = __importStar(getTaggedSuggestions);
 	client$1.AppBskyUnspeccedSearchActorsSkeleton = __importStar(searchActorsSkeleton);
 	client$1.AppBskyUnspeccedSearchPostsSkeleton = __importStar(searchPostsSkeleton);
 	client$1.ChatBskyActorDeclaration = __importStar(declaration);
-	client$1.ChatBskyActorDefs = __importStar(defs$3);
+	client$1.ChatBskyActorDefs = __importStar(defs$4);
 	client$1.ChatBskyActorDeleteAccount = __importStar(deleteAccount);
 	client$1.ChatBskyActorExportAccountData = __importStar(exportAccountData);
-	client$1.ChatBskyConvoDefs = __importStar(defs$2);
+	client$1.ChatBskyConvoDefs = __importStar(defs$3);
 	client$1.ChatBskyConvoDeleteMessageForSelf = __importStar(deleteMessageForSelf);
 	client$1.ChatBskyConvoGetConvo = __importStar(getConvo);
 	client$1.ChatBskyConvoGetConvoForMembers = __importStar(getConvoForMembers);
@@ -28592,11 +29408,11 @@ if (cid) {
 	client$1.ChatBskyModerationGetMessageContext = __importStar(getMessageContext);
 	client$1.ChatBskyModerationUpdateActorAccess = __importStar(updateActorAccess);
 	client$1.ToolsOzoneCommunicationCreateTemplate = __importStar(createTemplate);
-	client$1.ToolsOzoneCommunicationDefs = __importStar(defs$1);
+	client$1.ToolsOzoneCommunicationDefs = __importStar(defs$2);
 	client$1.ToolsOzoneCommunicationDeleteTemplate = __importStar(deleteTemplate);
 	client$1.ToolsOzoneCommunicationListTemplates = __importStar(listTemplates);
 	client$1.ToolsOzoneCommunicationUpdateTemplate = __importStar(updateTemplate);
-	client$1.ToolsOzoneModerationDefs = __importStar(defs);
+	client$1.ToolsOzoneModerationDefs = __importStar(defs$1);
 	client$1.ToolsOzoneModerationEmitEvent = __importStar(emitEvent);
 	client$1.ToolsOzoneModerationGetEvent = __importStar(getEvent);
 	client$1.ToolsOzoneModerationGetRecord = __importStar(getRecord);
@@ -28605,6 +29421,11 @@ if (cid) {
 	client$1.ToolsOzoneModerationQueryStatuses = __importStar(queryStatuses);
 	client$1.ToolsOzoneModerationSearchRepos = __importStar(searchRepos);
 	client$1.ToolsOzoneServerGetConfig = __importStar(getConfig);
+	client$1.ToolsOzoneTeamAddMember = __importStar(addMember);
+	client$1.ToolsOzoneTeamDefs = __importStar(defs);
+	client$1.ToolsOzoneTeamDeleteMember = __importStar(deleteMember);
+	client$1.ToolsOzoneTeamListMembers = __importStar(listMembers);
+	client$1.ToolsOzoneTeamUpdateMember = __importStar(updateMember);
 	client$1.COM_ATPROTO_MODERATION = {
 	  DefsReasonSpam: 'com.atproto.moderation.defs#reasonSpam',
 	  DefsReasonViolation: 'com.atproto.moderation.defs#reasonViolation',
@@ -28630,13 +29451,19 @@ if (cid) {
 	};
 	client$1.APP_BSKY_GRAPH = {
 	  DefsModlist: 'app.bsky.graph.defs#modlist',
-	  DefsCuratelist: 'app.bsky.graph.defs#curatelist'
+	  DefsCuratelist: 'app.bsky.graph.defs#curatelist',
+	  DefsReferencelist: 'app.bsky.graph.defs#referencelist'
 	};
 	client$1.TOOLS_OZONE_MODERATION = {
 	  DefsReviewOpen: 'tools.ozone.moderation.defs#reviewOpen',
 	  DefsReviewEscalated: 'tools.ozone.moderation.defs#reviewEscalated',
 	  DefsReviewClosed: 'tools.ozone.moderation.defs#reviewClosed',
 	  DefsReviewNone: 'tools.ozone.moderation.defs#reviewNone'
+	};
+	client$1.TOOLS_OZONE_TEAM = {
+	  DefsRoleAdmin: 'tools.ozone.team.defs#roleAdmin',
+	  DefsRoleModerator: 'tools.ozone.team.defs#roleModerator',
+	  DefsRoleTriage: 'tools.ozone.team.defs#roleTriage'
 	};
 	class AtpBaseClient {
 	  constructor() {
@@ -29846,12 +30673,24 @@ if (cid) {
 	      writable: true,
 	      value: void 0
 	    });
+	    Object.defineProperty(this, "starterpack", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: void 0
+	    });
 	    this._service = service;
 	    this.block = new BlockRecord(service);
 	    this.follow = new FollowRecord(service);
 	    this.list = new ListRecord(service);
 	    this.listblock = new ListblockRecord(service);
 	    this.listitem = new ListitemRecord(service);
+	    this.starterpack = new StarterpackRecord(service);
+	  }
+	  getActorStarterPacks(params, opts) {
+	    return this._service.xrpc.call('app.bsky.graph.getActorStarterPacks', params, undefined, opts).catch(e => {
+	      throw AppBskyGraphGetActorStarterPacks.toKnownErr(e);
+	    });
 	  }
 	  getBlocks(params, opts) {
 	    return this._service.xrpc.call('app.bsky.graph.getBlocks', params, undefined, opts).catch(e => {
@@ -29901,6 +30740,16 @@ if (cid) {
 	  getRelationships(params, opts) {
 	    return this._service.xrpc.call('app.bsky.graph.getRelationships', params, undefined, opts).catch(e => {
 	      throw AppBskyGraphGetRelationships.toKnownErr(e);
+	    });
+	  }
+	  getStarterPack(params, opts) {
+	    return this._service.xrpc.call('app.bsky.graph.getStarterPack', params, undefined, opts).catch(e => {
+	      throw AppBskyGraphGetStarterPack.toKnownErr(e);
+	    });
+	  }
+	  getStarterPacks(params, opts) {
+	    return this._service.xrpc.call('app.bsky.graph.getStarterPacks', params, undefined, opts).catch(e => {
+	      throw AppBskyGraphGetStarterPacks.toKnownErr(e);
 	    });
 	  }
 	  getSuggestedFollowsByActor(params, opts) {
@@ -30170,6 +31019,52 @@ if (cid) {
 	  }
 	}
 	client$1.ListitemRecord = ListitemRecord;
+	class StarterpackRecord {
+	  constructor(service) {
+	    Object.defineProperty(this, "_service", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: void 0
+	    });
+	    this._service = service;
+	  }
+	  async list(params) {
+	    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+	      collection: 'app.bsky.graph.starterpack',
+	      ...params
+	    });
+	    return res.data;
+	  }
+	  async get(params) {
+	    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+	      collection: 'app.bsky.graph.starterpack',
+	      ...params
+	    });
+	    return res.data;
+	  }
+	  async create(params, record, headers) {
+	    record.$type = 'app.bsky.graph.starterpack';
+	    const res = await this._service.xrpc.call('com.atproto.repo.createRecord', undefined, {
+	      collection: 'app.bsky.graph.starterpack',
+	      ...params,
+	      record
+	    }, {
+	      encoding: 'application/json',
+	      headers
+	    });
+	    return res.data;
+	  }
+	  async delete(params, headers) {
+	    await this._service.xrpc.call('com.atproto.repo.deleteRecord', undefined, {
+	      collection: 'app.bsky.graph.starterpack',
+	      ...params
+	    }, {
+	      headers
+	    });
+	  }
+	}
+	client$1.StarterpackRecord = StarterpackRecord;
 	class AppBskyLabelerNS {
 	  constructor(service) {
 	    Object.defineProperty(this, "_service", {
@@ -30594,10 +31489,17 @@ if (cid) {
 	      writable: true,
 	      value: void 0
 	    });
+	    Object.defineProperty(this, "team", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: void 0
+	    });
 	    this._service = service;
 	    this.communication = new ToolsOzoneCommunicationNS(service);
 	    this.moderation = new ToolsOzoneModerationNS(service);
 	    this.server = new ToolsOzoneServerNS(service);
+	    this.team = new ToolsOzoneTeamNS(service);
 	  }
 	}
 	client$1.ToolsOzoneNS = ToolsOzoneNS;
@@ -30697,6 +31599,38 @@ if (cid) {
 	  }
 	}
 	client$1.ToolsOzoneServerNS = ToolsOzoneServerNS;
+	class ToolsOzoneTeamNS {
+	  constructor(service) {
+	    Object.defineProperty(this, "_service", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: void 0
+	    });
+	    this._service = service;
+	  }
+	  addMember(data, opts) {
+	    return this._service.xrpc.call('tools.ozone.team.addMember', opts?.qp, data, opts).catch(e => {
+	      throw ToolsOzoneTeamAddMember.toKnownErr(e);
+	    });
+	  }
+	  deleteMember(data, opts) {
+	    return this._service.xrpc.call('tools.ozone.team.deleteMember', opts?.qp, data, opts).catch(e => {
+	      throw ToolsOzoneTeamDeleteMember.toKnownErr(e);
+	    });
+	  }
+	  listMembers(params, opts) {
+	    return this._service.xrpc.call('tools.ozone.team.listMembers', params, undefined, opts).catch(e => {
+	      throw ToolsOzoneTeamListMembers.toKnownErr(e);
+	    });
+	  }
+	  updateMember(data, opts) {
+	    return this._service.xrpc.call('tools.ozone.team.updateMember', opts?.qp, data, opts).catch(e => {
+	      throw ToolsOzoneTeamUpdateMember.toKnownErr(e);
+	    });
+	  }
+	}
+	client$1.ToolsOzoneTeamNS = ToolsOzoneTeamNS;
 
 	var agent = {};
 
@@ -30709,7 +31643,6 @@ if (cid) {
 	const common_web_1$2 = dist$2;
 	const client_1$5 = client$1;
 	const const_1 = _const;
-	const MAX_LABELERS = 10;
 	const REFRESH_SESSION = 'com.atproto.server.refreshSession';
 	/**
 	 * An ATP "Agent"
@@ -31005,7 +31938,7 @@ if (cid) {
 	    }
 	    reqHeaders = {
 	      ...reqHeaders,
-	      [labelerHeaderName]: labelerHeaders.slice(0, MAX_LABELERS).join(', ')
+	      [labelerHeaderName]: labelerHeaders.join(', ')
 	    };
 	    return reqHeaders;
 	  }
@@ -32279,7 +33212,6 @@ if (cid) {
 		"sh",
 		"shangrila",
 		"sharp",
-		"shaw",
 		"shell",
 		"shia",
 		"shiksha",
@@ -32706,7 +33638,7 @@ if (cid) {
 	// eslint-disable-next-line no-misleading-character-class
 	/(^|\s)[#＃]((?!\ufe0f)[^\s\u00AD\u2060\u200A\u200B\u200C\u200D\u20e2]*[^\d\s\p{P}\u00AD\u2060\u200A\u200B\u200C\u200D\u20e2]+[^\s\u00AD\u2060\u200A\u200B\u200C\u200D\u20e2]*)?/gu;
 
-	var __importDefault = commonjsGlobal && commonjsGlobal.__importDefault || function (mod) {
+	var __importDefault$1 = commonjsGlobal && commonjsGlobal.__importDefault || function (mod) {
 	  return mod && mod.__esModule ? mod : {
 	    "default": mod
 	  };
@@ -32715,7 +33647,7 @@ if (cid) {
 	  value: true
 	});
 	detection.detectFacets = void 0;
-	const tlds_1 = __importDefault(require$$0);
+	const tlds_1 = __importDefault$1(require$$0);
 	const util_1$1 = util$1;
 	function detectFacets(text) {
 	  let match;
@@ -34586,12 +35518,122 @@ if (cid) {
 
 	var bskyAgent = {};
 
+	var AwaitLock$1 = {};
+
+	var __classPrivateFieldGet = commonjsGlobal && commonjsGlobal.__classPrivateFieldGet || function (receiver, state, kind, f) {
+	  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+	  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+	  return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+	};
+	var __classPrivateFieldSet = commonjsGlobal && commonjsGlobal.__classPrivateFieldSet || function (receiver, state, value, kind, f) {
+	  if (kind === "m") throw new TypeError("Private method is not writable");
+	  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+	  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+	  return kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value), value;
+	};
+	var _AwaitLock_acquired, _AwaitLock_waitingResolvers;
+	Object.defineProperty(AwaitLock$1, "__esModule", {
+	  value: true
+	});
+	/**
+	 * A mutex lock for coordination across async functions
+	 */
+	class AwaitLock {
+	  constructor() {
+	    _AwaitLock_acquired.set(this, false);
+	    _AwaitLock_waitingResolvers.set(this, new Set());
+	  }
+	  /**
+	   * Whether the lock is currently acquired or not. Accessing this property does not affect the
+	   * status of the lock.
+	   */
+	  get acquired() {
+	    return __classPrivateFieldGet(this, _AwaitLock_acquired, "f");
+	  }
+	  /**
+	   * Acquires the lock, waiting if necessary for it to become free if it is already locked. The
+	   * returned promise is fulfilled once the lock is acquired.
+	   *
+	   * A timeout (in milliseconds) may be optionally provided. If the lock cannot be acquired before
+	   * the timeout elapses, the returned promise is rejected with an error. The behavior of invalid
+	   * timeout values depends on how `setTimeout` handles those values.
+	   *
+	   * After acquiring the lock, you **must** call `release` when you are done with it.
+	   */
+	  acquireAsync({
+	    timeout
+	  } = {}) {
+	    if (!__classPrivateFieldGet(this, _AwaitLock_acquired, "f")) {
+	      __classPrivateFieldSet(this, _AwaitLock_acquired, true, "f");
+	      return Promise.resolve();
+	    }
+	    if (timeout == null) {
+	      return new Promise(resolve => {
+	        __classPrivateFieldGet(this, _AwaitLock_waitingResolvers, "f").add(resolve);
+	      });
+	    }
+	    let resolver;
+	    let timer;
+	    return Promise.race([new Promise(resolve => {
+	      resolver = () => {
+	        clearTimeout(timer);
+	        resolve();
+	      };
+	      __classPrivateFieldGet(this, _AwaitLock_waitingResolvers, "f").add(resolver);
+	    }), new Promise((_, reject) => {
+	      timer = setTimeout(() => {
+	        __classPrivateFieldGet(this, _AwaitLock_waitingResolvers, "f").delete(resolver);
+	        reject(new Error(`Timed out waiting for lock`));
+	      }, timeout);
+	    })]);
+	  }
+	  /**
+	   * Acquires the lock if it is free and otherwise returns immediately without waiting. Returns
+	   * `true` if the lock was free and is now acquired, and `false` otherwise.
+	   *
+	   * This method differs from calling `acquireAsync` with a zero-millisecond timeout in that it runs
+	   * synchronously without waiting for the JavaScript task queue.
+	   */
+	  tryAcquire() {
+	    if (!__classPrivateFieldGet(this, _AwaitLock_acquired, "f")) {
+	      __classPrivateFieldSet(this, _AwaitLock_acquired, true, "f");
+	      return true;
+	    }
+	    return false;
+	  }
+	  /**
+	   * Releases the lock and gives it to the next waiting acquirer, if there is one. Each acquirer
+	   * must release the lock exactly once.
+	   */
+	  release() {
+	    if (!__classPrivateFieldGet(this, _AwaitLock_acquired, "f")) {
+	      throw new Error(`Cannot release an unacquired lock`);
+	    }
+	    if (__classPrivateFieldGet(this, _AwaitLock_waitingResolvers, "f").size > 0) {
+	      // Sets preserve insertion order like a queue
+	      const [resolve] = __classPrivateFieldGet(this, _AwaitLock_waitingResolvers, "f");
+	      __classPrivateFieldGet(this, _AwaitLock_waitingResolvers, "f").delete(resolve);
+	      resolve();
+	    } else {
+	      __classPrivateFieldSet(this, _AwaitLock_acquired, false, "f");
+	    }
+	  }
+	}
+	AwaitLock$1.default = AwaitLock;
+	_AwaitLock_acquired = new WeakMap(), _AwaitLock_waitingResolvers = new WeakMap();
+
+	var __importDefault = commonjsGlobal && commonjsGlobal.__importDefault || function (mod) {
+	  return mod && mod.__esModule ? mod : {
+	    "default": mod
+	  };
+	};
 	Object.defineProperty(bskyAgent, "__esModule", {
 	  value: true
 	});
 	bskyAgent.BskyAgent = void 0;
 	const syntax_1 = dist$4;
 	const common_web_1 = dist$2;
+	const await_lock_1 = __importDefault(AwaitLock$1);
 	const agent_1 = agent;
 	const client_1 = client$1;
 	const labels_1 = labels;
@@ -34611,6 +35653,12 @@ if (cid) {
 	class BskyAgent extends agent_1.AtpAgent {
 	  constructor() {
 	    super(...arguments);
+	    Object.defineProperty(this, "_prefsLock", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: new await_lock_1.default()
+	    });
 	    Object.defineProperty(this, "getTimeline", {
 	      enumerable: true,
 	      configurable: true,
@@ -34972,6 +36020,10 @@ if (cid) {
 	      birthDate: undefined,
 	      interests: {
 	        tags: []
+	      },
+	      bskyAppState: {
+	        queuedNudges: [],
+	        activeProgressGuide: undefined
 	      }
 	    };
 	    const res = await this.app.bsky.actor.getPreferences({});
@@ -35051,6 +36103,14 @@ if (cid) {
 	          ...v
 	        } = pref;
 	        prefs.moderationPrefs.hiddenPosts = v.items;
+	      } else if (client_1.AppBskyActorDefs.isBskyAppStatePref(pref) && client_1.AppBskyActorDefs.validateBskyAppStatePref(pref).success) {
+	        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+	        const {
+	          $type,
+	          ...v
+	        } = pref;
+	        prefs.bskyAppState.queuedNudges = v.queuedNudges || [];
+	        prefs.bskyAppState.activeProgressGuide = v.activeProgressGuide;
 	      }
 	    }
 	    /*
@@ -35455,6 +36515,44 @@ if (cid) {
 	  async unhidePost(postUri) {
 	    await updateHiddenPost(this, postUri, 'unhide');
 	  }
+	  async bskyAppQueueNudges(nudges) {
+	    await updatePreferences(this, prefs => {
+	      let bskyAppStatePref = prefs.findLast(pref => client_1.AppBskyActorDefs.isBskyAppStatePref(pref) && client_1.AppBskyActorDefs.validateBskyAppStatePref(pref).success);
+	      bskyAppStatePref = bskyAppStatePref || {};
+	      nudges = Array.isArray(nudges) ? nudges : [nudges];
+	      bskyAppStatePref.queuedNudges = (bskyAppStatePref.queuedNudges || []).concat(nudges);
+	      return prefs.filter(p => !client_1.AppBskyActorDefs.isBskyAppStatePref(p)).concat([{
+	        ...bskyAppStatePref,
+	        $type: 'app.bsky.actor.defs#bskyAppStatePref'
+	      }]);
+	    });
+	  }
+	  async bskyAppDismissNudges(nudges) {
+	    await updatePreferences(this, prefs => {
+	      let bskyAppStatePref = prefs.findLast(pref => client_1.AppBskyActorDefs.isBskyAppStatePref(pref) && client_1.AppBskyActorDefs.validateBskyAppStatePref(pref).success);
+	      bskyAppStatePref = bskyAppStatePref || {};
+	      nudges = Array.isArray(nudges) ? nudges : [nudges];
+	      bskyAppStatePref.queuedNudges = (bskyAppStatePref.queuedNudges || []).filter(nudge => !nudges.includes(nudge));
+	      return prefs.filter(p => !client_1.AppBskyActorDefs.isBskyAppStatePref(p)).concat([{
+	        ...bskyAppStatePref,
+	        $type: 'app.bsky.actor.defs#bskyAppStatePref'
+	      }]);
+	    });
+	  }
+	  async bskyAppSetActiveProgressGuide(guide) {
+	    if (guide && !client_1.AppBskyActorDefs.validateBskyAppProgressGuide(guide).success) {
+	      throw new Error('Invalid progress guide');
+	    }
+	    await updatePreferences(this, prefs => {
+	      let bskyAppStatePref = prefs.findLast(pref => client_1.AppBskyActorDefs.isBskyAppStatePref(pref) && client_1.AppBskyActorDefs.validateBskyAppStatePref(pref).success);
+	      bskyAppStatePref = bskyAppStatePref || {};
+	      bskyAppStatePref.activeProgressGuide = guide;
+	      return prefs.filter(p => !client_1.AppBskyActorDefs.isBskyAppStatePref(p)).concat([{
+	        ...bskyAppStatePref,
+	        $type: 'app.bsky.actor.defs#bskyAppStatePref'
+	      }]);
+	    });
+	  }
 	}
 	bskyAgent.BskyAgent = BskyAgent;
 	/**
@@ -35466,15 +36564,20 @@ if (cid) {
 	 * argument and if the callback returns false, the preferences are not updated.
 	 */
 	async function updatePreferences(agent, cb) {
-	  const res = await agent.app.bsky.actor.getPreferences({});
-	  const newPrefs = cb(res.data.preferences);
-	  if (newPrefs === false) {
-	    return res.data.preferences;
+	  try {
+	    await agent._prefsLock.acquireAsync();
+	    const res = await agent.app.bsky.actor.getPreferences({});
+	    const newPrefs = cb(res.data.preferences);
+	    if (newPrefs === false) {
+	      return res.data.preferences;
+	    }
+	    await agent.app.bsky.actor.putPreferences({
+	      preferences: newPrefs
+	    });
+	    return newPrefs;
+	  } finally {
+	    agent._prefsLock.release();
 	  }
-	  await agent.app.bsky.actor.putPreferences({
-	    preferences: newPrefs
-	  });
-	  return newPrefs;
 	}
 	/**
 	 * A helper specifically for updating feed preferences
@@ -42731,7 +43834,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.53.2";
+	var version = "0.2.54";
 
 	// @ts-check
 
@@ -43160,7 +44263,7 @@ if (cid) {
 	 *
 	 * By David Fahlander, david.fahlander@gmail.com
 	 *
-	 * Version 4.0.7, Sun May 26 2024
+	 * Version 4.0.8, Wed Jul 10 2024
 	 *
 	 * https://dexie.org
 	 *
@@ -44235,7 +45338,7 @@ if (cid) {
 	        });
 	      }
 	    }
-	    var DEXIE_VERSION = '4.0.7';
+	    var DEXIE_VERSION = '4.0.8';
 	    var maxString = String.fromCharCode(65535);
 	    var minKey = -Infinity;
 	    var INVALID_KEY_ARGUMENT = "Invalid key provided. Keys must be of type string, number, Date or Array<string | number | Date>.";
@@ -46982,6 +48085,10 @@ if (cid) {
 	          return addRange(_this, key, key);
 	        });
 	        return this;
+	      },
+	      hasKey: function (key) {
+	        var node = getRangeSetIterator(this).next(key).value;
+	        return node && cmp(node.from, key) <= 0 && cmp(node.to, key) >= 0;
 	      }
 	    }, _a[iteratorSymbol] = function () {
 	      return getRangeSetIterator(this);
@@ -48081,16 +49188,22 @@ if (cid) {
 	      var extractLowLevelIndex = (index.lowLevelIndex || index).extractKey;
 	      var finalResult = ops.reduce(function (result, op) {
 	        var modifedResult = result;
-	        var includedValues = op.type === 'add' || op.type === 'put' ? op.values.filter(function (v) {
-	          var key = extractIndex(v);
-	          return multiEntry && isArray(key) ? key.some(function (k) {
-	            return isWithinRange(k, queryRange);
-	          }) : isWithinRange(key, queryRange);
-	        }).map(function (v) {
-	          v = deepClone(v);
-	          if (immutable) Object.freeze(v);
-	          return v;
-	        }) : [];
+	        var includedValues = [];
+	        if (op.type === 'add' || op.type === 'put') {
+	          var includedPKs = new RangeSet();
+	          for (var i = op.values.length - 1; i >= 0; --i) {
+	            var value = op.values[i];
+	            var pk = extractPrimKey(value);
+	            if (includedPKs.hasKey(pk)) continue;
+	            var key = extractIndex(value);
+	            if (multiEntry && isArray(key) ? key.some(function (k) {
+	              return isWithinRange(k, queryRange);
+	            }) : isWithinRange(key, queryRange)) {
+	              includedPKs.addKey(pk);
+	              includedValues.push(value);
+	            }
+	          }
+	        }
 	        switch (op.type) {
 	          case 'add':
 	            modifedResult = result.concat(req.values ? includedValues : includedValues.map(function (v) {
@@ -48102,8 +49215,7 @@ if (cid) {
 	              return extractPrimKey(v);
 	            }));
 	            modifedResult = result.filter(function (item) {
-	              var key = req.values ? extractPrimKey(item) : item;
-	              return !rangesOverlap(new RangeSet(key), keySet_1);
+	              return !keySet_1.hasKey(req.values ? extractPrimKey(item) : item);
 	            }).concat(req.values ? includedValues : includedValues.map(function (v) {
 	              return extractPrimKey(v);
 	            }));
@@ -48111,8 +49223,7 @@ if (cid) {
 	          case 'delete':
 	            var keysToDelete_1 = new RangeSet().addKeys(op.keys);
 	            modifedResult = result.filter(function (item) {
-	              var key = req.values ? extractPrimKey(item) : item;
-	              return !rangesOverlap(new RangeSet(key), keysToDelete_1);
+	              return !keysToDelete_1.hasKey(req.values ? extractPrimKey(item) : item);
 	            });
 	            break;
 	          case 'deleteRange':
