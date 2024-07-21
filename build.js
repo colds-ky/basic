@@ -22,7 +22,7 @@ async function rollupBuilder() {
   const { babel } = require('@rollup/plugin-babel');
 
   const watcher = (mode === 'serve' || mode === 'watch' ? rollup.watch : rollup.rollup)({
-    input: 'lib/index.js',
+    input: 'package/index.js',
     plugins: [
       nodeResolve({
         // @ts-ignore
@@ -85,6 +85,7 @@ function esbuildBuilder() {
       '.md': 'text'
     },
     format: 'iife',
+    resolveExtensions: ['.js'],
     //logLevel: 'info',
     external: [
       'fs', 'path', 'os',
@@ -169,7 +170,7 @@ function esbuildBuilder() {
 
     const webOptions = {
       ...baseOptions,
-      entryPoints: ['web/index.js'],
+      entryPoints: ['app.js'],
       outfile: 'index.js',
       plugins: [
         {
