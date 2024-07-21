@@ -158,6 +158,7 @@ function esbuildBuilder() {
       console.log('WATCHING LIB...');
     } else {
       await esbuild.build(options);
+      console.log('ESBUILD complete.');
     }
   }
 
