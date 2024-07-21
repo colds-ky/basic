@@ -162,7 +162,7 @@ function esbuildBuilder() {
     }
   }
 
-  async function buildSite(mode) {
+  async function buildSites(mode) {
 
     const gistingOptions = {
       ...baseOptions,
@@ -197,7 +197,7 @@ function esbuildBuilder() {
     };
 
     if (mode === 'serve') {
-      (async () => {
+      await (async () => {
         const gistingCtx = await esbuild.context(gistingOptions);
         const gistingServer = await gistingCtx.serve({
           servedir: path.resolve(__dirname, 'gisting/dist'),
@@ -212,14 +212,14 @@ function esbuildBuilder() {
         const coldskyServer = await coldskyCtx.serve({
           servedir: path.resolve(__dirname, 'coldsky/dist'),
           fallback: 'index.html',
-          port: 8081
+          port: 8800
         });
         await coldskyCtx.watch();
         console.log('SERVING CODSKY SITE http://' + (coldskyServer.host === '0.0.0.0' ? 'localhost' : coldskyServer.host) + ':' + coldskyServer.port + '/');
       })();
 
     } else if (mode === 'watch') {
-      (async () => {
+      await (async () => {
         const gistingCtx = await esbuild.context(gistingOptions);
         await gistingCtx.watch();
         console.log('WATCHING SITE...');
@@ -236,6 +236,6 @@ function esbuildBuilder() {
     }
   }
 
-  buildLib(mode);
-  buildSite(mode);
+  //buildLib(mode);
+  buildSites(mode);
 }
