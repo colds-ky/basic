@@ -128,7 +128,7 @@ padding-left: 4.5vh;
   to { transform: translateX(70%); }
 }
 
-.landing .landing-bottom-bar {
+.landing .landing-bottom-bar, .landing .landing-top-bar .coldsky-link {
   grid-row: 5;
   padding: 0.2em 0.4em;
   font-family: sans-serif;

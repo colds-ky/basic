@@ -791,7 +791,8 @@ a.account-label.account-handle {
     transform: translateX(70%);
   }
 }
-.landing .landing-bottom-bar {
+.landing .landing-bottom-bar,
+.landing .landing-top-bar .coldsky-link {
   grid-row: 5;
   padding: 0.2em 0.4em;
   font-family: sans-serif;
@@ -1162,5 +1163,13 @@ html.account body {
   padding-left: 0.4em;
   padding-top: 1.2em;
   font-size: 97%l;
+}
+
+/* web/coldsky/show-readme.css */
+.show-readme {
+  padding: 1em;
+}
+h1 {
+  text-align: center;
 }
 /*# sourceMappingURL=index.css.map */

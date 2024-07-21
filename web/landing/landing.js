@@ -2,8 +2,7 @@
 
 import React, { useEffect } from 'react';
 
-import { replaceIcon } from '../icon-inject';
-import { localise } from '../localise';
+import { setGlobalAppView } from '../icon-inject';
 import { FunBackground } from './fun-background';
 import { SearchArea } from './search-area';
 
@@ -11,22 +10,21 @@ import { version } from '../../package.json';
 
 import './landing.css';
 import { AtlasComponent } from '../atlas';
-
-export const uppercase_GIST = localise('𝓖𝓘𝓢𝓣', { uk: '𝓷𝓮𝓹𝓮𝓬𝔂𝓰' });
+import { Link } from 'react-router-dom';
 
 export function Landing() {
   const [showAtlas, setShowAtlas] = React.useState(false);
 
   useEffect(() => {
-    document.documentElement.classList.remove('account');
-    document.title = uppercase_GIST;
-    replaceIcon(null);
-  });
+    setGlobalAppView(undefined);
+  }, []);
   
   return (
     <div className='landing'>
       <div className='landing-top-bar'>
-        <a href="https://bsky.app/profile/gist.ing">Gist</a>
+        <Link className='coldsky-link' to='coldsky'>
+          Cold Sky
+        </Link>
       </div>
 
       <SearchArea

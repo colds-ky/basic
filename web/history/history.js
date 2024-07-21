@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import { useDB } from '..';
 import { likelyDID, makeFeedUri, shortenDID } from '../../lib';
 import { forAwait } from '../../coldsky/api/forAwait';
-import { overlayAvatar, replaceIcon } from '../icon-inject';
+import { setGlobalAppView } from '../icon-inject';
 import { localise } from '../localise';
 import { Thread } from '../widgets/post/thread';
 import { HistoryLayout } from './history-layout';
@@ -40,25 +40,7 @@ function HistoryCore() {
     placeholder: true
   };
 
-  useEffect(() => {
-    var stop = false;
-    (async () => {
-      let appliedAvatar = '';
-      for await (const profile of db.getProfileIncrementally(handle)) {
-        if (stop) return;
-        if (profile.avatar && profile.avatar !== appliedAvatar) {
-          appliedAvatar = profile.avatar;
-          const avatarIcon = await overlayAvatar(profile.avatar).catch(() => { });
-          if (stop) return;
-          replaceIcon(avatarIcon || undefined);
-        }
-      }
-    })();
-
-    return () => {
-      stop = true;
-    }
-  }, [handle]);
+  setGlobalAppView(handle ? { account: handle } : undefined);
 
   const [searchQuery, setSearchQuery] = React.useState('');
 

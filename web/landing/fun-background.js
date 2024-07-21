@@ -28,7 +28,7 @@ export function FunBackground() {
                 key={thread?.current?.uri || "undefined"}
                 thread={thread}
                 onClick={() => {
-                  navigate(thread.current.uri);
+                  navigate(thread.current.uri, { replace: false });
                 }}
               />
             ))}

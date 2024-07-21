@@ -1,5 +1,3 @@
-![md(`](coldsky-icon.png)
-
 # ColdSky
 
 ## The goal
@@ -17,6 +15,3 @@ into accessible addressable indexed set of plain files.
 
 * Script to process those CAR files into "materialised indices"  <br>
    *sharding data by domain-specific clusters*
-
-
-<!-- `)] // -->

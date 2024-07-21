@@ -2,9 +2,9 @@
 
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { uppercase_GIST } from '../landing/landing';
-import { breakHandleParts } from '../widgets/account/full-handle';
 import { applyModifier } from '../api/unicode-styles/apply-modifier';
+import { uppercase_TITLE } from '../icon-inject';
+import { breakHandleParts } from '../widgets/account/full-handle';
 
 const middledot = '\u00B7';
 
@@ -18,7 +18,7 @@ export function HistoryPageDecorations({ children }) {
     document.documentElement.classList.add('account');
 
     if (!handle) {
-      document.title = uppercase_GIST;
+      document.title = uppercase_TITLE;
     } else {
       const { mainText, tldSuffix, bskySocialSuffix, didPrefix, didBody } = breakHandleParts(handle);
 

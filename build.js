@@ -80,7 +80,10 @@ function esbuildBuilder() {
     bundle: true,
     sourcemap: true,
     target: 'es6',
-    loader: { '.js': 'jsx' },
+    loader: {
+      '.js': 'jsx',
+      '.md': 'text'
+    },
     format: 'iife',
     //logLevel: 'info',
     external: [

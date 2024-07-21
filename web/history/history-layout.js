@@ -27,24 +27,27 @@ export function HistoryLayout({
 }) {
   const [forceShowSearch, setForceShowSearch] = useState(false);
 
+  const [timeout] = React.useState({ timeout: 0, searchText: '' });
+
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchText, setSearchText] = useState(searchParams.get('q') || '');
+  const searchText = searchParams.get('q') || '';
 
   const showSearch = forceShowSearch || !!searchText;
-
-  const [timeout] = React.useState({ timeout: 0, searchText: '' });
 
   if (searchText !== timeout.searchText) {
     clearTimeout(timeout.timeout);
     timeout.searchText = searchText;
     if (!/\S/.test(searchText)) {
-      setSearchParams({});
+      console.log('setSearchParams', searchText, { replace: !searchText });
+      setSearchParams({}, { replace: !searchText });
       onSearchQueryChanged?.('');
       return;
     }
 
     timeout.timeout = /** @type {*} */(setTimeout(async () => {
-      setSearchParams({ q: searchText });
+      timeout.timeout = 0;
+      console.log('setSearchParams', searchText, { replace: !!searchText });
+      setSearchParams({ q: searchText }, { replace: !!searchText });
       onSearchQueryChanged?.(searchText);
     }, 400));
   }
@@ -95,7 +98,10 @@ export function HistoryLayout({
               <input
                 id='history-search-input'
                 value={searchText}
-                onChange={e => setSearchText(e.target.value)}
+                  onChange={e => {
+                    const newSearchText = e.target.value; 
+                    setSearchParams({ q: newSearchText }, { replace: !!searchText === !!newSearchText });
+                  }}
               />
           }
           <SearchIcon className='history-search-icon' onClick={() => {

@@ -15,6 +15,7 @@ import { createTheme, ThemeProvider } from '@mui/material';
 import { Landing } from './landing';
 import { History } from './history';
 import { breakFeedURIPostOnly, breakPostURL, defineCachedStore, detectProfileURL } from '../lib';
+import { ShowReadme } from './coldsky';
 
 /** @typedef {ReturnType<typeof defineCachedStore>} DBAccess */
 var db;
@@ -72,13 +73,14 @@ function runApp() {
 
   const router = useRouter(
     [
-      { path: '/', element: <Landing /> },
-      { path: '/index.html', element: <Landing /> },
-      { path: '/profile/:handle/post/:post', element: <History /> },
-      { path: '/profile/:handle', element: <History /> },
-      { path: '/:handle', element: <History /> },
-      { path: '/:handle/:post', element: <History /> },
-      { path: '*', element: <ParseLink /> },
+      { path: '/', Component: Landing },
+      { path: '/index.html', Component: Landing },
+      { path: '/coldsky', Component: ShowReadme },
+      { path: '/profile/:handle/post/:post', Component: History },
+      { path: '/profile/:handle', Component: History },
+      { path: '/:handle', Component: History },
+      { path: '/:handle/:post', Component: History },
+      { path: '*', Component: ParseLink },
     ], {
     basename
   });
