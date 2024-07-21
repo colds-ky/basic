@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/autocomplete-input/autocomplete-input.css", "src/maintain/ui/maintain-panel.css"],
-  "sourcesContent": [".autocomplete-list {\n  position: absolute;\n  background: white;\n  z-index: 10;\n  padding: 0.25em 0.5em;\n  border: solid 1px black;\n  max-width: 60%;\n  max-height: 60%;\n  overflow: auto;\n}\n\nspan.autocomplete-post {\n  float: right;\n  font-size: 80%;\n  color: #b55f00;\n}\n", ".maintain-panel {\n  position: absolute;\n  left: 0;\n  top: 0;\n  width: 100%;\n  height: 100%;\n  color: white;\n  font-family: monospace;\n  font-size: 90%;\n}\n\n.maintain-panel:before {\n  position: absolute;\n  left: 0;\n  top: 0;\n  width: 100%;\n  height: 100%;\n  content: ' ';\n  background: linear-gradient(115deg, black -50%, transparent);\n  z-index: -1;\n}\n\n.maintain-panel .maintain-panel-title {\n  font-size: 200%;\n}\n\n.maintain-panel .apply-button {\n  margin: 0.5em;\n}"],
-  "mappings": ";AAAA,CAAC;AACC,YAAU;AACV,cAAY;AACZ,WAAS;AACT,WAAS,OAAO;AAChB,UAAQ,MAAM,IAAI;AAClB,aAAW;AACX,cAAY;AACZ,YAAU;AACZ;AAEA,IAAI,CAAC;AACH,SAAO;AACP,aAAW;AACX,SAAO;AACT;;;ACfA,CAAC;AACC,YAAU;AACV,QAAM;AACN,OAAK;AACL,SAAO;AACP,UAAQ;AACR,SAAO;AACP,eAAa;AACb,aAAW;AACb;AAEA,CAXC,cAWc;AACb,YAAU;AACV,QAAM;AACN,OAAK;AACL,SAAO;AACP,UAAQ;AACR,WAAS;AACT;AAAA,IAAY;AAAA,MAAgB,MAAM;AAAA,MAAE,MAAM,IAAI;AAAA,MAAE;AAChD,WAAS;AACX;AAEA,CAtBC,eAsBe,CAAC;AACf,aAAW;AACb;AAEA,CA1BC,eA0Be,CAAC;AACf,UAAQ;AACV;",
-  "names": []
-}

@@ -164,9 +164,9 @@ function esbuildBuilder() {
 
   async function buildSites(mode) {
 
-    const gistingOptions = {
+    const webOptions = {
       ...baseOptions,
-      entryPoints: ['gisting/index.js'],
+      entryPoints: ['web/index.js'],
       outfile: 'index.js',
       plugins: [
         {
@@ -181,20 +181,20 @@ function esbuildBuilder() {
     };
 
     if (mode === 'serve') {
-      const gistingCtx = await esbuild.context(gistingOptions);
-      const gistingServer = await gistingCtx.serve({
+      const webCtx = await esbuild.context(webOptions);
+      const webServer = await webCtx.serve({
         servedir: path.resolve(__dirname),
         fallback: 'index.html'
       });
-      await gistingCtx.watch();
-      console.log('SERVING SITE http://' + (gistingServer.host === '0.0.0.0' ? 'localhost' : gistingServer.host) + ':' + gistingServer.port + '/');
+      await webCtx.watch();
+      console.log('SERVING SITE http://' + (webServer.host === '0.0.0.0' ? 'localhost' : webServer.host) + ':' + webServer.port + '/');
 
     } else if (mode === 'watch') {
-      const gistingCtx = await esbuild.context(gistingOptions);
-      await gistingCtx.watch();
+      const webCtx = await esbuild.context(webOptions);
+      await webCtx.watch();
       console.log('WATCHING SITE...');
     } else {
-      await esbuild.build(gistingOptions);
+      await esbuild.build(webOptions);
     }
   }
 

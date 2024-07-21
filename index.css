@@ -1,4 +1,4 @@
-/* gisting/landing/fun-background.css */
+/* web/landing/fun-background.css */
 .fun-background {
   position: absolute;
   left: 0;
@@ -74,7 +74,7 @@
   }
 }
 
-/* gisting/widgets/account/account-chip.css */
+/* web/widgets/account/account-chip.css */
 .account-avatar.account-avatar-chip {
   background: no-repeat center center;
   background-size: cover;
@@ -88,7 +88,7 @@
   top: -0.15em;
 }
 
-/* gisting/widgets/post/post-text-content.css */
+/* web/widgets/post/post-text-content.css */
 .facet-mention {
   text-decoration: none;
 }
@@ -145,9 +145,9 @@
   border-radius: 0.2em;
 }
 
-/* gisting/widgets/account/full-handle.css */
+/* web/widgets/account/full-handle.css */
 
-/* gisting/widgets/account/account-label.css */
+/* web/widgets/account/account-label.css */
 a.account-label.account-handle {
   color: inherit;
   text-decoration: none;
@@ -205,7 +205,7 @@ a.account-label.account-handle {
   padding-left: 0.3em;
 }
 
-/* gisting/widgets/post/post.css */
+/* web/widgets/post/post.css */
 .post-frame-outer {
   padding: 1em;
   padding-bottom: 0.65em;
@@ -521,7 +521,7 @@ a.account-label.account-handle {
   border-top: none;
 }
 
-/* gisting/widgets/post/thread.css */
+/* web/widgets/post/thread.css */
 .thread-view .thread-reply-post {
   margin-top: -0.7em;
 }
@@ -660,7 +660,7 @@ a.account-label.account-handle {
   top: 0.75em;
 }
 
-/* gisting/landing/landing.css */
+/* web/landing/landing.css */
 .landing {
   position: fixed;
   top: 0;
@@ -799,7 +799,7 @@ a.account-label.account-handle {
   text-shadow: 0 0 14px #0052ff, 0 0 2px black;
 }
 
-/* gisting/history/history-layout.css */
+/* web/history/history-layout.css */
 .history-layout {
   display: grid;
   grid-template-rows: 14vmax 7vmax 7vmax auto auto 1fr;
@@ -1019,7 +1019,7 @@ a.account-label.account-handle {
   }
 }
 
-/* gisting/history/timeline/search-animations.css */
+/* web/history/timeline/search-animations.css */
 .search-animation {
   height: 30em;
   overflow: hidden;
@@ -1069,7 +1069,7 @@ a.account-label.account-handle {
   }
 }
 
-/* gisting/history/timeline/timeline.css */
+/* web/history/timeline/timeline.css */
 .timeline-container {
   margin-right: 0.8em;
   margin-bottom: 1.3em;
@@ -1152,7 +1152,7 @@ a.account-label.account-handle {
   transform: scale(0);
 }
 
-/* gisting/history/history.css */
+/* web/history/history.css */
 html.account body {
   overflow: auto;
 }
