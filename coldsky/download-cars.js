@@ -22,7 +22,14 @@ async function downloadCARs() {
       continue;
     }
 
-    await downloadAccount(dirPath, account);
+    await downloadAccount(dirPath, account).catch(err => {
+      if (/Known faulty/i.test(err?.message || '')) {
+        console.log(' ', err.message);
+      } else {
+        console.log(' ', err);
+        console.log();
+      }
+    });
   }
 }
 
@@ -89,38 +96,47 @@ function shortenDID(did) {
   return did && /** @type {T} */(did.replace(_shortenDID_Regex, '').toLowerCase() || undefined);
 }
 
+var knownFaultyDomains;
+
 /**
  * @param {string} url
+ * @param {boolean} arrayBuffer
  */
-async function fetchRetryBuffer(url) {
-  for (let i = 0; i < 10; i++) {
+async function fetchRetryCore(url, arrayBuffer) {
+  const { host } = new URL(url);
+  const faulty = knownFaultyDomains?.get(host);
+  if (faulty > 10) throw new Error('Known faulty ' + host + ' failed ' + faulty + ' times.');
+
+  for (let i = 0; i < (faulty ? 1 : 4); i++) {
     try {
-      const buf = await fetch(url).then(x => x.arrayBuffer());
+      const buf = await fetch(url).then(x => arrayBuffer ? x.arrayBuffer() : /** @type {*} */(x.text()));
+      if (faulty) knownFaultyDomains.delete(host);
+      
       return buf;
     } catch (error) {
-      process.stdout.write(' (?)');
+      if (!knownFaultyDomains) knownFaultyDomains = new Map();
+      knownFaultyDomains.set(host, (knownFaultyDomains.get(host) || 0) + 1);
+      process.stdout.write(' (' + (faulty||'?') + ')');
       await new Promise(resolve => setTimeout(resolve, 200 * i));
     }
   }
 
-  await new Promise(resolve => setTimeout(resolve, 15000));
-  return fetch(url).then(x => x.arrayBuffer());
+  await new Promise(resolve => setTimeout(resolve, faulty ? 300 : 1000));
+
+  return fetch(url).then(x => arrayBuffer ? x.arrayBuffer() : /** @type {*} */(x.text()));
+}
+
+
+/**
+ * @param {string} url
+ */
+function fetchRetryBuffer(url) {
+  return fetchRetryCore(url, /* arrayBuffer */true);
 }
 
 /**
  * @param {string} url
  */
-async function fetchRetryText(url) {
-  for (let i = 0; i < 10; i++) {
-    try {
-      const text = await fetch(url).then(x => x.text());
-      return text;
-    } catch (error) {
-      process.stdout.write(' (?)');
-      await new Promise(resolve => setTimeout(resolve, 200 * i));
-    }
-  }
-
-  await new Promise(resolve => setTimeout(resolve, 15000));
-  return fetch(url).then(x => x.text());
+function fetchRetryText(url) {
+  return fetchRetryCore(url, /* arrayBuffer */false);
 }
