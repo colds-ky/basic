@@ -151,3 +151,7 @@
   position: relative;
   top: 0.75em;
 }
+
+.insignificant-expandable-avatar-marker {
+  cursor: pointer;
+}

@@ -121,7 +121,11 @@ function ThreadNestedChildPost({ className, leading, branch, linkTimestamp, link
             />
             {
               !branch?.insignificants?.length ? null :
-                <InsignificantMarkers branches={branch.insignificants} />
+                <InsignificantMarkers
+                  branches={branch.insignificants}
+                  linkTimestamp={linkTimestamp}
+                  linkAuthor={linkAuthor}
+                />
             }
           </PostFrame>
       }

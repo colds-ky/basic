@@ -1,6 +1,6 @@
 // @ts-check
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useMatches } from 'react-router-dom';
 
 import { forAwait } from '../../app-shared/forAwait';
@@ -13,6 +13,8 @@ import { ThreadForumView } from './thread-forum-view';
 import { threadStructure } from './thread-structure';
 
 import './thread.css';
+import { Tooltip } from '@mui/material';
+import { ThreadNestedChildren } from './thread-nested-children';
 
 /**
  * @param {{
@@ -108,41 +110,72 @@ export function ThreadView({
 
 /**
  * @param {{
- *  branches: import('./thread-structure').ThreadBranch[]
+ *  branches: import('./thread-structure').ThreadBranch[],
+ *  linkTimestamp?: boolean,
+ *  linkAuthor?: boolean
  * }} _
  */
-export function InsignificantMarkers({ branches }) {
+export function InsignificantMarkers({ branches, linkTimestamp, linkAuthor }) {
   const replyAvatars = useMemo(() => collectReplyAvatars(branches), [branches]);
-  if (!replyAvatars?.length) return null;
+  const [expanded, setExpanded] = useState(false);
+  if (!replyAvatars?.size) return null;
+
+  if (expanded) {
+    return (
+      <ThreadNestedChildren
+        className='thread-insignificants-expanded'
+        branches={branches}
+        linkTimestamp={linkTimestamp}
+        linkAuthor={linkAuthor}
+      />
+    );
+  }
+
   return (
-    <div className='insignificant-expandable-markers'>
-      {replyAvatars.map(shortDID => (
-        <AccountChip
-          key={'insignificant-avatar-' + shortDID}
-          className='insignificant-expandable-avatar-marker'
-          account={shortDID} />
+    <div className='insignificant-expandable-markers' onClick={() => setExpanded(true)}>
+      {[...replyAvatars.entries()].map(([shortDID, br]) => (
+        <Tooltip title={<PostTooltip branch={br} />}>
+          <span>
+            <AccountChip
+              key={'insignificant-avatar-' + shortDID}
+              className='insignificant-expandable-avatar-marker'
+              account={shortDID}
+            />
+          </span>
+        </Tooltip>
       ))}
     </div>
   );
 }
 
 /**
+ * @param {{
+ *  branch: import('./thread-structure').ThreadBranch
+ * }} _
+ */
+export function PostTooltip({ branch }) {
+  return (
+    <CompletePostContent post={branch.post} replies={branch.children} />
+  );
+}
+
+/**
  * @param {import('./thread-structure').ThreadBranch[] | undefined} branches
- * @param {string[]} [shortDIDs]
+ * @param {Map<string, import('./thread-structure').ThreadBranch>} [shortDIDs]
  */
 function collectReplyAvatars(branches, shortDIDs) {
   const MAX_AVATAR_DISPLAY = 3;
 
   if (!branches) return shortDIDs;
-  if (!shortDIDs) shortDIDs = [];
+  if (!shortDIDs) shortDIDs = new Map();
   for (const br of branches) {
-    if (shortDIDs.indexOf(br.post.shortDID) < 0)
-      shortDIDs.push(br.post.shortDID);
-    if (shortDIDs.length > MAX_AVATAR_DISPLAY)
+    if (!shortDIDs.has(br.post.shortDID)) shortDIDs.set(br.post.shortDID, br);
+
+    if (shortDIDs.size > MAX_AVATAR_DISPLAY)
       break;
   }
   for (const br of branches) {
-    if (shortDIDs.length > MAX_AVATAR_DISPLAY) break;
+    if (shortDIDs.size > MAX_AVATAR_DISPLAY) break;
     collectReplyAvatars(br.children, shortDIDs);
   }
   return shortDIDs;

@@ -78,6 +78,9 @@ function esbuildBuilder() {
   const baseOptions = {
     //entryPoints: ['lib/index.js'],
     bundle: true,
+    define: {
+      "process.env.NODE_ENV": "'development'",
+    },
     sourcemap: true,
     target: 'es6',
     loader: {

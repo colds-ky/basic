@@ -583,6 +583,9 @@ a.account-label.account-handle {
   position: relative;
   top: 0.75em;
 }
+.insignificant-expandable-avatar-marker {
+  cursor: pointer;
+}
 
 /* history/history-layout.css */
 .history-layout {

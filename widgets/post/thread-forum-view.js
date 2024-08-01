@@ -26,7 +26,11 @@ export function ThreadForumView({
         linkTimestamp={linkTimestamp}
         linkAuthor={linkAuthor}
       />
-      <InsignificantMarkers branches={parent?.insignificants || []} />
+      <InsignificantMarkers
+        branches={parent?.insignificants || []}
+        linkTimestamp={linkTimestamp}
+        linkAuthor={linkAuthor}
+      />
       <ThreadNestedChildren
         className='thread-forum-children'
         branches={parent.asides || parent.children || []}
