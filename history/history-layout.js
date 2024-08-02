@@ -15,6 +15,7 @@ import './history-layout.css';
  *  profile: import('../package').CompactProfile & { placeholder?: boolean },
  *  hideSearch?: boolean,
  *  onSearchQueryChanged?: (searchText: string) => void,
+ *  onSlashCommand?: (command: string) => void,
  *  children?: React.ReactNode,
  * }} Props
  */
@@ -23,6 +24,7 @@ export function HistoryLayout({
   profile,
   hideSearch,
   onSearchQueryChanged,
+  onSlashCommand,
   children,
 }) {
   const [forceShowSearch, setForceShowSearch] = useState(false);
@@ -96,11 +98,18 @@ export function HistoryLayout({
           {
             !showSearch ? undefined :
               <input
-                id='history-search-input'
-                value={searchText}
+                  id='history-search-input'
+                  value={searchText}
                   onChange={e => {
-                    const newSearchText = e.target.value; 
+                    const newSearchText = e.target.value;
                     setSearchParams({ q: newSearchText }, { replace: !!searchText === !!newSearchText });
+                  }}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.keyCode === 13) {
+                      const searchTextStartsWithSlash = (searchText || '').trim().startsWith('/');
+                      if (searchTextStartsWithSlash)
+                        onSlashCommand?.(searchText);
+                    }
                   }}
               />
           }

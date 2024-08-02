@@ -1,6 +1,6 @@
 // @ts-check
 
-import { shortenDID, shortenHandle, shortenPDC } from '../shorten';
+import { shortenDID, shortenHandle, shortenPDS } from '../shorten';
 import { detectWordStartsNormalized } from './capture-records/compact-post-words';
 import { createRepoData } from './repo-data';
 
@@ -24,7 +24,7 @@ export function capturePLCDirectoryEntriesForStore(recs, store, intercepts) {
   for (const [shortDID, recs] of affectedRepos) {
     const repoData = store.get(shortDID);
     const history = recs.map(entry => {
-      const pds = shortenPDC(
+      const pds = shortenPDS(
         entry.operation.services?.atproto_pds?.endpoint ||
         /** @type {*} */(entry.operation).service);
       

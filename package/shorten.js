@@ -80,7 +80,7 @@ function cheapNormalizeHandle(handle) {
 }
 
 /** @param {string | undefined | null} pdc */
-export function shortenPDC(pdc) {
+export function shortenPDS(pdc) {
   if (!pdc) return undefined;
 
   pdc = pdc.trim().toLowerCase();
@@ -93,7 +93,7 @@ export function shortenPDC(pdc) {
   return pdc.replace(/^https:\/\//, '').replace(/host\.bsky\.network$/, '');
 }
 
-export function unwrapShortPDC(shortPDC) {
+export function unwrapShortPDS(shortPDC) {
   if (!shortPDC) return undefined;
 
   if (shortPDC === '.s') return 'https://bsky.social';

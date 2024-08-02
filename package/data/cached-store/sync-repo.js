@@ -14,7 +14,6 @@ import { getProfileIncrementally } from './get-profile-incrementally';
  * }} Args
  */
 
-
 /**
  * @param {Args} args
  */
@@ -22,6 +21,7 @@ export async function syncRepo(args) {
   const { shortDID, dbStore } = args;
   if (!shortDID) return;
 
+  if (!shortDID) return;
   const lastRepoSyncRev = await dbStore.getLastRepoSyncRev(shortDID);
   let profile = await dbStore.getProfile(shortDID);
   if (!profile) {
@@ -45,22 +45,17 @@ export async function syncRepo(args) {
     return;
   }
 
-  const pds = profile.history?.map(h => h.pds)?.find(Boolean);
-
-  const fullDID = unwrapShortDID(shortDID);
-  const pdsAgent = new ColdskyAgent({
-    service: pds
-  });
+  const pds = /** @type {string} */(profile.history?.map(h => h.pds)?.find(Boolean));
 
   const startDownloadCAR = Date.now();
-  const repoData = await pdsAgent.com.atproto.sync.getRepo({
-    did: fullDID,
-    since: lastRepoSyncRev
-  });
-  console.log('@' + profile.handle + ' CAR ' + Math.round(repoData.data.byteLength / 1024).toLocaleString() + 'Kb downloaded in ', (Date.now() - startDownloadCAR) / 1000, 's');
+
+  const repoData = await downloadCAR({ shortDID, pds: pds, lastRev: lastRepoSyncRev });
+  if (!repoData) return;
+
+  console.log('@' + profile.handle + ' CAR ' + Math.round(repoData.byteLength / 1024).toLocaleString() + 'Kb downloaded in ', (Date.now() - startDownloadCAR) / 1000, 's');
 
   const startParse = Date.now();
-  const parsed = await readCAR(shortDID, repoData.data);
+  const parsed = await readCAR(shortDID, repoData);
   console.log('@' + profile.handle + ' parsed repo in ', (Date.now() - startParse) / 1000, 's');
 
   const startUploadingToDB = Date.now();
@@ -68,4 +63,25 @@ export async function syncRepo(args) {
   console.log('@' + profile.handle + ' uploaded to DB in ', (Date.now() - startUploadingToDB) / 1000, 's');
 
   return uptick;
+}
+
+/**
+ * @param {{
+ *  shortDID: string,
+ *  pds: string,
+ *  lastRev?: string
+ * }} _
+ */
+export async function downloadCAR({ shortDID, pds, lastRev }) {
+
+  const fullDID = unwrapShortDID(shortDID);
+  const pdsAgent = new ColdskyAgent({
+    service: pds
+  });
+
+  const repoData = await pdsAgent.com.atproto.sync.getRepo({
+    did: fullDID,
+    since: lastRev
+  });
+  return repoData.data;
 }

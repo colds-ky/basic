@@ -4,10 +4,11 @@ import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { useDB } from '../app';
-import { likelyDID, makeFeedUri, shortenDID } from '../package';
 import { forAwait } from '../app-shared/forAwait';
 import { setGlobalAppView } from '../app-shared/icon-inject';
 import { localise } from '../app-shared/localise';
+import { likelyDID, makeFeedUri, plcDirectoryHistoryCompact, plcDirectoryHistoryRaw, shortenDID, unwrapShortPDS } from '../package';
+import { downloadCAR } from '../package/data/cached-store/sync-repo';
 import { Thread } from '../widgets/post/thread';
 import { HistoryLayout } from './history-layout';
 import { HistoryPageDecorations } from './history-page-decorations';
@@ -44,18 +45,25 @@ function HistoryCore() {
 
   const [searchQuery, setSearchQuery] = React.useState('');
 
+  const searchQueryStartsWithSlash = (searchQuery || '').trim().startsWith('/');
+
   return (
     <HistoryLayout
       profile={resolved}
       hideSearch={!!post}
       onSearchQueryChanged={setSearchQuery}
+      onSlashCommand={command => {
+        if (/^\/download?$/i.test(command)) {
+          downloadCARAndShow(handle || '', db);
+        }
+      }}
     >
       {
         resolved.placeholder ? undefined :
           !post ?
             <Timeline
               shortDID={resolved.shortDID}
-              searchQuery={searchQuery} /> :
+              searchQuery={searchQueryStartsWithSlash ? '' : searchQuery} /> :
             <Thread
               uri={makeFeedUri(resolved.shortDID, post)}
               significantPost={post => post.shortDID === resolved.shortDID}
@@ -68,4 +76,31 @@ function HistoryCore() {
       </div>
     </HistoryLayout>
   );
+}
+
+/**
+ * @param {string} handleOrDID
+ * @param {import('../app').DBAccess} db
+ */
+async function downloadCARAndShow(handleOrDID, db) {
+  /** @type {string} */
+  let handle = handleOrDID;
+  /** @type {string} */
+  let shortDID = '';
+
+  for await (const profile of db.getProfileIncrementally(handleOrDID)) {
+    if (profile.handle) handle = profile.handle;
+    shortDID = profile.shortDID;
+    if (shortDID) break;
+  }
+
+  const pds = unwrapShortPDS ((await plcDirectoryHistoryCompact(shortDID)).reverse().map(entry => entry.shortPDC)[0]);
+
+  const repoData = await downloadCAR({ shortDID, pds });
+
+  const link = document.createElement('a');
+  link.download = handle.replace(/[^a-z0-9\.]+/ig, ' ').trim().replace(/\s/g, '-') + '.car';
+  link.href = URL.createObjectURL(new Blob([repoData], { type: 'application/octet-stream' }));
+  document.body.appendChild(link);
+  link.click();
 }

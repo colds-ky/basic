@@ -1,7 +1,7 @@
 // @ts-check
 
 import { streamBuffer } from './akpa';
-import { shortenDID, shortenHandle, shortenPDC, unwrapShortDID } from './shorten';
+import { shortenDID, shortenHandle, shortenPDS, unwrapShortDID } from './shorten';
 
 /**
  * @typedef {{
@@ -139,7 +139,7 @@ export async function* plcDirectoryCompact(since, overrides) {
         shortDID: shortenDID(entry.did),
         shortHandle: shortenHandle(
           entry.operation.alsoKnownAs?.[0] || entry.operation.handle),
-        shortPDC: shortenPDC(
+        shortPDC: shortenPDS(
           entry.operation.services?.atproto_pds?.endpoint ||
           entry.operation.service)
       };
@@ -178,7 +178,7 @@ export async function plcDirectoryHistoryCompact(shortDID, overrides) {
       shortDID: shortenDID(entry.did),
       shortHandle: shortenHandle(
         entry.operation.alsoKnownAs?.[0] || /** @type {*} */(entry.operation).handle),
-      shortPDC: shortenPDC(
+      shortPDC: shortenPDS(
         entry.operation.services?.atproto_pds?.endpoint ||
         /** @type {*} */(entry.operation).service)
     };

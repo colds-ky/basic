@@ -58,6 +58,13 @@ export function SearchArea({ handleBandClassName, autoCompletionAreaClassName })
             const searchText = e.target.value;
             setSearchText(searchText);
           }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+              const searchTextStartsWithSlash = (searchText || '').trim().startsWith('/');
+              if (searchTextStartsWithSlash)
+                handleSlashCommand(searchText);
+            }
+          }}
         />
       </div>
       {
@@ -121,6 +128,13 @@ export function SearchArea({ handleBandClassName, autoCompletionAreaClassName })
         return r;
       });
     }
+  }
+
+  /**
+   * @param {string} command
+   */
+  function handleSlashCommand(command) {
+    alert('Pick a CAR file to import... ' + command);
   }
 }
 

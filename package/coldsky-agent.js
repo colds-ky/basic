@@ -2,7 +2,7 @@
 
 import { BskyAgent } from '@atproto/api';
 import { throttledAsyncCache } from './throttled-async-cache';
-import { unwrapShortPDC } from './shorten';
+import { unwrapShortPDS } from './shorten';
 
 export const BSKY_SOCIAL_URL = 'https://bsky.social/';
 export const BSKY_NETWORK_URL = 'https://bsky.network/';
@@ -21,7 +21,7 @@ export class ColdskyAgent extends BskyAgent {
     super({
       ...args,
       // most of methods work fine on bsky.social
-      service: args?.service ? unwrapShortPDC(args.service) : BSKY_SOCIAL_URL,
+      service: args?.service ? unwrapShortPDS(args.service) : BSKY_SOCIAL_URL,
     });
 
     // find all clients to patch
