@@ -44000,7 +44000,7 @@ if (cid) {
 	let cbor_x_extended = false;
 
 	/**
-	 * @returns {AsyncGenerator<FirehoseBlock[], void, void>}
+	 * @returns {AsyncGenerator<FirehoseBlock, void, void>}
 	 */
 	async function* firehose$1() {
 	  ensureCborXExtended();
@@ -44017,13 +44017,13 @@ if (cid) {
 	  try {
 	    while (true) {
 	      await buf.promise;
-	      const blocks = buf.blocks;
+	      const block = buf.block;
 	      buf = createAwaitPromise();
 	      if (closed) {
-	        if (blocks.length) yield blocks;
+	        if (block.messages.length || block.deletes?.length || block.unexpected?.length) yield block;
 	        break;
 	      }
-	      yield blocks;
+	      yield block;
 	    }
 	  } finally {
 	    if (!closed) {
@@ -44051,14 +44051,9 @@ if (cid) {
 	    if (!commit.ops?.length) return; // TODO: alert unusual commit
 
 	    const car = await CarReader.fromBytes(commit.blocks);
-
-	    /** @type {FirehoseBlock} */
-	    const blockEntry = {
-	      receiveTimestamp,
-	      since: commit.since,
-	      time: commit.time,
-	      messages: []
-	    };
+	    buf.block.receiveTimestamp = receiveTimestamp;
+	    buf.block.since = commit.since;
+	    buf.block.time = commit.time;
 	    for (const op of commit.ops) {
 	      const block = op.cid && (await car.get( /** @type {*} */op.cid));
 	      if (!block) continue; // TODO: alert unusual op
@@ -44076,16 +44071,15 @@ if (cid) {
 	      record.action = op.action;
 	      let unexpected = op.action !== 'create' && op.action !== 'update' && op.action !== 'delete' || known$Types.indexOf(record.$type) < 0;
 	      if (unexpected) {
-	        if (!blockEntry.unexpected) blockEntry.unexpected = [];
-	        blockEntry.unexpected.push(record);
+	        if (!buf.block.unexpected) buf.block.unexpected = [];
+	        buf.block.unexpected.push(record);
 	      } else if (op.action === 'delete') {
-	        if (!blockEntry.deletes) blockEntry.deletes = [];
-	        blockEntry.deletes.push(record);
+	        if (!buf.block.deletes) buf.block.deletes = [];
+	        buf.block.deletes.push(record);
 	      } else {
-	        blockEntry.messages.push(record);
+	        buf.block.messages.push(record);
 	      }
 	    }
-	    buf.blocks.push(blockEntry);
 	    buf.resolve();
 	  }
 	  function handleError(error) {
@@ -44096,14 +44090,16 @@ if (cid) {
 	}
 
 	/** @returns {{
-	 *  blocks: FirehoseBlock[],
+	 *  block: FirehoseBlock,
 	 *  resolve: () => void,
 	 *  reject: (reason?: any) => void,
 	 *  promise: Promise<void>
 	 * }} */
 	function createAwaitPromise() {
 	  const result = {
-	    blocks: []
+	    block: {
+	      messages: []
+	    }
 	  };
 	  result.promise = new Promise((resolve, reject) => {
 	    result.resolve = resolve;
@@ -44127,7 +44123,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.56";
+	var version = "0.2.57";
 
 	// @ts-check
 
@@ -52706,7 +52702,7 @@ if (cid) {
 	 * @returns {AsyncGenerator<import('..').CompactFirehoseBlock>}
 	 */
 	async function* firehose(dbStore) {
-	  for await (const blockSet of firehose$1()) {
+	  for await (const block of firehose$1()) {
 	    /** @type {Map<string, CompactPost>} */
 	    const updatedPosts = new Map();
 	    /** @type {Map<string, CompactProfile>} */
@@ -52720,26 +52716,24 @@ if (cid) {
 
 	    /** @type {import('../../firehose').FirehoseRecord[] | undefined} */
 	    let unexpecteds;
-	    for (const block of blockSet) {
-	      if (block.messages) {
-	        for (const rec of block.messages) {
-	          messages.push(rec);
-	          const updated = dbStore.captureRecord(rec, block.receiveTimestamp);
-	          if (updated) {
-	            if ('uri' in updated) updatedPosts.set(updated.uri, updated);else updatedProfiles.set(updated.shortDID, updated);
-	          }
+	    if (block.messages) {
+	      for (const rec of block.messages) {
+	        messages.push(rec);
+	        const updated = dbStore.captureRecord(rec, block.receiveTimestamp);
+	        if (updated) {
+	          if ('uri' in updated) updatedPosts.set(updated.uri, updated);else updatedProfiles.set(updated.shortDID, updated);
 	        }
 	      }
-	      if (block.deletes?.length) {
-	        if (!deletes) deletes = [];
-	        for (const rec of block.deletes) {
-	          dbStore.deleteRecord(rec);
-	          deletes.push(rec);
-	        }
+	    }
+	    if (block.deletes?.length) {
+	      if (!deletes) deletes = [];
+	      for (const rec of block.deletes) {
+	        dbStore.deleteRecord(rec);
+	        deletes.push(rec);
 	      }
-	      if (block.unexpected?.length) {
-	        if (!unexpecteds) unexpecteds = block.unexpected;else if (block.unexpected.length === 1) unexpecteds.push(block.unexpected[0]);else unexpecteds = unexpecteds.concat(block.unexpected);
-	      }
+	    }
+	    if (block.unexpected?.length) {
+	      if (!unexpecteds) unexpecteds = block.unexpected;else if (block.unexpected.length === 1) unexpecteds.push(block.unexpected[0]);else unexpecteds = unexpecteds.concat(block.unexpected);
 	    }
 	    yield {
 	      messages,

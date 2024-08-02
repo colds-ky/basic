@@ -68,7 +68,7 @@ firehose.knownTypes = known$Types;
 let cbor_x_extended = false;
 
 /**
- * @returns {AsyncGenerator<FirehoseBlock[], void, void>}
+ * @returns {AsyncGenerator<FirehoseBlock, void, void>}
  */
 export async function* firehose() {
   ensureCborXExtended();
@@ -91,13 +91,13 @@ export async function* firehose() {
 
     while (true) {
       await buf.promise;
-      const blocks = buf.blocks;
+      const block = buf.block;
       buf = createAwaitPromise();
       if (closed) {
-        if (blocks.length) yield blocks;
+        if (block.messages.length || block.deletes?.length || block.unexpected?.length) yield block;
         break;
       }
-      yield blocks;
+      yield block;
     }
   } finally {
     if (!closed) {
@@ -132,13 +132,9 @@ export async function* firehose() {
 
     const car = await ipld_CarReader.fromBytes(commit.blocks);
 
-    /** @type {FirehoseBlock} */
-    const blockEntry = {
-      receiveTimestamp,
-      since: commit.since,
-      time: commit.time,
-      messages: []
-    };
+    buf.block.receiveTimestamp = receiveTimestamp;
+    buf.block.since = commit.since;
+    buf.block.time = commit.time;
 
     for (const op of commit.ops) {
       const block = op.cid && await car.get(/** @type {*} */(op.cid));
@@ -161,17 +157,16 @@ export async function* firehose() {
         known$Types.indexOf(record.$type) < 0;
 
       if (unexpected) {
-        if (!blockEntry.unexpected) blockEntry.unexpected = [];
-        blockEntry.unexpected.push(record);
+        if (!buf.block.unexpected) buf.block.unexpected = [];
+        buf.block.unexpected.push(record);
       } else if (op.action === 'delete') {
-        if (!blockEntry.deletes) blockEntry.deletes = [];
-        blockEntry.deletes.push(record);
+        if (!buf.block.deletes) buf.block.deletes = [];
+        buf.block.deletes.push(record);
       } else {
-        blockEntry.messages.push(record);
+        buf.block.messages.push(record);
       }
     }
 
-    buf.blocks.push(blockEntry);
     buf.resolve();
   }
 
@@ -185,13 +180,13 @@ export async function* firehose() {
 }
 
 /** @returns {{
- *  blocks: FirehoseBlock[],
+ *  block: FirehoseBlock,
  *  resolve: () => void,
  *  reject: (reason?: any) => void,
  *  promise: Promise<void>
  * }} */
 function createAwaitPromise() {
-  const result = { blocks: [] };
+  const result = { block: { messages: [] } };
   result.promise = new Promise((resolve, reject) => {
     result.resolve = resolve;
     result.reject = reject;

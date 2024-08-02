@@ -243,9 +243,15 @@ export function createAtlasRenderer({
    */
   function redraw(camera) {
     latestCamera = camera;
-    flashRenderer.updateNodes({
-      nodes: latestNodes,
-      getTimes: getFlashTime
+    if (Math.random() > 10) {
+      flashRenderer.updateNodes({
+        nodes: latestNodes,
+        getTimes: getFlashTime
+      });
+    }
+
+    staticRenderer?.updateNodes({
+      nodes: latestNodes
     });
 
     geoLayer?.updateWithCamera(camera);

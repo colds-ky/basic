@@ -1,12 +1,12 @@
 // @ts-check
 
-//import { OrbitControls } from 'three/examples/jsm/Addons.js';
+import { OrbitControls } from 'three/examples/jsm/Addons.js';
+import { firehoseThreads } from '../../app-shared';
 import { makeClock } from '../clock';
+import { createAtlasRenderer } from '../render';
+import { handleWindowResizes } from './handle-window-resizes';
 import { setupScene } from './setup-scene';
 import { startAnimation } from './start-animation';
-import { handleWindowResizes } from './handle-window-resizes';
-import { createAtlasRenderer } from '../render';
-import { firehoseThreads } from '../../app-shared';
 import { getGlobalCachedStore } from '../../app';
 
 /**
@@ -23,8 +23,8 @@ export function boot(elem, unmountPromise) {
     camera,
     lights,
     renderer,
-    // stats,
-    // orbit
+    stats,
+    orbit
   } = setupScene(clock);
 
   elem.appendChild(renderer.domElement);
@@ -35,9 +35,9 @@ export function boot(elem, unmountPromise) {
     camera,
     clock,
     scene,
-    //orbit: /** @type {OrbitControls} */(orbit.controls),
+    orbit: /** @type {OrbitControls} */(orbit.controls),
     renderer,
-    // stats,
+    stats,
     onRedrawLive,
     onRedrawRare
   });
@@ -50,7 +50,7 @@ export function boot(elem, unmountPromise) {
       point.x = thread.x;
       point.y = thread.y;
       point.h = 0;
-      point.weight = 1;
+      point.weight = thread.all.length / 2000;
     },
     getLabel: (thread) => (thread.root.text || '').slice(0, 10),
     getDescription: (thread) => thread.root.text || '',
@@ -63,7 +63,7 @@ export function boot(elem, unmountPromise) {
   function onRedrawLive() {
     const delta = lastRender ? clock.nowMSec - lastRender : 0;
     lastRender = clock.nowMSec;
-    // orbit.controls?.update?.(Math.min(delta / 1000, 0.2));
+    orbit.controls?.update?.(Math.min(delta / 1000, 0.2));
 
     atlasRenderer.redraw(camera);
   }
@@ -71,32 +71,46 @@ export function boot(elem, unmountPromise) {
   function onRedrawRare() {
   }
 
-  async function* streamFirehoseThreads() {
-    /** @type {ThreadWithPosition[]} */
-    const threads = [];
+  async function* streamAccountPositions() {
+    /** @type {AccountPosition[]} */
+    let accountPositions = [];
     /** @type {{[uri: string]: number}} */
-    const threadIndexByUri = {};
+    const accountIndexByShortDID = {};
 
-    for await (const threadChunk of firehoseThreads(getGlobalCachedStore())) {
-      for (const th of threadChunk) {
-        const thWithPos = /** @type {ThreadWithPosition} */(th);
-        calcPos(thWithPos);
+    let lastInject = Date.now();
 
-        const uri = th.root.uri;
-        if (uri in threadIndexByUri) {
-          threads[threadIndexByUri[uri]] = thWithPos;
-        } else {
-          threadIndexByUri[uri] = threads.length;
-          threads.push(thWithPos);
+    for await (const block of getGlobalCachedStore().firehose()) {
+      for (const msg of block.messages) {
+        switch (msg.$type) {
+          case 'app.bsky.actor.profile':
+            
         }
       }
 
-      yield threads;
+      if (Date.now() - lastInject > 400) {
+        for (const th of newThreads) {
+          accounts = accounts.slice();
+          const thWithPos = /** @type {ThreadWithPosition} */(th);
+          calcPos(thWithPos);
+
+          const uri = th.root.uri;
+          if (uri in threadIndexByUri) {
+            accounts[threadIndexByUri[uri]] = thWithPos;
+          } else {
+            threadIndexByUri[uri] = accounts.length;
+            accounts.push(thWithPos);
+          }
+        }
+
+        lastInject = Date.now();
+
+        console.log('threads: ', accounts);
+        yield accounts;
+      }
     }
   }
 
   // TODO: handle unmountPromise
-}
 
 /**
  * @typedef {import('../../package').CompactThreadPostSet & {
@@ -105,20 +119,40 @@ export function boot(elem, unmountPromise) {
  * }} ThreadWithPosition
  */
 
-/**
- * @param {ThreadWithPosition} thread
- */
-function calcPos(thread) {
-  thread.x = 0;
-  thread.y = 0;
+  /**
+   * @param {ThreadWithPosition} thread
+   */
+  function calcPos(thread) {
+    thread.x = 0;
+    thread.y = 0;
 
-  if (thread.root.text?.length) {
-    for (let i = 0; i < thread.root.text.length; i++) {
-      const charCode = thread.root.text.charCodeAt(i);
-      thread.x += charCode;
+    if (thread.root.text?.length) {
+      for (let i = 0; i < thread.root.text.length; i++) {
+        const charCode = thread.root.text.charCodeAt(i);
+        thread.x += 1 / charCode;
+        thread.x = Math.pow(10, thread.x);
+        thread.x = thread.x - Math.floor(thread.x);
+      }
+      thread.x = thread.x - 0.5;
     }
-    thread.x = thread.x / thread.root.text.length;
-  }
 
-  thread.y = thread.all.length / 10;
+    for (let i = 0; i < thread.root.uri.length; i++) {
+      const charCode = thread.root.uri.charCodeAt(i);
+      thread.y += 1 / charCode;
+      thread.y = Math.pow(10, thread.y);
+      thread.y = thread.y - Math.floor(thread.y);
+    }
+    thread.y = thread.y - 0.5;
+
+  }
 }
+
+/**
+ * @typedef {{
+ *  account: AccountInfo;
+ *  index: number;
+ *  x: number;
+ *  y: number;
+ *  socialWeight: number;
+ * }} AccountPosition
+ */

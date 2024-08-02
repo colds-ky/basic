@@ -1,8 +1,8 @@
 // @ts-check
 
 import { AmbientLight, DirectionalLight, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from 'three';
-// import Stats from 'three/examples/jsm/libs/stats.module.js';
-// import { setupOrbitControls } from './setup-orbit-controls';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
+import { setupOrbitControls } from './setup-orbit-controls';
 
 /**
  * @param {ReturnType<typeof import('../clock').makeClock>} clock
@@ -30,17 +30,17 @@ export function setupScene(clock) {
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
 
-  // const stats = new Stats();
+  const stats = new Stats();
 
-  // const orbit =
-  //   setupOrbitControls({ camera, host: renderer.domElement, clock });
+  const orbit =
+    setupOrbitControls({ camera, host: renderer.domElement, clock });
 
   return {
     scene,
     camera,
     lights: { dirLight1, dirLight2, ambientLight },
     renderer,
-    // stats,
-    // orbit
+    stats,
+    orbit
   };
 }

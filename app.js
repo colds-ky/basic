@@ -17,6 +17,7 @@ import { breakFeedURIPostOnly, breakPostURL, defineCachedStore, detectProfileURL
 import { ShowReadme } from './widgets/show-readme/show-readme';
 
 /** @typedef {ReturnType<typeof defineCachedStore>} DBAccess */
+/** @type {DBAccess} */
 var db;
 const DB_NAME = 'gisting-cache';
 

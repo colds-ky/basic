@@ -136,9 +136,11 @@ export function staticShaderRenderer({ clock, nodes, getPoint, getColor }) {
    */
   function updateNodes({ nodes }) {
     if (nodes.length > allocateCount) {
-      allocateCount = Math.max(
+      const newAllocateCount = Math.max(
         Math.floor(nodes.length * 1.5),
         nodes.length + 300);
+      console.log('Reallocating buffers from ', allocateCount, ' to ', newAllocateCount);
+      allocateCount = newAllocateCount;
 
       let result = createGeometryAndBuffers(allocateCount);
       offsetBuf = result.offsetBuf;
