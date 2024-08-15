@@ -1,6 +1,6 @@
 {
   "name": "coldsky",
-  "version": "0.2.57",
+  "version": "0.2.58",
   "description": "Library and the app for BlueSky",
   "main": "libs.js",
   "scripts": {
@@ -23,7 +23,6 @@
     "@babel/core": "*",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
-    "@ipld/car": "*",
     "@mui/icons-material": "^5.15.14",
     "@mui/material": "^5.15.14",
     "@rollup/plugin-babel": "*",
@@ -32,12 +31,10 @@
     "@rollup/plugin-node-resolve": "*",
     "ag-grid-community": "^32.0.2",
     "ag-grid-react": "^32.0.2",
-    "cbor-x": "*",
     "dexie": "^4.0.1",
     "esbuild": "*",
     "fuse.js": "^6.6.2",
     "marked": "^13.0.2",
-    "multiformats": "*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",

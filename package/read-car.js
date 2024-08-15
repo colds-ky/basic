@@ -2,7 +2,7 @@
 
 import { decode as cbor_x_decode } from 'cbor-x';
 import { CID } from 'multiformats';
-import { CarReader as ipld_CarReader } from '../node_modules/@ipld/car/src/reader-browser.js';
+import { CarReader as ipld_CarReader } from '../node_modules/@ipld/car/lib/reader-browser.js';
 
 import { ensureCborXExtended } from './firehose';
 import { unwrapShortDID } from './shorten.js';

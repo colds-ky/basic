@@ -4,7 +4,6 @@ import { isCompactPost } from '..';
 import { streamEvery } from '../../../package/akpa';
 import { ColdskyAgent } from '../../coldsky-agent';
 import { plcDirectoryHistoryRaw } from '../../plc-directory';
-import { readCAR } from '../../read-car';
 import { unwrapShortDID, unwrapShortHandle } from '../../shorten';
 import { breakIntoWords } from '../capture-records/compact-post-words';
 import { syncRepo } from './sync-repo';

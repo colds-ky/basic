@@ -54,779 +54,6 @@
 
 	var dist$4 = {};
 
-	var handle = {};
-
-	(function (exports) {
-
-	  Object.defineProperty(exports, "__esModule", {
-	    value: true
-	  });
-	  exports.DisallowedDomainError = exports.UnsupportedDomainError = exports.ReservedHandleError = exports.InvalidHandleError = exports.isValidTld = exports.isValidHandle = exports.normalizeAndEnsureValidHandle = exports.normalizeHandle = exports.ensureValidHandleRegex = exports.ensureValidHandle = exports.DISALLOWED_TLDS = exports.INVALID_HANDLE = void 0;
-	  exports.INVALID_HANDLE = 'handle.invalid';
-	  // Currently these are registration-time restrictions, not protocol-level
-	  // restrictions. We have a couple accounts in the wild that we need to clean up
-	  // before hard-disallow.
-	  // See also: https://en.wikipedia.org/wiki/Top-level_domain#Reserved_domains
-	  exports.DISALLOWED_TLDS = ['.local', '.arpa', '.invalid', '.localhost', '.internal', '.example', '.alt',
-	  // policy could concievably change on ".onion" some day
-	  '.onion'
-	  // NOTE: .test is allowed in testing and devopment. In practical terms
-	  // "should" "never" actually resolve and get registered in production
-	  ];
-	  // Handle constraints, in English:
-	  //  - must be a possible domain name
-	  //    - RFC-1035 is commonly referenced, but has been updated. eg, RFC-3696,
-	  //      section 2. and RFC-3986, section 3. can now have leading numbers (eg,
-	  //      4chan.org)
-	  //    - "labels" (sub-names) are made of ASCII letters, digits, hyphens
-	  //    - can not start or end with a hyphen
-	  //    - TLD (last component) should not start with a digit
-	  //    - can't end with a hyphen (can end with digit)
-	  //    - each segment must be between 1 and 63 characters (not including any periods)
-	  //    - overall length can't be more than 253 characters
-	  //    - separated by (ASCII) periods; does not start or end with period
-	  //    - case insensitive
-	  //    - domains (handles) are equal if they are the same lower-case
-	  //    - punycode allowed for internationalization
-	  //  - no whitespace, null bytes, joining chars, etc
-	  //  - does not validate whether domain or TLD exists, or is a reserved or
-	  //    special TLD (eg, .onion or .local)
-	  //  - does not validate punycode
-	  const ensureValidHandle = handle => {
-	    // check that all chars are boring ASCII
-	    if (!/^[a-zA-Z0-9.-]*$/.test(handle)) {
-	      throw new InvalidHandleError('Disallowed characters in handle (ASCII letters, digits, dashes, periods only)');
-	    }
-	    if (handle.length > 253) {
-	      throw new InvalidHandleError('Handle is too long (253 chars max)');
-	    }
-	    const labels = handle.split('.');
-	    if (labels.length < 2) {
-	      throw new InvalidHandleError('Handle domain needs at least two parts');
-	    }
-	    for (let i = 0; i < labels.length; i++) {
-	      const l = labels[i];
-	      if (l.length < 1) {
-	        throw new InvalidHandleError('Handle parts can not be empty');
-	      }
-	      if (l.length > 63) {
-	        throw new InvalidHandleError('Handle part too long (max 63 chars)');
-	      }
-	      if (l.endsWith('-') || l.startsWith('-')) {
-	        throw new InvalidHandleError('Handle parts can not start or end with hyphens');
-	      }
-	      if (i + 1 == labels.length && !/^[a-zA-Z]/.test(l)) {
-	        throw new InvalidHandleError('Handle final component (TLD) must start with ASCII letter');
-	      }
-	    }
-	  };
-	  exports.ensureValidHandle = ensureValidHandle;
-	  // simple regex translation of above constraints
-	  const ensureValidHandleRegex = handle => {
-	    if (!/^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(handle)) {
-	      throw new InvalidHandleError("Handle didn't validate via regex");
-	    }
-	    if (handle.length > 253) {
-	      throw new InvalidHandleError('Handle is too long (253 chars max)');
-	    }
-	  };
-	  exports.ensureValidHandleRegex = ensureValidHandleRegex;
-	  const normalizeHandle = handle => {
-	    return handle.toLowerCase();
-	  };
-	  exports.normalizeHandle = normalizeHandle;
-	  const normalizeAndEnsureValidHandle = handle => {
-	    const normalized = (0, exports.normalizeHandle)(handle);
-	    (0, exports.ensureValidHandle)(normalized);
-	    return normalized;
-	  };
-	  exports.normalizeAndEnsureValidHandle = normalizeAndEnsureValidHandle;
-	  const isValidHandle = handle => {
-	    try {
-	      (0, exports.ensureValidHandle)(handle);
-	    } catch (err) {
-	      if (err instanceof InvalidHandleError) {
-	        return false;
-	      }
-	      throw err;
-	    }
-	    return true;
-	  };
-	  exports.isValidHandle = isValidHandle;
-	  const isValidTld = handle => {
-	    return !exports.DISALLOWED_TLDS.some(domain => handle.endsWith(domain));
-	  };
-	  exports.isValidTld = isValidTld;
-	  class InvalidHandleError extends Error {}
-	  exports.InvalidHandleError = InvalidHandleError;
-	  class ReservedHandleError extends Error {}
-	  exports.ReservedHandleError = ReservedHandleError;
-	  class UnsupportedDomainError extends Error {}
-	  exports.UnsupportedDomainError = UnsupportedDomainError;
-	  class DisallowedDomainError extends Error {}
-	  exports.DisallowedDomainError = DisallowedDomainError;
-	})(handle);
-
-	var did = {};
-
-	Object.defineProperty(did, "__esModule", {
-	  value: true
-	});
-	did.InvalidDidError = did.ensureValidDidRegex = did.ensureValidDid = void 0;
-	// Human-readable constraints:
-	//   - valid W3C DID (https://www.w3.org/TR/did-core/#did-syntax)
-	//      - entire URI is ASCII: [a-zA-Z0-9._:%-]
-	//      - always starts "did:" (lower-case)
-	//      - method name is one or more lower-case letters, followed by ":"
-	//      - remaining identifier can have any of the above chars, but can not end in ":"
-	//      - it seems that a bunch of ":" can be included, and don't need spaces between
-	//      - "%" is used only for "percent encoding" and must be followed by two hex characters (and thus can't end in "%")
-	//      - query ("?") and fragment ("#") stuff is defined for "DID URIs", but not as part of identifier itself
-	//      - "The current specification does not take a position on the maximum length of a DID"
-	//   - in current atproto, only allowing did:plc and did:web. But not *forcing* this at lexicon layer
-	//   - hard length limit of 8KBytes
-	//   - not going to validate "percent encoding" here
-	const ensureValidDid = did => {
-	  // check that all chars are boring ASCII
-	  if (!/^[a-zA-Z0-9._:%-]*$/.test(did)) {
-	    throw new InvalidDidError('Disallowed characters in DID (ASCII letters, digits, and a couple other characters only)');
-	  }
-	  const parts = did.split(':');
-	  if (parts.length < 3) {
-	    throw new InvalidDidError('DID requires prefix, method, and method-specific content');
-	  }
-	  if (parts[0] != 'did') {
-	    throw new InvalidDidError('DID requires "did:" prefix');
-	  }
-	  if (!/^[a-z]+$/.test(parts[1])) {
-	    throw new InvalidDidError('DID method must be lower-case letters');
-	  }
-	  if (did.endsWith(':') || did.endsWith('%')) {
-	    throw new InvalidDidError('DID can not end with ":" or "%"');
-	  }
-	  if (did.length > 2 * 1024) {
-	    throw new InvalidDidError('DID is too long (2048 chars max)');
-	  }
-	};
-	did.ensureValidDid = ensureValidDid;
-	const ensureValidDidRegex = did => {
-	  // simple regex to enforce most constraints via just regex and length.
-	  // hand wrote this regex based on above constraints
-	  if (!/^did:[a-z]+:[a-zA-Z0-9._:%-]*[a-zA-Z0-9._-]$/.test(did)) {
-	    throw new InvalidDidError("DID didn't validate via regex");
-	  }
-	  if (did.length > 2 * 1024) {
-	    throw new InvalidDidError('DID is too long (2048 chars max)');
-	  }
-	};
-	did.ensureValidDidRegex = ensureValidDidRegex;
-	class InvalidDidError extends Error {}
-	did.InvalidDidError = InvalidDidError;
-
-	var nsid = {};
-
-	(function (exports) {
-
-	  /*
-	  Grammar:
-	  	alpha     = "a" / "b" / "c" / "d" / "e" / "f" / "g" / "h" / "i" / "j" / "k" / "l" / "m" / "n" / "o" / "p" / "q" / "r" / "s" / "t" / "u" / "v" / "w" / "x" / "y" / "z" / "A" / "B" / "C" / "D" / "E" / "F" / "G" / "H" / "I" / "J" / "K" / "L" / "M" / "N" / "O" / "P" / "Q" / "R" / "S" / "T" / "U" / "V" / "W" / "X" / "Y" / "Z"
-	  number    = "1" / "2" / "3" / "4" / "5" / "6" / "7" / "8" / "9" / "0"
-	  delim     = "."
-	  segment   = alpha *( alpha / number / "-" )
-	  authority = segment *( delim segment )
-	  name      = alpha *( alpha )
-	  nsid      = authority delim name
-	  	*/
-	  Object.defineProperty(exports, "__esModule", {
-	    value: true
-	  });
-	  exports.InvalidNsidError = exports.ensureValidNsidRegex = exports.ensureValidNsid = exports.NSID = void 0;
-	  class NSID {
-	    static parse(nsid) {
-	      return new NSID(nsid);
-	    }
-	    static create(authority, name) {
-	      const segments = [...authority.split('.').reverse(), name].join('.');
-	      return new NSID(segments);
-	    }
-	    static isValid(nsid) {
-	      try {
-	        NSID.parse(nsid);
-	        return true;
-	      } catch (e) {
-	        return false;
-	      }
-	    }
-	    constructor(nsid) {
-	      Object.defineProperty(this, "segments", {
-	        enumerable: true,
-	        configurable: true,
-	        writable: true,
-	        value: []
-	      });
-	      (0, exports.ensureValidNsid)(nsid);
-	      this.segments = nsid.split('.');
-	    }
-	    get authority() {
-	      return this.segments.slice(0, this.segments.length - 1).reverse().join('.');
-	    }
-	    get name() {
-	      return this.segments.at(this.segments.length - 1);
-	    }
-	    toString() {
-	      return this.segments.join('.');
-	    }
-	  }
-	  exports.NSID = NSID;
-	  // Human readable constraints on NSID:
-	  // - a valid domain in reversed notation
-	  // - followed by an additional period-separated name, which is camel-case letters
-	  const ensureValidNsid = nsid => {
-	    const toCheck = nsid;
-	    // check that all chars are boring ASCII
-	    if (!/^[a-zA-Z0-9.-]*$/.test(toCheck)) {
-	      throw new InvalidNsidError('Disallowed characters in NSID (ASCII letters, digits, dashes, periods only)');
-	    }
-	    if (toCheck.length > 253 + 1 + 63) {
-	      throw new InvalidNsidError('NSID is too long (317 chars max)');
-	    }
-	    const labels = toCheck.split('.');
-	    if (labels.length < 3) {
-	      throw new InvalidNsidError('NSID needs at least three parts');
-	    }
-	    for (let i = 0; i < labels.length; i++) {
-	      const l = labels[i];
-	      if (l.length < 1) {
-	        throw new InvalidNsidError('NSID parts can not be empty');
-	      }
-	      if (l.length > 63) {
-	        throw new InvalidNsidError('NSID part too long (max 63 chars)');
-	      }
-	      if (l.endsWith('-') || l.startsWith('-')) {
-	        throw new InvalidNsidError('NSID parts can not start or end with hyphen');
-	      }
-	      if (/^[0-9]/.test(l) && i == 0) {
-	        throw new InvalidNsidError('NSID first part may not start with a digit');
-	      }
-	      if (!/^[a-zA-Z]+$/.test(l) && i + 1 == labels.length) {
-	        throw new InvalidNsidError('NSID name part must be only letters');
-	      }
-	    }
-	  };
-	  exports.ensureValidNsid = ensureValidNsid;
-	  const ensureValidNsidRegex = nsid => {
-	    // simple regex to enforce most constraints via just regex and length.
-	    // hand wrote this regex based on above constraints
-	    if (!/^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(\.[a-zA-Z]([a-zA-Z]{0,61}[a-zA-Z])?)$/.test(nsid)) {
-	      throw new InvalidNsidError("NSID didn't validate via regex");
-	    }
-	    if (nsid.length > 253 + 1 + 63) {
-	      throw new InvalidNsidError('NSID is too long (317 chars max)');
-	    }
-	  };
-	  exports.ensureValidNsidRegex = ensureValidNsidRegex;
-	  class InvalidNsidError extends Error {}
-	  exports.InvalidNsidError = InvalidNsidError;
-	})(nsid);
-
-	var aturi = {};
-
-	var aturi_validation = {};
-
-	Object.defineProperty(aturi_validation, "__esModule", {
-	  value: true
-	});
-	aturi_validation.ensureValidAtUriRegex = aturi_validation.ensureValidAtUri = void 0;
-	const handle_1 = handle;
-	const did_1 = did;
-	const nsid_1 = nsid;
-	// Human-readable constraints on ATURI:
-	//   - following regular URLs, a 8KByte hard total length limit
-	//   - follows ATURI docs on website
-	//      - all ASCII characters, no whitespace. non-ASCII could be URL-encoded
-	//      - starts "at://"
-	//      - "authority" is a valid DID or a valid handle
-	//      - optionally, follow "authority" with "/" and valid NSID as start of path
-	//      - optionally, if NSID given, follow that with "/" and rkey
-	//      - rkey path component can include URL-encoded ("percent encoded"), or:
-	//          ALPHA / DIGIT / "-" / "." / "_" / "~" / ":" / "@" / "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="
-	//          [a-zA-Z0-9._~:@!$&'\(\)*+,;=-]
-	//      - rkey must have at least one char
-	//      - regardless of path component, a fragment can follow  as "#" and then a JSON pointer (RFC-6901)
-	const ensureValidAtUri = uri => {
-	  // JSON pointer is pretty different from rest of URI, so split that out first
-	  const uriParts = uri.split('#');
-	  if (uriParts.length > 2) {
-	    throw new Error('ATURI can have at most one "#", separating fragment out');
-	  }
-	  const fragmentPart = uriParts[1] || null;
-	  uri = uriParts[0];
-	  // check that all chars are boring ASCII
-	  if (!/^[a-zA-Z0-9._~:@!$&')(*+,;=%/-]*$/.test(uri)) {
-	    throw new Error('Disallowed characters in ATURI (ASCII)');
-	  }
-	  const parts = uri.split('/');
-	  if (parts.length >= 3 && (parts[0] != 'at:' || parts[1].length != 0)) {
-	    throw new Error('ATURI must start with "at://"');
-	  }
-	  if (parts.length < 3) {
-	    throw new Error('ATURI requires at least method and authority sections');
-	  }
-	  try {
-	    if (parts[2].startsWith('did:')) {
-	      (0, did_1.ensureValidDid)(parts[2]);
-	    } else {
-	      (0, handle_1.ensureValidHandle)(parts[2]);
-	    }
-	  } catch {
-	    throw new Error('ATURI authority must be a valid handle or DID');
-	  }
-	  if (parts.length >= 4) {
-	    if (parts[3].length == 0) {
-	      throw new Error('ATURI can not have a slash after authority without a path segment');
-	    }
-	    try {
-	      (0, nsid_1.ensureValidNsid)(parts[3]);
-	    } catch {
-	      throw new Error('ATURI requires first path segment (if supplied) to be valid NSID');
-	    }
-	  }
-	  if (parts.length >= 5) {
-	    if (parts[4].length == 0) {
-	      throw new Error('ATURI can not have a slash after collection, unless record key is provided');
-	    }
-	    // would validate rkey here, but there are basically no constraints!
-	  }
-	  if (parts.length >= 6) {
-	    throw new Error('ATURI path can have at most two parts, and no trailing slash');
-	  }
-	  if (uriParts.length >= 2 && fragmentPart == null) {
-	    throw new Error('ATURI fragment must be non-empty and start with slash');
-	  }
-	  if (fragmentPart != null) {
-	    if (fragmentPart.length == 0 || fragmentPart[0] != '/') {
-	      throw new Error('ATURI fragment must be non-empty and start with slash');
-	    }
-	    // NOTE: enforcing *some* checks here for sanity. Eg, at least no whitespace
-	    if (!/^\/[a-zA-Z0-9._~:@!$&')(*+,;=%[\]/-]*$/.test(fragmentPart)) {
-	      throw new Error('Disallowed characters in ATURI fragment (ASCII)');
-	    }
-	  }
-	  if (uri.length > 8 * 1024) {
-	    throw new Error('ATURI is far too long');
-	  }
-	};
-	aturi_validation.ensureValidAtUri = ensureValidAtUri;
-	const ensureValidAtUriRegex = uri => {
-	  // simple regex to enforce most constraints via just regex and length.
-	  // hand wrote this regex based on above constraints. whew!
-	  const aturiRegex = /^at:\/\/(?<authority>[a-zA-Z0-9._:%-]+)(\/(?<collection>[a-zA-Z0-9-.]+)(\/(?<rkey>[a-zA-Z0-9._~:@!$&%')(*+,;=-]+))?)?(#(?<fragment>\/[a-zA-Z0-9._~:@!$&%')(*+,;=\-[\]/\\]*))?$/;
-	  const rm = uri.match(aturiRegex);
-	  if (!rm || !rm.groups) {
-	    throw new Error("ATURI didn't validate via regex");
-	  }
-	  const groups = rm.groups;
-	  try {
-	    (0, handle_1.ensureValidHandleRegex)(groups.authority);
-	  } catch {
-	    try {
-	      (0, did_1.ensureValidDidRegex)(groups.authority);
-	    } catch {
-	      throw new Error('ATURI authority must be a valid handle or DID');
-	    }
-	  }
-	  if (groups.collection) {
-	    try {
-	      (0, nsid_1.ensureValidNsidRegex)(groups.collection);
-	    } catch {
-	      throw new Error('ATURI collection path segment must be a valid NSID');
-	    }
-	  }
-	  if (uri.length > 8 * 1024) {
-	    throw new Error('ATURI is far too long');
-	  }
-	};
-	aturi_validation.ensureValidAtUriRegex = ensureValidAtUriRegex;
-
-	(function (exports) {
-
-	  var __createBinding = commonjsGlobal && commonjsGlobal.__createBinding || (Object.create ? function (o, m, k, k2) {
-	    if (k2 === undefined) k2 = k;
-	    var desc = Object.getOwnPropertyDescriptor(m, k);
-	    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-	      desc = {
-	        enumerable: true,
-	        get: function () {
-	          return m[k];
-	        }
-	      };
-	    }
-	    Object.defineProperty(o, k2, desc);
-	  } : function (o, m, k, k2) {
-	    if (k2 === undefined) k2 = k;
-	    o[k2] = m[k];
-	  });
-	  var __exportStar = commonjsGlobal && commonjsGlobal.__exportStar || function (m, exports) {
-	    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-	  };
-	  Object.defineProperty(exports, "__esModule", {
-	    value: true
-	  });
-	  exports.AtUri = exports.ATP_URI_REGEX = void 0;
-	  __exportStar(aturi_validation, exports);
-	  exports.ATP_URI_REGEX =
-	  // proto-    --did--------------   --name----------------   --path----   --query--   --hash--
-	  /^(at:\/\/)?((?:did:[a-z0-9:%-]+)|(?:[a-z0-9][a-z0-9.:-]*))(\/[^?#\s]*)?(\?[^#\s]+)?(#[^\s]+)?$/i;
-	  //                       --path-----   --query--  --hash--
-	  const RELATIVE_REGEX = /^(\/[^?#\s]*)?(\?[^#\s]+)?(#[^\s]+)?$/i;
-	  class AtUri {
-	    constructor(uri, base) {
-	      Object.defineProperty(this, "hash", {
-	        enumerable: true,
-	        configurable: true,
-	        writable: true,
-	        value: void 0
-	      });
-	      Object.defineProperty(this, "host", {
-	        enumerable: true,
-	        configurable: true,
-	        writable: true,
-	        value: void 0
-	      });
-	      Object.defineProperty(this, "pathname", {
-	        enumerable: true,
-	        configurable: true,
-	        writable: true,
-	        value: void 0
-	      });
-	      Object.defineProperty(this, "searchParams", {
-	        enumerable: true,
-	        configurable: true,
-	        writable: true,
-	        value: void 0
-	      });
-	      let parsed;
-	      if (base) {
-	        parsed = parse(base);
-	        if (!parsed) {
-	          throw new Error(`Invalid at uri: ${base}`);
-	        }
-	        const relativep = parseRelative(uri);
-	        if (!relativep) {
-	          throw new Error(`Invalid path: ${uri}`);
-	        }
-	        Object.assign(parsed, relativep);
-	      } else {
-	        parsed = parse(uri);
-	        if (!parsed) {
-	          throw new Error(`Invalid at uri: ${uri}`);
-	        }
-	      }
-	      this.hash = parsed.hash;
-	      this.host = parsed.host;
-	      this.pathname = parsed.pathname;
-	      this.searchParams = parsed.searchParams;
-	    }
-	    static make(handleOrDid, collection, rkey) {
-	      let str = handleOrDid;
-	      if (collection) str += '/' + collection;
-	      if (rkey) str += '/' + rkey;
-	      return new AtUri(str);
-	    }
-	    get protocol() {
-	      return 'at:';
-	    }
-	    get origin() {
-	      return `at://${this.host}`;
-	    }
-	    get hostname() {
-	      return this.host;
-	    }
-	    set hostname(v) {
-	      this.host = v;
-	    }
-	    get search() {
-	      return this.searchParams.toString();
-	    }
-	    set search(v) {
-	      this.searchParams = new URLSearchParams(v);
-	    }
-	    get collection() {
-	      return this.pathname.split('/').filter(Boolean)[0] || '';
-	    }
-	    set collection(v) {
-	      const parts = this.pathname.split('/').filter(Boolean);
-	      parts[0] = v;
-	      this.pathname = parts.join('/');
-	    }
-	    get rkey() {
-	      return this.pathname.split('/').filter(Boolean)[1] || '';
-	    }
-	    set rkey(v) {
-	      const parts = this.pathname.split('/').filter(Boolean);
-	      if (!parts[0]) parts[0] = 'undefined';
-	      parts[1] = v;
-	      this.pathname = parts.join('/');
-	    }
-	    get href() {
-	      return this.toString();
-	    }
-	    toString() {
-	      let path = this.pathname || '/';
-	      if (!path.startsWith('/')) {
-	        path = `/${path}`;
-	      }
-	      let qs = this.searchParams.toString();
-	      if (qs && !qs.startsWith('?')) {
-	        qs = `?${qs}`;
-	      }
-	      let hash = this.hash;
-	      if (hash && !hash.startsWith('#')) {
-	        hash = `#${hash}`;
-	      }
-	      return `at://${this.host}${path}${qs}${hash}`;
-	    }
-	  }
-	  exports.AtUri = AtUri;
-	  function parse(str) {
-	    const match = exports.ATP_URI_REGEX.exec(str);
-	    if (match) {
-	      return {
-	        hash: match[5] || '',
-	        host: match[2] || '',
-	        pathname: match[3] || '',
-	        searchParams: new URLSearchParams(match[4] || '')
-	      };
-	    }
-	    return undefined;
-	  }
-	  function parseRelative(str) {
-	    const match = RELATIVE_REGEX.exec(str);
-	    if (match) {
-	      return {
-	        hash: match[3] || '',
-	        pathname: match[1] || '',
-	        searchParams: new URLSearchParams(match[2] || '')
-	      };
-	    }
-	    return undefined;
-	  }
-	})(aturi);
-
-	var tid$1 = {};
-
-	(function (exports) {
-
-	  Object.defineProperty(exports, "__esModule", {
-	    value: true
-	  });
-	  exports.InvalidTidError = exports.isValidTid = exports.ensureValidTid = void 0;
-	  const ensureValidTid = tid => {
-	    if (tid.length != 13) {
-	      throw new InvalidTidError('TID must be 13 characters');
-	    }
-	    // simple regex to enforce most constraints via just regex and length.
-	    if (!/^[234567abcdefghij][234567abcdefghijklmnopqrstuvwxyz]{12}$/.test(tid)) {
-	      throw new InvalidTidError('TID syntax not valid (regex)');
-	    }
-	  };
-	  exports.ensureValidTid = ensureValidTid;
-	  const isValidTid = tid => {
-	    try {
-	      (0, exports.ensureValidTid)(tid);
-	    } catch (err) {
-	      if (err instanceof InvalidTidError) {
-	        return false;
-	      }
-	      throw err;
-	    }
-	    return true;
-	  };
-	  exports.isValidTid = isValidTid;
-	  class InvalidTidError extends Error {}
-	  exports.InvalidTidError = InvalidTidError;
-	})(tid$1);
-
-	var recordkey = {};
-
-	(function (exports) {
-
-	  Object.defineProperty(exports, "__esModule", {
-	    value: true
-	  });
-	  exports.InvalidRecordKeyError = exports.isValidRecordKey = exports.ensureValidRecordKey = void 0;
-	  const ensureValidRecordKey = rkey => {
-	    if (rkey.length > 512 || rkey.length < 1) {
-	      throw new InvalidRecordKeyError('record key must be 1 to 512 characters');
-	    }
-	    // simple regex to enforce most constraints via just regex and length.
-	    if (!/^[a-zA-Z0-9_~.:-]{1,512}$/.test(rkey)) {
-	      throw new InvalidRecordKeyError('record key syntax not valid (regex)');
-	    }
-	    if (rkey == '.' || rkey == '..') throw new InvalidRecordKeyError('record key can not be "." or ".."');
-	  };
-	  exports.ensureValidRecordKey = ensureValidRecordKey;
-	  const isValidRecordKey = rkey => {
-	    try {
-	      (0, exports.ensureValidRecordKey)(rkey);
-	    } catch (err) {
-	      if (err instanceof InvalidRecordKeyError) {
-	        return false;
-	      }
-	      throw err;
-	    }
-	    return true;
-	  };
-	  exports.isValidRecordKey = isValidRecordKey;
-	  class InvalidRecordKeyError extends Error {}
-	  exports.InvalidRecordKeyError = InvalidRecordKeyError;
-	})(recordkey);
-
-	var datetime = {};
-
-	(function (exports) {
-
-	  Object.defineProperty(exports, "__esModule", {
-	    value: true
-	  });
-	  exports.InvalidDatetimeError = exports.normalizeDatetimeAlways = exports.normalizeDatetime = exports.isValidDatetime = exports.ensureValidDatetime = void 0;
-	  /* Validates datetime string against atproto Lexicon 'datetime' format.
-	   * Syntax is described at: https://atproto.com/specs/lexicon#datetime
-	   */
-	  const ensureValidDatetime = dtStr => {
-	    const date = new Date(dtStr);
-	    // must parse as ISO 8601; this also verifies semantics like month is not 13 or 00
-	    if (isNaN(date.getTime())) {
-	      throw new InvalidDatetimeError('datetime did not parse as ISO 8601');
-	    }
-	    if (date.toISOString().startsWith('-')) {
-	      throw new InvalidDatetimeError('datetime normalized to a negative time');
-	    }
-	    // regex and other checks for RFC-3339
-	    if (!/^[0-9]{4}-[01][0-9]-[0-3][0-9]T[0-2][0-9]:[0-6][0-9]:[0-6][0-9](.[0-9]{1,20})?(Z|([+-][0-2][0-9]:[0-5][0-9]))$/.test(dtStr)) {
-	      throw new InvalidDatetimeError("datetime didn't validate via regex");
-	    }
-	    if (dtStr.length > 64) {
-	      throw new InvalidDatetimeError('datetime is too long (64 chars max)');
-	    }
-	    if (dtStr.endsWith('-00:00')) {
-	      throw new InvalidDatetimeError('datetime can not use "-00:00" for UTC timezone');
-	    }
-	    if (dtStr.startsWith('000')) {
-	      throw new InvalidDatetimeError('datetime so close to year zero not allowed');
-	    }
-	  };
-	  exports.ensureValidDatetime = ensureValidDatetime;
-	  /* Same logic as ensureValidDatetime(), but returns a boolean instead of throwing an exception.
-	   */
-	  const isValidDatetime = dtStr => {
-	    try {
-	      (0, exports.ensureValidDatetime)(dtStr);
-	    } catch (err) {
-	      if (err instanceof InvalidDatetimeError) {
-	        return false;
-	      }
-	      throw err;
-	    }
-	    return true;
-	  };
-	  exports.isValidDatetime = isValidDatetime;
-	  /* Takes a flexible datetime string and normalizes representation.
-	   *
-	   * This function will work with any valid atproto datetime (eg, anything which isValidDatetime() is true for). It *additionally* is more flexible about accepting datetimes that don't comply to RFC 3339, or are missing timezone information, and normalizing them to a valid datetime.
-	   *
-	   * One use-case is a consistent, sortable string. Another is to work with older invalid createdAt datetimes.
-	   *
-	   * Successful output will be a valid atproto datetime with millisecond precision (3 sub-second digits) and UTC timezone with trailing 'Z' syntax. Throws `InvalidDatetimeError` if the input string could not be parsed as a datetime, even with permissive parsing.
-	   *
-	   * Expected output format: YYYY-MM-DDTHH:mm:ss.sssZ
-	   */
-	  const normalizeDatetime = dtStr => {
-	    if ((0, exports.isValidDatetime)(dtStr)) {
-	      const outStr = new Date(dtStr).toISOString();
-	      if ((0, exports.isValidDatetime)(outStr)) {
-	        return outStr;
-	      }
-	    }
-	    // check if this permissive datetime is missing a timezone
-	    if (!/.*(([+-]\d\d:?\d\d)|[a-zA-Z])$/.test(dtStr)) {
-	      const date = new Date(dtStr + 'Z');
-	      if (!isNaN(date.getTime())) {
-	        const tzStr = date.toISOString();
-	        if ((0, exports.isValidDatetime)(tzStr)) {
-	          return tzStr;
-	        }
-	      }
-	    }
-	    // finally try parsing as simple datetime
-	    const date = new Date(dtStr);
-	    if (isNaN(date.getTime())) {
-	      throw new InvalidDatetimeError('datetime did not parse as any timestamp format');
-	    }
-	    const isoStr = date.toISOString();
-	    if ((0, exports.isValidDatetime)(isoStr)) {
-	      return isoStr;
-	    } else {
-	      throw new InvalidDatetimeError('datetime normalized to invalid timestamp string');
-	    }
-	  };
-	  exports.normalizeDatetime = normalizeDatetime;
-	  /* Variant of normalizeDatetime() which always returns a valid datetime strings.
-	   *
-	   * If a InvalidDatetimeError is encountered, returns the UNIX epoch time as a UTC datetime (1970-01-01T00:00:00.000Z).
-	   */
-	  const normalizeDatetimeAlways = dtStr => {
-	    try {
-	      return (0, exports.normalizeDatetime)(dtStr);
-	    } catch (err) {
-	      if (err instanceof InvalidDatetimeError) {
-	        return new Date(0).toISOString();
-	      }
-	      throw err;
-	    }
-	  };
-	  exports.normalizeDatetimeAlways = normalizeDatetimeAlways;
-	  /* Indicates a datetime string did not pass full atproto Lexicon datetime string format checks.
-	   */
-	  class InvalidDatetimeError extends Error {}
-	  exports.InvalidDatetimeError = InvalidDatetimeError;
-	})(datetime);
-
-	(function (exports) {
-
-	  var __createBinding = commonjsGlobal && commonjsGlobal.__createBinding || (Object.create ? function (o, m, k, k2) {
-	    if (k2 === undefined) k2 = k;
-	    var desc = Object.getOwnPropertyDescriptor(m, k);
-	    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-	      desc = {
-	        enumerable: true,
-	        get: function () {
-	          return m[k];
-	        }
-	      };
-	    }
-	    Object.defineProperty(o, k2, desc);
-	  } : function (o, m, k, k2) {
-	    if (k2 === undefined) k2 = k;
-	    o[k2] = m[k];
-	  });
-	  var __exportStar = commonjsGlobal && commonjsGlobal.__exportStar || function (m, exports) {
-	    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-	  };
-	  Object.defineProperty(exports, "__esModule", {
-	    value: true
-	  });
-	  __exportStar(handle, exports);
-	  __exportStar(did, exports);
-	  __exportStar(nsid, exports);
-	  __exportStar(aturi, exports);
-	  __exportStar(tid$1, exports);
-	  __exportStar(recordkey, exports);
-	  __exportStar(datetime, exports);
-	})(dist$4);
-
-	var dist$3 = {};
-
 	var types$5 = {};
 
 	var lib$1 = {};
@@ -963,8 +190,8 @@
 	  value: true
 	});
 	ZodError$1.ZodError = ZodError$1.quotelessJson = ZodError$1.ZodIssueCode = void 0;
-	const util_1$X = util$7;
-	ZodError$1.ZodIssueCode = util_1$X.util.arrayToEnum(["invalid_type", "invalid_literal", "custom", "invalid_union", "invalid_union_discriminator", "invalid_enum_value", "unrecognized_keys", "invalid_arguments", "invalid_return_type", "invalid_date", "invalid_string", "too_small", "too_big", "invalid_intersection_types", "not_multiple_of", "not_finite"]);
+	const util_1$Y = util$7;
+	ZodError$1.ZodIssueCode = util_1$Y.util.arrayToEnum(["invalid_type", "invalid_literal", "custom", "invalid_union", "invalid_union_discriminator", "invalid_enum_value", "unrecognized_keys", "invalid_arguments", "invalid_return_type", "invalid_date", "invalid_string", "too_small", "too_big", "invalid_intersection_types", "not_multiple_of", "not_finite"]);
 	const quotelessJson = obj => {
 	  const json = JSON.stringify(obj, null, 2);
 	  return json.replace(/"([^"]+)":/g, "$1:");
@@ -1051,7 +278,7 @@
 	    return this.message;
 	  }
 	  get message() {
-	    return JSON.stringify(this.issues, util_1$X.util.jsonStringifyReplacer, 2);
+	    return JSON.stringify(this.issues, util_1$Y.util.jsonStringifyReplacer, 2);
 	  }
 	  get isEmpty() {
 	    return this.issues.length === 0;
@@ -1085,32 +312,32 @@
 	Object.defineProperty(en, "__esModule", {
 	  value: true
 	});
-	const util_1$W = util$7;
+	const util_1$X = util$7;
 	const ZodError_1 = ZodError$1;
 	const errorMap = (issue, _ctx) => {
 	  let message;
 	  switch (issue.code) {
 	    case ZodError_1.ZodIssueCode.invalid_type:
-	      if (issue.received === util_1$W.ZodParsedType.undefined) {
+	      if (issue.received === util_1$X.ZodParsedType.undefined) {
 	        message = "Required";
 	      } else {
 	        message = `Expected ${issue.expected}, received ${issue.received}`;
 	      }
 	      break;
 	    case ZodError_1.ZodIssueCode.invalid_literal:
-	      message = `Invalid literal value, expected ${JSON.stringify(issue.expected, util_1$W.util.jsonStringifyReplacer)}`;
+	      message = `Invalid literal value, expected ${JSON.stringify(issue.expected, util_1$X.util.jsonStringifyReplacer)}`;
 	      break;
 	    case ZodError_1.ZodIssueCode.unrecognized_keys:
-	      message = `Unrecognized key(s) in object: ${util_1$W.util.joinValues(issue.keys, ", ")}`;
+	      message = `Unrecognized key(s) in object: ${util_1$X.util.joinValues(issue.keys, ", ")}`;
 	      break;
 	    case ZodError_1.ZodIssueCode.invalid_union:
 	      message = `Invalid input`;
 	      break;
 	    case ZodError_1.ZodIssueCode.invalid_union_discriminator:
-	      message = `Invalid discriminator value. Expected ${util_1$W.util.joinValues(issue.options)}`;
+	      message = `Invalid discriminator value. Expected ${util_1$X.util.joinValues(issue.options)}`;
 	      break;
 	    case ZodError_1.ZodIssueCode.invalid_enum_value:
-	      message = `Invalid enum value. Expected ${util_1$W.util.joinValues(issue.options)}, received '${issue.received}'`;
+	      message = `Invalid enum value. Expected ${util_1$X.util.joinValues(issue.options)}, received '${issue.received}'`;
 	      break;
 	    case ZodError_1.ZodIssueCode.invalid_arguments:
 	      message = `Invalid function arguments`;
@@ -1133,7 +360,7 @@
 	        } else if ("endsWith" in issue.validation) {
 	          message = `Invalid input: must end with "${issue.validation.endsWith}"`;
 	        } else {
-	          util_1$W.util.assertNever(issue.validation);
+	          util_1$X.util.assertNever(issue.validation);
 	        }
 	      } else if (issue.validation !== "regex") {
 	        message = `Invalid ${issue.validation}`;
@@ -1161,7 +388,7 @@
 	      break;
 	    default:
 	      message = _ctx.defaultError;
-	      util_1$W.util.assertNever(issue);
+	      util_1$X.util.assertNever(issue);
 	  }
 	  return {
 	    message
@@ -5168,11 +4395,1122 @@
 	  exports.default = z;
 	})(lib$1);
 
+	var dist$3 = {};
+
+	var handle$1 = {};
+
+	(function (exports) {
+
+	  Object.defineProperty(exports, "__esModule", {
+	    value: true
+	  });
+	  exports.DisallowedDomainError = exports.UnsupportedDomainError = exports.ReservedHandleError = exports.InvalidHandleError = exports.isValidTld = exports.isValidHandle = exports.normalizeAndEnsureValidHandle = exports.normalizeHandle = exports.ensureValidHandleRegex = exports.ensureValidHandle = exports.DISALLOWED_TLDS = exports.INVALID_HANDLE = void 0;
+	  exports.INVALID_HANDLE = 'handle.invalid';
+	  // Currently these are registration-time restrictions, not protocol-level
+	  // restrictions. We have a couple accounts in the wild that we need to clean up
+	  // before hard-disallow.
+	  // See also: https://en.wikipedia.org/wiki/Top-level_domain#Reserved_domains
+	  exports.DISALLOWED_TLDS = ['.local', '.arpa', '.invalid', '.localhost', '.internal', '.example', '.alt',
+	  // policy could concievably change on ".onion" some day
+	  '.onion'
+	  // NOTE: .test is allowed in testing and devopment. In practical terms
+	  // "should" "never" actually resolve and get registered in production
+	  ];
+	  // Handle constraints, in English:
+	  //  - must be a possible domain name
+	  //    - RFC-1035 is commonly referenced, but has been updated. eg, RFC-3696,
+	  //      section 2. and RFC-3986, section 3. can now have leading numbers (eg,
+	  //      4chan.org)
+	  //    - "labels" (sub-names) are made of ASCII letters, digits, hyphens
+	  //    - can not start or end with a hyphen
+	  //    - TLD (last component) should not start with a digit
+	  //    - can't end with a hyphen (can end with digit)
+	  //    - each segment must be between 1 and 63 characters (not including any periods)
+	  //    - overall length can't be more than 253 characters
+	  //    - separated by (ASCII) periods; does not start or end with period
+	  //    - case insensitive
+	  //    - domains (handles) are equal if they are the same lower-case
+	  //    - punycode allowed for internationalization
+	  //  - no whitespace, null bytes, joining chars, etc
+	  //  - does not validate whether domain or TLD exists, or is a reserved or
+	  //    special TLD (eg, .onion or .local)
+	  //  - does not validate punycode
+	  const ensureValidHandle = handle => {
+	    // check that all chars are boring ASCII
+	    if (!/^[a-zA-Z0-9.-]*$/.test(handle)) {
+	      throw new InvalidHandleError('Disallowed characters in handle (ASCII letters, digits, dashes, periods only)');
+	    }
+	    if (handle.length > 253) {
+	      throw new InvalidHandleError('Handle is too long (253 chars max)');
+	    }
+	    const labels = handle.split('.');
+	    if (labels.length < 2) {
+	      throw new InvalidHandleError('Handle domain needs at least two parts');
+	    }
+	    for (let i = 0; i < labels.length; i++) {
+	      const l = labels[i];
+	      if (l.length < 1) {
+	        throw new InvalidHandleError('Handle parts can not be empty');
+	      }
+	      if (l.length > 63) {
+	        throw new InvalidHandleError('Handle part too long (max 63 chars)');
+	      }
+	      if (l.endsWith('-') || l.startsWith('-')) {
+	        throw new InvalidHandleError('Handle parts can not start or end with hyphens');
+	      }
+	      if (i + 1 == labels.length && !/^[a-zA-Z]/.test(l)) {
+	        throw new InvalidHandleError('Handle final component (TLD) must start with ASCII letter');
+	      }
+	    }
+	  };
+	  exports.ensureValidHandle = ensureValidHandle;
+	  // simple regex translation of above constraints
+	  const ensureValidHandleRegex = handle => {
+	    if (!/^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(handle)) {
+	      throw new InvalidHandleError("Handle didn't validate via regex");
+	    }
+	    if (handle.length > 253) {
+	      throw new InvalidHandleError('Handle is too long (253 chars max)');
+	    }
+	  };
+	  exports.ensureValidHandleRegex = ensureValidHandleRegex;
+	  const normalizeHandle = handle => {
+	    return handle.toLowerCase();
+	  };
+	  exports.normalizeHandle = normalizeHandle;
+	  const normalizeAndEnsureValidHandle = handle => {
+	    const normalized = (0, exports.normalizeHandle)(handle);
+	    (0, exports.ensureValidHandle)(normalized);
+	    return normalized;
+	  };
+	  exports.normalizeAndEnsureValidHandle = normalizeAndEnsureValidHandle;
+	  const isValidHandle = handle => {
+	    try {
+	      (0, exports.ensureValidHandle)(handle);
+	    } catch (err) {
+	      if (err instanceof InvalidHandleError) {
+	        return false;
+	      }
+	      throw err;
+	    }
+	    return true;
+	  };
+	  exports.isValidHandle = isValidHandle;
+	  const isValidTld = handle => {
+	    return !exports.DISALLOWED_TLDS.some(domain => handle.endsWith(domain));
+	  };
+	  exports.isValidTld = isValidTld;
+	  class InvalidHandleError extends Error {}
+	  exports.InvalidHandleError = InvalidHandleError;
+	  class ReservedHandleError extends Error {}
+	  exports.ReservedHandleError = ReservedHandleError;
+	  class UnsupportedDomainError extends Error {}
+	  exports.UnsupportedDomainError = UnsupportedDomainError;
+	  class DisallowedDomainError extends Error {}
+	  exports.DisallowedDomainError = DisallowedDomainError;
+	})(handle$1);
+
+	var did$1 = {};
+
+	Object.defineProperty(did$1, "__esModule", {
+	  value: true
+	});
+	did$1.InvalidDidError = did$1.ensureValidDidRegex = did$1.ensureValidDid = void 0;
+	// Human-readable constraints:
+	//   - valid W3C DID (https://www.w3.org/TR/did-core/#did-syntax)
+	//      - entire URI is ASCII: [a-zA-Z0-9._:%-]
+	//      - always starts "did:" (lower-case)
+	//      - method name is one or more lower-case letters, followed by ":"
+	//      - remaining identifier can have any of the above chars, but can not end in ":"
+	//      - it seems that a bunch of ":" can be included, and don't need spaces between
+	//      - "%" is used only for "percent encoding" and must be followed by two hex characters (and thus can't end in "%")
+	//      - query ("?") and fragment ("#") stuff is defined for "DID URIs", but not as part of identifier itself
+	//      - "The current specification does not take a position on the maximum length of a DID"
+	//   - in current atproto, only allowing did:plc and did:web. But not *forcing* this at lexicon layer
+	//   - hard length limit of 8KBytes
+	//   - not going to validate "percent encoding" here
+	const ensureValidDid = did => {
+	  // check that all chars are boring ASCII
+	  if (!/^[a-zA-Z0-9._:%-]*$/.test(did)) {
+	    throw new InvalidDidError('Disallowed characters in DID (ASCII letters, digits, and a couple other characters only)');
+	  }
+	  const parts = did.split(':');
+	  if (parts.length < 3) {
+	    throw new InvalidDidError('DID requires prefix, method, and method-specific content');
+	  }
+	  if (parts[0] != 'did') {
+	    throw new InvalidDidError('DID requires "did:" prefix');
+	  }
+	  if (!/^[a-z]+$/.test(parts[1])) {
+	    throw new InvalidDidError('DID method must be lower-case letters');
+	  }
+	  if (did.endsWith(':') || did.endsWith('%')) {
+	    throw new InvalidDidError('DID can not end with ":" or "%"');
+	  }
+	  if (did.length > 2 * 1024) {
+	    throw new InvalidDidError('DID is too long (2048 chars max)');
+	  }
+	};
+	did$1.ensureValidDid = ensureValidDid;
+	const ensureValidDidRegex = did => {
+	  // simple regex to enforce most constraints via just regex and length.
+	  // hand wrote this regex based on above constraints
+	  if (!/^did:[a-z]+:[a-zA-Z0-9._:%-]*[a-zA-Z0-9._-]$/.test(did)) {
+	    throw new InvalidDidError("DID didn't validate via regex");
+	  }
+	  if (did.length > 2 * 1024) {
+	    throw new InvalidDidError('DID is too long (2048 chars max)');
+	  }
+	};
+	did$1.ensureValidDidRegex = ensureValidDidRegex;
+	class InvalidDidError extends Error {}
+	did$1.InvalidDidError = InvalidDidError;
+
+	var nsid$1 = {};
+
+	(function (exports) {
+
+	  /*
+	  Grammar:
+	  	alpha     = "a" / "b" / "c" / "d" / "e" / "f" / "g" / "h" / "i" / "j" / "k" / "l" / "m" / "n" / "o" / "p" / "q" / "r" / "s" / "t" / "u" / "v" / "w" / "x" / "y" / "z" / "A" / "B" / "C" / "D" / "E" / "F" / "G" / "H" / "I" / "J" / "K" / "L" / "M" / "N" / "O" / "P" / "Q" / "R" / "S" / "T" / "U" / "V" / "W" / "X" / "Y" / "Z"
+	  number    = "1" / "2" / "3" / "4" / "5" / "6" / "7" / "8" / "9" / "0"
+	  delim     = "."
+	  segment   = alpha *( alpha / number / "-" )
+	  authority = segment *( delim segment )
+	  name      = alpha *( alpha )
+	  nsid      = authority delim name
+	  	*/
+	  Object.defineProperty(exports, "__esModule", {
+	    value: true
+	  });
+	  exports.InvalidNsidError = exports.ensureValidNsidRegex = exports.ensureValidNsid = exports.NSID = void 0;
+	  class NSID {
+	    static parse(nsid) {
+	      return new NSID(nsid);
+	    }
+	    static create(authority, name) {
+	      const segments = [...authority.split('.').reverse(), name].join('.');
+	      return new NSID(segments);
+	    }
+	    static isValid(nsid) {
+	      try {
+	        NSID.parse(nsid);
+	        return true;
+	      } catch (e) {
+	        return false;
+	      }
+	    }
+	    constructor(nsid) {
+	      Object.defineProperty(this, "segments", {
+	        enumerable: true,
+	        configurable: true,
+	        writable: true,
+	        value: []
+	      });
+	      (0, exports.ensureValidNsid)(nsid);
+	      this.segments = nsid.split('.');
+	    }
+	    get authority() {
+	      return this.segments.slice(0, this.segments.length - 1).reverse().join('.');
+	    }
+	    get name() {
+	      return this.segments.at(this.segments.length - 1);
+	    }
+	    toString() {
+	      return this.segments.join('.');
+	    }
+	  }
+	  exports.NSID = NSID;
+	  // Human readable constraints on NSID:
+	  // - a valid domain in reversed notation
+	  // - followed by an additional period-separated name, which is camel-case letters
+	  const ensureValidNsid = nsid => {
+	    const toCheck = nsid;
+	    // check that all chars are boring ASCII
+	    if (!/^[a-zA-Z0-9.-]*$/.test(toCheck)) {
+	      throw new InvalidNsidError('Disallowed characters in NSID (ASCII letters, digits, dashes, periods only)');
+	    }
+	    if (toCheck.length > 253 + 1 + 63) {
+	      throw new InvalidNsidError('NSID is too long (317 chars max)');
+	    }
+	    const labels = toCheck.split('.');
+	    if (labels.length < 3) {
+	      throw new InvalidNsidError('NSID needs at least three parts');
+	    }
+	    for (let i = 0; i < labels.length; i++) {
+	      const l = labels[i];
+	      if (l.length < 1) {
+	        throw new InvalidNsidError('NSID parts can not be empty');
+	      }
+	      if (l.length > 63) {
+	        throw new InvalidNsidError('NSID part too long (max 63 chars)');
+	      }
+	      if (l.endsWith('-') || l.startsWith('-')) {
+	        throw new InvalidNsidError('NSID parts can not start or end with hyphen');
+	      }
+	      if (/^[0-9]/.test(l) && i == 0) {
+	        throw new InvalidNsidError('NSID first part may not start with a digit');
+	      }
+	      if (!/^[a-zA-Z]+$/.test(l) && i + 1 == labels.length) {
+	        throw new InvalidNsidError('NSID name part must be only letters');
+	      }
+	    }
+	  };
+	  exports.ensureValidNsid = ensureValidNsid;
+	  const ensureValidNsidRegex = nsid => {
+	    // simple regex to enforce most constraints via just regex and length.
+	    // hand wrote this regex based on above constraints
+	    if (!/^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(\.[a-zA-Z]([a-zA-Z]{0,61}[a-zA-Z])?)$/.test(nsid)) {
+	      throw new InvalidNsidError("NSID didn't validate via regex");
+	    }
+	    if (nsid.length > 253 + 1 + 63) {
+	      throw new InvalidNsidError('NSID is too long (317 chars max)');
+	    }
+	  };
+	  exports.ensureValidNsidRegex = ensureValidNsidRegex;
+	  class InvalidNsidError extends Error {}
+	  exports.InvalidNsidError = InvalidNsidError;
+	})(nsid$1);
+
+	var aturi = {};
+
+	var aturi_validation = {};
+
+	Object.defineProperty(aturi_validation, "__esModule", {
+	  value: true
+	});
+	aturi_validation.ensureValidAtUriRegex = aturi_validation.ensureValidAtUri = void 0;
+	const handle_1 = handle$1;
+	const did_1 = did$1;
+	const nsid_1 = nsid$1;
+	// Human-readable constraints on ATURI:
+	//   - following regular URLs, a 8KByte hard total length limit
+	//   - follows ATURI docs on website
+	//      - all ASCII characters, no whitespace. non-ASCII could be URL-encoded
+	//      - starts "at://"
+	//      - "authority" is a valid DID or a valid handle
+	//      - optionally, follow "authority" with "/" and valid NSID as start of path
+	//      - optionally, if NSID given, follow that with "/" and rkey
+	//      - rkey path component can include URL-encoded ("percent encoded"), or:
+	//          ALPHA / DIGIT / "-" / "." / "_" / "~" / ":" / "@" / "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="
+	//          [a-zA-Z0-9._~:@!$&'\(\)*+,;=-]
+	//      - rkey must have at least one char
+	//      - regardless of path component, a fragment can follow  as "#" and then a JSON pointer (RFC-6901)
+	const ensureValidAtUri = uri => {
+	  // JSON pointer is pretty different from rest of URI, so split that out first
+	  const uriParts = uri.split('#');
+	  if (uriParts.length > 2) {
+	    throw new Error('ATURI can have at most one "#", separating fragment out');
+	  }
+	  const fragmentPart = uriParts[1] || null;
+	  uri = uriParts[0];
+	  // check that all chars are boring ASCII
+	  if (!/^[a-zA-Z0-9._~:@!$&')(*+,;=%/-]*$/.test(uri)) {
+	    throw new Error('Disallowed characters in ATURI (ASCII)');
+	  }
+	  const parts = uri.split('/');
+	  if (parts.length >= 3 && (parts[0] != 'at:' || parts[1].length != 0)) {
+	    throw new Error('ATURI must start with "at://"');
+	  }
+	  if (parts.length < 3) {
+	    throw new Error('ATURI requires at least method and authority sections');
+	  }
+	  try {
+	    if (parts[2].startsWith('did:')) {
+	      (0, did_1.ensureValidDid)(parts[2]);
+	    } else {
+	      (0, handle_1.ensureValidHandle)(parts[2]);
+	    }
+	  } catch {
+	    throw new Error('ATURI authority must be a valid handle or DID');
+	  }
+	  if (parts.length >= 4) {
+	    if (parts[3].length == 0) {
+	      throw new Error('ATURI can not have a slash after authority without a path segment');
+	    }
+	    try {
+	      (0, nsid_1.ensureValidNsid)(parts[3]);
+	    } catch {
+	      throw new Error('ATURI requires first path segment (if supplied) to be valid NSID');
+	    }
+	  }
+	  if (parts.length >= 5) {
+	    if (parts[4].length == 0) {
+	      throw new Error('ATURI can not have a slash after collection, unless record key is provided');
+	    }
+	    // would validate rkey here, but there are basically no constraints!
+	  }
+	  if (parts.length >= 6) {
+	    throw new Error('ATURI path can have at most two parts, and no trailing slash');
+	  }
+	  if (uriParts.length >= 2 && fragmentPart == null) {
+	    throw new Error('ATURI fragment must be non-empty and start with slash');
+	  }
+	  if (fragmentPart != null) {
+	    if (fragmentPart.length == 0 || fragmentPart[0] != '/') {
+	      throw new Error('ATURI fragment must be non-empty and start with slash');
+	    }
+	    // NOTE: enforcing *some* checks here for sanity. Eg, at least no whitespace
+	    if (!/^\/[a-zA-Z0-9._~:@!$&')(*+,;=%[\]/-]*$/.test(fragmentPart)) {
+	      throw new Error('Disallowed characters in ATURI fragment (ASCII)');
+	    }
+	  }
+	  if (uri.length > 8 * 1024) {
+	    throw new Error('ATURI is far too long');
+	  }
+	};
+	aturi_validation.ensureValidAtUri = ensureValidAtUri;
+	const ensureValidAtUriRegex = uri => {
+	  // simple regex to enforce most constraints via just regex and length.
+	  // hand wrote this regex based on above constraints. whew!
+	  const aturiRegex = /^at:\/\/(?<authority>[a-zA-Z0-9._:%-]+)(\/(?<collection>[a-zA-Z0-9-.]+)(\/(?<rkey>[a-zA-Z0-9._~:@!$&%')(*+,;=-]+))?)?(#(?<fragment>\/[a-zA-Z0-9._~:@!$&%')(*+,;=\-[\]/\\]*))?$/;
+	  const rm = uri.match(aturiRegex);
+	  if (!rm || !rm.groups) {
+	    throw new Error("ATURI didn't validate via regex");
+	  }
+	  const groups = rm.groups;
+	  try {
+	    (0, handle_1.ensureValidHandleRegex)(groups.authority);
+	  } catch {
+	    try {
+	      (0, did_1.ensureValidDidRegex)(groups.authority);
+	    } catch {
+	      throw new Error('ATURI authority must be a valid handle or DID');
+	    }
+	  }
+	  if (groups.collection) {
+	    try {
+	      (0, nsid_1.ensureValidNsidRegex)(groups.collection);
+	    } catch {
+	      throw new Error('ATURI collection path segment must be a valid NSID');
+	    }
+	  }
+	  if (uri.length > 8 * 1024) {
+	    throw new Error('ATURI is far too long');
+	  }
+	};
+	aturi_validation.ensureValidAtUriRegex = ensureValidAtUriRegex;
+
+	(function (exports) {
+
+	  var __createBinding = commonjsGlobal && commonjsGlobal.__createBinding || (Object.create ? function (o, m, k, k2) {
+	    if (k2 === undefined) k2 = k;
+	    var desc = Object.getOwnPropertyDescriptor(m, k);
+	    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+	      desc = {
+	        enumerable: true,
+	        get: function () {
+	          return m[k];
+	        }
+	      };
+	    }
+	    Object.defineProperty(o, k2, desc);
+	  } : function (o, m, k, k2) {
+	    if (k2 === undefined) k2 = k;
+	    o[k2] = m[k];
+	  });
+	  var __exportStar = commonjsGlobal && commonjsGlobal.__exportStar || function (m, exports) {
+	    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+	  };
+	  Object.defineProperty(exports, "__esModule", {
+	    value: true
+	  });
+	  exports.AtUri = exports.ATP_URI_REGEX = void 0;
+	  __exportStar(aturi_validation, exports);
+	  exports.ATP_URI_REGEX =
+	  // proto-    --did--------------   --name----------------   --path----   --query--   --hash--
+	  /^(at:\/\/)?((?:did:[a-z0-9:%-]+)|(?:[a-z0-9][a-z0-9.:-]*))(\/[^?#\s]*)?(\?[^#\s]+)?(#[^\s]+)?$/i;
+	  //                       --path-----   --query--  --hash--
+	  const RELATIVE_REGEX = /^(\/[^?#\s]*)?(\?[^#\s]+)?(#[^\s]+)?$/i;
+	  class AtUri {
+	    constructor(uri, base) {
+	      Object.defineProperty(this, "hash", {
+	        enumerable: true,
+	        configurable: true,
+	        writable: true,
+	        value: void 0
+	      });
+	      Object.defineProperty(this, "host", {
+	        enumerable: true,
+	        configurable: true,
+	        writable: true,
+	        value: void 0
+	      });
+	      Object.defineProperty(this, "pathname", {
+	        enumerable: true,
+	        configurable: true,
+	        writable: true,
+	        value: void 0
+	      });
+	      Object.defineProperty(this, "searchParams", {
+	        enumerable: true,
+	        configurable: true,
+	        writable: true,
+	        value: void 0
+	      });
+	      let parsed;
+	      if (base) {
+	        parsed = parse(base);
+	        if (!parsed) {
+	          throw new Error(`Invalid at uri: ${base}`);
+	        }
+	        const relativep = parseRelative(uri);
+	        if (!relativep) {
+	          throw new Error(`Invalid path: ${uri}`);
+	        }
+	        Object.assign(parsed, relativep);
+	      } else {
+	        parsed = parse(uri);
+	        if (!parsed) {
+	          throw new Error(`Invalid at uri: ${uri}`);
+	        }
+	      }
+	      this.hash = parsed.hash;
+	      this.host = parsed.host;
+	      this.pathname = parsed.pathname;
+	      this.searchParams = parsed.searchParams;
+	    }
+	    static make(handleOrDid, collection, rkey) {
+	      let str = handleOrDid;
+	      if (collection) str += '/' + collection;
+	      if (rkey) str += '/' + rkey;
+	      return new AtUri(str);
+	    }
+	    get protocol() {
+	      return 'at:';
+	    }
+	    get origin() {
+	      return `at://${this.host}`;
+	    }
+	    get hostname() {
+	      return this.host;
+	    }
+	    set hostname(v) {
+	      this.host = v;
+	    }
+	    get search() {
+	      return this.searchParams.toString();
+	    }
+	    set search(v) {
+	      this.searchParams = new URLSearchParams(v);
+	    }
+	    get collection() {
+	      return this.pathname.split('/').filter(Boolean)[0] || '';
+	    }
+	    set collection(v) {
+	      const parts = this.pathname.split('/').filter(Boolean);
+	      parts[0] = v;
+	      this.pathname = parts.join('/');
+	    }
+	    get rkey() {
+	      return this.pathname.split('/').filter(Boolean)[1] || '';
+	    }
+	    set rkey(v) {
+	      const parts = this.pathname.split('/').filter(Boolean);
+	      if (!parts[0]) parts[0] = 'undefined';
+	      parts[1] = v;
+	      this.pathname = parts.join('/');
+	    }
+	    get href() {
+	      return this.toString();
+	    }
+	    toString() {
+	      let path = this.pathname || '/';
+	      if (!path.startsWith('/')) {
+	        path = `/${path}`;
+	      }
+	      let qs = this.searchParams.toString();
+	      if (qs && !qs.startsWith('?')) {
+	        qs = `?${qs}`;
+	      }
+	      let hash = this.hash;
+	      if (hash && !hash.startsWith('#')) {
+	        hash = `#${hash}`;
+	      }
+	      return `at://${this.host}${path}${qs}${hash}`;
+	    }
+	  }
+	  exports.AtUri = AtUri;
+	  function parse(str) {
+	    const match = exports.ATP_URI_REGEX.exec(str);
+	    if (match) {
+	      return {
+	        hash: match[5] || '',
+	        host: match[2] || '',
+	        pathname: match[3] || '',
+	        searchParams: new URLSearchParams(match[4] || '')
+	      };
+	    }
+	    return undefined;
+	  }
+	  function parseRelative(str) {
+	    const match = RELATIVE_REGEX.exec(str);
+	    if (match) {
+	      return {
+	        hash: match[3] || '',
+	        pathname: match[1] || '',
+	        searchParams: new URLSearchParams(match[2] || '')
+	      };
+	    }
+	    return undefined;
+	  }
+	})(aturi);
+
+	var tid$2 = {};
+
+	(function (exports) {
+
+	  Object.defineProperty(exports, "__esModule", {
+	    value: true
+	  });
+	  exports.InvalidTidError = exports.isValidTid = exports.ensureValidTid = void 0;
+	  const ensureValidTid = tid => {
+	    if (tid.length != 13) {
+	      throw new InvalidTidError('TID must be 13 characters');
+	    }
+	    // simple regex to enforce most constraints via just regex and length.
+	    if (!/^[234567abcdefghij][234567abcdefghijklmnopqrstuvwxyz]{12}$/.test(tid)) {
+	      throw new InvalidTidError('TID syntax not valid (regex)');
+	    }
+	  };
+	  exports.ensureValidTid = ensureValidTid;
+	  const isValidTid = tid => {
+	    try {
+	      (0, exports.ensureValidTid)(tid);
+	    } catch (err) {
+	      if (err instanceof InvalidTidError) {
+	        return false;
+	      }
+	      throw err;
+	    }
+	    return true;
+	  };
+	  exports.isValidTid = isValidTid;
+	  class InvalidTidError extends Error {}
+	  exports.InvalidTidError = InvalidTidError;
+	})(tid$2);
+
+	var recordkey = {};
+
+	(function (exports) {
+
+	  Object.defineProperty(exports, "__esModule", {
+	    value: true
+	  });
+	  exports.InvalidRecordKeyError = exports.isValidRecordKey = exports.ensureValidRecordKey = void 0;
+	  const ensureValidRecordKey = rkey => {
+	    if (rkey.length > 512 || rkey.length < 1) {
+	      throw new InvalidRecordKeyError('record key must be 1 to 512 characters');
+	    }
+	    // simple regex to enforce most constraints via just regex and length.
+	    if (!/^[a-zA-Z0-9_~.:-]{1,512}$/.test(rkey)) {
+	      throw new InvalidRecordKeyError('record key syntax not valid (regex)');
+	    }
+	    if (rkey == '.' || rkey == '..') throw new InvalidRecordKeyError('record key can not be "." or ".."');
+	  };
+	  exports.ensureValidRecordKey = ensureValidRecordKey;
+	  const isValidRecordKey = rkey => {
+	    try {
+	      (0, exports.ensureValidRecordKey)(rkey);
+	    } catch (err) {
+	      if (err instanceof InvalidRecordKeyError) {
+	        return false;
+	      }
+	      throw err;
+	    }
+	    return true;
+	  };
+	  exports.isValidRecordKey = isValidRecordKey;
+	  class InvalidRecordKeyError extends Error {}
+	  exports.InvalidRecordKeyError = InvalidRecordKeyError;
+	})(recordkey);
+
+	var datetime$1 = {};
+
+	(function (exports) {
+
+	  Object.defineProperty(exports, "__esModule", {
+	    value: true
+	  });
+	  exports.InvalidDatetimeError = exports.normalizeDatetimeAlways = exports.normalizeDatetime = exports.isValidDatetime = exports.ensureValidDatetime = void 0;
+	  /* Validates datetime string against atproto Lexicon 'datetime' format.
+	   * Syntax is described at: https://atproto.com/specs/lexicon#datetime
+	   */
+	  const ensureValidDatetime = dtStr => {
+	    const date = new Date(dtStr);
+	    // must parse as ISO 8601; this also verifies semantics like month is not 13 or 00
+	    if (isNaN(date.getTime())) {
+	      throw new InvalidDatetimeError('datetime did not parse as ISO 8601');
+	    }
+	    if (date.toISOString().startsWith('-')) {
+	      throw new InvalidDatetimeError('datetime normalized to a negative time');
+	    }
+	    // regex and other checks for RFC-3339
+	    if (!/^[0-9]{4}-[01][0-9]-[0-3][0-9]T[0-2][0-9]:[0-6][0-9]:[0-6][0-9](.[0-9]{1,20})?(Z|([+-][0-2][0-9]:[0-5][0-9]))$/.test(dtStr)) {
+	      throw new InvalidDatetimeError("datetime didn't validate via regex");
+	    }
+	    if (dtStr.length > 64) {
+	      throw new InvalidDatetimeError('datetime is too long (64 chars max)');
+	    }
+	    if (dtStr.endsWith('-00:00')) {
+	      throw new InvalidDatetimeError('datetime can not use "-00:00" for UTC timezone');
+	    }
+	    if (dtStr.startsWith('000')) {
+	      throw new InvalidDatetimeError('datetime so close to year zero not allowed');
+	    }
+	  };
+	  exports.ensureValidDatetime = ensureValidDatetime;
+	  /* Same logic as ensureValidDatetime(), but returns a boolean instead of throwing an exception.
+	   */
+	  const isValidDatetime = dtStr => {
+	    try {
+	      (0, exports.ensureValidDatetime)(dtStr);
+	    } catch (err) {
+	      if (err instanceof InvalidDatetimeError) {
+	        return false;
+	      }
+	      throw err;
+	    }
+	    return true;
+	  };
+	  exports.isValidDatetime = isValidDatetime;
+	  /* Takes a flexible datetime string and normalizes representation.
+	   *
+	   * This function will work with any valid atproto datetime (eg, anything which isValidDatetime() is true for). It *additionally* is more flexible about accepting datetimes that don't comply to RFC 3339, or are missing timezone information, and normalizing them to a valid datetime.
+	   *
+	   * One use-case is a consistent, sortable string. Another is to work with older invalid createdAt datetimes.
+	   *
+	   * Successful output will be a valid atproto datetime with millisecond precision (3 sub-second digits) and UTC timezone with trailing 'Z' syntax. Throws `InvalidDatetimeError` if the input string could not be parsed as a datetime, even with permissive parsing.
+	   *
+	   * Expected output format: YYYY-MM-DDTHH:mm:ss.sssZ
+	   */
+	  const normalizeDatetime = dtStr => {
+	    if ((0, exports.isValidDatetime)(dtStr)) {
+	      const outStr = new Date(dtStr).toISOString();
+	      if ((0, exports.isValidDatetime)(outStr)) {
+	        return outStr;
+	      }
+	    }
+	    // check if this permissive datetime is missing a timezone
+	    if (!/.*(([+-]\d\d:?\d\d)|[a-zA-Z])$/.test(dtStr)) {
+	      const date = new Date(dtStr + 'Z');
+	      if (!isNaN(date.getTime())) {
+	        const tzStr = date.toISOString();
+	        if ((0, exports.isValidDatetime)(tzStr)) {
+	          return tzStr;
+	        }
+	      }
+	    }
+	    // finally try parsing as simple datetime
+	    const date = new Date(dtStr);
+	    if (isNaN(date.getTime())) {
+	      throw new InvalidDatetimeError('datetime did not parse as any timestamp format');
+	    }
+	    const isoStr = date.toISOString();
+	    if ((0, exports.isValidDatetime)(isoStr)) {
+	      return isoStr;
+	    } else {
+	      throw new InvalidDatetimeError('datetime normalized to invalid timestamp string');
+	    }
+	  };
+	  exports.normalizeDatetime = normalizeDatetime;
+	  /* Variant of normalizeDatetime() which always returns a valid datetime strings.
+	   *
+	   * If a InvalidDatetimeError is encountered, returns the UNIX epoch time as a UTC datetime (1970-01-01T00:00:00.000Z).
+	   */
+	  const normalizeDatetimeAlways = dtStr => {
+	    try {
+	      return (0, exports.normalizeDatetime)(dtStr);
+	    } catch (err) {
+	      if (err instanceof InvalidDatetimeError) {
+	        return new Date(0).toISOString();
+	      }
+	      throw err;
+	    }
+	  };
+	  exports.normalizeDatetimeAlways = normalizeDatetimeAlways;
+	  /* Indicates a datetime string did not pass full atproto Lexicon datetime string format checks.
+	   */
+	  class InvalidDatetimeError extends Error {}
+	  exports.InvalidDatetimeError = InvalidDatetimeError;
+	})(datetime$1);
+
+	(function (exports) {
+
+	  var __createBinding = commonjsGlobal && commonjsGlobal.__createBinding || (Object.create ? function (o, m, k, k2) {
+	    if (k2 === undefined) k2 = k;
+	    var desc = Object.getOwnPropertyDescriptor(m, k);
+	    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+	      desc = {
+	        enumerable: true,
+	        get: function () {
+	          return m[k];
+	        }
+	      };
+	    }
+	    Object.defineProperty(o, k2, desc);
+	  } : function (o, m, k, k2) {
+	    if (k2 === undefined) k2 = k;
+	    o[k2] = m[k];
+	  });
+	  var __exportStar = commonjsGlobal && commonjsGlobal.__exportStar || function (m, exports) {
+	    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+	  };
+	  Object.defineProperty(exports, "__esModule", {
+	    value: true
+	  });
+	  __exportStar(handle$1, exports);
+	  __exportStar(did$1, exports);
+	  __exportStar(nsid$1, exports);
+	  __exportStar(aturi, exports);
+	  __exportStar(tid$2, exports);
+	  __exportStar(recordkey, exports);
+	  __exportStar(datetime$1, exports);
+	})(dist$3);
+
 	var util$6 = {};
+
+	Object.defineProperty(util$6, "__esModule", {
+	  value: true
+	});
+	util$6.requiredPropertiesRefinement = util$6.toConcreteTypes = util$6.toLexUri = void 0;
+	const zod_1 = lib$1;
+	function toLexUri(str, baseUri) {
+	  if (str.split('#').length > 2) {
+	    throw new Error('Uri can only have one hash segment');
+	  }
+	  if (str.startsWith('lex:')) {
+	    return str;
+	  }
+	  if (str.startsWith('#')) {
+	    if (!baseUri) {
+	      throw new Error(`Unable to resolve uri without anchor: ${str}`);
+	    }
+	    return `${baseUri}${str}`;
+	  }
+	  return `lex:${str}`;
+	}
+	util$6.toLexUri = toLexUri;
+	function toConcreteTypes(lexicons, def) {
+	  if (def.type === 'ref') {
+	    return [lexicons.getDefOrThrow(def.ref)];
+	  } else if (def.type === 'union') {
+	    return def.refs.map(ref => lexicons.getDefOrThrow(ref)).flat();
+	  } else {
+	    return [def];
+	  }
+	}
+	util$6.toConcreteTypes = toConcreteTypes;
+	function requiredPropertiesRefinement(object, ctx) {
+	  // Required fields check
+	  if (object.required === undefined) {
+	    return;
+	  }
+	  if (!Array.isArray(object.required)) {
+	    ctx.addIssue({
+	      code: zod_1.z.ZodIssueCode.invalid_type,
+	      received: typeof object.required,
+	      expected: 'array'
+	    });
+	    return;
+	  }
+	  if (object.properties === undefined) {
+	    if (object.required.length > 0) {
+	      ctx.addIssue({
+	        code: zod_1.z.ZodIssueCode.custom,
+	        message: `Required fields defined but no properties defined`
+	      });
+	    }
+	    return;
+	  }
+	  for (const field of object.required) {
+	    if (object.properties[field] === undefined) {
+	      ctx.addIssue({
+	        code: zod_1.z.ZodIssueCode.custom,
+	        message: `Required field "${field}" not defined`
+	      });
+	    }
+	  }
+	}
+	util$6.requiredPropertiesRefinement = requiredPropertiesRefinement;
+
+	(function (exports) {
+
+	  Object.defineProperty(exports, "__esModule", {
+	    value: true
+	  });
+	  exports.LexiconDefNotFoundError = exports.InvalidLexiconError = exports.ValidationError = exports.parseLexiconDoc = exports.isDiscriminatedObject = exports.discriminatedObject = exports.hasProp = exports.isObj = exports.isValidLexiconDoc = exports.lexiconDoc = exports.lexUserType = exports.lexRecord = exports.lexXrpcSubscription = exports.lexXrpcProcedure = exports.lexXrpcQuery = exports.lexXrpcError = exports.lexXrpcSubscriptionMessage = exports.lexXrpcBody = exports.lexXrpcParameters = exports.lexObject = exports.lexToken = exports.lexPrimitiveArray = exports.lexArray = exports.lexBlob = exports.lexRefVariant = exports.lexRefUnion = exports.lexRef = exports.lexIpldType = exports.lexCidLink = exports.lexBytes = exports.lexPrimitive = exports.lexUnknown = exports.lexString = exports.lexStringFormat = exports.lexInteger = exports.lexBoolean = void 0;
+	  const zod_1 = lib$1;
+	  const syntax_1 = dist$3;
+	  const util_1 = util$6;
+	  // primitives
+	  // =
+	  exports.lexBoolean = zod_1.z.object({
+	    type: zod_1.z.literal('boolean'),
+	    description: zod_1.z.string().optional(),
+	    default: zod_1.z.boolean().optional(),
+	    const: zod_1.z.boolean().optional()
+	  }).strict();
+	  exports.lexInteger = zod_1.z.object({
+	    type: zod_1.z.literal('integer'),
+	    description: zod_1.z.string().optional(),
+	    default: zod_1.z.number().int().optional(),
+	    minimum: zod_1.z.number().int().optional(),
+	    maximum: zod_1.z.number().int().optional(),
+	    enum: zod_1.z.number().int().array().optional(),
+	    const: zod_1.z.number().int().optional()
+	  }).strict();
+	  exports.lexStringFormat = zod_1.z.enum(['datetime', 'uri', 'at-uri', 'did', 'handle', 'at-identifier', 'nsid', 'cid', 'language', 'tid', 'record-key']);
+	  exports.lexString = zod_1.z.object({
+	    type: zod_1.z.literal('string'),
+	    format: exports.lexStringFormat.optional(),
+	    description: zod_1.z.string().optional(),
+	    default: zod_1.z.string().optional(),
+	    minLength: zod_1.z.number().int().optional(),
+	    maxLength: zod_1.z.number().int().optional(),
+	    minGraphemes: zod_1.z.number().int().optional(),
+	    maxGraphemes: zod_1.z.number().int().optional(),
+	    enum: zod_1.z.string().array().optional(),
+	    const: zod_1.z.string().optional(),
+	    knownValues: zod_1.z.string().array().optional()
+	  }).strict();
+	  exports.lexUnknown = zod_1.z.object({
+	    type: zod_1.z.literal('unknown'),
+	    description: zod_1.z.string().optional()
+	  }).strict();
+	  exports.lexPrimitive = zod_1.z.discriminatedUnion('type', [exports.lexBoolean, exports.lexInteger, exports.lexString, exports.lexUnknown]);
+	  // ipld types
+	  // =
+	  exports.lexBytes = zod_1.z.object({
+	    type: zod_1.z.literal('bytes'),
+	    description: zod_1.z.string().optional(),
+	    maxLength: zod_1.z.number().optional(),
+	    minLength: zod_1.z.number().optional()
+	  }).strict();
+	  exports.lexCidLink = zod_1.z.object({
+	    type: zod_1.z.literal('cid-link'),
+	    description: zod_1.z.string().optional()
+	  }).strict();
+	  exports.lexIpldType = zod_1.z.discriminatedUnion('type', [exports.lexBytes, exports.lexCidLink]);
+	  // references
+	  // =
+	  exports.lexRef = zod_1.z.object({
+	    type: zod_1.z.literal('ref'),
+	    description: zod_1.z.string().optional(),
+	    ref: zod_1.z.string()
+	  }).strict();
+	  exports.lexRefUnion = zod_1.z.object({
+	    type: zod_1.z.literal('union'),
+	    description: zod_1.z.string().optional(),
+	    refs: zod_1.z.string().array(),
+	    closed: zod_1.z.boolean().optional()
+	  }).strict();
+	  exports.lexRefVariant = zod_1.z.discriminatedUnion('type', [exports.lexRef, exports.lexRefUnion]);
+	  // blobs
+	  // =
+	  exports.lexBlob = zod_1.z.object({
+	    type: zod_1.z.literal('blob'),
+	    description: zod_1.z.string().optional(),
+	    accept: zod_1.z.string().array().optional(),
+	    maxSize: zod_1.z.number().optional()
+	  }).strict();
+	  // complex types
+	  // =
+	  exports.lexArray = zod_1.z.object({
+	    type: zod_1.z.literal('array'),
+	    description: zod_1.z.string().optional(),
+	    items: zod_1.z.union([exports.lexPrimitive, exports.lexIpldType, exports.lexBlob, exports.lexRefVariant]),
+	    minLength: zod_1.z.number().int().optional(),
+	    maxLength: zod_1.z.number().int().optional()
+	  }).strict();
+	  exports.lexPrimitiveArray = exports.lexArray.merge(zod_1.z.object({
+	    items: exports.lexPrimitive
+	  }).strict());
+	  exports.lexToken = zod_1.z.object({
+	    type: zod_1.z.literal('token'),
+	    description: zod_1.z.string().optional()
+	  }).strict();
+	  exports.lexObject = zod_1.z.object({
+	    type: zod_1.z.literal('object'),
+	    description: zod_1.z.string().optional(),
+	    required: zod_1.z.string().array().optional(),
+	    nullable: zod_1.z.string().array().optional(),
+	    properties: zod_1.z.record(zod_1.z.union([exports.lexRefVariant, exports.lexIpldType, exports.lexArray, exports.lexBlob, exports.lexPrimitive]))
+	  }).strict().superRefine(util_1.requiredPropertiesRefinement);
+	  // xrpc
+	  // =
+	  exports.lexXrpcParameters = zod_1.z.object({
+	    type: zod_1.z.literal('params'),
+	    description: zod_1.z.string().optional(),
+	    required: zod_1.z.string().array().optional(),
+	    properties: zod_1.z.record(zod_1.z.union([exports.lexPrimitive, exports.lexPrimitiveArray]))
+	  }).strict().superRefine(util_1.requiredPropertiesRefinement);
+	  exports.lexXrpcBody = zod_1.z.object({
+	    description: zod_1.z.string().optional(),
+	    encoding: zod_1.z.string(),
+	    schema: zod_1.z.union([exports.lexRefVariant, exports.lexObject]).optional()
+	  }).strict();
+	  exports.lexXrpcSubscriptionMessage = zod_1.z.object({
+	    description: zod_1.z.string().optional(),
+	    schema: zod_1.z.union([exports.lexRefVariant, exports.lexObject]).optional()
+	  }).strict();
+	  exports.lexXrpcError = zod_1.z.object({
+	    name: zod_1.z.string(),
+	    description: zod_1.z.string().optional()
+	  }).strict();
+	  exports.lexXrpcQuery = zod_1.z.object({
+	    type: zod_1.z.literal('query'),
+	    description: zod_1.z.string().optional(),
+	    parameters: exports.lexXrpcParameters.optional(),
+	    output: exports.lexXrpcBody.optional(),
+	    errors: exports.lexXrpcError.array().optional()
+	  }).strict();
+	  exports.lexXrpcProcedure = zod_1.z.object({
+	    type: zod_1.z.literal('procedure'),
+	    description: zod_1.z.string().optional(),
+	    parameters: exports.lexXrpcParameters.optional(),
+	    input: exports.lexXrpcBody.optional(),
+	    output: exports.lexXrpcBody.optional(),
+	    errors: exports.lexXrpcError.array().optional()
+	  }).strict();
+	  exports.lexXrpcSubscription = zod_1.z.object({
+	    type: zod_1.z.literal('subscription'),
+	    description: zod_1.z.string().optional(),
+	    parameters: exports.lexXrpcParameters.optional(),
+	    message: exports.lexXrpcSubscriptionMessage.optional(),
+	    errors: exports.lexXrpcError.array().optional()
+	  }).strict();
+	  // database
+	  // =
+	  exports.lexRecord = zod_1.z.object({
+	    type: zod_1.z.literal('record'),
+	    description: zod_1.z.string().optional(),
+	    key: zod_1.z.string().optional(),
+	    record: exports.lexObject
+	  }).strict();
+	  // core
+	  // =
+	  // We need to use `z.custom` here because
+	  // lexXrpcProperty and lexObject are refined
+	  // `z.union` would work, but it's too slow
+	  // see #915 for details
+	  exports.lexUserType = zod_1.z.custom(val => {
+	    if (!val || typeof val !== 'object') {
+	      return;
+	    }
+	    if (val['type'] === undefined) {
+	      return;
+	    }
+	    switch (val['type']) {
+	      case 'record':
+	        return exports.lexRecord.parse(val);
+	      case 'query':
+	        return exports.lexXrpcQuery.parse(val);
+	      case 'procedure':
+	        return exports.lexXrpcProcedure.parse(val);
+	      case 'subscription':
+	        return exports.lexXrpcSubscription.parse(val);
+	      case 'blob':
+	        return exports.lexBlob.parse(val);
+	      case 'array':
+	        return exports.lexArray.parse(val);
+	      case 'token':
+	        return exports.lexToken.parse(val);
+	      case 'object':
+	        return exports.lexObject.parse(val);
+	      case 'boolean':
+	        return exports.lexBoolean.parse(val);
+	      case 'integer':
+	        return exports.lexInteger.parse(val);
+	      case 'string':
+	        return exports.lexString.parse(val);
+	      case 'bytes':
+	        return exports.lexBytes.parse(val);
+	      case 'cid-link':
+	        return exports.lexCidLink.parse(val);
+	      case 'unknown':
+	        return exports.lexUnknown.parse(val);
+	    }
+	  }, val => {
+	    if (!val || typeof val !== 'object') {
+	      return {
+	        message: 'Must be an object',
+	        fatal: true
+	      };
+	    }
+	    if (val['type'] === undefined) {
+	      return {
+	        message: 'Must have a type',
+	        fatal: true
+	      };
+	    }
+	    return {
+	      message: `Invalid type: ${val['type']} must be one of: record, query, procedure, subscription, blob, array, token, object, boolean, integer, string, bytes, cid-link, unknown`,
+	      fatal: true
+	    };
+	  });
+	  exports.lexiconDoc = zod_1.z.object({
+	    lexicon: zod_1.z.literal(1),
+	    id: zod_1.z.string().refine(v => syntax_1.NSID.isValid(v), {
+	      message: 'Must be a valid NSID'
+	    }),
+	    revision: zod_1.z.number().optional(),
+	    description: zod_1.z.string().optional(),
+	    defs: zod_1.z.record(exports.lexUserType)
+	  }).strict().superRefine((doc, ctx) => {
+	    for (const defId in doc.defs) {
+	      const def = doc.defs[defId];
+	      if (defId !== 'main' && (def.type === 'record' || def.type === 'procedure' || def.type === 'query' || def.type === 'subscription')) {
+	        ctx.addIssue({
+	          code: zod_1.z.ZodIssueCode.custom,
+	          message: `Records, procedures, queries, and subscriptions must be the main definition.`
+	        });
+	      }
+	    }
+	  });
+	  // helpers
+	  // =
+	  function isValidLexiconDoc(v) {
+	    return exports.lexiconDoc.safeParse(v).success;
+	  }
+	  exports.isValidLexiconDoc = isValidLexiconDoc;
+	  function isObj(obj) {
+	    return obj !== null && typeof obj === 'object';
+	  }
+	  exports.isObj = isObj;
+	  function hasProp(data, prop) {
+	    return prop in data;
+	  }
+	  exports.hasProp = hasProp;
+	  exports.discriminatedObject = zod_1.z.object({
+	    $type: zod_1.z.string()
+	  });
+	  function isDiscriminatedObject(value) {
+	    return exports.discriminatedObject.safeParse(value).success;
+	  }
+	  exports.isDiscriminatedObject = isDiscriminatedObject;
+	  function parseLexiconDoc(v) {
+	    exports.lexiconDoc.parse(v);
+	    return v;
+	  }
+	  exports.parseLexiconDoc = parseLexiconDoc;
+	  class ValidationError extends Error {}
+	  exports.ValidationError = ValidationError;
+	  class InvalidLexiconError extends Error {}
+	  exports.InvalidLexiconError = InvalidLexiconError;
+	  class LexiconDefNotFoundError extends Error {}
+	  exports.LexiconDefNotFoundError = LexiconDefNotFoundError;
+	})(types$5);
+
+	var lexicons$1 = {};
+
+	var validation = {};
 
 	var complex = {};
 
-	var primitives = {};
+	var blob$1 = {};
+
+	var blobRefs = {};
 
 	var dist$2 = {};
 
@@ -5533,13 +5871,13 @@
 	  };
 	})(async);
 
-	var tid = {};
+	var tid$1 = {};
 
-	Object.defineProperty(tid, "__esModule", {
+	Object.defineProperty(tid$1, "__esModule", {
 	  value: true
 	});
-	tid.TID = void 0;
-	const util_1$V = util$5;
+	tid$1.TID = void 0;
+	const util_1$W = util$5;
 	const TID_LEN = 13;
 	let lastTimestamp = 0;
 	let timestampCount = 0;
@@ -5587,7 +5925,7 @@
 	  }
 	  static fromTime(timestamp, clockid) {
 	    // base32 encode with encoding variant sort (s32)
-	    const str = `${(0, util_1$V.s32encode)(timestamp)}${(0, util_1$V.s32encode)(clockid).padStart(2, '2')}`;
+	    const str = `${(0, util_1$W.s32encode)(timestamp)}${(0, util_1$W.s32encode)(clockid).padStart(2, '2')}`;
 	    return new TID(str);
 	  }
 	  static fromStr(str) {
@@ -5603,10 +5941,10 @@
 	    return dedash(str).length === TID_LEN;
 	  }
 	  timestamp() {
-	    return (0, util_1$V.s32decode)(this.str.slice(0, 11));
+	    return (0, util_1$W.s32decode)(this.str.slice(0, 11));
 	  }
 	  clockid() {
-	    return (0, util_1$V.s32decode)(this.str.slice(11, 13));
+	    return (0, util_1$W.s32decode)(this.str.slice(11, 13));
 	  }
 	  formatted() {
 	    const str = this.toString();
@@ -5631,36 +5969,36 @@
 	    return this.compareTo(other) < 0;
 	  }
 	}
-	tid.TID = TID;
-	tid.default = TID;
+	tid$1.TID = TID;
+	tid$1.default = TID;
 
 	var ipld = {};
 
-	var encode_1$3 = encode$8;
-	var MSB$4 = 128,
-	  REST$4 = 127,
-	  MSBALL$3 = ~REST$4,
-	  INT$3 = Math.pow(2, 31);
-	function encode$8(num, out, offset) {
+	var encode_1$1 = encode$3;
+	var MSB$2 = 128,
+	  REST$2 = 127,
+	  MSBALL$1 = ~REST$2,
+	  INT$1 = Math.pow(2, 31);
+	function encode$3(num, out, offset) {
 	  out = out || [];
 	  offset = offset || 0;
 	  var oldOffset = offset;
-	  while (num >= INT$3) {
-	    out[offset++] = num & 255 | MSB$4;
+	  while (num >= INT$1) {
+	    out[offset++] = num & 255 | MSB$2;
 	    num /= 128;
 	  }
-	  while (num & MSBALL$3) {
-	    out[offset++] = num & 255 | MSB$4;
+	  while (num & MSBALL$1) {
+	    out[offset++] = num & 255 | MSB$2;
 	    num >>>= 7;
 	  }
 	  out[offset] = num | 0;
-	  encode$8.bytes = offset - oldOffset + 1;
+	  encode$3.bytes = offset - oldOffset + 1;
 	  return out;
 	}
-	var decode$h = read$4;
-	var MSB$1$3 = 128,
-	  REST$1$3 = 127;
-	function read$4(buf, offset) {
+	var decode$8 = read$2;
+	var MSB$1$1 = 128,
+	  REST$1$1 = 127;
+	function read$2(buf, offset) {
 	  var res = 0,
 	    offset = offset || 0,
 	    shift = 0,
@@ -5669,48 +6007,48 @@
 	    l = buf.length;
 	  do {
 	    if (counter >= l) {
-	      read$4.bytes = 0;
+	      read$2.bytes = 0;
 	      throw new RangeError('Could not decode varint');
 	    }
 	    b = buf[counter++];
-	    res += shift < 28 ? (b & REST$1$3) << shift : (b & REST$1$3) * Math.pow(2, shift);
+	    res += shift < 28 ? (b & REST$1$1) << shift : (b & REST$1$1) * Math.pow(2, shift);
 	    shift += 7;
-	  } while (b >= MSB$1$3);
-	  read$4.bytes = counter - offset;
+	  } while (b >= MSB$1$1);
+	  read$2.bytes = counter - offset;
 	  return res;
 	}
-	var N1$3 = Math.pow(2, 7);
-	var N2$3 = Math.pow(2, 14);
-	var N3$3 = Math.pow(2, 21);
-	var N4$3 = Math.pow(2, 28);
-	var N5$3 = Math.pow(2, 35);
-	var N6$3 = Math.pow(2, 42);
-	var N7$3 = Math.pow(2, 49);
-	var N8$3 = Math.pow(2, 56);
-	var N9$3 = Math.pow(2, 63);
-	var length$3 = function (value) {
-	  return value < N1$3 ? 1 : value < N2$3 ? 2 : value < N3$3 ? 3 : value < N4$3 ? 4 : value < N5$3 ? 5 : value < N6$3 ? 6 : value < N7$3 ? 7 : value < N8$3 ? 8 : value < N9$3 ? 9 : 10;
+	var N1$1 = Math.pow(2, 7);
+	var N2$1 = Math.pow(2, 14);
+	var N3$1 = Math.pow(2, 21);
+	var N4$1 = Math.pow(2, 28);
+	var N5$1 = Math.pow(2, 35);
+	var N6$1 = Math.pow(2, 42);
+	var N7$1 = Math.pow(2, 49);
+	var N8$1 = Math.pow(2, 56);
+	var N9$1 = Math.pow(2, 63);
+	var length$1 = function (value) {
+	  return value < N1$1 ? 1 : value < N2$1 ? 2 : value < N3$1 ? 3 : value < N4$1 ? 4 : value < N5$1 ? 5 : value < N6$1 ? 6 : value < N7$1 ? 7 : value < N8$1 ? 8 : value < N9$1 ? 9 : 10;
 	};
-	var varint$4 = {
-	  encode: encode_1$3,
-	  decode: decode$h,
-	  encodingLength: length$3
+	var varint$2 = {
+	  encode: encode_1$1,
+	  decode: decode$8,
+	  encodingLength: length$1
 	};
-	var _brrp_varint$2 = varint$4;
+	var _brrp_varint = varint$2;
 
-	const decode$g = (data, offset = 0) => {
-	  const code = _brrp_varint$2.decode(data, offset);
-	  return [code, _brrp_varint$2.decode.bytes];
+	const decode$7 = (data, offset = 0) => {
+	  const code = _brrp_varint.decode(data, offset);
+	  return [code, _brrp_varint.decode.bytes];
 	};
-	const encodeTo$2 = (int, target, offset = 0) => {
-	  _brrp_varint$2.encode(int, target, offset);
+	const encodeTo = (int, target, offset = 0) => {
+	  _brrp_varint.encode(int, target, offset);
 	  return target;
 	};
-	const encodingLength$2 = int => {
-	  return _brrp_varint$2.encodingLength(int);
+	const encodingLength = int => {
+	  return _brrp_varint.encodingLength(int);
 	};
 
-	const equals$6 = (aa, bb) => {
+	const equals$2 = (aa, bb) => {
 	  if (aa === bb) return true;
 	  if (aa.byteLength !== bb.byteLength) {
 	    return false;
@@ -5722,7 +6060,7 @@
 	  }
 	  return true;
 	};
-	const coerce$3 = o => {
+	const coerce = o => {
 	  if (o instanceof Uint8Array && o.constructor.name === 'Uint8Array') return o;
 	  if (o instanceof ArrayBuffer) return new Uint8Array(o);
 	  if (ArrayBuffer.isView(o)) {
@@ -5730,44 +6068,46 @@
 	  }
 	  throw new Error('Unknown type, must be binary type');
 	};
+	const fromString$2 = str => new TextEncoder().encode(str);
+	const toString$3 = b => new TextDecoder().decode(b);
 
-	const create$2 = (code, digest) => {
+	const create = (code, digest) => {
 	  const size = digest.byteLength;
-	  const sizeOffset = encodingLength$2(code);
-	  const digestOffset = sizeOffset + encodingLength$2(size);
+	  const sizeOffset = encodingLength(code);
+	  const digestOffset = sizeOffset + encodingLength(size);
 	  const bytes = new Uint8Array(digestOffset + size);
-	  encodeTo$2(code, bytes, 0);
-	  encodeTo$2(size, bytes, sizeOffset);
+	  encodeTo(code, bytes, 0);
+	  encodeTo(size, bytes, sizeOffset);
 	  bytes.set(digest, digestOffset);
-	  return new Digest$2(code, size, digest, bytes);
+	  return new Digest(code, size, digest, bytes);
 	};
-	const decode$f = multihash => {
-	  const bytes = coerce$3(multihash);
-	  const [code, sizeOffset] = decode$g(bytes);
-	  const [size, digestOffset] = decode$g(bytes.subarray(sizeOffset));
+	const decode$6 = multihash => {
+	  const bytes = coerce(multihash);
+	  const [code, sizeOffset] = decode$7(bytes);
+	  const [size, digestOffset] = decode$7(bytes.subarray(sizeOffset));
 	  const digest = bytes.subarray(sizeOffset + digestOffset);
 	  if (digest.byteLength !== size) {
 	    throw new Error('Incorrect length');
 	  }
-	  return new Digest$2(code, size, digest, bytes);
+	  return new Digest(code, size, digest, bytes);
 	};
-	const equals$5 = (a, b) => {
+	const equals$1 = (a, b) => {
 	  if (a === b) {
 	    return true;
 	  } else {
-	    return a.code === b.code && a.size === b.size && equals$6(a.bytes, b.bytes);
+	    return a.code === b.code && a.size === b.size && equals$2(a.bytes, b.bytes);
 	  }
 	};
-	let Digest$2 = class Digest {
+	class Digest {
 	  constructor(code, size, digest, bytes) {
 	    this.code = code;
 	    this.size = size;
 	    this.digest = digest;
 	    this.bytes = bytes;
 	  }
-	};
+	}
 
-	function base$3(ALPHABET, name) {
+	function base(ALPHABET, name) {
 	  if (ALPHABET.length >= 255) {
 	    throw new TypeError('Alphabet too long');
 	  }
@@ -5896,10 +6236,10 @@
 	    decode: decode
 	  };
 	}
-	var src$5 = base$3;
-	var _brrp__multiformats_scope_baseX$3 = src$5;
+	var src$2 = base;
+	var _brrp__multiformats_scope_baseX = src$2;
 
-	let Encoder$4 = class Encoder {
+	let Encoder$1 = class Encoder {
 	  constructor(name, prefix, baseEncode) {
 	    this.name = name;
 	    this.prefix = prefix;
@@ -5913,7 +6253,7 @@
 	    }
 	  }
 	};
-	let Decoder$4 = class Decoder {
+	let Decoder$1 = class Decoder {
 	  constructor(name, prefix, baseDecode) {
 	    this.name = name;
 	    this.prefix = prefix;
@@ -5934,15 +6274,15 @@
 	    }
 	  }
 	  or(decoder) {
-	    return or$3(this, decoder);
+	    return or(this, decoder);
 	  }
 	};
-	let ComposedDecoder$3 = class ComposedDecoder {
+	class ComposedDecoder {
 	  constructor(decoders) {
 	    this.decoders = decoders;
 	  }
 	  or(decoder) {
-	    return or$3(this, decoder);
+	    return or(this, decoder);
 	  }
 	  decode(input) {
 	    const prefix = input[0];
@@ -5953,8 +6293,8 @@
 	      throw RangeError(`Unable to decode multibase string ${JSON.stringify(input)}, only inputs prefixed with ${Object.keys(this.decoders)} are supported`);
 	    }
 	  }
-	};
-	const or$3 = (left, right) => new ComposedDecoder$3({
+	}
+	const or = (left, right) => new ComposedDecoder({
 	  ...(left.decoders || {
 	    [left.prefix]: left
 	  }),
@@ -5962,14 +6302,14 @@
 	    [right.prefix]: right
 	  })
 	});
-	let Codec$3 = class Codec {
+	class Codec {
 	  constructor(name, prefix, baseEncode, baseDecode) {
 	    this.name = name;
 	    this.prefix = prefix;
 	    this.baseEncode = baseEncode;
 	    this.baseDecode = baseDecode;
-	    this.encoder = new Encoder$4(name, prefix, baseEncode);
-	    this.decoder = new Decoder$4(name, prefix, baseDecode);
+	    this.encoder = new Encoder$1(name, prefix, baseEncode);
+	    this.decoder = new Decoder$1(name, prefix, baseDecode);
 	  }
 	  encode(input) {
 	    return this.encoder.encode(input);
@@ -5977,14 +6317,14 @@
 	  decode(input) {
 	    return this.decoder.decode(input);
 	  }
-	};
-	const from$3 = ({
+	}
+	const from = ({
 	  name,
 	  prefix,
 	  encode,
 	  decode
-	}) => new Codec$3(name, prefix, encode, decode);
-	const baseX$3 = ({
+	}) => new Codec(name, prefix, encode, decode);
+	const baseX = ({
 	  prefix,
 	  name,
 	  alphabet
@@ -5992,15 +6332,15 @@
 	  const {
 	    encode,
 	    decode
-	  } = _brrp__multiformats_scope_baseX$3(alphabet, name);
-	  return from$3({
+	  } = _brrp__multiformats_scope_baseX(alphabet, name);
+	  return from({
 	    prefix,
 	    name,
 	    encode,
-	    decode: text => coerce$3(decode(text))
+	    decode: text => coerce(decode(text))
 	  });
 	};
-	const decode$e = (string, alphabet, bitsPerChar, name) => {
+	const decode$5 = (string, alphabet, bitsPerChar, name) => {
 	  const codes = {};
 	  for (let i = 0; i < alphabet.length; ++i) {
 	    codes[alphabet[i]] = i;
@@ -6030,7 +6370,7 @@
 	  }
 	  return out;
 	};
-	const encode$7 = (data, alphabet, bitsPerChar) => {
+	const encode$2 = (data, alphabet, bitsPerChar) => {
 	  const pad = alphabet[alphabet.length - 1] === '=';
 	  const mask = (1 << bitsPerChar) - 1;
 	  let out = '';
@@ -6054,91 +6394,110 @@
 	  }
 	  return out;
 	};
-	const rfc4648$3 = ({
+	const rfc4648 = ({
 	  name,
 	  prefix,
 	  bitsPerChar,
 	  alphabet
 	}) => {
-	  return from$3({
+	  return from({
 	    prefix,
 	    name,
 	    encode(input) {
-	      return encode$7(input, alphabet, bitsPerChar);
+	      return encode$2(input, alphabet, bitsPerChar);
 	    },
 	    decode(input) {
-	      return decode$e(input, alphabet, bitsPerChar, name);
+	      return decode$5(input, alphabet, bitsPerChar, name);
 	    }
 	  });
 	};
 
-	const base58btc$3 = baseX$3({
+	const base58btc = baseX({
 	  name: 'base58btc',
 	  prefix: 'z',
 	  alphabet: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 	});
-	baseX$3({
+	const base58flickr = baseX({
 	  name: 'base58flickr',
 	  prefix: 'Z',
 	  alphabet: '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
 	});
 
-	const base32$4 = rfc4648$3({
+	var base58 = /*#__PURE__*/Object.freeze({
+		__proto__: null,
+		base58btc: base58btc,
+		base58flickr: base58flickr
+	});
+
+	const base32 = rfc4648({
 	  prefix: 'b',
 	  name: 'base32',
 	  alphabet: 'abcdefghijklmnopqrstuvwxyz234567',
 	  bitsPerChar: 5
 	});
-	rfc4648$3({
+	const base32upper = rfc4648({
 	  prefix: 'B',
 	  name: 'base32upper',
 	  alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567',
 	  bitsPerChar: 5
 	});
-	rfc4648$3({
+	const base32pad = rfc4648({
 	  prefix: 'c',
 	  name: 'base32pad',
 	  alphabet: 'abcdefghijklmnopqrstuvwxyz234567=',
 	  bitsPerChar: 5
 	});
-	rfc4648$3({
+	const base32padupper = rfc4648({
 	  prefix: 'C',
 	  name: 'base32padupper',
 	  alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567=',
 	  bitsPerChar: 5
 	});
-	rfc4648$3({
+	const base32hex = rfc4648({
 	  prefix: 'v',
 	  name: 'base32hex',
 	  alphabet: '0123456789abcdefghijklmnopqrstuv',
 	  bitsPerChar: 5
 	});
-	rfc4648$3({
+	const base32hexupper = rfc4648({
 	  prefix: 'V',
 	  name: 'base32hexupper',
 	  alphabet: '0123456789ABCDEFGHIJKLMNOPQRSTUV',
 	  bitsPerChar: 5
 	});
-	rfc4648$3({
+	const base32hexpad = rfc4648({
 	  prefix: 't',
 	  name: 'base32hexpad',
 	  alphabet: '0123456789abcdefghijklmnopqrstuv=',
 	  bitsPerChar: 5
 	});
-	rfc4648$3({
+	const base32hexpadupper = rfc4648({
 	  prefix: 'T',
 	  name: 'base32hexpadupper',
 	  alphabet: '0123456789ABCDEFGHIJKLMNOPQRSTUV=',
 	  bitsPerChar: 5
 	});
-	rfc4648$3({
+	const base32z = rfc4648({
 	  prefix: 'h',
 	  name: 'base32z',
 	  alphabet: 'ybndrfg8ejkmcpqxot1uwisza345h769',
 	  bitsPerChar: 5
 	});
 
-	let CID$2 = class CID {
+	var base32$1 = /*#__PURE__*/Object.freeze({
+		__proto__: null,
+		base32: base32,
+		base32hex: base32hex,
+		base32hexpad: base32hexpad,
+		base32hexpadupper: base32hexpadupper,
+		base32hexupper: base32hexupper,
+		base32pad: base32pad,
+		base32padupper: base32padupper,
+		base32upper: base32upper,
+		base32z: base32z
+	});
+
+	class CID {
 	  constructor(version, code, multihash, bytes) {
 	    this.code = code;
 	    this.version = version;
@@ -6149,14 +6508,14 @@
 	    this.asCID = this;
 	    this._baseCache = new Map();
 	    Object.defineProperties(this, {
-	      byteOffset: hidden$1,
-	      byteLength: hidden$1,
-	      code: readonly$1,
-	      version: readonly$1,
-	      multihash: readonly$1,
-	      bytes: readonly$1,
-	      _baseCache: hidden$1,
-	      asCID: hidden$1
+	      byteOffset: hidden,
+	      byteLength: hidden,
+	      code: readonly,
+	      version: readonly,
+	      multihash: readonly,
+	      bytes: readonly,
+	      _baseCache: hidden,
+	      asCID: hidden
 	    });
 	  }
 	  toV0() {
@@ -6171,10 +6530,10 @@
 	            code,
 	            multihash
 	          } = this;
-	          if (code !== DAG_PB_CODE$2) {
+	          if (code !== DAG_PB_CODE) {
 	            throw new Error('Cannot convert a non dag-pb CID to CIDv0');
 	          }
-	          if (multihash.code !== SHA_256_CODE$2) {
+	          if (multihash.code !== SHA_256_CODE) {
 	            throw new Error('Cannot convert non sha2-256 multihash CID to CIDv0');
 	          }
 	          return CID.createV0(multihash);
@@ -6189,7 +6548,7 @@
 	            code,
 	            digest
 	          } = this.multihash;
-	          const multihash = create$2(code, digest);
+	          const multihash = create(code, digest);
 	          return CID.createV1(this.code, multihash);
 	        }
 	      case 1:
@@ -6203,7 +6562,7 @@
 	    }
 	  }
 	  equals(other) {
-	    return other && this.code === other.code && this.version === other.version && equals$5(this.multihash, other.multihash);
+	    return other && this.code === other.code && this.version === other.version && equals$1(this.multihash, other.multihash);
 	  }
 	  toString(base) {
 	    const {
@@ -6213,9 +6572,9 @@
 	    } = this;
 	    switch (version) {
 	      case 0:
-	        return toStringV0$2(bytes, _baseCache, base || base58btc$3.encoder);
+	        return toStringV0(bytes, _baseCache, base || base58btc.encoder);
 	      default:
-	        return toStringV1$2(bytes, _baseCache, base || base32$4.encoder);
+	        return toStringV1(bytes, _baseCache, base || base32.encoder);
 	    }
 	  }
 	  toJSON() {
@@ -6232,8 +6591,8 @@
 	    return 'CID(' + this.toString() + ')';
 	  }
 	  static isCID(value) {
-	    deprecate$1(/^0\.0/, IS_CID_DEPRECATION$1);
-	    return !!(value && (value[cidSymbol$2] || value.asCID === value));
+	    deprecate(/^0\.0/, IS_CID_DEPRECATION);
+	    return !!(value && (value[cidSymbol] || value.asCID === value));
 	  }
 	  get toBaseEncodedString() {
 	    throw new Error('Deprecated, use .toString()');
@@ -6260,14 +6619,14 @@
 	        multihash,
 	        bytes
 	      } = value;
-	      return new CID(version, code, multihash, bytes || encodeCID$2(version, code, multihash.bytes));
-	    } else if (value != null && value[cidSymbol$2] === true) {
+	      return new CID(version, code, multihash, bytes || encodeCID(version, code, multihash.bytes));
+	    } else if (value != null && value[cidSymbol] === true) {
 	      const {
 	        version,
 	        multihash,
 	        code
 	      } = value;
-	      const digest = decode$f(multihash);
+	      const digest = decode$6(multihash);
 	      return CID.create(version, code, digest);
 	    } else {
 	      return null;
@@ -6280,15 +6639,15 @@
 	    switch (version) {
 	      case 0:
 	        {
-	          if (code !== DAG_PB_CODE$2) {
-	            throw new Error(`Version 0 CID must use dag-pb (code: ${DAG_PB_CODE$2}) block encoding`);
+	          if (code !== DAG_PB_CODE) {
+	            throw new Error(`Version 0 CID must use dag-pb (code: ${DAG_PB_CODE}) block encoding`);
 	          } else {
 	            return new CID(version, code, digest, digest.bytes);
 	          }
 	        }
 	      case 1:
 	        {
-	          const bytes = encodeCID$2(version, code, digest.bytes);
+	          const bytes = encodeCID(version, code, digest.bytes);
 	          return new CID(version, code, digest, bytes);
 	        }
 	      default:
@@ -6298,7 +6657,7 @@
 	    }
 	  }
 	  static createV0(digest) {
-	    return CID.create(0, DAG_PB_CODE$2, digest);
+	    return CID.create(0, DAG_PB_CODE, digest);
 	  }
 	  static createV1(code, digest) {
 	    return CID.create(1, code, digest);
@@ -6313,24 +6672,24 @@
 	  static decodeFirst(bytes) {
 	    const specs = CID.inspectBytes(bytes);
 	    const prefixSize = specs.size - specs.multihashSize;
-	    const multihashBytes = coerce$3(bytes.subarray(prefixSize, prefixSize + specs.multihashSize));
+	    const multihashBytes = coerce(bytes.subarray(prefixSize, prefixSize + specs.multihashSize));
 	    if (multihashBytes.byteLength !== specs.multihashSize) {
 	      throw new Error('Incorrect length');
 	    }
 	    const digestBytes = multihashBytes.subarray(specs.multihashSize - specs.digestSize);
-	    const digest = new Digest$2(specs.multihashCode, specs.digestSize, digestBytes, multihashBytes);
+	    const digest = new Digest(specs.multihashCode, specs.digestSize, digestBytes, multihashBytes);
 	    const cid = specs.version === 0 ? CID.createV0(digest) : CID.createV1(specs.codec, digest);
 	    return [cid, bytes.subarray(specs.size)];
 	  }
 	  static inspectBytes(initialBytes) {
 	    let offset = 0;
 	    const next = () => {
-	      const [i, length] = decode$g(initialBytes.subarray(offset));
+	      const [i, length] = decode$7(initialBytes.subarray(offset));
 	      offset += length;
 	      return i;
 	    };
 	    let version = next();
-	    let codec = DAG_PB_CODE$2;
+	    let codec = DAG_PB_CODE;
 	    if (version === 18) {
 	      version = 0;
 	      offset = 0;
@@ -6355,28 +6714,28 @@
 	    };
 	  }
 	  static parse(source, base) {
-	    const [prefix, bytes] = parseCIDtoBytes$2(source, base);
+	    const [prefix, bytes] = parseCIDtoBytes(source, base);
 	    const cid = CID.decode(bytes);
 	    cid._baseCache.set(prefix, source);
 	    return cid;
 	  }
-	};
-	const parseCIDtoBytes$2 = (source, base) => {
+	}
+	const parseCIDtoBytes = (source, base) => {
 	  switch (source[0]) {
 	    case 'Q':
 	      {
-	        const decoder = base || base58btc$3;
-	        return [base58btc$3.prefix, decoder.decode(`${base58btc$3.prefix}${source}`)];
+	        const decoder = base || base58btc;
+	        return [base58btc.prefix, decoder.decode(`${base58btc.prefix}${source}`)];
 	      }
-	    case base58btc$3.prefix:
+	    case base58btc.prefix:
 	      {
-	        const decoder = base || base58btc$3;
-	        return [base58btc$3.prefix, decoder.decode(source)];
+	        const decoder = base || base58btc;
+	        return [base58btc.prefix, decoder.decode(source)];
 	      }
-	    case base32$4.prefix:
+	    case base32.prefix:
 	      {
-	        const decoder = base || base32$4;
-	        return [base32$4.prefix, decoder.decode(source)];
+	        const decoder = base || base32;
+	        return [base32.prefix, decoder.decode(source)];
 	      }
 	    default:
 	      {
@@ -6387,11 +6746,11 @@
 	      }
 	  }
 	};
-	const toStringV0$2 = (bytes, cache, base) => {
+	const toStringV0 = (bytes, cache, base) => {
 	  const {
 	    prefix
 	  } = base;
-	  if (prefix !== base58btc$3.prefix) {
+	  if (prefix !== base58btc.prefix) {
 	    throw Error(`Cannot string encode V0 in ${base.name} encoding`);
 	  }
 	  const cid = cache.get(prefix);
@@ -6403,7 +6762,7 @@
 	    return cid;
 	  }
 	};
-	const toStringV1$2 = (bytes, cache, base) => {
+	const toStringV1 = (bytes, cache, base) => {
 	  const {
 	    prefix
 	  } = base;
@@ -6416,37 +6775,37 @@
 	    return cid;
 	  }
 	};
-	const DAG_PB_CODE$2 = 112;
-	const SHA_256_CODE$2 = 18;
-	const encodeCID$2 = (version, code, multihash) => {
-	  const codeOffset = encodingLength$2(version);
-	  const hashOffset = codeOffset + encodingLength$2(code);
+	const DAG_PB_CODE = 112;
+	const SHA_256_CODE = 18;
+	const encodeCID = (version, code, multihash) => {
+	  const codeOffset = encodingLength(version);
+	  const hashOffset = codeOffset + encodingLength(code);
 	  const bytes = new Uint8Array(hashOffset + multihash.byteLength);
-	  encodeTo$2(version, bytes, 0);
-	  encodeTo$2(code, bytes, codeOffset);
+	  encodeTo(version, bytes, 0);
+	  encodeTo(code, bytes, codeOffset);
 	  bytes.set(multihash, hashOffset);
 	  return bytes;
 	};
-	const cidSymbol$2 = Symbol.for('@ipld/js-cid/CID');
-	const readonly$1 = {
+	const cidSymbol = Symbol.for('@ipld/js-cid/CID');
+	const readonly = {
 	  writable: false,
 	  configurable: false,
 	  enumerable: true
 	};
-	const hidden$1 = {
+	const hidden = {
 	  writable: false,
 	  enumerable: false,
 	  configurable: false
 	};
-	const version$2 = '0.0.0-dev';
-	const deprecate$1 = (range, message) => {
-	  if (range.test(version$2)) {
+	const version$1 = '0.0.0-dev';
+	const deprecate = (range, message) => {
+	  if (range.test(version$1)) {
 	    console.warn(message);
 	  } else {
 	    throw new Error(message);
 	  }
 	};
-	const IS_CID_DEPRECATION$1 = `CID.isCID(v) is deprecated and will be removed in the next major release.
+	const IS_CID_DEPRECATION = `CID.isCID(v) is deprecated and will be removed in the next major release.
 Following code pattern:
 
 if (CID.isCID(value)) {
@@ -6464,10 +6823,10 @@ if (cid) {
 
 	var cid$1 = /*#__PURE__*/Object.freeze({
 		__proto__: null,
-		CID: CID$2
+		CID: CID
 	});
 
-	var require$$0$1 = /*@__PURE__*/getAugmentedNamespace(cid$1);
+	var require$$1$1 = /*@__PURE__*/getAugmentedNamespace(cid$1);
 
 	function compare$1(a, b) {
 	  for (let i = 0; i < a.byteLength; i++) {
@@ -6500,7 +6859,7 @@ if (cid) {
 	  return output;
 	}
 
-	function equals$4(a, b) {
+	function equals(a, b) {
 	  if (a === b) {
 	    return true;
 	  }
@@ -6515,323 +6874,7 @@ if (cid) {
 	  return true;
 	}
 
-	function base$2(ALPHABET, name) {
-	  if (ALPHABET.length >= 255) {
-	    throw new TypeError('Alphabet too long');
-	  }
-	  var BASE_MAP = new Uint8Array(256);
-	  for (var j = 0; j < BASE_MAP.length; j++) {
-	    BASE_MAP[j] = 255;
-	  }
-	  for (var i = 0; i < ALPHABET.length; i++) {
-	    var x = ALPHABET.charAt(i);
-	    var xc = x.charCodeAt(0);
-	    if (BASE_MAP[xc] !== 255) {
-	      throw new TypeError(x + ' is ambiguous');
-	    }
-	    BASE_MAP[xc] = i;
-	  }
-	  var BASE = ALPHABET.length;
-	  var LEADER = ALPHABET.charAt(0);
-	  var FACTOR = Math.log(BASE) / Math.log(256);
-	  var iFACTOR = Math.log(256) / Math.log(BASE);
-	  function encode(source) {
-	    if (source instanceof Uint8Array) ;else if (ArrayBuffer.isView(source)) {
-	      source = new Uint8Array(source.buffer, source.byteOffset, source.byteLength);
-	    } else if (Array.isArray(source)) {
-	      source = Uint8Array.from(source);
-	    }
-	    if (!(source instanceof Uint8Array)) {
-	      throw new TypeError('Expected Uint8Array');
-	    }
-	    if (source.length === 0) {
-	      return '';
-	    }
-	    var zeroes = 0;
-	    var length = 0;
-	    var pbegin = 0;
-	    var pend = source.length;
-	    while (pbegin !== pend && source[pbegin] === 0) {
-	      pbegin++;
-	      zeroes++;
-	    }
-	    var size = (pend - pbegin) * iFACTOR + 1 >>> 0;
-	    var b58 = new Uint8Array(size);
-	    while (pbegin !== pend) {
-	      var carry = source[pbegin];
-	      var i = 0;
-	      for (var it1 = size - 1; (carry !== 0 || i < length) && it1 !== -1; it1--, i++) {
-	        carry += 256 * b58[it1] >>> 0;
-	        b58[it1] = carry % BASE >>> 0;
-	        carry = carry / BASE >>> 0;
-	      }
-	      if (carry !== 0) {
-	        throw new Error('Non-zero carry');
-	      }
-	      length = i;
-	      pbegin++;
-	    }
-	    var it2 = size - length;
-	    while (it2 !== size && b58[it2] === 0) {
-	      it2++;
-	    }
-	    var str = LEADER.repeat(zeroes);
-	    for (; it2 < size; ++it2) {
-	      str += ALPHABET.charAt(b58[it2]);
-	    }
-	    return str;
-	  }
-	  function decodeUnsafe(source) {
-	    if (typeof source !== 'string') {
-	      throw new TypeError('Expected String');
-	    }
-	    if (source.length === 0) {
-	      return new Uint8Array();
-	    }
-	    var psz = 0;
-	    if (source[psz] === ' ') {
-	      return;
-	    }
-	    var zeroes = 0;
-	    var length = 0;
-	    while (source[psz] === LEADER) {
-	      zeroes++;
-	      psz++;
-	    }
-	    var size = (source.length - psz) * FACTOR + 1 >>> 0;
-	    var b256 = new Uint8Array(size);
-	    while (source[psz]) {
-	      var carry = BASE_MAP[source.charCodeAt(psz)];
-	      if (carry === 255) {
-	        return;
-	      }
-	      var i = 0;
-	      for (var it3 = size - 1; (carry !== 0 || i < length) && it3 !== -1; it3--, i++) {
-	        carry += BASE * b256[it3] >>> 0;
-	        b256[it3] = carry % 256 >>> 0;
-	        carry = carry / 256 >>> 0;
-	      }
-	      if (carry !== 0) {
-	        throw new Error('Non-zero carry');
-	      }
-	      length = i;
-	      psz++;
-	    }
-	    if (source[psz] === ' ') {
-	      return;
-	    }
-	    var it4 = size - length;
-	    while (it4 !== size && b256[it4] === 0) {
-	      it4++;
-	    }
-	    var vch = new Uint8Array(zeroes + (size - it4));
-	    var j = zeroes;
-	    while (it4 !== size) {
-	      vch[j++] = b256[it4++];
-	    }
-	    return vch;
-	  }
-	  function decode(string) {
-	    var buffer = decodeUnsafe(string);
-	    if (buffer) {
-	      return buffer;
-	    }
-	    throw new Error(`Non-${name} character`);
-	  }
-	  return {
-	    encode: encode,
-	    decodeUnsafe: decodeUnsafe,
-	    decode: decode
-	  };
-	}
-	var src$4 = base$2;
-	var _brrp__multiformats_scope_baseX$2 = src$4;
-
-	const coerce$2 = o => {
-	  if (o instanceof Uint8Array && o.constructor.name === 'Uint8Array') return o;
-	  if (o instanceof ArrayBuffer) return new Uint8Array(o);
-	  if (ArrayBuffer.isView(o)) {
-	    return new Uint8Array(o.buffer, o.byteOffset, o.byteLength);
-	  }
-	  throw new Error('Unknown type, must be binary type');
-	};
-	const fromString$2 = str => new TextEncoder().encode(str);
-	const toString$3 = b => new TextDecoder().decode(b);
-
-	let Encoder$3 = class Encoder {
-	  constructor(name, prefix, baseEncode) {
-	    this.name = name;
-	    this.prefix = prefix;
-	    this.baseEncode = baseEncode;
-	  }
-	  encode(bytes) {
-	    if (bytes instanceof Uint8Array) {
-	      return `${this.prefix}${this.baseEncode(bytes)}`;
-	    } else {
-	      throw Error('Unknown type, must be binary type');
-	    }
-	  }
-	};
-	let Decoder$3 = class Decoder {
-	  constructor(name, prefix, baseDecode) {
-	    this.name = name;
-	    this.prefix = prefix;
-	    if (prefix.codePointAt(0) === undefined) {
-	      throw new Error('Invalid prefix character');
-	    }
-	    this.prefixCodePoint = prefix.codePointAt(0);
-	    this.baseDecode = baseDecode;
-	  }
-	  decode(text) {
-	    if (typeof text === 'string') {
-	      if (text.codePointAt(0) !== this.prefixCodePoint) {
-	        throw Error(`Unable to decode multibase string ${JSON.stringify(text)}, ${this.name} decoder only supports inputs prefixed with ${this.prefix}`);
-	      }
-	      return this.baseDecode(text.slice(this.prefix.length));
-	    } else {
-	      throw Error('Can only multibase decode strings');
-	    }
-	  }
-	  or(decoder) {
-	    return or$2(this, decoder);
-	  }
-	};
-	let ComposedDecoder$2 = class ComposedDecoder {
-	  constructor(decoders) {
-	    this.decoders = decoders;
-	  }
-	  or(decoder) {
-	    return or$2(this, decoder);
-	  }
-	  decode(input) {
-	    const prefix = input[0];
-	    const decoder = this.decoders[prefix];
-	    if (decoder) {
-	      return decoder.decode(input);
-	    } else {
-	      throw RangeError(`Unable to decode multibase string ${JSON.stringify(input)}, only inputs prefixed with ${Object.keys(this.decoders)} are supported`);
-	    }
-	  }
-	};
-	const or$2 = (left, right) => new ComposedDecoder$2({
-	  ...(left.decoders || {
-	    [left.prefix]: left
-	  }),
-	  ...(right.decoders || {
-	    [right.prefix]: right
-	  })
-	});
-	let Codec$2 = class Codec {
-	  constructor(name, prefix, baseEncode, baseDecode) {
-	    this.name = name;
-	    this.prefix = prefix;
-	    this.baseEncode = baseEncode;
-	    this.baseDecode = baseDecode;
-	    this.encoder = new Encoder$3(name, prefix, baseEncode);
-	    this.decoder = new Decoder$3(name, prefix, baseDecode);
-	  }
-	  encode(input) {
-	    return this.encoder.encode(input);
-	  }
-	  decode(input) {
-	    return this.decoder.decode(input);
-	  }
-	};
-	const from$2 = ({
-	  name,
-	  prefix,
-	  encode,
-	  decode
-	}) => new Codec$2(name, prefix, encode, decode);
-	const baseX$2 = ({
-	  prefix,
-	  name,
-	  alphabet
-	}) => {
-	  const {
-	    encode,
-	    decode
-	  } = _brrp__multiformats_scope_baseX$2(alphabet, name);
-	  return from$2({
-	    prefix,
-	    name,
-	    encode,
-	    decode: text => coerce$2(decode(text))
-	  });
-	};
-	const decode$d = (string, alphabet, bitsPerChar, name) => {
-	  const codes = {};
-	  for (let i = 0; i < alphabet.length; ++i) {
-	    codes[alphabet[i]] = i;
-	  }
-	  let end = string.length;
-	  while (string[end - 1] === '=') {
-	    --end;
-	  }
-	  const out = new Uint8Array(end * bitsPerChar / 8 | 0);
-	  let bits = 0;
-	  let buffer = 0;
-	  let written = 0;
-	  for (let i = 0; i < end; ++i) {
-	    const value = codes[string[i]];
-	    if (value === undefined) {
-	      throw new SyntaxError(`Non-${name} character`);
-	    }
-	    buffer = buffer << bitsPerChar | value;
-	    bits += bitsPerChar;
-	    if (bits >= 8) {
-	      bits -= 8;
-	      out[written++] = 255 & buffer >> bits;
-	    }
-	  }
-	  if (bits >= bitsPerChar || 255 & buffer << 8 - bits) {
-	    throw new SyntaxError('Unexpected end of data');
-	  }
-	  return out;
-	};
-	const encode$6 = (data, alphabet, bitsPerChar) => {
-	  const pad = alphabet[alphabet.length - 1] === '=';
-	  const mask = (1 << bitsPerChar) - 1;
-	  let out = '';
-	  let bits = 0;
-	  let buffer = 0;
-	  for (let i = 0; i < data.length; ++i) {
-	    buffer = buffer << 8 | data[i];
-	    bits += 8;
-	    while (bits > bitsPerChar) {
-	      bits -= bitsPerChar;
-	      out += alphabet[mask & buffer >> bits];
-	    }
-	  }
-	  if (bits) {
-	    out += alphabet[mask & buffer << bitsPerChar - bits];
-	  }
-	  if (pad) {
-	    while (out.length * bitsPerChar & 7) {
-	      out += '=';
-	    }
-	  }
-	  return out;
-	};
-	const rfc4648$2 = ({
-	  name,
-	  prefix,
-	  bitsPerChar,
-	  alphabet
-	}) => {
-	  return from$2({
-	    prefix,
-	    name,
-	    encode(input) {
-	      return encode$6(input, alphabet, bitsPerChar);
-	    },
-	    decode(input) {
-	      return decode$d(input, alphabet, bitsPerChar, name);
-	    }
-	  });
-	};
-
-	const identity = from$2({
+	const identity = from({
 	  prefix: '\0',
 	  name: 'identity',
 	  encode: buf => toString$3(buf),
@@ -6843,7 +6886,7 @@ if (cid) {
 		identity: identity
 	});
 
-	const base2 = rfc4648$2({
+	const base2 = rfc4648({
 	  prefix: '0',
 	  name: 'base2',
 	  alphabet: '01',
@@ -6855,7 +6898,7 @@ if (cid) {
 		base2: base2
 	});
 
-	const base8 = rfc4648$2({
+	const base8 = rfc4648({
 	  prefix: '7',
 	  name: 'base8',
 	  alphabet: '01234567',
@@ -6867,7 +6910,7 @@ if (cid) {
 		base8: base8
 	});
 
-	const base10 = baseX$2({
+	const base10 = baseX({
 	  prefix: '9',
 	  name: 'base10',
 	  alphabet: '0123456789'
@@ -6878,13 +6921,13 @@ if (cid) {
 		base10: base10
 	});
 
-	const base16 = rfc4648$2({
+	const base16 = rfc4648({
 	  prefix: 'f',
 	  name: 'base16',
 	  alphabet: '0123456789abcdef',
 	  bitsPerChar: 4
 	});
-	const base16upper = rfc4648$2({
+	const base16upper = rfc4648({
 	  prefix: 'F',
 	  name: 'base16upper',
 	  alphabet: '0123456789ABCDEF',
@@ -6897,80 +6940,12 @@ if (cid) {
 		base16upper: base16upper
 	});
 
-	const base32$2 = rfc4648$2({
-	  prefix: 'b',
-	  name: 'base32',
-	  alphabet: 'abcdefghijklmnopqrstuvwxyz234567',
-	  bitsPerChar: 5
-	});
-	const base32upper = rfc4648$2({
-	  prefix: 'B',
-	  name: 'base32upper',
-	  alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567',
-	  bitsPerChar: 5
-	});
-	const base32pad = rfc4648$2({
-	  prefix: 'c',
-	  name: 'base32pad',
-	  alphabet: 'abcdefghijklmnopqrstuvwxyz234567=',
-	  bitsPerChar: 5
-	});
-	const base32padupper = rfc4648$2({
-	  prefix: 'C',
-	  name: 'base32padupper',
-	  alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567=',
-	  bitsPerChar: 5
-	});
-	const base32hex = rfc4648$2({
-	  prefix: 'v',
-	  name: 'base32hex',
-	  alphabet: '0123456789abcdefghijklmnopqrstuv',
-	  bitsPerChar: 5
-	});
-	const base32hexupper = rfc4648$2({
-	  prefix: 'V',
-	  name: 'base32hexupper',
-	  alphabet: '0123456789ABCDEFGHIJKLMNOPQRSTUV',
-	  bitsPerChar: 5
-	});
-	const base32hexpad = rfc4648$2({
-	  prefix: 't',
-	  name: 'base32hexpad',
-	  alphabet: '0123456789abcdefghijklmnopqrstuv=',
-	  bitsPerChar: 5
-	});
-	const base32hexpadupper = rfc4648$2({
-	  prefix: 'T',
-	  name: 'base32hexpadupper',
-	  alphabet: '0123456789ABCDEFGHIJKLMNOPQRSTUV=',
-	  bitsPerChar: 5
-	});
-	const base32z = rfc4648$2({
-	  prefix: 'h',
-	  name: 'base32z',
-	  alphabet: 'ybndrfg8ejkmcpqxot1uwisza345h769',
-	  bitsPerChar: 5
-	});
-
-	var base32$3 = /*#__PURE__*/Object.freeze({
-		__proto__: null,
-		base32: base32$2,
-		base32hex: base32hex,
-		base32hexpad: base32hexpad,
-		base32hexpadupper: base32hexpadupper,
-		base32hexupper: base32hexupper,
-		base32pad: base32pad,
-		base32padupper: base32padupper,
-		base32upper: base32upper,
-		base32z: base32z
-	});
-
-	const base36 = baseX$2({
+	const base36 = baseX({
 	  prefix: 'k',
 	  name: 'base36',
 	  alphabet: '0123456789abcdefghijklmnopqrstuvwxyz'
 	});
-	const base36upper = baseX$2({
+	const base36upper = baseX({
 	  prefix: 'K',
 	  name: 'base36upper',
 	  alphabet: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -6982,42 +6957,25 @@ if (cid) {
 		base36upper: base36upper
 	});
 
-	const base58btc$2 = baseX$2({
-	  name: 'base58btc',
-	  prefix: 'z',
-	  alphabet: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
-	});
-	const base58flickr = baseX$2({
-	  name: 'base58flickr',
-	  prefix: 'Z',
-	  alphabet: '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
-	});
-
-	var base58 = /*#__PURE__*/Object.freeze({
-		__proto__: null,
-		base58btc: base58btc$2,
-		base58flickr: base58flickr
-	});
-
-	const base64 = rfc4648$2({
+	const base64 = rfc4648({
 	  prefix: 'm',
 	  name: 'base64',
 	  alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',
 	  bitsPerChar: 6
 	});
-	const base64pad = rfc4648$2({
+	const base64pad = rfc4648({
 	  prefix: 'M',
 	  name: 'base64pad',
 	  alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
 	  bitsPerChar: 6
 	});
-	const base64url = rfc4648$2({
+	const base64url = rfc4648({
 	  prefix: 'u',
 	  name: 'base64url',
 	  alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_',
 	  bitsPerChar: 6
 	});
-	const base64urlpad = rfc4648$2({
+	const base64urlpad = rfc4648({
 	  prefix: 'U',
 	  name: 'base64urlpad',
 	  alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=',
@@ -7041,13 +6999,13 @@ if (cid) {
 	  p[c.codePointAt(0)] = i;
 	  return p;
 	}, []);
-	function encode$5(data) {
+	function encode$1(data) {
 	  return data.reduce((p, c) => {
 	    p += alphabetBytesToChars[c];
 	    return p;
 	  }, '');
 	}
-	function decode$c(str) {
+	function decode$4(str) {
 	  const byts = [];
 	  for (const char of str) {
 	    const byt = alphabetCharsToBytes[char.codePointAt(0)];
@@ -7058,11 +7016,11 @@ if (cid) {
 	  }
 	  return new Uint8Array(byts);
 	}
-	const base256emoji = from$2({
+	const base256emoji = from({
 	  prefix: '\uD83D\uDE80',
 	  name: 'base256emoji',
-	  encode: encode$5,
-	  decode: decode$c
+	  encode: encode$1,
+	  decode: decode$4
 	});
 
 	var base256emoji$1 = /*#__PURE__*/Object.freeze({
@@ -7079,7 +7037,7 @@ if (cid) {
 	  ...base8$1,
 	  ...base10$1,
 	  ...base16$1,
-	  ...base32$3,
+	  ...base32$1,
 	  ...base36$1,
 	  ...base58,
 	  ...base64$1,
@@ -7100,7 +7058,7 @@ if (cid) {
 	    }
 	  };
 	}
-	const string = createCodec('utf8', 'u', buf => {
+	const string$1 = createCodec('utf8', 'u', buf => {
 	  const decoder = new TextDecoder('utf8');
 	  return 'u' + decoder.decode(buf);
 	}, str => {
@@ -7122,8 +7080,8 @@ if (cid) {
 	  return buf;
 	});
 	const BASES = {
-	  utf8: string,
-	  'utf-8': string,
+	  utf8: string$1,
+	  'utf-8': string$1,
 	  hex: bases.base16,
 	  latin1: ascii,
 	  ascii: ascii,
@@ -7158,17 +7116,17 @@ if (cid) {
 	  return result;
 	}
 
-	var src$3 = /*#__PURE__*/Object.freeze({
+	var src$1 = /*#__PURE__*/Object.freeze({
 		__proto__: null,
 		compare: compare$1,
 		concat: concat,
-		equals: equals$4,
+		equals: equals,
 		fromString: fromString$1,
 		toString: toString$2,
 		xor: xor
 	});
 
-	var require$$1$1 = /*@__PURE__*/getAugmentedNamespace(src$3);
+	var require$$1 = /*@__PURE__*/getAugmentedNamespace(src$1);
 
 	(function (exports) {
 
@@ -7207,8 +7165,8 @@ if (cid) {
 	    value: true
 	  });
 	  exports.ipldEquals = exports.ipldToJson = exports.jsonToIpld = void 0;
-	  const cid_1 = require$$0$1;
-	  const ui8 = __importStar(require$$1$1);
+	  const cid_1 = require$$1$1;
+	  const ui8 = __importStar(require$$1);
 	  // @NOTE avoiding use of check.is() here only because it makes
 	  // these implementations slow, and they often live in hot paths.
 	  const jsonToIpld = val => {
@@ -7303,7 +7261,7 @@ if (cid) {
 	  value: true
 	});
 	retry$1.backoffMs = retry$1.retry = void 0;
-	const util_1$U = util$5;
+	const util_1$V = util$5;
 	async function retry(fn, opts = {}) {
 	  const {
 	    maxRetries = 3,
@@ -7321,7 +7279,7 @@ if (cid) {
 	      if (willRetry) {
 	        retries += 1;
 	        if (waitMs !== 0) {
-	          await (0, util_1$U.wait)(waitMs);
+	          await (0, util_1$V.wait)(waitMs);
 	        }
 	      } else {
 	        doneError = err;
@@ -7356,7 +7314,7 @@ if (cid) {
 	    value: true
 	  });
 	  exports.def = exports.schema = void 0;
-	  const cid_1 = require$$0$1;
+	  const cid_1 = require$$1$1;
 	  const zod_1 = lib$1;
 	  const cidSchema = zod_1.z.any().refine(obj => cid_1.CID.asCID(obj) !== null, {
 	    message: 'Not a CID'
@@ -9657,7 +9615,7 @@ if (cid) {
 	});
 	strings.validateLanguage = strings.parseLanguage = strings.b64UrlToUtf8 = strings.utf8ToB64Url = strings.graphemeLen = strings.utf8Len = void 0;
 	const graphemer_1 = __importDefault$2(lib);
-	const ui8 = __importStar$4(require$$1$1);
+	const ui8 = __importStar$4(require$$1);
 	// counts the number of bytes in a utf8 string
 	const utf8Len = str => {
 	  return new TextEncoder().encode(str).byteLength;
@@ -9881,7 +9839,7 @@ if (cid) {
 	  __exportStar(arrays, exports);
 	  __exportStar(async, exports);
 	  __exportStar(util$5, exports);
-	  __exportStar(tid, exports);
+	  __exportStar(tid$1, exports);
 	  __exportStar(ipld, exports);
 	  __exportStar(retry$1, exports);
 	  __exportStar(types$3, exports);
@@ -9890,1395 +9848,6 @@ if (cid) {
 	  __exportStar(didDoc, exports);
 	})(dist$2);
 
-	var encode_1$2 = encode$4;
-	var MSB$3 = 128,
-	  REST$3 = 127,
-	  MSBALL$2 = ~REST$3,
-	  INT$2 = Math.pow(2, 31);
-	function encode$4(num, out, offset) {
-	  out = out || [];
-	  offset = offset || 0;
-	  var oldOffset = offset;
-	  while (num >= INT$2) {
-	    out[offset++] = num & 255 | MSB$3;
-	    num /= 128;
-	  }
-	  while (num & MSBALL$2) {
-	    out[offset++] = num & 255 | MSB$3;
-	    num >>>= 7;
-	  }
-	  out[offset] = num | 0;
-	  encode$4.bytes = offset - oldOffset + 1;
-	  return out;
-	}
-	var decode$b = read$3;
-	var MSB$1$2 = 128,
-	  REST$1$2 = 127;
-	function read$3(buf, offset) {
-	  var res = 0,
-	    offset = offset || 0,
-	    shift = 0,
-	    counter = offset,
-	    b,
-	    l = buf.length;
-	  do {
-	    if (counter >= l) {
-	      read$3.bytes = 0;
-	      throw new RangeError('Could not decode varint');
-	    }
-	    b = buf[counter++];
-	    res += shift < 28 ? (b & REST$1$2) << shift : (b & REST$1$2) * Math.pow(2, shift);
-	    shift += 7;
-	  } while (b >= MSB$1$2);
-	  read$3.bytes = counter - offset;
-	  return res;
-	}
-	var N1$2 = Math.pow(2, 7);
-	var N2$2 = Math.pow(2, 14);
-	var N3$2 = Math.pow(2, 21);
-	var N4$2 = Math.pow(2, 28);
-	var N5$2 = Math.pow(2, 35);
-	var N6$2 = Math.pow(2, 42);
-	var N7$2 = Math.pow(2, 49);
-	var N8$2 = Math.pow(2, 56);
-	var N9$2 = Math.pow(2, 63);
-	var length$2 = function (value) {
-	  return value < N1$2 ? 1 : value < N2$2 ? 2 : value < N3$2 ? 3 : value < N4$2 ? 4 : value < N5$2 ? 5 : value < N6$2 ? 6 : value < N7$2 ? 7 : value < N8$2 ? 8 : value < N9$2 ? 9 : 10;
-	};
-	var varint$3 = {
-	  encode: encode_1$2,
-	  decode: decode$b,
-	  encodingLength: length$2
-	};
-	var _brrp_varint$1 = varint$3;
-
-	const decode$a = (data, offset = 0) => {
-	  const code = _brrp_varint$1.decode(data, offset);
-	  return [code, _brrp_varint$1.decode.bytes];
-	};
-	const encodeTo$1 = (int, target, offset = 0) => {
-	  _brrp_varint$1.encode(int, target, offset);
-	  return target;
-	};
-	const encodingLength$1 = int => {
-	  return _brrp_varint$1.encodingLength(int);
-	};
-
-	const equals$3 = (aa, bb) => {
-	  if (aa === bb) return true;
-	  if (aa.byteLength !== bb.byteLength) {
-	    return false;
-	  }
-	  for (let ii = 0; ii < aa.byteLength; ii++) {
-	    if (aa[ii] !== bb[ii]) {
-	      return false;
-	    }
-	  }
-	  return true;
-	};
-	const coerce$1 = o => {
-	  if (o instanceof Uint8Array && o.constructor.name === 'Uint8Array') return o;
-	  if (o instanceof ArrayBuffer) return new Uint8Array(o);
-	  if (ArrayBuffer.isView(o)) {
-	    return new Uint8Array(o.buffer, o.byteOffset, o.byteLength);
-	  }
-	  throw new Error('Unknown type, must be binary type');
-	};
-
-	const create$1 = (code, digest) => {
-	  const size = digest.byteLength;
-	  const sizeOffset = encodingLength$1(code);
-	  const digestOffset = sizeOffset + encodingLength$1(size);
-	  const bytes = new Uint8Array(digestOffset + size);
-	  encodeTo$1(code, bytes, 0);
-	  encodeTo$1(size, bytes, sizeOffset);
-	  bytes.set(digest, digestOffset);
-	  return new Digest$1(code, size, digest, bytes);
-	};
-	const decode$9 = multihash => {
-	  const bytes = coerce$1(multihash);
-	  const [code, sizeOffset] = decode$a(bytes);
-	  const [size, digestOffset] = decode$a(bytes.subarray(sizeOffset));
-	  const digest = bytes.subarray(sizeOffset + digestOffset);
-	  if (digest.byteLength !== size) {
-	    throw new Error('Incorrect length');
-	  }
-	  return new Digest$1(code, size, digest, bytes);
-	};
-	const equals$2 = (a, b) => {
-	  if (a === b) {
-	    return true;
-	  } else {
-	    return a.code === b.code && a.size === b.size && equals$3(a.bytes, b.bytes);
-	  }
-	};
-	let Digest$1 = class Digest {
-	  constructor(code, size, digest, bytes) {
-	    this.code = code;
-	    this.size = size;
-	    this.digest = digest;
-	    this.bytes = bytes;
-	  }
-	};
-
-	function base$1(ALPHABET, name) {
-	  if (ALPHABET.length >= 255) {
-	    throw new TypeError('Alphabet too long');
-	  }
-	  var BASE_MAP = new Uint8Array(256);
-	  for (var j = 0; j < BASE_MAP.length; j++) {
-	    BASE_MAP[j] = 255;
-	  }
-	  for (var i = 0; i < ALPHABET.length; i++) {
-	    var x = ALPHABET.charAt(i);
-	    var xc = x.charCodeAt(0);
-	    if (BASE_MAP[xc] !== 255) {
-	      throw new TypeError(x + ' is ambiguous');
-	    }
-	    BASE_MAP[xc] = i;
-	  }
-	  var BASE = ALPHABET.length;
-	  var LEADER = ALPHABET.charAt(0);
-	  var FACTOR = Math.log(BASE) / Math.log(256);
-	  var iFACTOR = Math.log(256) / Math.log(BASE);
-	  function encode(source) {
-	    if (source instanceof Uint8Array) ;else if (ArrayBuffer.isView(source)) {
-	      source = new Uint8Array(source.buffer, source.byteOffset, source.byteLength);
-	    } else if (Array.isArray(source)) {
-	      source = Uint8Array.from(source);
-	    }
-	    if (!(source instanceof Uint8Array)) {
-	      throw new TypeError('Expected Uint8Array');
-	    }
-	    if (source.length === 0) {
-	      return '';
-	    }
-	    var zeroes = 0;
-	    var length = 0;
-	    var pbegin = 0;
-	    var pend = source.length;
-	    while (pbegin !== pend && source[pbegin] === 0) {
-	      pbegin++;
-	      zeroes++;
-	    }
-	    var size = (pend - pbegin) * iFACTOR + 1 >>> 0;
-	    var b58 = new Uint8Array(size);
-	    while (pbegin !== pend) {
-	      var carry = source[pbegin];
-	      var i = 0;
-	      for (var it1 = size - 1; (carry !== 0 || i < length) && it1 !== -1; it1--, i++) {
-	        carry += 256 * b58[it1] >>> 0;
-	        b58[it1] = carry % BASE >>> 0;
-	        carry = carry / BASE >>> 0;
-	      }
-	      if (carry !== 0) {
-	        throw new Error('Non-zero carry');
-	      }
-	      length = i;
-	      pbegin++;
-	    }
-	    var it2 = size - length;
-	    while (it2 !== size && b58[it2] === 0) {
-	      it2++;
-	    }
-	    var str = LEADER.repeat(zeroes);
-	    for (; it2 < size; ++it2) {
-	      str += ALPHABET.charAt(b58[it2]);
-	    }
-	    return str;
-	  }
-	  function decodeUnsafe(source) {
-	    if (typeof source !== 'string') {
-	      throw new TypeError('Expected String');
-	    }
-	    if (source.length === 0) {
-	      return new Uint8Array();
-	    }
-	    var psz = 0;
-	    if (source[psz] === ' ') {
-	      return;
-	    }
-	    var zeroes = 0;
-	    var length = 0;
-	    while (source[psz] === LEADER) {
-	      zeroes++;
-	      psz++;
-	    }
-	    var size = (source.length - psz) * FACTOR + 1 >>> 0;
-	    var b256 = new Uint8Array(size);
-	    while (source[psz]) {
-	      var carry = BASE_MAP[source.charCodeAt(psz)];
-	      if (carry === 255) {
-	        return;
-	      }
-	      var i = 0;
-	      for (var it3 = size - 1; (carry !== 0 || i < length) && it3 !== -1; it3--, i++) {
-	        carry += BASE * b256[it3] >>> 0;
-	        b256[it3] = carry % 256 >>> 0;
-	        carry = carry / 256 >>> 0;
-	      }
-	      if (carry !== 0) {
-	        throw new Error('Non-zero carry');
-	      }
-	      length = i;
-	      psz++;
-	    }
-	    if (source[psz] === ' ') {
-	      return;
-	    }
-	    var it4 = size - length;
-	    while (it4 !== size && b256[it4] === 0) {
-	      it4++;
-	    }
-	    var vch = new Uint8Array(zeroes + (size - it4));
-	    var j = zeroes;
-	    while (it4 !== size) {
-	      vch[j++] = b256[it4++];
-	    }
-	    return vch;
-	  }
-	  function decode(string) {
-	    var buffer = decodeUnsafe(string);
-	    if (buffer) {
-	      return buffer;
-	    }
-	    throw new Error(`Non-${name} character`);
-	  }
-	  return {
-	    encode: encode,
-	    decodeUnsafe: decodeUnsafe,
-	    decode: decode
-	  };
-	}
-	var src$2 = base$1;
-	var _brrp__multiformats_scope_baseX$1 = src$2;
-
-	let Encoder$2 = class Encoder {
-	  constructor(name, prefix, baseEncode) {
-	    this.name = name;
-	    this.prefix = prefix;
-	    this.baseEncode = baseEncode;
-	  }
-	  encode(bytes) {
-	    if (bytes instanceof Uint8Array) {
-	      return `${this.prefix}${this.baseEncode(bytes)}`;
-	    } else {
-	      throw Error('Unknown type, must be binary type');
-	    }
-	  }
-	};
-	let Decoder$2 = class Decoder {
-	  constructor(name, prefix, baseDecode) {
-	    this.name = name;
-	    this.prefix = prefix;
-	    if (prefix.codePointAt(0) === undefined) {
-	      throw new Error('Invalid prefix character');
-	    }
-	    this.prefixCodePoint = prefix.codePointAt(0);
-	    this.baseDecode = baseDecode;
-	  }
-	  decode(text) {
-	    if (typeof text === 'string') {
-	      if (text.codePointAt(0) !== this.prefixCodePoint) {
-	        throw Error(`Unable to decode multibase string ${JSON.stringify(text)}, ${this.name} decoder only supports inputs prefixed with ${this.prefix}`);
-	      }
-	      return this.baseDecode(text.slice(this.prefix.length));
-	    } else {
-	      throw Error('Can only multibase decode strings');
-	    }
-	  }
-	  or(decoder) {
-	    return or$1(this, decoder);
-	  }
-	};
-	let ComposedDecoder$1 = class ComposedDecoder {
-	  constructor(decoders) {
-	    this.decoders = decoders;
-	  }
-	  or(decoder) {
-	    return or$1(this, decoder);
-	  }
-	  decode(input) {
-	    const prefix = input[0];
-	    const decoder = this.decoders[prefix];
-	    if (decoder) {
-	      return decoder.decode(input);
-	    } else {
-	      throw RangeError(`Unable to decode multibase string ${JSON.stringify(input)}, only inputs prefixed with ${Object.keys(this.decoders)} are supported`);
-	    }
-	  }
-	};
-	const or$1 = (left, right) => new ComposedDecoder$1({
-	  ...(left.decoders || {
-	    [left.prefix]: left
-	  }),
-	  ...(right.decoders || {
-	    [right.prefix]: right
-	  })
-	});
-	let Codec$1 = class Codec {
-	  constructor(name, prefix, baseEncode, baseDecode) {
-	    this.name = name;
-	    this.prefix = prefix;
-	    this.baseEncode = baseEncode;
-	    this.baseDecode = baseDecode;
-	    this.encoder = new Encoder$2(name, prefix, baseEncode);
-	    this.decoder = new Decoder$2(name, prefix, baseDecode);
-	  }
-	  encode(input) {
-	    return this.encoder.encode(input);
-	  }
-	  decode(input) {
-	    return this.decoder.decode(input);
-	  }
-	};
-	const from$1 = ({
-	  name,
-	  prefix,
-	  encode,
-	  decode
-	}) => new Codec$1(name, prefix, encode, decode);
-	const baseX$1 = ({
-	  prefix,
-	  name,
-	  alphabet
-	}) => {
-	  const {
-	    encode,
-	    decode
-	  } = _brrp__multiformats_scope_baseX$1(alphabet, name);
-	  return from$1({
-	    prefix,
-	    name,
-	    encode,
-	    decode: text => coerce$1(decode(text))
-	  });
-	};
-	const decode$8 = (string, alphabet, bitsPerChar, name) => {
-	  const codes = {};
-	  for (let i = 0; i < alphabet.length; ++i) {
-	    codes[alphabet[i]] = i;
-	  }
-	  let end = string.length;
-	  while (string[end - 1] === '=') {
-	    --end;
-	  }
-	  const out = new Uint8Array(end * bitsPerChar / 8 | 0);
-	  let bits = 0;
-	  let buffer = 0;
-	  let written = 0;
-	  for (let i = 0; i < end; ++i) {
-	    const value = codes[string[i]];
-	    if (value === undefined) {
-	      throw new SyntaxError(`Non-${name} character`);
-	    }
-	    buffer = buffer << bitsPerChar | value;
-	    bits += bitsPerChar;
-	    if (bits >= 8) {
-	      bits -= 8;
-	      out[written++] = 255 & buffer >> bits;
-	    }
-	  }
-	  if (bits >= bitsPerChar || 255 & buffer << 8 - bits) {
-	    throw new SyntaxError('Unexpected end of data');
-	  }
-	  return out;
-	};
-	const encode$3 = (data, alphabet, bitsPerChar) => {
-	  const pad = alphabet[alphabet.length - 1] === '=';
-	  const mask = (1 << bitsPerChar) - 1;
-	  let out = '';
-	  let bits = 0;
-	  let buffer = 0;
-	  for (let i = 0; i < data.length; ++i) {
-	    buffer = buffer << 8 | data[i];
-	    bits += 8;
-	    while (bits > bitsPerChar) {
-	      bits -= bitsPerChar;
-	      out += alphabet[mask & buffer >> bits];
-	    }
-	  }
-	  if (bits) {
-	    out += alphabet[mask & buffer << bitsPerChar - bits];
-	  }
-	  if (pad) {
-	    while (out.length * bitsPerChar & 7) {
-	      out += '=';
-	    }
-	  }
-	  return out;
-	};
-	const rfc4648$1 = ({
-	  name,
-	  prefix,
-	  bitsPerChar,
-	  alphabet
-	}) => {
-	  return from$1({
-	    prefix,
-	    name,
-	    encode(input) {
-	      return encode$3(input, alphabet, bitsPerChar);
-	    },
-	    decode(input) {
-	      return decode$8(input, alphabet, bitsPerChar, name);
-	    }
-	  });
-	};
-
-	const base58btc$1 = baseX$1({
-	  name: 'base58btc',
-	  prefix: 'z',
-	  alphabet: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
-	});
-	baseX$1({
-	  name: 'base58flickr',
-	  prefix: 'Z',
-	  alphabet: '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
-	});
-
-	const base32$1 = rfc4648$1({
-	  prefix: 'b',
-	  name: 'base32',
-	  alphabet: 'abcdefghijklmnopqrstuvwxyz234567',
-	  bitsPerChar: 5
-	});
-	rfc4648$1({
-	  prefix: 'B',
-	  name: 'base32upper',
-	  alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567',
-	  bitsPerChar: 5
-	});
-	rfc4648$1({
-	  prefix: 'c',
-	  name: 'base32pad',
-	  alphabet: 'abcdefghijklmnopqrstuvwxyz234567=',
-	  bitsPerChar: 5
-	});
-	rfc4648$1({
-	  prefix: 'C',
-	  name: 'base32padupper',
-	  alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567=',
-	  bitsPerChar: 5
-	});
-	rfc4648$1({
-	  prefix: 'v',
-	  name: 'base32hex',
-	  alphabet: '0123456789abcdefghijklmnopqrstuv',
-	  bitsPerChar: 5
-	});
-	rfc4648$1({
-	  prefix: 'V',
-	  name: 'base32hexupper',
-	  alphabet: '0123456789ABCDEFGHIJKLMNOPQRSTUV',
-	  bitsPerChar: 5
-	});
-	rfc4648$1({
-	  prefix: 't',
-	  name: 'base32hexpad',
-	  alphabet: '0123456789abcdefghijklmnopqrstuv=',
-	  bitsPerChar: 5
-	});
-	rfc4648$1({
-	  prefix: 'T',
-	  name: 'base32hexpadupper',
-	  alphabet: '0123456789ABCDEFGHIJKLMNOPQRSTUV=',
-	  bitsPerChar: 5
-	});
-	rfc4648$1({
-	  prefix: 'h',
-	  name: 'base32z',
-	  alphabet: 'ybndrfg8ejkmcpqxot1uwisza345h769',
-	  bitsPerChar: 5
-	});
-
-	let CID$1 = class CID {
-	  constructor(version, code, multihash, bytes) {
-	    this.code = code;
-	    this.version = version;
-	    this.multihash = multihash;
-	    this.bytes = bytes;
-	    this.byteOffset = bytes.byteOffset;
-	    this.byteLength = bytes.byteLength;
-	    this.asCID = this;
-	    this._baseCache = new Map();
-	    Object.defineProperties(this, {
-	      byteOffset: hidden,
-	      byteLength: hidden,
-	      code: readonly,
-	      version: readonly,
-	      multihash: readonly,
-	      bytes: readonly,
-	      _baseCache: hidden,
-	      asCID: hidden
-	    });
-	  }
-	  toV0() {
-	    switch (this.version) {
-	      case 0:
-	        {
-	          return this;
-	        }
-	      default:
-	        {
-	          const {
-	            code,
-	            multihash
-	          } = this;
-	          if (code !== DAG_PB_CODE$1) {
-	            throw new Error('Cannot convert a non dag-pb CID to CIDv0');
-	          }
-	          if (multihash.code !== SHA_256_CODE$1) {
-	            throw new Error('Cannot convert non sha2-256 multihash CID to CIDv0');
-	          }
-	          return CID.createV0(multihash);
-	        }
-	    }
-	  }
-	  toV1() {
-	    switch (this.version) {
-	      case 0:
-	        {
-	          const {
-	            code,
-	            digest
-	          } = this.multihash;
-	          const multihash = create$1(code, digest);
-	          return CID.createV1(this.code, multihash);
-	        }
-	      case 1:
-	        {
-	          return this;
-	        }
-	      default:
-	        {
-	          throw Error(`Can not convert CID version ${this.version} to version 0. This is a bug please report`);
-	        }
-	    }
-	  }
-	  equals(other) {
-	    return other && this.code === other.code && this.version === other.version && equals$2(this.multihash, other.multihash);
-	  }
-	  toString(base) {
-	    const {
-	      bytes,
-	      version,
-	      _baseCache
-	    } = this;
-	    switch (version) {
-	      case 0:
-	        return toStringV0$1(bytes, _baseCache, base || base58btc$1.encoder);
-	      default:
-	        return toStringV1$1(bytes, _baseCache, base || base32$1.encoder);
-	    }
-	  }
-	  toJSON() {
-	    return {
-	      code: this.code,
-	      version: this.version,
-	      hash: this.multihash.bytes
-	    };
-	  }
-	  get [Symbol.toStringTag]() {
-	    return 'CID';
-	  }
-	  [Symbol.for('nodejs.util.inspect.custom')]() {
-	    return 'CID(' + this.toString() + ')';
-	  }
-	  static isCID(value) {
-	    deprecate(/^0\.0/, IS_CID_DEPRECATION);
-	    return !!(value && (value[cidSymbol$1] || value.asCID === value));
-	  }
-	  get toBaseEncodedString() {
-	    throw new Error('Deprecated, use .toString()');
-	  }
-	  get codec() {
-	    throw new Error('"codec" property is deprecated, use integer "code" property instead');
-	  }
-	  get buffer() {
-	    throw new Error('Deprecated .buffer property, use .bytes to get Uint8Array instead');
-	  }
-	  get multibaseName() {
-	    throw new Error('"multibaseName" property is deprecated');
-	  }
-	  get prefix() {
-	    throw new Error('"prefix" property is deprecated');
-	  }
-	  static asCID(value) {
-	    if (value instanceof CID) {
-	      return value;
-	    } else if (value != null && value.asCID === value) {
-	      const {
-	        version,
-	        code,
-	        multihash,
-	        bytes
-	      } = value;
-	      return new CID(version, code, multihash, bytes || encodeCID$1(version, code, multihash.bytes));
-	    } else if (value != null && value[cidSymbol$1] === true) {
-	      const {
-	        version,
-	        multihash,
-	        code
-	      } = value;
-	      const digest = decode$9(multihash);
-	      return CID.create(version, code, digest);
-	    } else {
-	      return null;
-	    }
-	  }
-	  static create(version, code, digest) {
-	    if (typeof code !== 'number') {
-	      throw new Error('String codecs are no longer supported');
-	    }
-	    switch (version) {
-	      case 0:
-	        {
-	          if (code !== DAG_PB_CODE$1) {
-	            throw new Error(`Version 0 CID must use dag-pb (code: ${DAG_PB_CODE$1}) block encoding`);
-	          } else {
-	            return new CID(version, code, digest, digest.bytes);
-	          }
-	        }
-	      case 1:
-	        {
-	          const bytes = encodeCID$1(version, code, digest.bytes);
-	          return new CID(version, code, digest, bytes);
-	        }
-	      default:
-	        {
-	          throw new Error('Invalid version');
-	        }
-	    }
-	  }
-	  static createV0(digest) {
-	    return CID.create(0, DAG_PB_CODE$1, digest);
-	  }
-	  static createV1(code, digest) {
-	    return CID.create(1, code, digest);
-	  }
-	  static decode(bytes) {
-	    const [cid, remainder] = CID.decodeFirst(bytes);
-	    if (remainder.length) {
-	      throw new Error('Incorrect length');
-	    }
-	    return cid;
-	  }
-	  static decodeFirst(bytes) {
-	    const specs = CID.inspectBytes(bytes);
-	    const prefixSize = specs.size - specs.multihashSize;
-	    const multihashBytes = coerce$1(bytes.subarray(prefixSize, prefixSize + specs.multihashSize));
-	    if (multihashBytes.byteLength !== specs.multihashSize) {
-	      throw new Error('Incorrect length');
-	    }
-	    const digestBytes = multihashBytes.subarray(specs.multihashSize - specs.digestSize);
-	    const digest = new Digest$1(specs.multihashCode, specs.digestSize, digestBytes, multihashBytes);
-	    const cid = specs.version === 0 ? CID.createV0(digest) : CID.createV1(specs.codec, digest);
-	    return [cid, bytes.subarray(specs.size)];
-	  }
-	  static inspectBytes(initialBytes) {
-	    let offset = 0;
-	    const next = () => {
-	      const [i, length] = decode$a(initialBytes.subarray(offset));
-	      offset += length;
-	      return i;
-	    };
-	    let version = next();
-	    let codec = DAG_PB_CODE$1;
-	    if (version === 18) {
-	      version = 0;
-	      offset = 0;
-	    } else if (version === 1) {
-	      codec = next();
-	    }
-	    if (version !== 0 && version !== 1) {
-	      throw new RangeError(`Invalid CID version ${version}`);
-	    }
-	    const prefixSize = offset;
-	    const multihashCode = next();
-	    const digestSize = next();
-	    const size = offset + digestSize;
-	    const multihashSize = size - prefixSize;
-	    return {
-	      version,
-	      codec,
-	      multihashCode,
-	      digestSize,
-	      multihashSize,
-	      size
-	    };
-	  }
-	  static parse(source, base) {
-	    const [prefix, bytes] = parseCIDtoBytes$1(source, base);
-	    const cid = CID.decode(bytes);
-	    cid._baseCache.set(prefix, source);
-	    return cid;
-	  }
-	};
-	const parseCIDtoBytes$1 = (source, base) => {
-	  switch (source[0]) {
-	    case 'Q':
-	      {
-	        const decoder = base || base58btc$1;
-	        return [base58btc$1.prefix, decoder.decode(`${base58btc$1.prefix}${source}`)];
-	      }
-	    case base58btc$1.prefix:
-	      {
-	        const decoder = base || base58btc$1;
-	        return [base58btc$1.prefix, decoder.decode(source)];
-	      }
-	    case base32$1.prefix:
-	      {
-	        const decoder = base || base32$1;
-	        return [base32$1.prefix, decoder.decode(source)];
-	      }
-	    default:
-	      {
-	        if (base == null) {
-	          throw Error('To parse non base32 or base58btc encoded CID multibase decoder must be provided');
-	        }
-	        return [source[0], base.decode(source)];
-	      }
-	  }
-	};
-	const toStringV0$1 = (bytes, cache, base) => {
-	  const {
-	    prefix
-	  } = base;
-	  if (prefix !== base58btc$1.prefix) {
-	    throw Error(`Cannot string encode V0 in ${base.name} encoding`);
-	  }
-	  const cid = cache.get(prefix);
-	  if (cid == null) {
-	    const cid = base.encode(bytes).slice(1);
-	    cache.set(prefix, cid);
-	    return cid;
-	  } else {
-	    return cid;
-	  }
-	};
-	const toStringV1$1 = (bytes, cache, base) => {
-	  const {
-	    prefix
-	  } = base;
-	  const cid = cache.get(prefix);
-	  if (cid == null) {
-	    const cid = base.encode(bytes);
-	    cache.set(prefix, cid);
-	    return cid;
-	  } else {
-	    return cid;
-	  }
-	};
-	const DAG_PB_CODE$1 = 112;
-	const SHA_256_CODE$1 = 18;
-	const encodeCID$1 = (version, code, multihash) => {
-	  const codeOffset = encodingLength$1(version);
-	  const hashOffset = codeOffset + encodingLength$1(code);
-	  const bytes = new Uint8Array(hashOffset + multihash.byteLength);
-	  encodeTo$1(version, bytes, 0);
-	  encodeTo$1(code, bytes, codeOffset);
-	  bytes.set(multihash, hashOffset);
-	  return bytes;
-	};
-	const cidSymbol$1 = Symbol.for('@ipld/js-cid/CID');
-	const readonly = {
-	  writable: false,
-	  configurable: false,
-	  enumerable: true
-	};
-	const hidden = {
-	  writable: false,
-	  enumerable: false,
-	  configurable: false
-	};
-	const version$1 = '0.0.0-dev';
-	const deprecate = (range, message) => {
-	  if (range.test(version$1)) {
-	    console.warn(message);
-	  } else {
-	    throw new Error(message);
-	  }
-	};
-	const IS_CID_DEPRECATION = `CID.isCID(v) is deprecated and will be removed in the next major release.
-Following code pattern:
-
-if (CID.isCID(value)) {
-  doSomethingWithCID(value)
-}
-
-Is replaced with:
-
-const cid = CID.asCID(value)
-if (cid) {
-  // Make sure to use cid instead of value
-  doSomethingWithCID(cid)
-}
-`;
-
-	var cid = /*#__PURE__*/Object.freeze({
-		__proto__: null,
-		CID: CID$1
-	});
-
-	var require$$1 = /*@__PURE__*/getAugmentedNamespace(cid);
-
-	var formats = {};
-
-	var dist$1 = {};
-
-	(function (exports) {
-	  (() => {
-
-	    var e = {
-	        d: (t, r) => {
-	          for (var n in r) e.o(r, n) && !e.o(t, n) && Object.defineProperty(t, n, {
-	            enumerable: !0,
-	            get: r[n]
-	          });
-	        },
-	        o: (e, t) => Object.prototype.hasOwnProperty.call(e, t),
-	        r: e => {
-	          "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {
-	            value: "Module"
-	          }), Object.defineProperty(e, "__esModule", {
-	            value: !0
-	          });
-	        }
-	      },
-	      t = {};
-	    function r(e, t) {
-	      return void 0 === t && (t = "-"), new RegExp("^(?!0{4}" + t + "0{2}" + t + "0{2})((?=[0-9]{4}" + t + "(((0[^2])|1[0-2])|02(?=" + t + "(([0-1][0-9])|2[0-8])))" + t + "[0-9]{2})|(?=((([13579][26])|([2468][048])|(0[48]))0{2})|([0-9]{2}((((0|[2468])[48])|[2468][048])|([13579][26])))" + t + "02" + t + "29))([0-9]{4})" + t + "(?!((0[469])|11)" + t + "31)((0[1,3-9]|1[0-2])|(02(?!" + t + "3)))" + t + "(0[1-9]|[1-2][0-9]|3[0-1])$").test(e);
-	    }
-	    function n(e) {
-	      var t = /\D/.exec(e);
-	      return t ? t[0] : "";
-	    }
-	    function i(e, t, r) {
-	      void 0 === t && (t = ":"), void 0 === r && (r = !1);
-	      var i = new RegExp("^([0-1]|2(?=([0-3])|4" + t + "00))[0-9]" + t + "[0-5][0-9](" + t + "([0-5]|6(?=0))[0-9])?(.[0-9]{1,9})?$");
-	      if (!r || !/[Z+\-]/.test(e)) return i.test(e);
-	      if (/Z$/.test(e)) return i.test(e.replace("Z", ""));
-	      var o = e.includes("+"),
-	        a = e.split(/[+-]/),
-	        u = a[0],
-	        d = a[1];
-	      return i.test(u) && function (e, t, r) {
-	        return void 0 === r && (r = ":"), new RegExp(t ? "^(0(?!(2" + r + "4)|0" + r + "3)|1(?=([0-1]|2(?=" + r + "[04])|[34](?=" + r + "0))))([03469](?=" + r + "[03])|[17](?=" + r + "0)|2(?=" + r + "[04])|5(?=" + r + "[034])|8(?=" + r + "[04]))" + r + "([03](?=0)|4(?=5))[05]$" : "^(0(?=[^0])|1(?=[0-2]))([39](?=" + r + "[03])|[0-24-8](?=" + r + "00))" + r + "[03]0$").test(e);
-	      }(d, o, n(d));
-	    }
-	    function o(e) {
-	      var t = e.split("T"),
-	        o = t[0],
-	        a = t[1],
-	        u = r(o, n(o));
-	      if (!a) return !1;
-	      var d,
-	        s = (d = a.match(/([^Z+\-\d])(?=\d+\1)/), Array.isArray(d) ? d[0] : "");
-	      return u && i(a, s, !0);
-	    }
-	    function a(e, t) {
-	      return void 0 === t && (t = "-"), new RegExp("^[0-9]{4}" + t + "(0(?=[^0])|1(?=[0-2]))[0-9]$").test(e);
-	    }
-	    e.r(t), e.d(t, {
-	      isValidDate: () => r,
-	      isValidISODateString: () => o,
-	      isValidTime: () => i,
-	      isValidYearMonth: () => a
-	    });
-	    var u = exports;
-	    for (var d in t) u[d] = t[d];
-	    t.__esModule && Object.defineProperty(u, "__esModule", {
-	      value: !0
-	    });
-	  })();
-	})(dist$1);
-
-	var hasRequiredFormats;
-	function requireFormats() {
-	  if (hasRequiredFormats) return formats;
-	  hasRequiredFormats = 1;
-	  Object.defineProperty(formats, "__esModule", {
-	    value: true
-	  });
-	  formats.language = formats.cid = formats.nsid = formats.atIdentifier = formats.handle = formats.did = formats.atUri = formats.uri = formats.datetime = void 0;
-	  const iso_datestring_validator_1 = dist$1;
-	  const cid_1 = require$$1;
-	  const types_1 = requireTypes();
-	  const syntax_1 = dist$4;
-	  const common_web_1 = dist$2;
-	  function datetime(path, value) {
-	    try {
-	      if (!(0, iso_datestring_validator_1.isValidISODateString)(value)) {
-	        throw new Error();
-	      }
-	    } catch {
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} must be an valid atproto datetime (both RFC-3339 and ISO-8601)`)
-	      };
-	    }
-	    return {
-	      success: true,
-	      value
-	    };
-	  }
-	  formats.datetime = datetime;
-	  function uri(path, value) {
-	    const isUri = value.match(/^\w+:(?:\/\/)?[^\s/][^\s]*$/) !== null;
-	    if (!isUri) {
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} must be a uri`)
-	      };
-	    }
-	    return {
-	      success: true,
-	      value
-	    };
-	  }
-	  formats.uri = uri;
-	  function atUri(path, value) {
-	    try {
-	      (0, syntax_1.ensureValidAtUri)(value);
-	    } catch {
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} must be a valid at-uri`)
-	      };
-	    }
-	    return {
-	      success: true,
-	      value
-	    };
-	  }
-	  formats.atUri = atUri;
-	  function did(path, value) {
-	    try {
-	      (0, syntax_1.ensureValidDid)(value);
-	    } catch {
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} must be a valid did`)
-	      };
-	    }
-	    return {
-	      success: true,
-	      value
-	    };
-	  }
-	  formats.did = did;
-	  function handle(path, value) {
-	    try {
-	      (0, syntax_1.ensureValidHandle)(value);
-	    } catch {
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} must be a valid handle`)
-	      };
-	    }
-	    return {
-	      success: true,
-	      value
-	    };
-	  }
-	  formats.handle = handle;
-	  function atIdentifier(path, value) {
-	    const isDid = did(path, value);
-	    if (!isDid.success) {
-	      const isHandle = handle(path, value);
-	      if (!isHandle.success) {
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`${path} must be a valid did or a handle`)
-	        };
-	      }
-	    }
-	    return {
-	      success: true,
-	      value
-	    };
-	  }
-	  formats.atIdentifier = atIdentifier;
-	  function nsid(path, value) {
-	    try {
-	      (0, syntax_1.ensureValidNsid)(value);
-	    } catch {
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} must be a valid nsid`)
-	      };
-	    }
-	    return {
-	      success: true,
-	      value
-	    };
-	  }
-	  formats.nsid = nsid;
-	  function cid(path, value) {
-	    try {
-	      cid_1.CID.parse(value);
-	    } catch {
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} must be a cid string`)
-	      };
-	    }
-	    return {
-	      success: true,
-	      value
-	    };
-	  }
-	  formats.cid = cid;
-	  // The language format validates well-formed BCP 47 language tags: https://www.rfc-editor.org/info/bcp47
-	  function language(path, value) {
-	    if ((0, common_web_1.validateLanguage)(value)) {
-	      return {
-	        success: true,
-	        value
-	      };
-	    }
-	    return {
-	      success: false,
-	      error: new types_1.ValidationError(`${path} must be a well-formed BCP 47 language tag`)
-	    };
-	  }
-	  formats.language = language;
-	  return formats;
-	}
-
-	var hasRequiredPrimitives;
-	function requirePrimitives() {
-	  if (hasRequiredPrimitives) return primitives;
-	  hasRequiredPrimitives = 1;
-	  var __createBinding = commonjsGlobal && commonjsGlobal.__createBinding || (Object.create ? function (o, m, k, k2) {
-	    if (k2 === undefined) k2 = k;
-	    var desc = Object.getOwnPropertyDescriptor(m, k);
-	    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-	      desc = {
-	        enumerable: true,
-	        get: function () {
-	          return m[k];
-	        }
-	      };
-	    }
-	    Object.defineProperty(o, k2, desc);
-	  } : function (o, m, k, k2) {
-	    if (k2 === undefined) k2 = k;
-	    o[k2] = m[k];
-	  });
-	  var __setModuleDefault = commonjsGlobal && commonjsGlobal.__setModuleDefault || (Object.create ? function (o, v) {
-	    Object.defineProperty(o, "default", {
-	      enumerable: true,
-	      value: v
-	    });
-	  } : function (o, v) {
-	    o["default"] = v;
-	  });
-	  var __importStar = commonjsGlobal && commonjsGlobal.__importStar || function (mod) {
-	    if (mod && mod.__esModule) return mod;
-	    var result = {};
-	    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-	    __setModuleDefault(result, mod);
-	    return result;
-	  };
-	  Object.defineProperty(primitives, "__esModule", {
-	    value: true
-	  });
-	  primitives.unknown = primitives.cidLink = primitives.bytes = primitives.string = primitives.integer = primitives.boolean = primitives.validate = void 0;
-	  const common_web_1 = dist$2;
-	  const cid_1 = require$$1;
-	  const formats = __importStar(requireFormats());
-	  const types_1 = requireTypes();
-	  function validate(lexicons, path, def, value) {
-	    switch (def.type) {
-	      case 'boolean':
-	        return boolean(lexicons, path, def, value);
-	      case 'integer':
-	        return integer(lexicons, path, def, value);
-	      case 'string':
-	        return string(lexicons, path, def, value);
-	      case 'bytes':
-	        return bytes(lexicons, path, def, value);
-	      case 'cid-link':
-	        return cidLink(lexicons, path, def, value);
-	      case 'unknown':
-	        return unknown(lexicons, path, def, value);
-	      default:
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`Unexpected lexicon type: ${def.type}`)
-	        };
-	    }
-	  }
-	  primitives.validate = validate;
-	  function boolean(lexicons, path, def, value) {
-	    def = def;
-	    // type
-	    const type = typeof value;
-	    if (type === 'undefined') {
-	      if (typeof def.default === 'boolean') {
-	        return {
-	          success: true,
-	          value: def.default
-	        };
-	      }
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} must be a boolean`)
-	      };
-	    } else if (type !== 'boolean') {
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} must be a boolean`)
-	      };
-	    }
-	    // const
-	    if (typeof def.const === 'boolean') {
-	      if (value !== def.const) {
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`${path} must be ${def.const}`)
-	        };
-	      }
-	    }
-	    return {
-	      success: true,
-	      value
-	    };
-	  }
-	  primitives.boolean = boolean;
-	  function integer(lexicons, path, def, value) {
-	    def = def;
-	    // type
-	    const type = typeof value;
-	    if (type === 'undefined') {
-	      if (typeof def.default === 'number') {
-	        return {
-	          success: true,
-	          value: def.default
-	        };
-	      }
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} must be an integer`)
-	      };
-	    } else if (!Number.isInteger(value)) {
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} must be an integer`)
-	      };
-	    }
-	    // const
-	    if (typeof def.const === 'number') {
-	      if (value !== def.const) {
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`${path} must be ${def.const}`)
-	        };
-	      }
-	    }
-	    // enum
-	    if (Array.isArray(def.enum)) {
-	      if (!def.enum.includes(value)) {
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`${path} must be one of (${def.enum.join('|')})`)
-	        };
-	      }
-	    }
-	    // maximum
-	    if (typeof def.maximum === 'number') {
-	      if (value > def.maximum) {
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`${path} can not be greater than ${def.maximum}`)
-	        };
-	      }
-	    }
-	    // minimum
-	    if (typeof def.minimum === 'number') {
-	      if (value < def.minimum) {
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`${path} can not be less than ${def.minimum}`)
-	        };
-	      }
-	    }
-	    return {
-	      success: true,
-	      value
-	    };
-	  }
-	  primitives.integer = integer;
-	  function string(lexicons, path, def, value) {
-	    def = def;
-	    // type
-	    if (typeof value === 'undefined') {
-	      if (typeof def.default === 'string') {
-	        return {
-	          success: true,
-	          value: def.default
-	        };
-	      }
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} must be a string`)
-	      };
-	    } else if (typeof value !== 'string') {
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} must be a string`)
-	      };
-	    }
-	    // const
-	    if (typeof def.const === 'string') {
-	      if (value !== def.const) {
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`${path} must be ${def.const}`)
-	        };
-	      }
-	    }
-	    // enum
-	    if (Array.isArray(def.enum)) {
-	      if (!def.enum.includes(value)) {
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`${path} must be one of (${def.enum.join('|')})`)
-	        };
-	      }
-	    }
-	    // maxLength
-	    if (typeof def.maxLength === 'number') {
-	      if ((0, common_web_1.utf8Len)(value) > def.maxLength) {
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`${path} must not be longer than ${def.maxLength} characters`)
-	        };
-	      }
-	    }
-	    // minLength
-	    if (typeof def.minLength === 'number') {
-	      if ((0, common_web_1.utf8Len)(value) < def.minLength) {
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`${path} must not be shorter than ${def.minLength} characters`)
-	        };
-	      }
-	    }
-	    // maxGraphemes
-	    if (typeof def.maxGraphemes === 'number') {
-	      if ((0, common_web_1.graphemeLen)(value) > def.maxGraphemes) {
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`${path} must not be longer than ${def.maxGraphemes} graphemes`)
-	        };
-	      }
-	    }
-	    // minGraphemes
-	    if (typeof def.minGraphemes === 'number') {
-	      if ((0, common_web_1.graphemeLen)(value) < def.minGraphemes) {
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`${path} must not be shorter than ${def.minGraphemes} graphemes`)
-	        };
-	      }
-	    }
-	    if (typeof def.format === 'string') {
-	      switch (def.format) {
-	        case 'datetime':
-	          return formats.datetime(path, value);
-	        case 'uri':
-	          return formats.uri(path, value);
-	        case 'at-uri':
-	          return formats.atUri(path, value);
-	        case 'did':
-	          return formats.did(path, value);
-	        case 'handle':
-	          return formats.handle(path, value);
-	        case 'at-identifier':
-	          return formats.atIdentifier(path, value);
-	        case 'nsid':
-	          return formats.nsid(path, value);
-	        case 'cid':
-	          return formats.cid(path, value);
-	        case 'language':
-	          return formats.language(path, value);
-	      }
-	    }
-	    return {
-	      success: true,
-	      value
-	    };
-	  }
-	  primitives.string = string;
-	  function bytes(lexicons, path, def, value) {
-	    def = def;
-	    if (!value || !(value instanceof Uint8Array)) {
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} must be a byte array`)
-	      };
-	    }
-	    // maxLength
-	    if (typeof def.maxLength === 'number') {
-	      if (value.byteLength > def.maxLength) {
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`${path} must not be larger than ${def.maxLength} bytes`)
-	        };
-	      }
-	    }
-	    // minLength
-	    if (typeof def.minLength === 'number') {
-	      if (value.byteLength < def.minLength) {
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`${path} must not be smaller than ${def.minLength} bytes`)
-	        };
-	      }
-	    }
-	    return {
-	      success: true,
-	      value
-	    };
-	  }
-	  primitives.bytes = bytes;
-	  function cidLink(lexicons, path, def, value) {
-	    if (cid_1.CID.asCID(value) === null) {
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} must be a CID`)
-	      };
-	    }
-	    return {
-	      success: true,
-	      value
-	    };
-	  }
-	  primitives.cidLink = cidLink;
-	  function unknown(lexicons, path, def, value) {
-	    // type
-	    if (!value || typeof value !== 'object') {
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} must be an object`)
-	      };
-	    }
-	    return {
-	      success: true,
-	      value
-	    };
-	  }
-	  primitives.unknown = unknown;
-	  return primitives;
-	}
-
-	var blob = {};
-
-	var blobRefs = {};
-
 	(function (exports) {
 
 	  Object.defineProperty(exports, "__esModule", {
@@ -11286,7 +9855,7 @@ if (cid) {
 	  });
 	  exports.BlobRef = exports.jsonBlobRef = exports.untypedJsonBlobRef = exports.typedJsonBlobRef = void 0;
 	  const common_web_1 = dist$2;
-	  const cid_1 = require$$1;
+	  const cid_1 = require$$1$1;
 	  const zod_1 = lib$1;
 	  exports.typedJsonBlobRef = zod_1.z.object({
 	    $type: zod_1.z.literal('blob'),
@@ -11360,649 +9929,276 @@ if (cid) {
 	  exports.BlobRef = BlobRef;
 	})(blobRefs);
 
-	var hasRequiredBlob;
-	function requireBlob() {
-	  if (hasRequiredBlob) return blob;
-	  hasRequiredBlob = 1;
-	  Object.defineProperty(blob, "__esModule", {
-	    value: true
-	  });
-	  blob.blob = void 0;
-	  const blob_refs_1 = blobRefs;
-	  const types_1 = requireTypes();
-	  function blob$1(lexicons, path, def, value) {
-	    // check
-	    if (!value || !(value instanceof blob_refs_1.BlobRef)) {
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} should be a blob ref`)
-	      };
-	    }
-	    return {
-	      success: true,
-	      value
-	    };
-	  }
-	  blob.blob = blob$1;
-	  return blob;
-	}
-
-	var hasRequiredComplex;
-	function requireComplex() {
-	  if (hasRequiredComplex) return complex;
-	  hasRequiredComplex = 1;
-	  var __createBinding = commonjsGlobal && commonjsGlobal.__createBinding || (Object.create ? function (o, m, k, k2) {
-	    if (k2 === undefined) k2 = k;
-	    var desc = Object.getOwnPropertyDescriptor(m, k);
-	    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-	      desc = {
-	        enumerable: true,
-	        get: function () {
-	          return m[k];
-	        }
-	      };
-	    }
-	    Object.defineProperty(o, k2, desc);
-	  } : function (o, m, k, k2) {
-	    if (k2 === undefined) k2 = k;
-	    o[k2] = m[k];
-	  });
-	  var __setModuleDefault = commonjsGlobal && commonjsGlobal.__setModuleDefault || (Object.create ? function (o, v) {
-	    Object.defineProperty(o, "default", {
-	      enumerable: true,
-	      value: v
-	    });
-	  } : function (o, v) {
-	    o["default"] = v;
-	  });
-	  var __importStar = commonjsGlobal && commonjsGlobal.__importStar || function (mod) {
-	    if (mod && mod.__esModule) return mod;
-	    var result = {};
-	    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-	    __setModuleDefault(result, mod);
-	    return result;
-	  };
-	  Object.defineProperty(complex, "__esModule", {
-	    value: true
-	  });
-	  complex.object = complex.array = complex.validate = void 0;
-	  const types_1 = requireTypes();
-	  const util_1 = requireUtil();
-	  const Primitives = __importStar(requirePrimitives());
-	  const Blob = __importStar(requireBlob());
-	  function validate(lexicons, path, def, value) {
-	    switch (def.type) {
-	      case 'boolean':
-	        return Primitives.boolean(lexicons, path, def, value);
-	      case 'integer':
-	        return Primitives.integer(lexicons, path, def, value);
-	      case 'string':
-	        return Primitives.string(lexicons, path, def, value);
-	      case 'bytes':
-	        return Primitives.bytes(lexicons, path, def, value);
-	      case 'cid-link':
-	        return Primitives.cidLink(lexicons, path, def, value);
-	      case 'unknown':
-	        return Primitives.unknown(lexicons, path, def, value);
-	      case 'object':
-	        return object(lexicons, path, def, value);
-	      case 'array':
-	        return array(lexicons, path, def, value);
-	      case 'blob':
-	        return Blob.blob(lexicons, path, def, value);
-	      default:
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`Unexpected lexicon type: ${def.type}`)
-	        };
-	    }
-	  }
-	  complex.validate = validate;
-	  function array(lexicons, path, def, value) {
-	    // type
-	    if (!Array.isArray(value)) {
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} must be an array`)
-	      };
-	    }
-	    // maxLength
-	    if (typeof def.maxLength === 'number') {
-	      if (value.length > def.maxLength) {
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`${path} must not have more than ${def.maxLength} elements`)
-	        };
-	      }
-	    }
-	    // minLength
-	    if (typeof def.minLength === 'number') {
-	      if (value.length < def.minLength) {
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`${path} must not have fewer than ${def.minLength} elements`)
-	        };
-	      }
-	    }
-	    // items
-	    const itemsDef = def.items;
-	    for (let i = 0; i < value.length; i++) {
-	      const itemValue = value[i];
-	      const itemPath = `${path}/${i}`;
-	      const res = (0, util_1.validateOneOf)(lexicons, itemPath, itemsDef, itemValue);
-	      if (!res.success) {
-	        return res;
-	      }
-	    }
-	    return {
-	      success: true,
-	      value
-	    };
-	  }
-	  complex.array = array;
-	  function object(lexicons, path, def, value) {
-	    def = def;
-	    // type
-	    if (!value || typeof value !== 'object') {
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} must be an object`)
-	      };
-	    }
-	    const requiredProps = new Set(def.required);
-	    const nullableProps = new Set(def.nullable);
-	    // properties
-	    let resultValue = value;
-	    if (typeof def.properties === 'object') {
-	      for (const key in def.properties) {
-	        if (value[key] === null && nullableProps.has(key)) {
-	          continue;
-	        }
-	        const propDef = def.properties[key];
-	        const propPath = `${path}/${key}`;
-	        const validated = (0, util_1.validateOneOf)(lexicons, propPath, propDef, value[key]);
-	        const propValue = validated.success ? validated.value : value[key];
-	        const propIsUndefined = typeof propValue === 'undefined';
-	        // Return error for bad validation, giving required rule precedence
-	        if (propIsUndefined && requiredProps.has(key)) {
-	          return {
-	            success: false,
-	            error: new types_1.ValidationError(`${path} must have the property "${key}"`)
-	          };
-	        } else if (!propIsUndefined && !validated.success) {
-	          return validated;
-	        }
-	        // Adjust value based on e.g. applied defaults, cloning shallowly if there was a changed value
-	        if (propValue !== value[key]) {
-	          if (resultValue === value) {
-	            // Lazy shallow clone
-	            resultValue = {
-	              ...value
-	            };
-	          }
-	          resultValue[key] = propValue;
-	        }
-	      }
-	    }
-	    return {
-	      success: true,
-	      value: resultValue
-	    };
-	  }
-	  complex.object = object;
-	  return complex;
-	}
-
-	var hasRequiredUtil;
-	function requireUtil() {
-	  if (hasRequiredUtil) return util$6;
-	  hasRequiredUtil = 1;
-	  var __createBinding = commonjsGlobal && commonjsGlobal.__createBinding || (Object.create ? function (o, m, k, k2) {
-	    if (k2 === undefined) k2 = k;
-	    var desc = Object.getOwnPropertyDescriptor(m, k);
-	    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-	      desc = {
-	        enumerable: true,
-	        get: function () {
-	          return m[k];
-	        }
-	      };
-	    }
-	    Object.defineProperty(o, k2, desc);
-	  } : function (o, m, k, k2) {
-	    if (k2 === undefined) k2 = k;
-	    o[k2] = m[k];
-	  });
-	  var __setModuleDefault = commonjsGlobal && commonjsGlobal.__setModuleDefault || (Object.create ? function (o, v) {
-	    Object.defineProperty(o, "default", {
-	      enumerable: true,
-	      value: v
-	    });
-	  } : function (o, v) {
-	    o["default"] = v;
-	  });
-	  var __importStar = commonjsGlobal && commonjsGlobal.__importStar || function (mod) {
-	    if (mod && mod.__esModule) return mod;
-	    var result = {};
-	    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-	    __setModuleDefault(result, mod);
-	    return result;
-	  };
-	  Object.defineProperty(util$6, "__esModule", {
-	    value: true
-	  });
-	  util$6.requiredPropertiesRefinement = util$6.toConcreteTypes = util$6.assertValidOneOf = util$6.validateOneOf = util$6.toLexUri = void 0;
-	  const ComplexValidators = __importStar(requireComplex());
-	  const types_1 = requireTypes();
-	  const zod_1 = lib$1;
-	  function toLexUri(str, baseUri) {
-	    if (str.split('#').length > 2) {
-	      throw new Error('Uri can only have one hash segment');
-	    }
-	    if (str.startsWith('lex:')) {
-	      return str;
-	    }
-	    if (str.startsWith('#')) {
-	      if (!baseUri) {
-	        throw new Error(`Unable to resolve uri without anchor: ${str}`);
-	      }
-	      return `${baseUri}${str}`;
-	    }
-	    return `lex:${str}`;
-	  }
-	  util$6.toLexUri = toLexUri;
-	  function validateOneOf(lexicons, path, def, value, mustBeObj = false) {
-	    let error;
-	    let concreteDefs;
-	    if (def.type === 'union') {
-	      if (!(0, types_1.isDiscriminatedObject)(value)) {
-	        return {
-	          success: false,
-	          error: new types_1.ValidationError(`${path} must be an object which includes the "$type" property`)
-	        };
-	      }
-	      if (!refsContainType(def.refs, value.$type)) {
-	        if (def.closed) {
-	          return {
-	            success: false,
-	            error: new types_1.ValidationError(`${path} $type must be one of ${def.refs.join(', ')}`)
-	          };
-	        }
-	        return {
-	          success: true,
-	          value
-	        };
-	      } else {
-	        concreteDefs = toConcreteTypes(lexicons, {
-	          type: 'ref',
-	          ref: value.$type
-	        });
-	      }
-	    } else {
-	      concreteDefs = toConcreteTypes(lexicons, def);
-	    }
-	    for (const concreteDef of concreteDefs) {
-	      const result = mustBeObj ? ComplexValidators.object(lexicons, path, concreteDef, value) : ComplexValidators.validate(lexicons, path, concreteDef, value);
-	      if (result.success) {
-	        return result;
-	      }
-	      error ?? (error = result.error);
-	    }
-	    if (concreteDefs.length > 1) {
-	      return {
-	        success: false,
-	        error: new types_1.ValidationError(`${path} did not match any of the expected definitions`)
-	      };
-	    }
+	Object.defineProperty(blob$1, "__esModule", {
+	  value: true
+	});
+	blob$1.blob = void 0;
+	const blob_refs_1 = blobRefs;
+	const types_1$8 = types$5;
+	function blob(lexicons, path, def, value) {
+	  // check
+	  if (!value || !(value instanceof blob_refs_1.BlobRef)) {
 	    return {
 	      success: false,
-	      error
+	      error: new types_1$8.ValidationError(`${path} should be a blob ref`)
 	    };
 	  }
-	  util$6.validateOneOf = validateOneOf;
-	  function assertValidOneOf(lexicons, path, def, value, mustBeObj = false) {
-	    const res = validateOneOf(lexicons, path, def, value, mustBeObj);
-	    if (!res.success) throw res.error;
-	    return res.value;
-	  }
-	  util$6.assertValidOneOf = assertValidOneOf;
-	  function toConcreteTypes(lexicons, def) {
-	    if (def.type === 'ref') {
-	      return [lexicons.getDefOrThrow(def.ref)];
-	    } else if (def.type === 'union') {
-	      return def.refs.map(ref => lexicons.getDefOrThrow(ref)).flat();
-	    } else {
-	      return [def];
-	    }
-	  }
-	  util$6.toConcreteTypes = toConcreteTypes;
-	  function requiredPropertiesRefinement(object, ctx) {
-	    // Required fields check
-	    if (object.required === undefined) {
-	      return;
-	    }
-	    if (!Array.isArray(object.required)) {
-	      ctx.addIssue({
-	        code: zod_1.z.ZodIssueCode.invalid_type,
-	        received: typeof object.required,
-	        expected: 'array'
-	      });
-	      return;
-	    }
-	    if (object.properties === undefined) {
-	      if (object.required.length > 0) {
-	        ctx.addIssue({
-	          code: zod_1.z.ZodIssueCode.custom,
-	          message: `Required fields defined but no properties defined`
-	        });
-	      }
-	      return;
-	    }
-	    for (const field of object.required) {
-	      if (object.properties[field] === undefined) {
-	        ctx.addIssue({
-	          code: zod_1.z.ZodIssueCode.custom,
-	          message: `Required field "${field}" not defined`
-	        });
-	      }
-	    }
-	  }
-	  util$6.requiredPropertiesRefinement = requiredPropertiesRefinement;
-	  // to avoid bugs like #0189 this needs to handle both
-	  // explicit and implicit #main
-	  const refsContainType = (refs, type) => {
-	    const lexUri = toLexUri(type);
-	    if (refs.includes(lexUri)) {
-	      return true;
-	    }
-	    if (lexUri.endsWith('#main')) {
-	      return refs.includes(lexUri.replace('#main', ''));
-	    } else {
-	      return refs.includes(lexUri + '#main');
-	    }
+	  return {
+	    success: true,
+	    value
 	  };
-	  return util$6;
 	}
+	blob$1.blob = blob;
 
-	var hasRequiredTypes;
-	function requireTypes() {
-	  if (hasRequiredTypes) return types$5;
-	  hasRequiredTypes = 1;
-	  (function (exports) {
+	var primitives = {};
 
-	    Object.defineProperty(exports, "__esModule", {
-	      value: true
-	    });
-	    exports.LexiconDefNotFoundError = exports.InvalidLexiconError = exports.ValidationError = exports.parseLexiconDoc = exports.isDiscriminatedObject = exports.discriminatedObject = exports.hasProp = exports.isObj = exports.isValidLexiconDoc = exports.lexiconDoc = exports.lexUserType = exports.lexRecord = exports.lexXrpcSubscription = exports.lexXrpcProcedure = exports.lexXrpcQuery = exports.lexXrpcError = exports.lexXrpcSubscriptionMessage = exports.lexXrpcBody = exports.lexXrpcParameters = exports.lexObject = exports.lexToken = exports.lexPrimitiveArray = exports.lexArray = exports.lexBlob = exports.lexRefVariant = exports.lexRefUnion = exports.lexRef = exports.lexIpldType = exports.lexCidLink = exports.lexBytes = exports.lexPrimitive = exports.lexUnknown = exports.lexString = exports.lexStringFormat = exports.lexInteger = exports.lexBoolean = void 0;
-	    const zod_1 = lib$1;
-	    const syntax_1 = dist$4;
-	    const util_1 = requireUtil();
-	    // primitives
-	    // =
-	    exports.lexBoolean = zod_1.z.object({
-	      type: zod_1.z.literal('boolean'),
-	      description: zod_1.z.string().optional(),
-	      default: zod_1.z.boolean().optional(),
-	      const: zod_1.z.boolean().optional()
-	    }).strict();
-	    exports.lexInteger = zod_1.z.object({
-	      type: zod_1.z.literal('integer'),
-	      description: zod_1.z.string().optional(),
-	      default: zod_1.z.number().int().optional(),
-	      minimum: zod_1.z.number().int().optional(),
-	      maximum: zod_1.z.number().int().optional(),
-	      enum: zod_1.z.number().int().array().optional(),
-	      const: zod_1.z.number().int().optional()
-	    }).strict();
-	    exports.lexStringFormat = zod_1.z.enum(['datetime', 'uri', 'at-uri', 'did', 'handle', 'at-identifier', 'nsid', 'cid', 'language']);
-	    exports.lexString = zod_1.z.object({
-	      type: zod_1.z.literal('string'),
-	      format: exports.lexStringFormat.optional(),
-	      description: zod_1.z.string().optional(),
-	      default: zod_1.z.string().optional(),
-	      minLength: zod_1.z.number().int().optional(),
-	      maxLength: zod_1.z.number().int().optional(),
-	      minGraphemes: zod_1.z.number().int().optional(),
-	      maxGraphemes: zod_1.z.number().int().optional(),
-	      enum: zod_1.z.string().array().optional(),
-	      const: zod_1.z.string().optional(),
-	      knownValues: zod_1.z.string().array().optional()
-	    }).strict();
-	    exports.lexUnknown = zod_1.z.object({
-	      type: zod_1.z.literal('unknown'),
-	      description: zod_1.z.string().optional()
-	    }).strict();
-	    exports.lexPrimitive = zod_1.z.discriminatedUnion('type', [exports.lexBoolean, exports.lexInteger, exports.lexString, exports.lexUnknown]);
-	    // ipld types
-	    // =
-	    exports.lexBytes = zod_1.z.object({
-	      type: zod_1.z.literal('bytes'),
-	      description: zod_1.z.string().optional(),
-	      maxLength: zod_1.z.number().optional(),
-	      minLength: zod_1.z.number().optional()
-	    }).strict();
-	    exports.lexCidLink = zod_1.z.object({
-	      type: zod_1.z.literal('cid-link'),
-	      description: zod_1.z.string().optional()
-	    }).strict();
-	    exports.lexIpldType = zod_1.z.discriminatedUnion('type', [exports.lexBytes, exports.lexCidLink]);
-	    // references
-	    // =
-	    exports.lexRef = zod_1.z.object({
-	      type: zod_1.z.literal('ref'),
-	      description: zod_1.z.string().optional(),
-	      ref: zod_1.z.string()
-	    }).strict();
-	    exports.lexRefUnion = zod_1.z.object({
-	      type: zod_1.z.literal('union'),
-	      description: zod_1.z.string().optional(),
-	      refs: zod_1.z.string().array(),
-	      closed: zod_1.z.boolean().optional()
-	    }).strict();
-	    exports.lexRefVariant = zod_1.z.discriminatedUnion('type', [exports.lexRef, exports.lexRefUnion]);
-	    // blobs
-	    // =
-	    exports.lexBlob = zod_1.z.object({
-	      type: zod_1.z.literal('blob'),
-	      description: zod_1.z.string().optional(),
-	      accept: zod_1.z.string().array().optional(),
-	      maxSize: zod_1.z.number().optional()
-	    }).strict();
-	    // complex types
-	    // =
-	    exports.lexArray = zod_1.z.object({
-	      type: zod_1.z.literal('array'),
-	      description: zod_1.z.string().optional(),
-	      items: zod_1.z.union([exports.lexPrimitive, exports.lexIpldType, exports.lexBlob, exports.lexRefVariant]),
-	      minLength: zod_1.z.number().int().optional(),
-	      maxLength: zod_1.z.number().int().optional()
-	    }).strict();
-	    exports.lexPrimitiveArray = exports.lexArray.merge(zod_1.z.object({
-	      items: exports.lexPrimitive
-	    }).strict());
-	    exports.lexToken = zod_1.z.object({
-	      type: zod_1.z.literal('token'),
-	      description: zod_1.z.string().optional()
-	    }).strict();
-	    exports.lexObject = zod_1.z.object({
-	      type: zod_1.z.literal('object'),
-	      description: zod_1.z.string().optional(),
-	      required: zod_1.z.string().array().optional(),
-	      nullable: zod_1.z.string().array().optional(),
-	      properties: zod_1.z.record(zod_1.z.union([exports.lexRefVariant, exports.lexIpldType, exports.lexArray, exports.lexBlob, exports.lexPrimitive]))
-	    }).strict().superRefine(util_1.requiredPropertiesRefinement);
-	    // xrpc
-	    // =
-	    exports.lexXrpcParameters = zod_1.z.object({
-	      type: zod_1.z.literal('params'),
-	      description: zod_1.z.string().optional(),
-	      required: zod_1.z.string().array().optional(),
-	      properties: zod_1.z.record(zod_1.z.union([exports.lexPrimitive, exports.lexPrimitiveArray]))
-	    }).strict().superRefine(util_1.requiredPropertiesRefinement);
-	    exports.lexXrpcBody = zod_1.z.object({
-	      description: zod_1.z.string().optional(),
-	      encoding: zod_1.z.string(),
-	      schema: zod_1.z.union([exports.lexRefVariant, exports.lexObject]).optional()
-	    }).strict();
-	    exports.lexXrpcSubscriptionMessage = zod_1.z.object({
-	      description: zod_1.z.string().optional(),
-	      schema: zod_1.z.union([exports.lexRefVariant, exports.lexObject]).optional()
-	    }).strict();
-	    exports.lexXrpcError = zod_1.z.object({
-	      name: zod_1.z.string(),
-	      description: zod_1.z.string().optional()
-	    }).strict();
-	    exports.lexXrpcQuery = zod_1.z.object({
-	      type: zod_1.z.literal('query'),
-	      description: zod_1.z.string().optional(),
-	      parameters: exports.lexXrpcParameters.optional(),
-	      output: exports.lexXrpcBody.optional(),
-	      errors: exports.lexXrpcError.array().optional()
-	    }).strict();
-	    exports.lexXrpcProcedure = zod_1.z.object({
-	      type: zod_1.z.literal('procedure'),
-	      description: zod_1.z.string().optional(),
-	      parameters: exports.lexXrpcParameters.optional(),
-	      input: exports.lexXrpcBody.optional(),
-	      output: exports.lexXrpcBody.optional(),
-	      errors: exports.lexXrpcError.array().optional()
-	    }).strict();
-	    exports.lexXrpcSubscription = zod_1.z.object({
-	      type: zod_1.z.literal('subscription'),
-	      description: zod_1.z.string().optional(),
-	      parameters: exports.lexXrpcParameters.optional(),
-	      message: exports.lexXrpcSubscriptionMessage.optional(),
-	      errors: exports.lexXrpcError.array().optional()
-	    }).strict();
-	    // database
-	    // =
-	    exports.lexRecord = zod_1.z.object({
-	      type: zod_1.z.literal('record'),
-	      description: zod_1.z.string().optional(),
-	      key: zod_1.z.string().optional(),
-	      record: exports.lexObject
-	    }).strict();
-	    // core
-	    // =
-	    // We need to use `z.custom` here because
-	    // lexXrpcProperty and lexObject are refined
-	    // `z.union` would work, but it's too slow
-	    // see #915 for details
-	    exports.lexUserType = zod_1.z.custom(val => {
-	      if (!val || typeof val !== 'object') {
-	        return;
-	      }
-	      if (val['type'] === undefined) {
-	        return;
-	      }
-	      switch (val['type']) {
-	        case 'record':
-	          return exports.lexRecord.parse(val);
-	        case 'query':
-	          return exports.lexXrpcQuery.parse(val);
-	        case 'procedure':
-	          return exports.lexXrpcProcedure.parse(val);
-	        case 'subscription':
-	          return exports.lexXrpcSubscription.parse(val);
-	        case 'blob':
-	          return exports.lexBlob.parse(val);
-	        case 'array':
-	          return exports.lexArray.parse(val);
-	        case 'token':
-	          return exports.lexToken.parse(val);
-	        case 'object':
-	          return exports.lexObject.parse(val);
-	        case 'boolean':
-	          return exports.lexBoolean.parse(val);
-	        case 'integer':
-	          return exports.lexInteger.parse(val);
-	        case 'string':
-	          return exports.lexString.parse(val);
-	        case 'bytes':
-	          return exports.lexBytes.parse(val);
-	        case 'cid-link':
-	          return exports.lexCidLink.parse(val);
-	        case 'unknown':
-	          return exports.lexUnknown.parse(val);
-	      }
-	    }, val => {
-	      if (!val || typeof val !== 'object') {
-	        return {
-	          message: 'Must be an object',
-	          fatal: true
-	        };
-	      }
-	      if (val['type'] === undefined) {
-	        return {
-	          message: 'Must have a type',
-	          fatal: true
-	        };
-	      }
-	      return {
-	        message: `Invalid type: ${val['type']} must be one of: record, query, procedure, subscription, blob, array, token, object, boolean, integer, string, bytes, cid-link, unknown`,
-	        fatal: true
-	      };
-	    });
-	    exports.lexiconDoc = zod_1.z.object({
-	      lexicon: zod_1.z.literal(1),
-	      id: zod_1.z.string().refine(v => syntax_1.NSID.isValid(v), {
-	        message: 'Must be a valid NSID'
-	      }),
-	      revision: zod_1.z.number().optional(),
-	      description: zod_1.z.string().optional(),
-	      defs: zod_1.z.record(exports.lexUserType)
-	    }).strict().superRefine((doc, ctx) => {
-	      for (const defId in doc.defs) {
-	        const def = doc.defs[defId];
-	        if (defId !== 'main' && (def.type === 'record' || def.type === 'procedure' || def.type === 'query' || def.type === 'subscription')) {
-	          ctx.addIssue({
-	            code: zod_1.z.ZodIssueCode.custom,
-	            message: `Records, procedures, queries, and subscriptions must be the main definition.`
+	var formats$1 = {};
+
+	var dist$1 = {};
+
+	(function (exports) {
+	  (() => {
+
+	    var e = {
+	        d: (t, r) => {
+	          for (var n in r) e.o(r, n) && !e.o(t, n) && Object.defineProperty(t, n, {
+	            enumerable: !0,
+	            get: r[n]
+	          });
+	        },
+	        o: (e, t) => Object.prototype.hasOwnProperty.call(e, t),
+	        r: e => {
+	          "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {
+	            value: "Module"
+	          }), Object.defineProperty(e, "__esModule", {
+	            value: !0
 	          });
 	        }
-	      }
+	      },
+	      t = {};
+	    function r(e, t) {
+	      return void 0 === t && (t = "-"), new RegExp("^(?!0{4}" + t + "0{2}" + t + "0{2})((?=[0-9]{4}" + t + "(((0[^2])|1[0-2])|02(?=" + t + "(([0-1][0-9])|2[0-8])))" + t + "[0-9]{2})|(?=((([13579][26])|([2468][048])|(0[48]))0{2})|([0-9]{2}((((0|[2468])[48])|[2468][048])|([13579][26])))" + t + "02" + t + "29))([0-9]{4})" + t + "(?!((0[469])|11)" + t + "31)((0[1,3-9]|1[0-2])|(02(?!" + t + "3)))" + t + "(0[1-9]|[1-2][0-9]|3[0-1])$").test(e);
+	    }
+	    function n(e) {
+	      var t = /\D/.exec(e);
+	      return t ? t[0] : "";
+	    }
+	    function i(e, t, r) {
+	      void 0 === t && (t = ":"), void 0 === r && (r = !1);
+	      var i = new RegExp("^([0-1]|2(?=([0-3])|4" + t + "00))[0-9]" + t + "[0-5][0-9](" + t + "([0-5]|6(?=0))[0-9])?(.[0-9]{1,9})?$");
+	      if (!r || !/[Z+\-]/.test(e)) return i.test(e);
+	      if (/Z$/.test(e)) return i.test(e.replace("Z", ""));
+	      var o = e.includes("+"),
+	        a = e.split(/[+-]/),
+	        u = a[0],
+	        d = a[1];
+	      return i.test(u) && function (e, t, r) {
+	        return void 0 === r && (r = ":"), new RegExp(t ? "^(0(?!(2" + r + "4)|0" + r + "3)|1(?=([0-1]|2(?=" + r + "[04])|[34](?=" + r + "0))))([03469](?=" + r + "[03])|[17](?=" + r + "0)|2(?=" + r + "[04])|5(?=" + r + "[034])|8(?=" + r + "[04]))" + r + "([03](?=0)|4(?=5))[05]$" : "^(0(?=[^0])|1(?=[0-2]))([39](?=" + r + "[03])|[0-24-8](?=" + r + "00))" + r + "[03]0$").test(e);
+	      }(d, o, n(d));
+	    }
+	    function o(e) {
+	      var t = e.split("T"),
+	        o = t[0],
+	        a = t[1],
+	        u = r(o, n(o));
+	      if (!a) return !1;
+	      var d,
+	        s = (d = a.match(/([^Z+\-\d])(?=\d+\1)/), Array.isArray(d) ? d[0] : "");
+	      return u && i(a, s, !0);
+	    }
+	    function a(e, t) {
+	      return void 0 === t && (t = "-"), new RegExp("^[0-9]{4}" + t + "(0(?=[^0])|1(?=[0-2]))[0-9]$").test(e);
+	    }
+	    e.r(t), e.d(t, {
+	      isValidDate: () => r,
+	      isValidISODateString: () => o,
+	      isValidTime: () => i,
+	      isValidYearMonth: () => a
 	    });
-	    // helpers
-	    // =
-	    function isValidLexiconDoc(v) {
-	      return exports.lexiconDoc.safeParse(v).success;
-	    }
-	    exports.isValidLexiconDoc = isValidLexiconDoc;
-	    function isObj(obj) {
-	      return obj !== null && typeof obj === 'object';
-	    }
-	    exports.isObj = isObj;
-	    function hasProp(data, prop) {
-	      return prop in data;
-	    }
-	    exports.hasProp = hasProp;
-	    exports.discriminatedObject = zod_1.z.object({
-	      $type: zod_1.z.string()
+	    var u = exports;
+	    for (var d in t) u[d] = t[d];
+	    t.__esModule && Object.defineProperty(u, "__esModule", {
+	      value: !0
 	    });
-	    function isDiscriminatedObject(value) {
-	      return exports.discriminatedObject.safeParse(value).success;
+	  })();
+	})(dist$1);
+
+	Object.defineProperty(formats$1, "__esModule", {
+	  value: true
+	});
+	formats$1.recordKey = formats$1.tid = formats$1.language = formats$1.cid = formats$1.nsid = formats$1.atIdentifier = formats$1.handle = formats$1.did = formats$1.atUri = formats$1.uri = formats$1.datetime = void 0;
+	const iso_datestring_validator_1 = dist$1;
+	const cid_1$1 = require$$1$1;
+	const types_1$7 = types$5;
+	const syntax_1$2 = dist$3;
+	const common_web_1$4 = dist$2;
+	function datetime(path, value) {
+	  try {
+	    if (!(0, iso_datestring_validator_1.isValidISODateString)(value)) {
+	      throw new Error();
 	    }
-	    exports.isDiscriminatedObject = isDiscriminatedObject;
-	    function parseLexiconDoc(v) {
-	      exports.lexiconDoc.parse(v);
-	      return v;
-	    }
-	    exports.parseLexiconDoc = parseLexiconDoc;
-	    class ValidationError extends Error {}
-	    exports.ValidationError = ValidationError;
-	    class InvalidLexiconError extends Error {}
-	    exports.InvalidLexiconError = InvalidLexiconError;
-	    class LexiconDefNotFoundError extends Error {}
-	    exports.LexiconDefNotFoundError = LexiconDefNotFoundError;
-	  })(types$5);
-	  return types$5;
+	  } catch {
+	    return {
+	      success: false,
+	      error: new types_1$7.ValidationError(`${path} must be an valid atproto datetime (both RFC-3339 and ISO-8601)`)
+	    };
+	  }
+	  return {
+	    success: true,
+	    value
+	  };
 	}
-
-	var lexicons$1 = {};
-
-	var validation = {};
-
-	var xrpc = {};
+	formats$1.datetime = datetime;
+	function uri(path, value) {
+	  const isUri = value.match(/^\w+:(?:\/\/)?[^\s/][^\s]*$/) !== null;
+	  if (!isUri) {
+	    return {
+	      success: false,
+	      error: new types_1$7.ValidationError(`${path} must be a uri`)
+	    };
+	  }
+	  return {
+	    success: true,
+	    value
+	  };
+	}
+	formats$1.uri = uri;
+	function atUri(path, value) {
+	  try {
+	    (0, syntax_1$2.ensureValidAtUri)(value);
+	  } catch {
+	    return {
+	      success: false,
+	      error: new types_1$7.ValidationError(`${path} must be a valid at-uri`)
+	    };
+	  }
+	  return {
+	    success: true,
+	    value
+	  };
+	}
+	formats$1.atUri = atUri;
+	function did(path, value) {
+	  try {
+	    (0, syntax_1$2.ensureValidDid)(value);
+	  } catch {
+	    return {
+	      success: false,
+	      error: new types_1$7.ValidationError(`${path} must be a valid did`)
+	    };
+	  }
+	  return {
+	    success: true,
+	    value
+	  };
+	}
+	formats$1.did = did;
+	function handle(path, value) {
+	  try {
+	    (0, syntax_1$2.ensureValidHandle)(value);
+	  } catch {
+	    return {
+	      success: false,
+	      error: new types_1$7.ValidationError(`${path} must be a valid handle`)
+	    };
+	  }
+	  return {
+	    success: true,
+	    value
+	  };
+	}
+	formats$1.handle = handle;
+	function atIdentifier(path, value) {
+	  const isDid = did(path, value);
+	  if (!isDid.success) {
+	    const isHandle = handle(path, value);
+	    if (!isHandle.success) {
+	      return {
+	        success: false,
+	        error: new types_1$7.ValidationError(`${path} must be a valid did or a handle`)
+	      };
+	    }
+	  }
+	  return {
+	    success: true,
+	    value
+	  };
+	}
+	formats$1.atIdentifier = atIdentifier;
+	function nsid(path, value) {
+	  try {
+	    (0, syntax_1$2.ensureValidNsid)(value);
+	  } catch {
+	    return {
+	      success: false,
+	      error: new types_1$7.ValidationError(`${path} must be a valid nsid`)
+	    };
+	  }
+	  return {
+	    success: true,
+	    value
+	  };
+	}
+	formats$1.nsid = nsid;
+	function cid(path, value) {
+	  try {
+	    cid_1$1.CID.parse(value);
+	  } catch {
+	    return {
+	      success: false,
+	      error: new types_1$7.ValidationError(`${path} must be a cid string`)
+	    };
+	  }
+	  return {
+	    success: true,
+	    value
+	  };
+	}
+	formats$1.cid = cid;
+	// The language format validates well-formed BCP 47 language tags: https://www.rfc-editor.org/info/bcp47
+	function language(path, value) {
+	  if ((0, common_web_1$4.validateLanguage)(value)) {
+	    return {
+	      success: true,
+	      value
+	    };
+	  }
+	  return {
+	    success: false,
+	    error: new types_1$7.ValidationError(`${path} must be a well-formed BCP 47 language tag`)
+	  };
+	}
+	formats$1.language = language;
+	function tid(path, value) {
+	  try {
+	    (0, syntax_1$2.ensureValidTid)(value);
+	  } catch {
+	    return {
+	      success: false,
+	      error: new types_1$7.ValidationError(`${path} must be a valid TID (timestamp identifier)`)
+	    };
+	  }
+	  return {
+	    success: true,
+	    value
+	  };
+	}
+	formats$1.tid = tid;
+	function recordKey(path, value) {
+	  try {
+	    (0, syntax_1$2.ensureValidRecordKey)(value);
+	  } catch {
+	    return {
+	      success: false,
+	      error: new types_1$7.ValidationError(`${path} must be a valid Record Key`)
+	    };
+	  }
+	  return {
+	    success: true,
+	    value
+	  };
+	}
+	formats$1.recordKey = recordKey;
 
 	var __createBinding$3 = commonjsGlobal && commonjsGlobal.__createBinding || (Object.create ? function (o, m, k, k2) {
 	  if (k2 === undefined) k2 = k;
@@ -12035,30 +10231,418 @@ if (cid) {
 	  __setModuleDefault$3(result, mod);
 	  return result;
 	};
-	Object.defineProperty(xrpc, "__esModule", {
+	Object.defineProperty(primitives, "__esModule", {
 	  value: true
 	});
-	xrpc.params = void 0;
-	const types_1$4 = requireTypes();
-	const PrimitiveValidators = __importStar$3(requirePrimitives());
-	const complex_1 = requireComplex();
-	function params(lexicons, path, def, val) {
+	primitives.unknown = primitives.cidLink = primitives.bytes = primitives.string = primitives.integer = primitives.boolean = primitives.validate = void 0;
+	const common_web_1$3 = dist$2;
+	const cid_1 = require$$1$1;
+	const formats = __importStar$3(formats$1);
+	const types_1$6 = types$5;
+	function validate$1(lexicons, path, def, value) {
+	  switch (def.type) {
+	    case 'boolean':
+	      return boolean(lexicons, path, def, value);
+	    case 'integer':
+	      return integer(lexicons, path, def, value);
+	    case 'string':
+	      return string(lexicons, path, def, value);
+	    case 'bytes':
+	      return bytes(lexicons, path, def, value);
+	    case 'cid-link':
+	      return cidLink(lexicons, path, def, value);
+	    case 'unknown':
+	      return unknown(lexicons, path, def, value);
+	    default:
+	      return {
+	        success: false,
+	        error: new types_1$6.ValidationError(`Unexpected lexicon type: ${def.type}`)
+	      };
+	  }
+	}
+	primitives.validate = validate$1;
+	function boolean(lexicons, path, def, value) {
+	  def = def;
 	  // type
-	  const value = val && typeof val === 'object' ? val : {};
-	  const requiredProps = new Set(def.required ?? []);
+	  const type = typeof value;
+	  if (type === 'undefined') {
+	    if (typeof def.default === 'boolean') {
+	      return {
+	        success: true,
+	        value: def.default
+	      };
+	    }
+	    return {
+	      success: false,
+	      error: new types_1$6.ValidationError(`${path} must be a boolean`)
+	    };
+	  } else if (type !== 'boolean') {
+	    return {
+	      success: false,
+	      error: new types_1$6.ValidationError(`${path} must be a boolean`)
+	    };
+	  }
+	  // const
+	  if (typeof def.const === 'boolean') {
+	    if (value !== def.const) {
+	      return {
+	        success: false,
+	        error: new types_1$6.ValidationError(`${path} must be ${def.const}`)
+	      };
+	    }
+	  }
+	  return {
+	    success: true,
+	    value
+	  };
+	}
+	primitives.boolean = boolean;
+	function integer(lexicons, path, def, value) {
+	  def = def;
+	  // type
+	  const type = typeof value;
+	  if (type === 'undefined') {
+	    if (typeof def.default === 'number') {
+	      return {
+	        success: true,
+	        value: def.default
+	      };
+	    }
+	    return {
+	      success: false,
+	      error: new types_1$6.ValidationError(`${path} must be an integer`)
+	    };
+	  } else if (!Number.isInteger(value)) {
+	    return {
+	      success: false,
+	      error: new types_1$6.ValidationError(`${path} must be an integer`)
+	    };
+	  }
+	  // const
+	  if (typeof def.const === 'number') {
+	    if (value !== def.const) {
+	      return {
+	        success: false,
+	        error: new types_1$6.ValidationError(`${path} must be ${def.const}`)
+	      };
+	    }
+	  }
+	  // enum
+	  if (Array.isArray(def.enum)) {
+	    if (!def.enum.includes(value)) {
+	      return {
+	        success: false,
+	        error: new types_1$6.ValidationError(`${path} must be one of (${def.enum.join('|')})`)
+	      };
+	    }
+	  }
+	  // maximum
+	  if (typeof def.maximum === 'number') {
+	    if (value > def.maximum) {
+	      return {
+	        success: false,
+	        error: new types_1$6.ValidationError(`${path} can not be greater than ${def.maximum}`)
+	      };
+	    }
+	  }
+	  // minimum
+	  if (typeof def.minimum === 'number') {
+	    if (value < def.minimum) {
+	      return {
+	        success: false,
+	        error: new types_1$6.ValidationError(`${path} can not be less than ${def.minimum}`)
+	      };
+	    }
+	  }
+	  return {
+	    success: true,
+	    value
+	  };
+	}
+	primitives.integer = integer;
+	function string(lexicons, path, def, value) {
+	  def = def;
+	  // type
+	  if (typeof value === 'undefined') {
+	    if (typeof def.default === 'string') {
+	      return {
+	        success: true,
+	        value: def.default
+	      };
+	    }
+	    return {
+	      success: false,
+	      error: new types_1$6.ValidationError(`${path} must be a string`)
+	    };
+	  } else if (typeof value !== 'string') {
+	    return {
+	      success: false,
+	      error: new types_1$6.ValidationError(`${path} must be a string`)
+	    };
+	  }
+	  // const
+	  if (typeof def.const === 'string') {
+	    if (value !== def.const) {
+	      return {
+	        success: false,
+	        error: new types_1$6.ValidationError(`${path} must be ${def.const}`)
+	      };
+	    }
+	  }
+	  // enum
+	  if (Array.isArray(def.enum)) {
+	    if (!def.enum.includes(value)) {
+	      return {
+	        success: false,
+	        error: new types_1$6.ValidationError(`${path} must be one of (${def.enum.join('|')})`)
+	      };
+	    }
+	  }
+	  // maxLength
+	  if (typeof def.maxLength === 'number') {
+	    if ((0, common_web_1$3.utf8Len)(value) > def.maxLength) {
+	      return {
+	        success: false,
+	        error: new types_1$6.ValidationError(`${path} must not be longer than ${def.maxLength} characters`)
+	      };
+	    }
+	  }
+	  // minLength
+	  if (typeof def.minLength === 'number') {
+	    if ((0, common_web_1$3.utf8Len)(value) < def.minLength) {
+	      return {
+	        success: false,
+	        error: new types_1$6.ValidationError(`${path} must not be shorter than ${def.minLength} characters`)
+	      };
+	    }
+	  }
+	  // maxGraphemes
+	  if (typeof def.maxGraphemes === 'number') {
+	    if ((0, common_web_1$3.graphemeLen)(value) > def.maxGraphemes) {
+	      return {
+	        success: false,
+	        error: new types_1$6.ValidationError(`${path} must not be longer than ${def.maxGraphemes} graphemes`)
+	      };
+	    }
+	  }
+	  // minGraphemes
+	  if (typeof def.minGraphemes === 'number') {
+	    if ((0, common_web_1$3.graphemeLen)(value) < def.minGraphemes) {
+	      return {
+	        success: false,
+	        error: new types_1$6.ValidationError(`${path} must not be shorter than ${def.minGraphemes} graphemes`)
+	      };
+	    }
+	  }
+	  if (typeof def.format === 'string') {
+	    switch (def.format) {
+	      case 'datetime':
+	        return formats.datetime(path, value);
+	      case 'uri':
+	        return formats.uri(path, value);
+	      case 'at-uri':
+	        return formats.atUri(path, value);
+	      case 'did':
+	        return formats.did(path, value);
+	      case 'handle':
+	        return formats.handle(path, value);
+	      case 'at-identifier':
+	        return formats.atIdentifier(path, value);
+	      case 'nsid':
+	        return formats.nsid(path, value);
+	      case 'cid':
+	        return formats.cid(path, value);
+	      case 'language':
+	        return formats.language(path, value);
+	      case 'tid':
+	        return formats.tid(path, value);
+	      case 'record-key':
+	        return formats.recordKey(path, value);
+	    }
+	  }
+	  return {
+	    success: true,
+	    value
+	  };
+	}
+	primitives.string = string;
+	function bytes(lexicons, path, def, value) {
+	  def = def;
+	  if (!value || !(value instanceof Uint8Array)) {
+	    return {
+	      success: false,
+	      error: new types_1$6.ValidationError(`${path} must be a byte array`)
+	    };
+	  }
+	  // maxLength
+	  if (typeof def.maxLength === 'number') {
+	    if (value.byteLength > def.maxLength) {
+	      return {
+	        success: false,
+	        error: new types_1$6.ValidationError(`${path} must not be larger than ${def.maxLength} bytes`)
+	      };
+	    }
+	  }
+	  // minLength
+	  if (typeof def.minLength === 'number') {
+	    if (value.byteLength < def.minLength) {
+	      return {
+	        success: false,
+	        error: new types_1$6.ValidationError(`${path} must not be smaller than ${def.minLength} bytes`)
+	      };
+	    }
+	  }
+	  return {
+	    success: true,
+	    value
+	  };
+	}
+	primitives.bytes = bytes;
+	function cidLink(lexicons, path, def, value) {
+	  if (cid_1.CID.asCID(value) === null) {
+	    return {
+	      success: false,
+	      error: new types_1$6.ValidationError(`${path} must be a CID`)
+	    };
+	  }
+	  return {
+	    success: true,
+	    value
+	  };
+	}
+	primitives.cidLink = cidLink;
+	function unknown(lexicons, path, def, value) {
+	  // type
+	  if (!value || typeof value !== 'object') {
+	    return {
+	      success: false,
+	      error: new types_1$6.ValidationError(`${path} must be an object`)
+	    };
+	  }
+	  return {
+	    success: true,
+	    value
+	  };
+	}
+	primitives.unknown = unknown;
+
+	Object.defineProperty(complex, "__esModule", {
+	  value: true
+	});
+	complex.validateOneOf = complex.object = complex.array = complex.validate = void 0;
+	const types_1$5 = types$5;
+	const util_1$U = util$6;
+	const blob_1 = blob$1;
+	const primitives_1 = primitives;
+	function validate(lexicons, path, def, value) {
+	  switch (def.type) {
+	    case 'boolean':
+	      return (0, primitives_1.boolean)(lexicons, path, def, value);
+	    case 'integer':
+	      return (0, primitives_1.integer)(lexicons, path, def, value);
+	    case 'string':
+	      return (0, primitives_1.string)(lexicons, path, def, value);
+	    case 'bytes':
+	      return (0, primitives_1.bytes)(lexicons, path, def, value);
+	    case 'cid-link':
+	      return (0, primitives_1.cidLink)(lexicons, path, def, value);
+	    case 'unknown':
+	      return (0, primitives_1.unknown)(lexicons, path, def, value);
+	    case 'object':
+	      return object(lexicons, path, def, value);
+	    case 'array':
+	      return array(lexicons, path, def, value);
+	    case 'blob':
+	      return (0, blob_1.blob)(lexicons, path, def, value);
+	    default:
+	      return {
+	        success: false,
+	        error: new types_1$5.ValidationError(`Unexpected lexicon type: ${def.type}`)
+	      };
+	  }
+	}
+	complex.validate = validate;
+	function array(lexicons, path, def, value) {
+	  // type
+	  if (!Array.isArray(value)) {
+	    return {
+	      success: false,
+	      error: new types_1$5.ValidationError(`${path} must be an array`)
+	    };
+	  }
+	  // maxLength
+	  if (typeof def.maxLength === 'number') {
+	    if (value.length > def.maxLength) {
+	      return {
+	        success: false,
+	        error: new types_1$5.ValidationError(`${path} must not have more than ${def.maxLength} elements`)
+	      };
+	    }
+	  }
+	  // minLength
+	  if (typeof def.minLength === 'number') {
+	    if (value.length < def.minLength) {
+	      return {
+	        success: false,
+	        error: new types_1$5.ValidationError(`${path} must not have fewer than ${def.minLength} elements`)
+	      };
+	    }
+	  }
+	  // items
+	  const itemsDef = def.items;
+	  for (let i = 0; i < value.length; i++) {
+	    const itemValue = value[i];
+	    const itemPath = `${path}/${i}`;
+	    const res = validateOneOf(lexicons, itemPath, itemsDef, itemValue);
+	    if (!res.success) {
+	      return res;
+	    }
+	  }
+	  return {
+	    success: true,
+	    value
+	  };
+	}
+	complex.array = array;
+	function object(lexicons, path, def, value) {
+	  def = def;
+	  // type
+	  if (!value || typeof value !== 'object') {
+	    return {
+	      success: false,
+	      error: new types_1$5.ValidationError(`${path} must be an object`)
+	    };
+	  }
+	  const requiredProps = new Set(def.required);
+	  const nullableProps = new Set(def.nullable);
 	  // properties
 	  let resultValue = value;
 	  if (typeof def.properties === 'object') {
 	    for (const key in def.properties) {
+	      if (value[key] === null && nullableProps.has(key)) {
+	        continue;
+	      }
 	      const propDef = def.properties[key];
-	      const validated = propDef.type === 'array' ? (0, complex_1.array)(lexicons, key, propDef, value[key]) : PrimitiveValidators.validate(lexicons, key, propDef, value[key]);
+	      if (typeof value[key] === 'undefined' && !requiredProps.has(key)) {
+	        // Fast path for non-required undefined props.
+	        if (propDef.type === 'integer' || propDef.type === 'boolean' || propDef.type === 'string') {
+	          if (typeof propDef.default === 'undefined') {
+	            continue;
+	          }
+	        } else {
+	          // Other types have no defaults.
+	          continue;
+	        }
+	      }
+	      const propPath = `${path}/${key}`;
+	      const validated = validateOneOf(lexicons, propPath, propDef, value[key]);
 	      const propValue = validated.success ? validated.value : value[key];
 	      const propIsUndefined = typeof propValue === 'undefined';
 	      // Return error for bad validation, giving required rule precedence
 	      if (propIsUndefined && requiredProps.has(key)) {
 	        return {
 	          success: false,
-	          error: new types_1$4.ValidationError(`${path} must have the property "${key}"`)
+	          error: new types_1$5.ValidationError(`${path} must have the property "${key}"`)
 	        };
 	      } else if (!propIsUndefined && !validated.success) {
 	        return validated;
@@ -12080,7 +10664,71 @@ if (cid) {
 	    value: resultValue
 	  };
 	}
-	xrpc.params = params;
+	complex.object = object;
+	function validateOneOf(lexicons, path, def, value, mustBeObj = false) {
+	  let error;
+	  let concreteDefs;
+	  if (def.type === 'union') {
+	    if (!(0, types_1$5.isDiscriminatedObject)(value)) {
+	      return {
+	        success: false,
+	        error: new types_1$5.ValidationError(`${path} must be an object which includes the "$type" property`)
+	      };
+	    }
+	    if (!refsContainType(def.refs, value.$type)) {
+	      if (def.closed) {
+	        return {
+	          success: false,
+	          error: new types_1$5.ValidationError(`${path} $type must be one of ${def.refs.join(', ')}`)
+	        };
+	      }
+	      return {
+	        success: true,
+	        value
+	      };
+	    } else {
+	      concreteDefs = (0, util_1$U.toConcreteTypes)(lexicons, {
+	        type: 'ref',
+	        ref: value.$type
+	      });
+	    }
+	  } else {
+	    concreteDefs = (0, util_1$U.toConcreteTypes)(lexicons, def);
+	  }
+	  for (const concreteDef of concreteDefs) {
+	    const result = mustBeObj ? object(lexicons, path, concreteDef, value) : validate(lexicons, path, concreteDef, value);
+	    if (result.success) {
+	      return result;
+	    }
+	    error ?? (error = result.error);
+	  }
+	  if (concreteDefs.length > 1) {
+	    return {
+	      success: false,
+	      error: new types_1$5.ValidationError(`${path} did not match any of the expected definitions`)
+	    };
+	  }
+	  return {
+	    success: false,
+	    error
+	  };
+	}
+	complex.validateOneOf = validateOneOf;
+	// to avoid bugs like #0189 this needs to handle both
+	// explicit and implicit #main
+	const refsContainType = (refs, type) => {
+	  const lexUri = (0, util_1$U.toLexUri)(type);
+	  if (refs.includes(lexUri)) {
+	    return true;
+	  }
+	  if (lexUri.endsWith('#main')) {
+	    return refs.includes(lexUri.replace('#main', ''));
+	  } else {
+	    return refs.includes(lexUri + '#main');
+	  }
+	};
+
+	var xrpc = {};
 
 	var __createBinding$2 = commonjsGlobal && commonjsGlobal.__createBinding || (Object.create ? function (o, m, k, k2) {
 	  if (k2 === undefined) k2 = k;
@@ -12113,22 +10761,68 @@ if (cid) {
 	  __setModuleDefault$2(result, mod);
 	  return result;
 	};
+	Object.defineProperty(xrpc, "__esModule", {
+	  value: true
+	});
+	xrpc.params = void 0;
+	const types_1$4 = types$5;
+	const PrimitiveValidators = __importStar$2(primitives);
+	const complex_1$1 = complex;
+	function params(lexicons, path, def, val) {
+	  // type
+	  const value = val && typeof val === 'object' ? val : {};
+	  const requiredProps = new Set(def.required ?? []);
+	  // properties
+	  let resultValue = value;
+	  if (typeof def.properties === 'object') {
+	    for (const key in def.properties) {
+	      const propDef = def.properties[key];
+	      const validated = propDef.type === 'array' ? (0, complex_1$1.array)(lexicons, key, propDef, value[key]) : PrimitiveValidators.validate(lexicons, key, propDef, value[key]);
+	      const propValue = validated.success ? validated.value : value[key];
+	      const propIsUndefined = typeof propValue === 'undefined';
+	      // Return error for bad validation, giving required rule precedence
+	      if (propIsUndefined && requiredProps.has(key)) {
+	        return {
+	          success: false,
+	          error: new types_1$4.ValidationError(`${path} must have the property "${key}"`)
+	        };
+	      } else if (!propIsUndefined && !validated.success) {
+	        return validated;
+	      }
+	      // Adjust value based on e.g. applied defaults, cloning shallowly if there was a changed value
+	      if (propValue !== value[key]) {
+	        if (resultValue === value) {
+	          // Lazy shallow clone
+	          resultValue = {
+	            ...value
+	          };
+	        }
+	        resultValue[key] = propValue;
+	      }
+	    }
+	  }
+	  return {
+	    success: true,
+	    value: resultValue
+	  };
+	}
+	xrpc.params = params;
+
 	Object.defineProperty(validation, "__esModule", {
 	  value: true
 	});
 	validation.assertValidXrpcMessage = validation.assertValidXrpcOutput = validation.assertValidXrpcInput = validation.assertValidXrpcParams = validation.assertValidRecord = void 0;
-	const util_1$T = requireUtil();
-	const ComplexValidators$1 = __importStar$2(requireComplex());
-	const XrpcValidators = __importStar$2(xrpc);
+	const complex_1 = complex;
+	const xrpc_1$G = xrpc;
 	function assertValidRecord(lexicons, def, value) {
-	  const res = ComplexValidators$1.object(lexicons, 'Record', def.record, value);
+	  const res = (0, complex_1.object)(lexicons, 'Record', def.record, value);
 	  if (!res.success) throw res.error;
 	  return res.value;
 	}
 	validation.assertValidRecord = assertValidRecord;
 	function assertValidXrpcParams(lexicons, def, value) {
 	  if (def.parameters) {
-	    const res = XrpcValidators.params(lexicons, 'Params', def.parameters, value);
+	    const res = (0, xrpc_1$G.params)(lexicons, 'Params', def.parameters, value);
 	    if (!res.success) throw res.error;
 	    return res.value;
 	  }
@@ -12137,24 +10831,29 @@ if (cid) {
 	function assertValidXrpcInput(lexicons, def, value) {
 	  if (def.input?.schema) {
 	    // loop: all input schema definitions
-	    return (0, util_1$T.assertValidOneOf)(lexicons, 'Input', def.input.schema, value, true);
+	    return assertValidOneOf(lexicons, 'Input', def.input.schema, value, true);
 	  }
 	}
 	validation.assertValidXrpcInput = assertValidXrpcInput;
 	function assertValidXrpcOutput(lexicons, def, value) {
 	  if (def.output?.schema) {
 	    // loop: all output schema definitions
-	    return (0, util_1$T.assertValidOneOf)(lexicons, 'Output', def.output.schema, value, true);
+	    return assertValidOneOf(lexicons, 'Output', def.output.schema, value, true);
 	  }
 	}
 	validation.assertValidXrpcOutput = assertValidXrpcOutput;
 	function assertValidXrpcMessage(lexicons, def, value) {
 	  if (def.message?.schema) {
 	    // loop: all output schema definitions
-	    return (0, util_1$T.assertValidOneOf)(lexicons, 'Message', def.message.schema, value, true);
+	    return assertValidOneOf(lexicons, 'Message', def.message.schema, value, true);
 	  }
 	}
 	validation.assertValidXrpcMessage = assertValidXrpcMessage;
+	function assertValidOneOf(lexicons, path, def, value, mustBeObj = false) {
+	  const res = (0, complex_1.validateOneOf)(lexicons, path, def, value, mustBeObj);
+	  if (!res.success) throw res.error;
+	  return res.value;
+	}
 
 	var __createBinding$1 = commonjsGlobal && commonjsGlobal.__createBinding || (Object.create ? function (o, m, k, k2) {
 	  if (k2 === undefined) k2 = k;
@@ -12191,10 +10890,10 @@ if (cid) {
 	  value: true
 	});
 	lexicons$1.Lexicons = void 0;
-	const types_1$3 = requireTypes();
+	const types_1$3 = types$5;
 	const validation_1 = validation;
-	const util_1$S = requireUtil();
-	const ComplexValidators = __importStar$1(requireComplex());
+	const util_1$T = util$6;
+	const ComplexValidators = __importStar$1(complex);
 	/**
 	 * A collection of compiled lexicons.
 	 */
@@ -12212,17 +10911,31 @@ if (cid) {
 	      writable: true,
 	      value: new Map()
 	    });
-	    if (docs?.length) {
+	    if (docs) {
 	      for (const doc of docs) {
 	        this.add(doc);
 	      }
 	    }
 	  }
 	  /**
+	   * @example clone a lexicon:
+	   * ```ts
+	   * const clone = new Lexicons(originalLexicon)
+	   * ```
+	   *
+	   * @example get docs array:
+	   * ```ts
+	   * const docs = Array.from(lexicons)
+	   * ```
+	   */
+	  [Symbol.iterator]() {
+	    return this.docs.values();
+	  }
+	  /**
 	   * Add a lexicon doc.
 	   */
 	  add(doc) {
-	    const uri = (0, util_1$S.toLexUri)(doc.id);
+	    const uri = (0, util_1$T.toLexUri)(doc.id);
 	    if (this.docs.has(uri)) {
 	      throw new Error(`${uri} has already been registered`);
 	    }
@@ -12239,7 +10952,7 @@ if (cid) {
 	   * Remove a lexicon doc.
 	   */
 	  remove(uri) {
-	    uri = (0, util_1$S.toLexUri)(uri);
+	    uri = (0, util_1$T.toLexUri)(uri);
 	    const doc = this.docs.get(uri);
 	    if (!doc) {
 	      throw new Error(`Unable to remove "${uri}": does not exist`);
@@ -12253,14 +10966,14 @@ if (cid) {
 	   * Get a lexicon doc.
 	   */
 	  get(uri) {
-	    uri = (0, util_1$S.toLexUri)(uri);
+	    uri = (0, util_1$T.toLexUri)(uri);
 	    return this.docs.get(uri);
 	  }
 	  /**
 	   * Get a definition.
 	   */
 	  getDef(uri) {
-	    uri = (0, util_1$S.toLexUri)(uri);
+	    uri = (0, util_1$T.toLexUri)(uri);
 	    return this.defs.get(uri);
 	  }
 	  getDefOrThrow(uri, types) {
@@ -12277,7 +10990,7 @@ if (cid) {
 	   * Validate a record or object.
 	   */
 	  validate(lexUri, value) {
-	    lexUri = (0, util_1$S.toLexUri)(lexUri);
+	    lexUri = (0, util_1$T.toLexUri)(lexUri);
 	    const def = this.getDefOrThrow(lexUri, ['record', 'object']);
 	    if (!(0, types_1$3.isObj)(value)) {
 	      throw new types_1$3.ValidationError(`Value must be an object`);
@@ -12295,7 +11008,7 @@ if (cid) {
 	   * Validate a record and throw on any error.
 	   */
 	  assertValidRecord(lexUri, value) {
-	    lexUri = (0, util_1$S.toLexUri)(lexUri);
+	    lexUri = (0, util_1$T.toLexUri)(lexUri);
 	    const def = this.getDefOrThrow(lexUri, ['record']);
 	    if (!(0, types_1$3.isObj)(value)) {
 	      throw new types_1$3.ValidationError(`Record must be an object`);
@@ -12304,7 +11017,7 @@ if (cid) {
 	      throw new types_1$3.ValidationError(`Record/$type must be a string`);
 	    }
 	    const $type = value.$type || '';
-	    if ((0, util_1$S.toLexUri)($type) !== lexUri) {
+	    if ((0, util_1$T.toLexUri)($type) !== lexUri) {
 	      throw new types_1$3.ValidationError(`Invalid $type: must be ${lexUri}, got ${$type}`);
 	    }
 	    return (0, validation_1.assertValidRecord)(this, def, value);
@@ -12313,7 +11026,7 @@ if (cid) {
 	   * Validate xrpc query params and throw on any error.
 	   */
 	  assertValidXrpcParams(lexUri, value) {
-	    lexUri = (0, util_1$S.toLexUri)(lexUri);
+	    lexUri = (0, util_1$T.toLexUri)(lexUri);
 	    const def = this.getDefOrThrow(lexUri, ['query', 'procedure', 'subscription']);
 	    return (0, validation_1.assertValidXrpcParams)(this, def, value);
 	  }
@@ -12321,7 +11034,7 @@ if (cid) {
 	   * Validate xrpc input body and throw on any error.
 	   */
 	  assertValidXrpcInput(lexUri, value) {
-	    lexUri = (0, util_1$S.toLexUri)(lexUri);
+	    lexUri = (0, util_1$T.toLexUri)(lexUri);
 	    const def = this.getDefOrThrow(lexUri, ['procedure']);
 	    return (0, validation_1.assertValidXrpcInput)(this, def, value);
 	  }
@@ -12329,7 +11042,7 @@ if (cid) {
 	   * Validate xrpc output body and throw on any error.
 	   */
 	  assertValidXrpcOutput(lexUri, value) {
-	    lexUri = (0, util_1$S.toLexUri)(lexUri);
+	    lexUri = (0, util_1$T.toLexUri)(lexUri);
 	    const def = this.getDefOrThrow(lexUri, ['query', 'procedure']);
 	    return (0, validation_1.assertValidXrpcOutput)(this, def, value);
 	  }
@@ -12337,7 +11050,7 @@ if (cid) {
 	   * Validate xrpc subscription message and throw on any error.
 	   */
 	  assertValidXrpcMessage(lexUri, value) {
-	    lexUri = (0, util_1$S.toLexUri)(lexUri);
+	    lexUri = (0, util_1$T.toLexUri)(lexUri);
 	    const def = this.getDefOrThrow(lexUri, ['subscription']);
 	    return (0, validation_1.assertValidXrpcMessage)(this, def, value);
 	  }
@@ -12345,8 +11058,8 @@ if (cid) {
 	   * Resolve a lex uri given a ref
 	   */
 	  resolveLexUri(lexUri, ref) {
-	    lexUri = (0, util_1$S.toLexUri)(lexUri);
-	    return (0, util_1$S.toLexUri)(ref, lexUri);
+	    lexUri = (0, util_1$T.toLexUri)(lexUri);
+	    return (0, util_1$T.toLexUri)(ref, lexUri);
 	  }
 	}
 	lexicons$1.Lexicons = Lexicons;
@@ -12364,13 +11077,13 @@ if (cid) {
 	function resolveRefUris(obj, baseUri) {
 	  for (const k in obj) {
 	    if (obj.type === 'ref') {
-	      obj.ref = (0, util_1$S.toLexUri)(obj.ref, baseUri);
+	      obj.ref = (0, util_1$T.toLexUri)(obj.ref, baseUri);
 	    } else if (obj.type === 'union') {
-	      obj.refs = obj.refs.map(ref => (0, util_1$S.toLexUri)(ref, baseUri));
+	      obj.refs = obj.refs.map(ref => (0, util_1$T.toLexUri)(ref, baseUri));
 	    } else if (Array.isArray(obj[k])) {
 	      obj[k] = obj[k].map(item => {
 	        if (typeof item === 'string') {
-	          return item.startsWith('#') ? (0, util_1$S.toLexUri)(item, baseUri) : item;
+	          return item.startsWith('#') ? (0, util_1$T.toLexUri)(item, baseUri) : item;
 	        } else if (item && typeof item === 'object') {
 	          return resolveRefUris(item, baseUri);
 	        }
@@ -12392,7 +11105,7 @@ if (cid) {
 	  });
 	  exports.jsonStringToLex = exports.jsonToLex = exports.stringifyLex = exports.lexToJson = exports.ipldToLex = exports.lexToIpld = void 0;
 	  const common_web_1 = dist$2;
-	  const cid_1 = require$$1;
+	  const cid_1 = require$$1$1;
 	  const blob_refs_1 = blobRefs;
 	  // @NOTE avoiding use of check.is() here only because it makes
 	  // these implementations slow, and they often live in hot paths.
@@ -12490,550 +11203,11 @@ if (cid) {
 	  Object.defineProperty(exports, "__esModule", {
 	    value: true
 	  });
-	  __exportStar(requireTypes(), exports);
+	  __exportStar(types$5, exports);
 	  __exportStar(lexicons$1, exports);
 	  __exportStar(blobRefs, exports);
 	  __exportStar(serialize, exports);
-	})(dist$3);
-
-	var types$2 = {};
-
-	Object.defineProperty(types$2, "__esModule", {
-	  value: true
-	});
-
-	var _const = {};
-
-	Object.defineProperty(_const, "__esModule", {
-	  value: true
-	});
-	_const.BSKY_LABELER_DID = void 0;
-	_const.BSKY_LABELER_DID = 'did:plc:ar7c4by46qjdydhdevvrndac';
-
-	var util$4 = {};
-
-	Object.defineProperty(util$4, "__esModule", {
-	  value: true
-	});
-	util$4.validateSavedFeed = util$4.getSavedFeedType = util$4.savedFeedsToUriArrays = util$4.sanitizeMutedWordValue = void 0;
-	const syntax_1$2 = dist$4;
-	const common_web_1$3 = dist$2;
-	function sanitizeMutedWordValue(value) {
-	  return value.trim().replace(/^#(?!\ufe0f)/, '')
-	  // eslint-disable-next-line no-misleading-character-class
-	  .replace(/[\r\n\u00AD\u2060\u200D\u200C\u200B]+/, '');
-	}
-	util$4.sanitizeMutedWordValue = sanitizeMutedWordValue;
-	function savedFeedsToUriArrays(savedFeeds) {
-	  const pinned = [];
-	  const saved = [];
-	  for (const feed of savedFeeds) {
-	    if (feed.pinned) {
-	      pinned.push(feed.value);
-	      // saved in v1 includes pinned
-	      saved.push(feed.value);
-	    } else {
-	      saved.push(feed.value);
-	    }
-	  }
-	  return {
-	    pinned,
-	    saved
-	  };
-	}
-	util$4.savedFeedsToUriArrays = savedFeedsToUriArrays;
-	/**
-	 * Get the type of a saved feed, used by deprecated methods for backwards
-	 * compat. Should not be used moving forward. *Invalid URIs will throw.*
-	 *
-	 * @param uri - The AT URI of the saved feed
-	 */
-	function getSavedFeedType(uri) {
-	  const urip = new syntax_1$2.AtUri(uri);
-	  switch (urip.collection) {
-	    case 'app.bsky.feed.generator':
-	      return 'feed';
-	    case 'app.bsky.graph.list':
-	      return 'list';
-	    default:
-	      return 'unknown';
-	  }
-	}
-	util$4.getSavedFeedType = getSavedFeedType;
-	function validateSavedFeed$1(savedFeed) {
-	  new common_web_1$3.TID(savedFeed.id);
-	  if (['feed', 'list'].includes(savedFeed.type)) {
-	    const uri = new syntax_1$2.AtUri(savedFeed.value);
-	    const isFeed = uri.collection === 'app.bsky.feed.generator';
-	    const isList = uri.collection === 'app.bsky.graph.list';
-	    if (savedFeed.type === 'feed' && !isFeed) {
-	      throw new Error(`Saved feed of type 'feed' must be a feed, got ${uri.collection}`);
-	    }
-	    if (savedFeed.type === 'list' && !isList) {
-	      throw new Error(`Saved feed of type 'list' must be a list, got ${uri.collection}`);
-	    }
-	  }
-	}
-	util$4.validateSavedFeed = validateSavedFeed$1;
-
-	var client$1 = {};
-
-	var dist = {};
-
-	var types$1 = {};
-
-	(function (exports) {
-
-	  Object.defineProperty(exports, "__esModule", {
-	    value: true
-	  });
-	  exports.XRPCInvalidResponseError = exports.XRPCError = exports.XRPCResponse = exports.ResponseTypeStrings = exports.ResponseTypeNames = exports.ResponseType = exports.errorResponseBody = void 0;
-	  const zod_1 = lib$1;
-	  exports.errorResponseBody = zod_1.z.object({
-	    error: zod_1.z.string().optional(),
-	    message: zod_1.z.string().optional()
-	  });
-	  var ResponseType;
-	  (function (ResponseType) {
-	    ResponseType[ResponseType["Unknown"] = 1] = "Unknown";
-	    ResponseType[ResponseType["InvalidResponse"] = 2] = "InvalidResponse";
-	    ResponseType[ResponseType["Success"] = 200] = "Success";
-	    ResponseType[ResponseType["InvalidRequest"] = 400] = "InvalidRequest";
-	    ResponseType[ResponseType["AuthRequired"] = 401] = "AuthRequired";
-	    ResponseType[ResponseType["Forbidden"] = 403] = "Forbidden";
-	    ResponseType[ResponseType["XRPCNotSupported"] = 404] = "XRPCNotSupported";
-	    ResponseType[ResponseType["PayloadTooLarge"] = 413] = "PayloadTooLarge";
-	    ResponseType[ResponseType["RateLimitExceeded"] = 429] = "RateLimitExceeded";
-	    ResponseType[ResponseType["InternalServerError"] = 500] = "InternalServerError";
-	    ResponseType[ResponseType["MethodNotImplemented"] = 501] = "MethodNotImplemented";
-	    ResponseType[ResponseType["UpstreamFailure"] = 502] = "UpstreamFailure";
-	    ResponseType[ResponseType["NotEnoughResources"] = 503] = "NotEnoughResources";
-	    ResponseType[ResponseType["UpstreamTimeout"] = 504] = "UpstreamTimeout";
-	  })(ResponseType || (exports.ResponseType = ResponseType = {}));
-	  exports.ResponseTypeNames = {
-	    [ResponseType.InvalidResponse]: 'InvalidResponse',
-	    [ResponseType.Success]: 'Success',
-	    [ResponseType.InvalidRequest]: 'InvalidRequest',
-	    [ResponseType.AuthRequired]: 'AuthenticationRequired',
-	    [ResponseType.Forbidden]: 'Forbidden',
-	    [ResponseType.XRPCNotSupported]: 'XRPCNotSupported',
-	    [ResponseType.PayloadTooLarge]: 'PayloadTooLarge',
-	    [ResponseType.RateLimitExceeded]: 'RateLimitExceeded',
-	    [ResponseType.InternalServerError]: 'InternalServerError',
-	    [ResponseType.MethodNotImplemented]: 'MethodNotImplemented',
-	    [ResponseType.UpstreamFailure]: 'UpstreamFailure',
-	    [ResponseType.NotEnoughResources]: 'NotEnoughResources',
-	    [ResponseType.UpstreamTimeout]: 'UpstreamTimeout'
-	  };
-	  exports.ResponseTypeStrings = {
-	    [ResponseType.InvalidResponse]: 'Invalid Response',
-	    [ResponseType.Success]: 'Success',
-	    [ResponseType.InvalidRequest]: 'Invalid Request',
-	    [ResponseType.AuthRequired]: 'Authentication Required',
-	    [ResponseType.Forbidden]: 'Forbidden',
-	    [ResponseType.XRPCNotSupported]: 'XRPC Not Supported',
-	    [ResponseType.PayloadTooLarge]: 'Payload Too Large',
-	    [ResponseType.RateLimitExceeded]: 'Rate Limit Exceeded',
-	    [ResponseType.InternalServerError]: 'Internal Server Error',
-	    [ResponseType.MethodNotImplemented]: 'Method Not Implemented',
-	    [ResponseType.UpstreamFailure]: 'Upstream Failure',
-	    [ResponseType.NotEnoughResources]: 'Not Enough Resources',
-	    [ResponseType.UpstreamTimeout]: 'Upstream Timeout'
-	  };
-	  class XRPCResponse {
-	    constructor(data, headers) {
-	      Object.defineProperty(this, "data", {
-	        enumerable: true,
-	        configurable: true,
-	        writable: true,
-	        value: data
-	      });
-	      Object.defineProperty(this, "headers", {
-	        enumerable: true,
-	        configurable: true,
-	        writable: true,
-	        value: headers
-	      });
-	      Object.defineProperty(this, "success", {
-	        enumerable: true,
-	        configurable: true,
-	        writable: true,
-	        value: true
-	      });
-	    }
-	  }
-	  exports.XRPCResponse = XRPCResponse;
-	  class XRPCError extends Error {
-	    constructor(status, error, message, headers) {
-	      super(message || error || exports.ResponseTypeStrings[status]);
-	      Object.defineProperty(this, "status", {
-	        enumerable: true,
-	        configurable: true,
-	        writable: true,
-	        value: status
-	      });
-	      Object.defineProperty(this, "error", {
-	        enumerable: true,
-	        configurable: true,
-	        writable: true,
-	        value: error
-	      });
-	      Object.defineProperty(this, "success", {
-	        enumerable: true,
-	        configurable: true,
-	        writable: true,
-	        value: false
-	      });
-	      Object.defineProperty(this, "headers", {
-	        enumerable: true,
-	        configurable: true,
-	        writable: true,
-	        value: void 0
-	      });
-	      if (!this.error) {
-	        this.error = exports.ResponseTypeNames[status];
-	      }
-	      this.headers = headers;
-	    }
-	  }
-	  exports.XRPCError = XRPCError;
-	  class XRPCInvalidResponseError extends XRPCError {
-	    constructor(lexiconNsid, validationError, responseBody) {
-	      super(ResponseType.InvalidResponse, exports.ResponseTypeStrings[ResponseType.InvalidResponse], `The server gave an invalid response and may be out of date.`);
-	      Object.defineProperty(this, "lexiconNsid", {
-	        enumerable: true,
-	        configurable: true,
-	        writable: true,
-	        value: lexiconNsid
-	      });
-	      Object.defineProperty(this, "validationError", {
-	        enumerable: true,
-	        configurable: true,
-	        writable: true,
-	        value: validationError
-	      });
-	      Object.defineProperty(this, "responseBody", {
-	        enumerable: true,
-	        configurable: true,
-	        writable: true,
-	        value: responseBody
-	      });
-	    }
-	  }
-	  exports.XRPCInvalidResponseError = XRPCInvalidResponseError;
-	})(types$1);
-
-	var client = {};
-
-	var util$3 = {};
-
-	Object.defineProperty(util$3, "__esModule", {
-	  value: true
-	});
-	util$3.httpResponseBodyParse = util$3.httpResponseCodeToEnum = util$3.encodeMethodCallBody = util$3.constructMethodCallHeaders = util$3.normalizeHeaders = util$3.encodeQueryParam = util$3.constructMethodCallUri = util$3.getMethodSchemaHTTPMethod = void 0;
-	const lexicon_1$1 = dist$3;
-	const types_1$2 = types$1;
-	function getMethodSchemaHTTPMethod(schema) {
-	  if (schema.type === 'procedure') {
-	    return 'post';
-	  }
-	  return 'get';
-	}
-	util$3.getMethodSchemaHTTPMethod = getMethodSchemaHTTPMethod;
-	function constructMethodCallUri(nsid, schema, serviceUri, params) {
-	  const uri = new URL(serviceUri);
-	  uri.pathname = `/xrpc/${nsid}`;
-	  // given parameters
-	  if (params) {
-	    for (const [key, value] of Object.entries(params)) {
-	      const paramSchema = schema.parameters?.properties?.[key];
-	      if (!paramSchema) {
-	        throw new Error(`Invalid query parameter: ${key}`);
-	      }
-	      if (value !== undefined) {
-	        if (paramSchema.type === 'array') {
-	          const vals = [];
-	          vals.concat(value).forEach(val => {
-	            uri.searchParams.append(key, encodeQueryParam(paramSchema.items.type, val));
-	          });
-	        } else {
-	          uri.searchParams.set(key, encodeQueryParam(paramSchema.type, value));
-	        }
-	      }
-	    }
-	  }
-	  return uri.toString();
-	}
-	util$3.constructMethodCallUri = constructMethodCallUri;
-	function encodeQueryParam(type, value) {
-	  if (type === 'string' || type === 'unknown') {
-	    return String(value);
-	  }
-	  if (type === 'float') {
-	    return String(Number(value));
-	  } else if (type === 'integer') {
-	    return String(Number(value) | 0);
-	  } else if (type === 'boolean') {
-	    return value ? 'true' : 'false';
-	  } else if (type === 'datetime') {
-	    if (value instanceof Date) {
-	      return value.toISOString();
-	    }
-	    return String(value);
-	  }
-	  throw new Error(`Unsupported query param type: ${type}`);
-	}
-	util$3.encodeQueryParam = encodeQueryParam;
-	function normalizeHeaders(headers) {
-	  const normalized = {};
-	  for (const [header, value] of Object.entries(headers)) {
-	    normalized[header.toLowerCase()] = value;
-	  }
-	  return normalized;
-	}
-	util$3.normalizeHeaders = normalizeHeaders;
-	function constructMethodCallHeaders(schema, data, opts) {
-	  const headers = opts?.headers || {};
-	  if (schema.type === 'procedure') {
-	    if (opts?.encoding) {
-	      headers['Content-Type'] = opts.encoding;
-	    }
-	    if (data && typeof data === 'object') {
-	      if (!headers['Content-Type']) {
-	        headers['Content-Type'] = 'application/json';
-	      }
-	    }
-	  }
-	  return headers;
-	}
-	util$3.constructMethodCallHeaders = constructMethodCallHeaders;
-	function encodeMethodCallBody(headers, data) {
-	  if (!headers['content-type'] || typeof data === 'undefined') {
-	    return undefined;
-	  }
-	  if (data instanceof ArrayBuffer) {
-	    return data;
-	  }
-	  if (headers['content-type'].startsWith('text/')) {
-	    return new TextEncoder().encode(data.toString());
-	  }
-	  if (headers['content-type'].startsWith('application/json')) {
-	    return new TextEncoder().encode((0, lexicon_1$1.stringifyLex)(data));
-	  }
-	  return data;
-	}
-	util$3.encodeMethodCallBody = encodeMethodCallBody;
-	function httpResponseCodeToEnum(status) {
-	  let resCode;
-	  if (status in types_1$2.ResponseType) {
-	    resCode = status;
-	  } else if (status >= 100 && status < 200) {
-	    resCode = types_1$2.ResponseType.XRPCNotSupported;
-	  } else if (status >= 200 && status < 300) {
-	    resCode = types_1$2.ResponseType.Success;
-	  } else if (status >= 300 && status < 400) {
-	    resCode = types_1$2.ResponseType.XRPCNotSupported;
-	  } else if (status >= 400 && status < 500) {
-	    resCode = types_1$2.ResponseType.InvalidRequest;
-	  } else {
-	    resCode = types_1$2.ResponseType.InternalServerError;
-	  }
-	  return resCode;
-	}
-	util$3.httpResponseCodeToEnum = httpResponseCodeToEnum;
-	function httpResponseBodyParse(mimeType, data) {
-	  if (mimeType) {
-	    if (mimeType.includes('application/json') && data?.byteLength) {
-	      try {
-	        const str = new TextDecoder().decode(data);
-	        return (0, lexicon_1$1.jsonStringToLex)(str);
-	      } catch (e) {
-	        throw new types_1$2.XRPCError(types_1$2.ResponseType.InvalidResponse, `Failed to parse response body: ${String(e)}`);
-	      }
-	    }
-	    if (mimeType.startsWith('text/') && data?.byteLength) {
-	      try {
-	        return new TextDecoder().decode(data);
-	      } catch (e) {
-	        throw new types_1$2.XRPCError(types_1$2.ResponseType.InvalidResponse, `Failed to parse response body: ${String(e)}`);
-	      }
-	    }
-	  }
-	  if (data instanceof ArrayBuffer) {
-	    return new Uint8Array(data);
-	  }
-	  return data;
-	}
-	util$3.httpResponseBodyParse = httpResponseBodyParse;
-
-	Object.defineProperty(client, "__esModule", {
-	  value: true
-	});
-	client.defaultFetchHandler = client.ServiceClient = client.Client = void 0;
-	const lexicon_1 = dist$3;
-	const util_1$R = util$3;
-	const types_1$1 = types$1;
-	class Client {
-	  constructor() {
-	    Object.defineProperty(this, "fetch", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: defaultFetchHandler
-	    });
-	    Object.defineProperty(this, "lex", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: new lexicon_1.Lexicons()
-	    });
-	  }
-	  // method calls
-	  //
-	  async call(serviceUri, methodNsid, params, data, opts) {
-	    return this.service(serviceUri).call(methodNsid, params, data, opts);
-	  }
-	  service(serviceUri) {
-	    return new ServiceClient(this, serviceUri);
-	  }
-	  // schemas
-	  // =
-	  addLexicon(doc) {
-	    this.lex.add(doc);
-	  }
-	  addLexicons(docs) {
-	    for (const doc of docs) {
-	      this.addLexicon(doc);
-	    }
-	  }
-	  removeLexicon(uri) {
-	    this.lex.remove(uri);
-	  }
-	}
-	client.Client = Client;
-	class ServiceClient {
-	  constructor(baseClient, serviceUri) {
-	    Object.defineProperty(this, "baseClient", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: void 0
-	    });
-	    Object.defineProperty(this, "uri", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: void 0
-	    });
-	    Object.defineProperty(this, "headers", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: {}
-	    });
-	    this.baseClient = baseClient;
-	    this.uri = typeof serviceUri === 'string' ? new URL(serviceUri) : serviceUri;
-	  }
-	  setHeader(key, value) {
-	    this.headers[key] = value;
-	  }
-	  unsetHeader(key) {
-	    delete this.headers[key];
-	  }
-	  async call(methodNsid, params, data, opts) {
-	    const def = this.baseClient.lex.getDefOrThrow(methodNsid);
-	    if (!def || def.type !== 'query' && def.type !== 'procedure') {
-	      throw new Error(`Invalid lexicon: ${methodNsid}. Must be a query or procedure.`);
-	    }
-	    const httpMethod = (0, util_1$R.getMethodSchemaHTTPMethod)(def);
-	    const httpUri = (0, util_1$R.constructMethodCallUri)(methodNsid, def, this.uri, params);
-	    const httpHeaders = (0, util_1$R.constructMethodCallHeaders)(def, data, {
-	      headers: {
-	        ...this.headers,
-	        ...opts?.headers
-	      },
-	      encoding: opts?.encoding
-	    });
-	    const res = await this.baseClient.fetch(httpUri, httpMethod, httpHeaders, data);
-	    const resCode = (0, util_1$R.httpResponseCodeToEnum)(res.status);
-	    if (resCode === types_1$1.ResponseType.Success) {
-	      try {
-	        this.baseClient.lex.assertValidXrpcOutput(methodNsid, res.body);
-	      } catch (e) {
-	        if (e instanceof lexicon_1.ValidationError) {
-	          throw new types_1$1.XRPCInvalidResponseError(methodNsid, e, res.body);
-	        } else {
-	          throw e;
-	        }
-	      }
-	      return new types_1$1.XRPCResponse(res.body, res.headers);
-	    } else {
-	      if (res.body && isErrorResponseBody(res.body)) {
-	        throw new types_1$1.XRPCError(resCode, res.body.error, res.body.message, res.headers);
-	      } else {
-	        throw new types_1$1.XRPCError(resCode);
-	      }
-	    }
-	  }
-	}
-	client.ServiceClient = ServiceClient;
-	async function defaultFetchHandler(httpUri, httpMethod, httpHeaders, httpReqBody) {
-	  try {
-	    // The duplex field is now required for streaming bodies, but not yet reflected
-	    // anywhere in docs or types. See whatwg/fetch#1438, nodejs/node#46221.
-	    const headers = (0, util_1$R.normalizeHeaders)(httpHeaders);
-	    const reqInit = {
-	      method: httpMethod,
-	      headers,
-	      body: (0, util_1$R.encodeMethodCallBody)(headers, httpReqBody),
-	      duplex: 'half'
-	    };
-	    const res = await fetch(httpUri, reqInit);
-	    const resBody = await res.arrayBuffer();
-	    return {
-	      status: res.status,
-	      headers: Object.fromEntries(res.headers.entries()),
-	      body: (0, util_1$R.httpResponseBodyParse)(res.headers.get('content-type'), resBody)
-	    };
-	  } catch (e) {
-	    throw new types_1$1.XRPCError(types_1$1.ResponseType.Unknown, String(e));
-	  }
-	}
-	client.defaultFetchHandler = defaultFetchHandler;
-	function isErrorResponseBody(v) {
-	  return types_1$1.errorResponseBody.safeParse(v).success;
-	}
-
-	(function (exports) {
-
-	  var __createBinding = commonjsGlobal && commonjsGlobal.__createBinding || (Object.create ? function (o, m, k, k2) {
-	    if (k2 === undefined) k2 = k;
-	    var desc = Object.getOwnPropertyDescriptor(m, k);
-	    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-	      desc = {
-	        enumerable: true,
-	        get: function () {
-	          return m[k];
-	        }
-	      };
-	    }
-	    Object.defineProperty(o, k2, desc);
-	  } : function (o, m, k, k2) {
-	    if (k2 === undefined) k2 = k;
-	    o[k2] = m[k];
-	  });
-	  var __exportStar = commonjsGlobal && commonjsGlobal.__exportStar || function (m, exports) {
-	    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-	  };
-	  Object.defineProperty(exports, "__esModule", {
-	    value: true
-	  });
-	  __exportStar(types$1, exports);
-	  __exportStar(client, exports);
-	  const client_1 = client;
-	  const defaultInst = new client_1.Client();
-	  exports.default = defaultInst;
-	})(dist);
+	})(dist$4);
 
 	var lexicons = {};
 
@@ -13046,7 +11220,7 @@ if (cid) {
 	  /**
 	   * GENERATED CODE - DO NOT MODIFY
 	   */
-	  const lexicon_1 = dist$3;
+	  const lexicon_1 = dist$4;
 	  exports.schemaDict = {
 	    ComAtprotoAdminDefs: {
 	      lexicon: 1,
@@ -13900,7 +12074,7 @@ if (cid) {
 	        },
 	        labelValueDefinition: {
 	          type: 'object',
-	          description: 'Declares a label value and its expected interpertations and behaviors.',
+	          description: 'Declares a label value and its expected interpretations and behaviors.',
 	          required: ['identifier', 'severity', 'blurs', 'locales'],
 	          properties: {
 	            identifier: {
@@ -15451,6 +13625,15 @@ if (cid) {
 	                type: 'string',
 	                format: 'did',
 	                description: 'The DID of the service that the token will be used to authenticate with'
+	              },
+	              exp: {
+	                type: 'integer',
+	                description: 'The time in Unix Epoch seconds that the JWT expires. Defaults to 60 seconds in the future. The service may enforce certain time bounds on tokens depending on the requested scope.'
+	              },
+	              lxm: {
+	                type: 'string',
+	                format: 'nsid',
+	                description: 'Lexicon (XRPC) method to bind the requested token to'
 	              }
 	            }
 	          },
@@ -15465,7 +13648,11 @@ if (cid) {
 	                }
 	              }
 	            }
-	          }
+	          },
+	          errors: [{
+	            name: 'BadExpiration',
+	            description: 'Indicates that the requested expiration date is not a valid. May be in the past or may be reliant on the requested scopes.'
+	          }]
 	        }
 	      }
 	    },
@@ -18114,7 +16301,7 @@ if (cid) {
 	            },
 	            feedContext: {
 	              type: 'string',
-	              description: 'Context on a feed item that was orginally supplied by the feed generator on getFeedSkeleton.',
+	              description: 'Context on a feed item that was originally supplied by the feed generator on getFeedSkeleton.',
 	              maxLength: 2000
 	            }
 	          }
@@ -18219,41 +16406,6 @@ if (cid) {
 	            },
 	            termsOfService: {
 	              type: 'string'
-	            }
-	          }
-	        }
-	      }
-	    },
-	    AppBskyFeedDetach: {
-	      lexicon: 1,
-	      id: 'app.bsky.feed.detach',
-	      defs: {
-	        main: {
-	          type: 'record',
-	          key: 'tid',
-	          description: 'Record defining post URIs detached from a root post. The record key (rkey) of the detach record must match the record key of the root post in question, and that record must be in the same repository.',
-	          record: {
-	            type: 'object',
-	            required: ['post', 'targets', 'updatedAt'],
-	            properties: {
-	              post: {
-	                type: 'string',
-	                format: 'at-uri',
-	                description: 'Reference (AT-URI) to the post record.'
-	              },
-	              targets: {
-	                type: 'array',
-	                maxLength: 50,
-	                items: {
-	                  type: 'string',
-	                  format: 'at-uri'
-	                },
-	                description: 'List of detached post URIs.'
-	              },
-	              updatedAt: {
-	                type: 'string',
-	                format: 'datetime'
-	              }
 	            }
 	          }
 	        }
@@ -24031,7 +22183,6 @@ if (cid) {
 	    AppBskyEmbedRecordWithMedia: 'app.bsky.embed.recordWithMedia',
 	    AppBskyFeedDefs: 'app.bsky.feed.defs',
 	    AppBskyFeedDescribeFeedGenerator: 'app.bsky.feed.describeFeedGenerator',
-	    AppBskyFeedDetach: 'app.bsky.feed.detach',
 	    AppBskyFeedGenerator: 'app.bsky.feed.generator',
 	    AppBskyFeedGetActorFeeds: 'app.bsky.feed.getActorFeeds',
 	    AppBskyFeedGetActorLikes: 'app.bsky.feed.getActorLikes',
@@ -24137,357 +22288,779 @@ if (cid) {
 	  };
 	})(lexicons);
 
-	var deleteAccount$2 = {};
+	var types$2 = {};
 
-	Object.defineProperty(deleteAccount$2, "__esModule", {
+	Object.defineProperty(types$2, "__esModule", {
 	  value: true
 	});
-	deleteAccount$2.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2x = dist;
-	function toKnownErr$2v(e) {
-	  if (e instanceof xrpc_1$2x.XRPCError) ;
-	  return e;
-	}
-	deleteAccount$2.toKnownErr = toKnownErr$2v;
 
-	var disableAccountInvites = {};
+	var _const = {};
 
-	Object.defineProperty(disableAccountInvites, "__esModule", {
+	Object.defineProperty(_const, "__esModule", {
 	  value: true
 	});
-	disableAccountInvites.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2w = dist;
-	function toKnownErr$2u(e) {
-	  if (e instanceof xrpc_1$2w.XRPCError) ;
-	  return e;
-	}
-	disableAccountInvites.toKnownErr = toKnownErr$2u;
+	_const.BSKY_LABELER_DID = void 0;
+	_const.BSKY_LABELER_DID = 'did:plc:ar7c4by46qjdydhdevvrndac';
 
-	var disableInviteCodes = {};
+	var util$4 = {};
 
-	Object.defineProperty(disableInviteCodes, "__esModule", {
+	(function (exports) {
+
+	  Object.defineProperty(exports, "__esModule", {
+	    value: true
+	  });
+	  exports.asDid = exports.isDid = exports.validateSavedFeed = exports.getSavedFeedType = exports.savedFeedsToUriArrays = exports.sanitizeMutedWordValue = void 0;
+	  const syntax_1 = dist$3;
+	  const common_web_1 = dist$2;
+	  function sanitizeMutedWordValue(value) {
+	    return value.trim().replace(/^#(?!\ufe0f)/, '')
+	    // eslint-disable-next-line no-misleading-character-class
+	    .replace(/[\r\n\u00AD\u2060\u200D\u200C\u200B]+/, '');
+	  }
+	  exports.sanitizeMutedWordValue = sanitizeMutedWordValue;
+	  function savedFeedsToUriArrays(savedFeeds) {
+	    const pinned = [];
+	    const saved = [];
+	    for (const feed of savedFeeds) {
+	      if (feed.pinned) {
+	        pinned.push(feed.value);
+	        // saved in v1 includes pinned
+	        saved.push(feed.value);
+	      } else {
+	        saved.push(feed.value);
+	      }
+	    }
+	    return {
+	      pinned,
+	      saved
+	    };
+	  }
+	  exports.savedFeedsToUriArrays = savedFeedsToUriArrays;
+	  /**
+	   * Get the type of a saved feed, used by deprecated methods for backwards
+	   * compat. Should not be used moving forward. *Invalid URIs will throw.*
+	   *
+	   * @param uri - The AT URI of the saved feed
+	   */
+	  function getSavedFeedType(uri) {
+	    const urip = new syntax_1.AtUri(uri);
+	    switch (urip.collection) {
+	      case 'app.bsky.feed.generator':
+	        return 'feed';
+	      case 'app.bsky.graph.list':
+	        return 'list';
+	      default:
+	        return 'unknown';
+	    }
+	  }
+	  exports.getSavedFeedType = getSavedFeedType;
+	  function validateSavedFeed(savedFeed) {
+	    new common_web_1.TID(savedFeed.id);
+	    if (['feed', 'list'].includes(savedFeed.type)) {
+	      const uri = new syntax_1.AtUri(savedFeed.value);
+	      const isFeed = uri.collection === 'app.bsky.feed.generator';
+	      const isList = uri.collection === 'app.bsky.graph.list';
+	      if (savedFeed.type === 'feed' && !isFeed) {
+	        throw new Error(`Saved feed of type 'feed' must be a feed, got ${uri.collection}`);
+	      }
+	      if (savedFeed.type === 'list' && !isList) {
+	        throw new Error(`Saved feed of type 'list' must be a list, got ${uri.collection}`);
+	      }
+	    }
+	  }
+	  exports.validateSavedFeed = validateSavedFeed;
+	  // @TODO use tools from @atproto/did
+	  const isDid = str => typeof str === 'string' && str.startsWith('did:') && str.includes(':', 4) && str.length > 8 && str.length <= 2048;
+	  exports.isDid = isDid;
+	  const asDid = value => {
+	    if ((0, exports.isDid)(value)) return value;
+	    throw new TypeError(`Invalid DID: ${value}`);
+	  };
+	  exports.asDid = asDid;
+	})(util$4);
+
+	var client$1 = {};
+
+	var dist = {};
+
+	var client = {};
+
+	var xrpcClient = {};
+
+	var fetchHandler = {};
+
+	var util$3 = {};
+
+	var types$1 = {};
+
+	(function (exports) {
+
+	  Object.defineProperty(exports, "__esModule", {
+	    value: true
+	  });
+	  exports.XRPCInvalidResponseError = exports.XRPCError = exports.XRPCResponse = exports.httpResponseCodeToString = exports.ResponseTypeStrings = exports.httpResponseCodeToName = exports.ResponseTypeNames = exports.httpResponseCodeToEnum = exports.ResponseType = exports.errorResponseBody = void 0;
+	  const zod_1 = lib$1;
+	  exports.errorResponseBody = zod_1.z.object({
+	    error: zod_1.z.string().optional(),
+	    message: zod_1.z.string().optional()
+	  });
+	  var ResponseType;
+	  (function (ResponseType) {
+	    ResponseType[ResponseType["Unknown"] = 1] = "Unknown";
+	    ResponseType[ResponseType["InvalidResponse"] = 2] = "InvalidResponse";
+	    ResponseType[ResponseType["Success"] = 200] = "Success";
+	    ResponseType[ResponseType["InvalidRequest"] = 400] = "InvalidRequest";
+	    ResponseType[ResponseType["AuthRequired"] = 401] = "AuthRequired";
+	    ResponseType[ResponseType["Forbidden"] = 403] = "Forbidden";
+	    ResponseType[ResponseType["XRPCNotSupported"] = 404] = "XRPCNotSupported";
+	    ResponseType[ResponseType["PayloadTooLarge"] = 413] = "PayloadTooLarge";
+	    ResponseType[ResponseType["RateLimitExceeded"] = 429] = "RateLimitExceeded";
+	    ResponseType[ResponseType["InternalServerError"] = 500] = "InternalServerError";
+	    ResponseType[ResponseType["MethodNotImplemented"] = 501] = "MethodNotImplemented";
+	    ResponseType[ResponseType["UpstreamFailure"] = 502] = "UpstreamFailure";
+	    ResponseType[ResponseType["NotEnoughResources"] = 503] = "NotEnoughResources";
+	    ResponseType[ResponseType["UpstreamTimeout"] = 504] = "UpstreamTimeout";
+	  })(ResponseType || (exports.ResponseType = ResponseType = {}));
+	  function httpResponseCodeToEnum(status) {
+	    if (status in ResponseType) {
+	      return status;
+	    } else if (status >= 100 && status < 200) {
+	      return ResponseType.XRPCNotSupported;
+	    } else if (status >= 200 && status < 300) {
+	      return ResponseType.Success;
+	    } else if (status >= 300 && status < 400) {
+	      return ResponseType.XRPCNotSupported;
+	    } else if (status >= 400 && status < 500) {
+	      return ResponseType.InvalidRequest;
+	    } else {
+	      return ResponseType.InternalServerError;
+	    }
+	  }
+	  exports.httpResponseCodeToEnum = httpResponseCodeToEnum;
+	  exports.ResponseTypeNames = {
+	    [ResponseType.Unknown]: 'Unknown',
+	    [ResponseType.InvalidResponse]: 'InvalidResponse',
+	    [ResponseType.Success]: 'Success',
+	    [ResponseType.InvalidRequest]: 'InvalidRequest',
+	    [ResponseType.AuthRequired]: 'AuthenticationRequired',
+	    [ResponseType.Forbidden]: 'Forbidden',
+	    [ResponseType.XRPCNotSupported]: 'XRPCNotSupported',
+	    [ResponseType.PayloadTooLarge]: 'PayloadTooLarge',
+	    [ResponseType.RateLimitExceeded]: 'RateLimitExceeded',
+	    [ResponseType.InternalServerError]: 'InternalServerError',
+	    [ResponseType.MethodNotImplemented]: 'MethodNotImplemented',
+	    [ResponseType.UpstreamFailure]: 'UpstreamFailure',
+	    [ResponseType.NotEnoughResources]: 'NotEnoughResources',
+	    [ResponseType.UpstreamTimeout]: 'UpstreamTimeout'
+	  };
+	  function httpResponseCodeToName(status) {
+	    return exports.ResponseTypeNames[httpResponseCodeToEnum(status)];
+	  }
+	  exports.httpResponseCodeToName = httpResponseCodeToName;
+	  exports.ResponseTypeStrings = {
+	    [ResponseType.Unknown]: 'Unknown',
+	    [ResponseType.InvalidResponse]: 'Invalid Response',
+	    [ResponseType.Success]: 'Success',
+	    [ResponseType.InvalidRequest]: 'Invalid Request',
+	    [ResponseType.AuthRequired]: 'Authentication Required',
+	    [ResponseType.Forbidden]: 'Forbidden',
+	    [ResponseType.XRPCNotSupported]: 'XRPC Not Supported',
+	    [ResponseType.PayloadTooLarge]: 'Payload Too Large',
+	    [ResponseType.RateLimitExceeded]: 'Rate Limit Exceeded',
+	    [ResponseType.InternalServerError]: 'Internal Server Error',
+	    [ResponseType.MethodNotImplemented]: 'Method Not Implemented',
+	    [ResponseType.UpstreamFailure]: 'Upstream Failure',
+	    [ResponseType.NotEnoughResources]: 'Not Enough Resources',
+	    [ResponseType.UpstreamTimeout]: 'Upstream Timeout'
+	  };
+	  function httpResponseCodeToString(status) {
+	    return exports.ResponseTypeStrings[httpResponseCodeToEnum(status)];
+	  }
+	  exports.httpResponseCodeToString = httpResponseCodeToString;
+	  class XRPCResponse {
+	    constructor(data, headers) {
+	      Object.defineProperty(this, "data", {
+	        enumerable: true,
+	        configurable: true,
+	        writable: true,
+	        value: data
+	      });
+	      Object.defineProperty(this, "headers", {
+	        enumerable: true,
+	        configurable: true,
+	        writable: true,
+	        value: headers
+	      });
+	      Object.defineProperty(this, "success", {
+	        enumerable: true,
+	        configurable: true,
+	        writable: true,
+	        value: true
+	      });
+	    }
+	  }
+	  exports.XRPCResponse = XRPCResponse;
+	  class XRPCError extends Error {
+	    constructor(statusCode, error = httpResponseCodeToName(statusCode), message, headers, options) {
+	      super(message || error || httpResponseCodeToString(statusCode), options);
+	      Object.defineProperty(this, "error", {
+	        enumerable: true,
+	        configurable: true,
+	        writable: true,
+	        value: error
+	      });
+	      Object.defineProperty(this, "headers", {
+	        enumerable: true,
+	        configurable: true,
+	        writable: true,
+	        value: headers
+	      });
+	      Object.defineProperty(this, "success", {
+	        enumerable: true,
+	        configurable: true,
+	        writable: true,
+	        value: false
+	      });
+	      Object.defineProperty(this, "status", {
+	        enumerable: true,
+	        configurable: true,
+	        writable: true,
+	        value: void 0
+	      });
+	      this.status = httpResponseCodeToEnum(statusCode);
+	      // Pre 2022 runtimes won't handle the "options" constructor argument
+	      const cause = options?.cause;
+	      if (this.cause === undefined && cause !== undefined) {
+	        this.cause = cause;
+	      }
+	    }
+	    static from(cause, fallbackStatus) {
+	      if (cause instanceof XRPCError) {
+	        return cause;
+	      }
+	      // Extract status code from "http-errors" like errors
+	      const statusCode = cause instanceof Error ? ('statusCode' in cause ? cause.statusCode : undefined) ?? ('status' in cause ? cause.status : undefined) : undefined;
+	      const status = typeof statusCode === 'number' ? httpResponseCodeToEnum(statusCode) : fallbackStatus ?? ResponseType.Unknown;
+	      const error = exports.ResponseTypeNames[status];
+	      const message = cause instanceof Error ? cause.message : String(cause);
+	      return new XRPCError(status, error, message, undefined, {
+	        cause
+	      });
+	    }
+	  }
+	  exports.XRPCError = XRPCError;
+	  class XRPCInvalidResponseError extends XRPCError {
+	    constructor(lexiconNsid, validationError, responseBody) {
+	      super(ResponseType.InvalidResponse, exports.ResponseTypeStrings[ResponseType.InvalidResponse], `The server gave an invalid response and may be out of date.`, undefined, {
+	        cause: validationError
+	      });
+	      Object.defineProperty(this, "lexiconNsid", {
+	        enumerable: true,
+	        configurable: true,
+	        writable: true,
+	        value: lexiconNsid
+	      });
+	      Object.defineProperty(this, "validationError", {
+	        enumerable: true,
+	        configurable: true,
+	        writable: true,
+	        value: validationError
+	      });
+	      Object.defineProperty(this, "responseBody", {
+	        enumerable: true,
+	        configurable: true,
+	        writable: true,
+	        value: responseBody
+	      });
+	    }
+	  }
+	  exports.XRPCInvalidResponseError = XRPCInvalidResponseError;
+	})(types$1);
+
+	Object.defineProperty(util$3, "__esModule", {
 	  value: true
 	});
-	disableInviteCodes.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2v = dist;
-	function toKnownErr$2t(e) {
-	  if (e instanceof xrpc_1$2v.XRPCError) ;
-	  return e;
+	util$3.httpResponseBodyParse = util$3.encodeMethodCallBody = util$3.isIterable = util$3.isBodyInit = util$3.combineHeaders = util$3.constructMethodCallHeaders = util$3.encodeQueryParam = util$3.constructMethodCallUrl = util$3.constructMethodCallUri = util$3.getMethodSchemaHTTPMethod = util$3.isErrorResponseBody = void 0;
+	const lexicon_1$2 = dist$4;
+	const types_1$2 = types$1;
+	const ReadableStream$1 = globalThis.ReadableStream || class {
+	  constructor() {
+	    // This anonymous class will never pass any "instanceof" check and cannot
+	    // be instantiated.
+	    throw new Error('ReadableStream is not supported in this environment');
+	  }
+	};
+	function isErrorResponseBody(v) {
+	  return types_1$2.errorResponseBody.safeParse(v).success;
 	}
-	disableInviteCodes.toKnownErr = toKnownErr$2t;
+	util$3.isErrorResponseBody = isErrorResponseBody;
+	function getMethodSchemaHTTPMethod(schema) {
+	  if (schema.type === 'procedure') {
+	    return 'post';
+	  }
+	  return 'get';
+	}
+	util$3.getMethodSchemaHTTPMethod = getMethodSchemaHTTPMethod;
+	function constructMethodCallUri(nsid, schema, serviceUri, params) {
+	  const uri = new URL(constructMethodCallUrl(nsid, schema, params), serviceUri);
+	  return uri.toString();
+	}
+	util$3.constructMethodCallUri = constructMethodCallUri;
+	function constructMethodCallUrl(nsid, schema, params) {
+	  const pathname = `/xrpc/${encodeURIComponent(nsid)}`;
+	  if (!params) return pathname;
+	  const searchParams = [];
+	  for (const [key, value] of Object.entries(params)) {
+	    const paramSchema = schema.parameters?.properties?.[key];
+	    if (!paramSchema) {
+	      throw new Error(`Invalid query parameter: ${key}`);
+	    }
+	    if (value !== undefined) {
+	      if (paramSchema.type === 'array') {
+	        const values = Array.isArray(value) ? value : [value];
+	        for (const val of values) {
+	          searchParams.push([key, encodeQueryParam(paramSchema.items.type, val)]);
+	        }
+	      } else {
+	        searchParams.push([key, encodeQueryParam(paramSchema.type, value)]);
+	      }
+	    }
+	  }
+	  if (!searchParams.length) return pathname;
+	  return `${pathname}?${new URLSearchParams(searchParams).toString()}`;
+	}
+	util$3.constructMethodCallUrl = constructMethodCallUrl;
+	function encodeQueryParam(type, value) {
+	  if (type === 'string' || type === 'unknown') {
+	    return String(value);
+	  }
+	  if (type === 'float') {
+	    return String(Number(value));
+	  } else if (type === 'integer') {
+	    return String(Number(value) | 0);
+	  } else if (type === 'boolean') {
+	    return value ? 'true' : 'false';
+	  } else if (type === 'datetime') {
+	    if (value instanceof Date) {
+	      return value.toISOString();
+	    }
+	    return String(value);
+	  }
+	  throw new Error(`Unsupported query param type: ${type}`);
+	}
+	util$3.encodeQueryParam = encodeQueryParam;
+	function constructMethodCallHeaders(schema, data, opts) {
+	  // Not using `new Headers(opts?.headers)` to avoid duplicating headers values
+	  // due to inconsistent casing in headers name. In case of multiple headers
+	  // with the same name (but using a different case), the last one will be used.
+	  // new Headers({ 'content-type': 'foo', 'Content-Type': 'bar' }).get('content-type')
+	  // => 'foo, bar'
+	  const headers = new Headers();
+	  if (opts?.headers) {
+	    for (const name in opts.headers) {
+	      if (headers.has(name)) {
+	        throw new TypeError(`Duplicate header: ${name}`);
+	      }
+	      const value = opts.headers[name];
+	      if (value != null) {
+	        headers.set(name, value);
+	      }
+	    }
+	  }
+	  if (schema.type === 'procedure') {
+	    if (opts?.encoding) {
+	      headers.set('content-type', opts.encoding);
+	    } else if (!headers.has('content-type') && typeof data !== 'undefined') {
+	      // Special handling of BodyInit types before falling back to JSON encoding
+	      if (data instanceof ArrayBuffer || data instanceof ReadableStream$1 || ArrayBuffer.isView(data)) {
+	        headers.set('content-type', 'application/octet-stream');
+	      } else if (data instanceof FormData) {
+	        // Note: The multipart form data boundary is missing from the header
+	        // we set here, making that header invalid. This special case will be
+	        // handled in encodeMethodCallBody()
+	        headers.set('content-type', 'multipart/form-data');
+	      } else if (data instanceof URLSearchParams) {
+	        headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+	      } else if (isBlobLike(data)) {
+	        headers.set('content-type', data.type || 'application/octet-stream');
+	      } else if (typeof data === 'string') {
+	        headers.set('content-type', 'text/plain;charset=UTF-8');
+	      }
+	      // At this point, data is not a valid BodyInit type.
+	      else if (isIterable(data)) {
+	        headers.set('content-type', 'application/octet-stream');
+	      } else if (typeof data === 'boolean' || typeof data === 'number' || typeof data === 'string' || typeof data === 'object' // covers "null"
+	      ) {
+	        headers.set('content-type', 'application/json');
+	      } else {
+	        // symbol, function, bigint
+	        throw new types_1$2.XRPCError(types_1$2.ResponseType.InvalidRequest, `Unsupported data type: ${typeof data}`);
+	      }
+	    }
+	  }
+	  return headers;
+	}
+	util$3.constructMethodCallHeaders = constructMethodCallHeaders;
+	function combineHeaders(headersInit, defaultHeaders) {
+	  if (!defaultHeaders) return headersInit;
+	  let headers = undefined;
+	  for (const [name, definition] of defaultHeaders) {
+	    // Ignore undefined values (allowed for convenience when using
+	    // Object.entries).
+	    if (definition === undefined) continue;
+	    // Lazy initialization of the headers object
+	    headers ?? (headers = new Headers(headersInit));
+	    if (headers.has(name)) continue;
+	    const value = typeof definition === 'function' ? definition() : definition;
+	    if (typeof value === 'string') headers.set(name, value);else if (value === null) headers.delete(name);else throw new TypeError(`Invalid "${name}" header value: ${typeof value}`);
+	  }
+	  return headers ?? headersInit;
+	}
+	util$3.combineHeaders = combineHeaders;
+	function isBlobLike(value) {
+	  if (value == null) return false;
+	  if (typeof value !== 'object') return false;
+	  if (typeof Blob === 'function' && value instanceof Blob) return true;
+	  // Support for Blobs provided by libraries that don't use the native Blob
+	  // (e.g. fetch-blob from node-fetch).
+	  // https://github.com/node-fetch/fetch-blob/blob/a1a182e5978811407bef4ea1632b517567dda01f/index.js#L233-L244
+	  const tag = value[Symbol.toStringTag];
+	  if (tag === 'Blob' || tag === 'File') {
+	    return 'stream' in value && typeof value.stream === 'function';
+	  }
+	  return false;
+	}
+	function isBodyInit(value) {
+	  switch (typeof value) {
+	    case 'string':
+	      return true;
+	    case 'object':
+	      return value instanceof ArrayBuffer || value instanceof FormData || value instanceof URLSearchParams || value instanceof ReadableStream$1 || ArrayBuffer.isView(value) || isBlobLike(value);
+	    default:
+	      return false;
+	  }
+	}
+	util$3.isBodyInit = isBodyInit;
+	function isIterable(value) {
+	  return value != null && typeof value === 'object' && (Symbol.iterator in value || Symbol.asyncIterator in value);
+	}
+	util$3.isIterable = isIterable;
+	function encodeMethodCallBody(headers, data) {
+	  // Silently ignore the body if there is no content-type header.
+	  const contentType = headers.get('content-type');
+	  if (!contentType) {
+	    return undefined;
+	  }
+	  if (typeof data === 'undefined') {
+	    // This error would be returned by the server, but we can catch it earlier
+	    // to avoid un-necessary requests. Note that a content-length of 0 does not
+	    // necessary mean that the body is "empty" (e.g. an empty txt file).
+	    throw new types_1$2.XRPCError(types_1$2.ResponseType.InvalidRequest, `A request body is expected but none was provided`);
+	  }
+	  if (isBodyInit(data)) {
+	    if (data instanceof FormData && contentType === 'multipart/form-data') {
+	      // fetch() will encode FormData payload itself, but it won't override the
+	      // content-type header if already present. This would cause the boundary
+	      // to be missing from the content-type header, resulting in a 400 error.
+	      // Deleting the content-type header here to let fetch() re-create it.
+	      headers.delete('content-type');
+	    }
+	    // Will be encoded by the fetch API.
+	    return data;
+	  }
+	  if (isIterable(data)) {
+	    // Note that some environments support using Iterable & AsyncIterable as the
+	    // body (e.g. Node's fetch), but not all of them do (browsers).
+	    return iterableToReadableStream(data);
+	  }
+	  if (contentType.startsWith('text/')) {
+	    return new TextEncoder().encode(String(data));
+	  }
+	  if (contentType.startsWith('application/json')) {
+	    const json = (0, lexicon_1$2.stringifyLex)(data);
+	    // Server would return a 400 error if the JSON is invalid (e.g. trying to
+	    // JSONify a function, or an object that implements toJSON() poorly).
+	    if (json === undefined) {
+	      throw new types_1$2.XRPCError(types_1$2.ResponseType.InvalidRequest, `Failed to encode request body as JSON`);
+	    }
+	    return new TextEncoder().encode(json);
+	  }
+	  // At this point, "data" is not a valid BodyInit value, and we don't know how
+	  // to encode it into one. Passing it to fetch would result in an error. Let's
+	  // throw our own error instead.
+	  const type = !data || typeof data !== 'object' ? typeof data : data.constructor !== Object && typeof data.constructor === 'function' && typeof data.constructor?.name === 'string' ? data.constructor.name : 'object';
+	  throw new types_1$2.XRPCError(types_1$2.ResponseType.InvalidRequest, `Unable to encode ${type} as ${contentType} data`);
+	}
+	util$3.encodeMethodCallBody = encodeMethodCallBody;
+	/**
+	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream/from_static}
+	 */
+	function iterableToReadableStream(iterable) {
+	  // Use the native ReadableStream.from() if available.
+	  if ('from' in ReadableStream$1 && typeof ReadableStream$1.from === 'function') {
+	    return ReadableStream$1.from(iterable);
+	  }
+	  // If you see this error, consider using a polyfill for ReadableStream. For
+	  // example, the "web-streams-polyfill" package:
+	  // https://github.com/MattiasBuelens/web-streams-polyfill
+	  throw new TypeError('ReadableStream.from() is not supported in this environment. ' + 'It is required to support using iterables as the request body. ' + 'Consider using a polyfill or re-write your code to use a different body type.');
+	}
+	function httpResponseBodyParse(mimeType, data) {
+	  try {
+	    if (mimeType) {
+	      if (mimeType.includes('application/json')) {
+	        const str = new TextDecoder().decode(data);
+	        return (0, lexicon_1$2.jsonStringToLex)(str);
+	      }
+	      if (mimeType.startsWith('text/')) {
+	        return new TextDecoder().decode(data);
+	      }
+	    }
+	    if (data instanceof ArrayBuffer) {
+	      return new Uint8Array(data);
+	    }
+	    return data;
+	  } catch (cause) {
+	    throw new types_1$2.XRPCError(types_1$2.ResponseType.InvalidResponse, undefined, `Failed to parse response body: ${String(cause)}`, undefined, {
+	      cause
+	    });
+	  }
+	}
+	util$3.httpResponseBodyParse = httpResponseBodyParse;
 
-	var enableAccountInvites = {};
-
-	Object.defineProperty(enableAccountInvites, "__esModule", {
+	Object.defineProperty(fetchHandler, "__esModule", {
 	  value: true
 	});
-	enableAccountInvites.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2u = dist;
-	function toKnownErr$2s(e) {
-	  if (e instanceof xrpc_1$2u.XRPCError) ;
-	  return e;
+	fetchHandler.buildFetchHandler = void 0;
+	const util_1$S = util$3;
+	function buildFetchHandler(options) {
+	  // Already a fetch handler (allowed for convenience)
+	  if (typeof options === 'function') return options;
+	  const {
+	    service,
+	    headers: defaultHeaders = undefined,
+	    fetch = globalThis.fetch
+	  } = typeof options === 'string' || options instanceof URL ? {
+	    service: options
+	  } : options;
+	  if (typeof fetch !== 'function') {
+	    throw new TypeError('XrpcDispatcher requires fetch() to be available in your environment.');
+	  }
+	  const defaultHeadersEntries = defaultHeaders != null ? Object.entries(defaultHeaders) : undefined;
+	  return async function (url, init) {
+	    const base = typeof service === 'function' ? service() : service;
+	    const fullUrl = new URL(url, base);
+	    const headers = (0, util_1$S.combineHeaders)(init.headers, defaultHeadersEntries);
+	    return fetch(fullUrl, {
+	      ...init,
+	      headers
+	    });
+	  };
 	}
-	enableAccountInvites.toKnownErr = toKnownErr$2s;
+	fetchHandler.buildFetchHandler = buildFetchHandler;
 
-	var getAccountInfo = {};
-
-	Object.defineProperty(getAccountInfo, "__esModule", {
+	Object.defineProperty(xrpcClient, "__esModule", {
 	  value: true
 	});
-	getAccountInfo.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2t = dist;
-	function toKnownErr$2r(e) {
-	  if (e instanceof xrpc_1$2t.XRPCError) ;
-	  return e;
+	xrpcClient.XrpcClient = void 0;
+	const lexicon_1$1 = dist$4;
+	const fetch_handler_1 = fetchHandler;
+	const types_1$1 = types$1;
+	const util_1$R = util$3;
+	class XrpcClient {
+	  constructor(fetchHandlerOpts,
+	  // "Lexicons" is redundant here (because that class implements
+	  // "Iterable<LexiconDoc>") but we keep it for explicitness:
+	  lex) {
+	    Object.defineProperty(this, "fetchHandler", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: void 0
+	    });
+	    Object.defineProperty(this, "lex", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: void 0
+	    });
+	    this.fetchHandler = (0, fetch_handler_1.buildFetchHandler)(fetchHandlerOpts);
+	    this.lex = lex instanceof lexicon_1$1.Lexicons ? lex : new lexicon_1$1.Lexicons(lex);
+	  }
+	  async call(methodNsid, params, data, opts) {
+	    const def = this.lex.getDefOrThrow(methodNsid);
+	    if (!def || def.type !== 'query' && def.type !== 'procedure') {
+	      throw new TypeError(`Invalid lexicon: ${methodNsid}. Must be a query or procedure.`);
+	    }
+	    // @TODO: should we validate the params and data here?
+	    // this.lex.assertValidXrpcParams(methodNsid, params)
+	    // if (data !== undefined) {
+	    //   this.lex.assertValidXrpcInput(methodNsid, data)
+	    // }
+	    const reqUrl = (0, util_1$R.constructMethodCallUrl)(methodNsid, def, params);
+	    const reqMethod = (0, util_1$R.getMethodSchemaHTTPMethod)(def);
+	    const reqHeaders = (0, util_1$R.constructMethodCallHeaders)(def, data, opts);
+	    const reqBody = (0, util_1$R.encodeMethodCallBody)(reqHeaders, data);
+	    // The duplex field is required for streaming bodies, but not yet reflected
+	    // anywhere in docs or types. See whatwg/fetch#1438, nodejs/node#46221.
+	    const init = {
+	      method: reqMethod,
+	      headers: reqHeaders,
+	      body: reqBody,
+	      duplex: 'half',
+	      signal: opts?.signal
+	    };
+	    try {
+	      const response = await this.fetchHandler.call(undefined, reqUrl, init);
+	      const resStatus = response.status;
+	      const resHeaders = Object.fromEntries(response.headers.entries());
+	      const resBodyBytes = await response.arrayBuffer();
+	      const resBody = (0, util_1$R.httpResponseBodyParse)(response.headers.get('content-type'), resBodyBytes);
+	      const resCode = (0, types_1$1.httpResponseCodeToEnum)(resStatus);
+	      if (resCode !== types_1$1.ResponseType.Success) {
+	        const {
+	          error = undefined,
+	          message = undefined
+	        } = resBody && (0, util_1$R.isErrorResponseBody)(resBody) ? resBody : {};
+	        throw new types_1$1.XRPCError(resCode, error, message, resHeaders);
+	      }
+	      try {
+	        this.lex.assertValidXrpcOutput(methodNsid, resBody);
+	      } catch (e) {
+	        if (e instanceof lexicon_1$1.ValidationError) {
+	          throw new types_1$1.XRPCInvalidResponseError(methodNsid, e, resBody);
+	        }
+	        throw e;
+	      }
+	      return new types_1$1.XRPCResponse(resBody, resHeaders);
+	    } catch (err) {
+	      throw types_1$1.XRPCError.from(err);
+	    }
+	  }
 	}
-	getAccountInfo.toKnownErr = toKnownErr$2r;
+	xrpcClient.XrpcClient = XrpcClient;
 
-	var getAccountInfos = {};
-
-	Object.defineProperty(getAccountInfos, "__esModule", {
+	Object.defineProperty(client, "__esModule", {
 	  value: true
 	});
-	getAccountInfos.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2s = dist;
-	function toKnownErr$2q(e) {
-	  if (e instanceof xrpc_1$2s.XRPCError) ;
-	  return e;
+	client.ServiceClient = client.Client = void 0;
+	const lexicon_1 = dist$4;
+	const xrpc_client_1 = xrpcClient;
+	const util_1$Q = util$3;
+	/** @deprecated Use {@link XrpcClient} instead */
+	class Client {
+	  constructor() {
+	    Object.defineProperty(this, "lex", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: new lexicon_1.Lexicons()
+	    });
+	  }
+	  /** @deprecated */
+	  get fetch() {
+	    throw new Error('Client.fetch is no longer supported. Use an XrpcClient instead.');
+	  }
+	  /** @deprecated */
+	  set fetch(_) {
+	    throw new Error('Client.fetch is no longer supported. Use an XrpcClient instead.');
+	  }
+	  // method calls
+	  //
+	  async call(serviceUri, methodNsid, params, data, opts) {
+	    return this.service(serviceUri).call(methodNsid, params, data, opts);
+	  }
+	  service(serviceUri) {
+	    return new ServiceClient(this, serviceUri);
+	  }
+	  // schemas
+	  // =
+	  addLexicon(doc) {
+	    this.lex.add(doc);
+	  }
+	  addLexicons(docs) {
+	    for (const doc of docs) {
+	      this.addLexicon(doc);
+	    }
+	  }
+	  removeLexicon(uri) {
+	    this.lex.remove(uri);
+	  }
 	}
-	getAccountInfos.toKnownErr = toKnownErr$2q;
-
-	var getInviteCodes = {};
-
-	Object.defineProperty(getInviteCodes, "__esModule", {
-	  value: true
-	});
-	getInviteCodes.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2r = dist;
-	function toKnownErr$2p(e) {
-	  if (e instanceof xrpc_1$2r.XRPCError) ;
-	  return e;
+	client.Client = Client;
+	/** @deprecated Use {@link XrpcClient} instead */
+	class ServiceClient extends xrpc_client_1.XrpcClient {
+	  constructor(baseClient, serviceUri) {
+	    super(async (input, init) => {
+	      const headers = (0, util_1$Q.combineHeaders)(init.headers, Object.entries(this.headers));
+	      return fetch(new URL(input, this.uri), {
+	        ...init,
+	        headers
+	      });
+	    }, baseClient.lex);
+	    Object.defineProperty(this, "baseClient", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: baseClient
+	    });
+	    Object.defineProperty(this, "uri", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: void 0
+	    });
+	    Object.defineProperty(this, "headers", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: {}
+	    });
+	    this.uri = typeof serviceUri === 'string' ? new URL(serviceUri) : serviceUri;
+	  }
+	  setHeader(key, value) {
+	    this.headers[key] = value;
+	  }
+	  unsetHeader(key) {
+	    delete this.headers[key];
+	  }
 	}
-	getInviteCodes.toKnownErr = toKnownErr$2p;
+	client.ServiceClient = ServiceClient;
 
-	var getSubjectStatus = {};
+	(function (exports) {
 
-	Object.defineProperty(getSubjectStatus, "__esModule", {
-	  value: true
-	});
-	getSubjectStatus.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2q = dist;
-	function toKnownErr$2o(e) {
-	  if (e instanceof xrpc_1$2q.XRPCError) ;
-	  return e;
-	}
-	getSubjectStatus.toKnownErr = toKnownErr$2o;
-
-	var searchAccounts = {};
-
-	Object.defineProperty(searchAccounts, "__esModule", {
-	  value: true
-	});
-	searchAccounts.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2p = dist;
-	function toKnownErr$2n(e) {
-	  if (e instanceof xrpc_1$2p.XRPCError) ;
-	  return e;
-	}
-	searchAccounts.toKnownErr = toKnownErr$2n;
-
-	var sendEmail = {};
-
-	Object.defineProperty(sendEmail, "__esModule", {
-	  value: true
-	});
-	sendEmail.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2o = dist;
-	function toKnownErr$2m(e) {
-	  if (e instanceof xrpc_1$2o.XRPCError) ;
-	  return e;
-	}
-	sendEmail.toKnownErr = toKnownErr$2m;
-
-	var updateAccountEmail = {};
-
-	Object.defineProperty(updateAccountEmail, "__esModule", {
-	  value: true
-	});
-	updateAccountEmail.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2n = dist;
-	function toKnownErr$2l(e) {
-	  if (e instanceof xrpc_1$2n.XRPCError) ;
-	  return e;
-	}
-	updateAccountEmail.toKnownErr = toKnownErr$2l;
-
-	var updateAccountHandle = {};
-
-	Object.defineProperty(updateAccountHandle, "__esModule", {
-	  value: true
-	});
-	updateAccountHandle.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2m = dist;
-	function toKnownErr$2k(e) {
-	  if (e instanceof xrpc_1$2m.XRPCError) ;
-	  return e;
-	}
-	updateAccountHandle.toKnownErr = toKnownErr$2k;
-
-	var updateAccountPassword = {};
-
-	Object.defineProperty(updateAccountPassword, "__esModule", {
-	  value: true
-	});
-	updateAccountPassword.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2l = dist;
-	function toKnownErr$2j(e) {
-	  if (e instanceof xrpc_1$2l.XRPCError) ;
-	  return e;
-	}
-	updateAccountPassword.toKnownErr = toKnownErr$2j;
-
-	var updateSubjectStatus = {};
-
-	Object.defineProperty(updateSubjectStatus, "__esModule", {
-	  value: true
-	});
-	updateSubjectStatus.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2k = dist;
-	function toKnownErr$2i(e) {
-	  if (e instanceof xrpc_1$2k.XRPCError) ;
-	  return e;
-	}
-	updateSubjectStatus.toKnownErr = toKnownErr$2i;
-
-	var getRecommendedDidCredentials = {};
-
-	Object.defineProperty(getRecommendedDidCredentials, "__esModule", {
-	  value: true
-	});
-	getRecommendedDidCredentials.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2j = dist;
-	function toKnownErr$2h(e) {
-	  if (e instanceof xrpc_1$2j.XRPCError) ;
-	  return e;
-	}
-	getRecommendedDidCredentials.toKnownErr = toKnownErr$2h;
-
-	var requestPlcOperationSignature = {};
-
-	Object.defineProperty(requestPlcOperationSignature, "__esModule", {
-	  value: true
-	});
-	requestPlcOperationSignature.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2i = dist;
-	function toKnownErr$2g(e) {
-	  if (e instanceof xrpc_1$2i.XRPCError) ;
-	  return e;
-	}
-	requestPlcOperationSignature.toKnownErr = toKnownErr$2g;
-
-	var resolveHandle = {};
-
-	Object.defineProperty(resolveHandle, "__esModule", {
-	  value: true
-	});
-	resolveHandle.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2h = dist;
-	function toKnownErr$2f(e) {
-	  if (e instanceof xrpc_1$2h.XRPCError) ;
-	  return e;
-	}
-	resolveHandle.toKnownErr = toKnownErr$2f;
-
-	var signPlcOperation = {};
-
-	Object.defineProperty(signPlcOperation, "__esModule", {
-	  value: true
-	});
-	signPlcOperation.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2g = dist;
-	function toKnownErr$2e(e) {
-	  if (e instanceof xrpc_1$2g.XRPCError) ;
-	  return e;
-	}
-	signPlcOperation.toKnownErr = toKnownErr$2e;
-
-	var submitPlcOperation = {};
-
-	Object.defineProperty(submitPlcOperation, "__esModule", {
-	  value: true
-	});
-	submitPlcOperation.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2f = dist;
-	function toKnownErr$2d(e) {
-	  if (e instanceof xrpc_1$2f.XRPCError) ;
-	  return e;
-	}
-	submitPlcOperation.toKnownErr = toKnownErr$2d;
-
-	var updateHandle = {};
-
-	Object.defineProperty(updateHandle, "__esModule", {
-	  value: true
-	});
-	updateHandle.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2e = dist;
-	function toKnownErr$2c(e) {
-	  if (e instanceof xrpc_1$2e.XRPCError) ;
-	  return e;
-	}
-	updateHandle.toKnownErr = toKnownErr$2c;
-
-	var queryLabels = {};
-
-	Object.defineProperty(queryLabels, "__esModule", {
-	  value: true
-	});
-	queryLabels.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2d = dist;
-	function toKnownErr$2b(e) {
-	  if (e instanceof xrpc_1$2d.XRPCError) ;
-	  return e;
-	}
-	queryLabels.toKnownErr = toKnownErr$2b;
-
-	var createReport = {};
-
-	Object.defineProperty(createReport, "__esModule", {
-	  value: true
-	});
-	createReport.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$2c = dist;
-	function toKnownErr$2a(e) {
-	  if (e instanceof xrpc_1$2c.XRPCError) ;
-	  return e;
-	}
-	createReport.toKnownErr = toKnownErr$2a;
+	  var __createBinding = commonjsGlobal && commonjsGlobal.__createBinding || (Object.create ? function (o, m, k, k2) {
+	    if (k2 === undefined) k2 = k;
+	    var desc = Object.getOwnPropertyDescriptor(m, k);
+	    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+	      desc = {
+	        enumerable: true,
+	        get: function () {
+	          return m[k];
+	        }
+	      };
+	    }
+	    Object.defineProperty(o, k2, desc);
+	  } : function (o, m, k, k2) {
+	    if (k2 === undefined) k2 = k;
+	    o[k2] = m[k];
+	  });
+	  var __exportStar = commonjsGlobal && commonjsGlobal.__exportStar || function (m, exports) {
+	    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+	  };
+	  Object.defineProperty(exports, "__esModule", {
+	    value: true
+	  });
+	  __exportStar(client, exports);
+	  __exportStar(fetchHandler, exports);
+	  __exportStar(types$1, exports);
+	  __exportStar(util$3, exports);
+	  __exportStar(xrpcClient, exports);
+	  const client_1 = client;
+	  /** @deprecated create a local {@link XrpcClient} instance instead */
+	  const defaultInst = new client_1.Client();
+	  exports.default = defaultInst;
+	})(dist);
 
 	var applyWrites = {};
 
@@ -24516,44 +23089,46 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2b = dist;
-	const util_1$Q = util$2;
-	const lexicons_1$P = lexicons;
-	let InvalidSwapError$3 = class InvalidSwapError extends xrpc_1$2b.XRPCError {
+	const xrpc_1$F = dist;
+	const util_1$P = util$2;
+	const lexicons_1$O = lexicons;
+	let InvalidSwapError$3 = class InvalidSwapError extends xrpc_1$F.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	applyWrites.InvalidSwapError = InvalidSwapError$3;
-	function toKnownErr$29(e) {
-	  if (e instanceof xrpc_1$2b.XRPCError) {
+	function toKnownErr$2v(e) {
+	  if (e instanceof xrpc_1$F.XRPCError) {
 	    if (e.error === 'InvalidSwap') return new InvalidSwapError$3(e);
 	  }
 	  return e;
 	}
-	applyWrites.toKnownErr = toKnownErr$29;
+	applyWrites.toKnownErr = toKnownErr$2v;
 	function isCreate(v) {
-	  return (0, util_1$Q.isObj)(v) && (0, util_1$Q.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#create';
+	  return (0, util_1$P.isObj)(v) && (0, util_1$P.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#create';
 	}
 	applyWrites.isCreate = isCreate;
 	function validateCreate(v) {
-	  return lexicons_1$P.lexicons.validate('com.atproto.repo.applyWrites#create', v);
+	  return lexicons_1$O.lexicons.validate('com.atproto.repo.applyWrites#create', v);
 	}
 	applyWrites.validateCreate = validateCreate;
 	function isUpdate(v) {
-	  return (0, util_1$Q.isObj)(v) && (0, util_1$Q.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#update';
+	  return (0, util_1$P.isObj)(v) && (0, util_1$P.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#update';
 	}
 	applyWrites.isUpdate = isUpdate;
 	function validateUpdate(v) {
-	  return lexicons_1$P.lexicons.validate('com.atproto.repo.applyWrites#update', v);
+	  return lexicons_1$O.lexicons.validate('com.atproto.repo.applyWrites#update', v);
 	}
 	applyWrites.validateUpdate = validateUpdate;
 	function isDelete(v) {
-	  return (0, util_1$Q.isObj)(v) && (0, util_1$Q.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#delete';
+	  return (0, util_1$P.isObj)(v) && (0, util_1$P.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.applyWrites#delete';
 	}
 	applyWrites.isDelete = isDelete;
 	function validateDelete(v) {
-	  return lexicons_1$P.lexicons.validate('com.atproto.repo.applyWrites#delete', v);
+	  return lexicons_1$O.lexicons.validate('com.atproto.repo.applyWrites#delete', v);
 	}
 	applyWrites.validateDelete = validateDelete;
 
@@ -24566,20 +23141,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2a = dist;
-	let InvalidSwapError$2 = class InvalidSwapError extends xrpc_1$2a.XRPCError {
+	const xrpc_1$E = dist;
+	let InvalidSwapError$2 = class InvalidSwapError extends xrpc_1$E.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	createRecord.InvalidSwapError = InvalidSwapError$2;
-	function toKnownErr$28(e) {
-	  if (e instanceof xrpc_1$2a.XRPCError) {
+	function toKnownErr$2u(e) {
+	  if (e instanceof xrpc_1$E.XRPCError) {
 	    if (e.error === 'InvalidSwap') return new InvalidSwapError$2(e);
 	  }
 	  return e;
 	}
-	createRecord.toKnownErr = toKnownErr$28;
+	createRecord.toKnownErr = toKnownErr$2u;
 
 	var deleteRecord = {};
 
@@ -24590,120 +23167,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$29 = dist;
-	let InvalidSwapError$1 = class InvalidSwapError extends xrpc_1$29.XRPCError {
+	const xrpc_1$D = dist;
+	let InvalidSwapError$1 = class InvalidSwapError extends xrpc_1$D.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	deleteRecord.InvalidSwapError = InvalidSwapError$1;
-	function toKnownErr$27(e) {
-	  if (e instanceof xrpc_1$29.XRPCError) {
+	function toKnownErr$2t(e) {
+	  if (e instanceof xrpc_1$D.XRPCError) {
 	    if (e.error === 'InvalidSwap') return new InvalidSwapError$1(e);
 	  }
 	  return e;
 	}
-	deleteRecord.toKnownErr = toKnownErr$27;
-
-	var describeRepo = {};
-
-	Object.defineProperty(describeRepo, "__esModule", {
-	  value: true
-	});
-	describeRepo.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$28 = dist;
-	function toKnownErr$26(e) {
-	  if (e instanceof xrpc_1$28.XRPCError) ;
-	  return e;
-	}
-	describeRepo.toKnownErr = toKnownErr$26;
-
-	var getRecord$2 = {};
-
-	Object.defineProperty(getRecord$2, "__esModule", {
-	  value: true
-	});
-	getRecord$2.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$27 = dist;
-	function toKnownErr$25(e) {
-	  if (e instanceof xrpc_1$27.XRPCError) ;
-	  return e;
-	}
-	getRecord$2.toKnownErr = toKnownErr$25;
-
-	var importRepo = {};
-
-	Object.defineProperty(importRepo, "__esModule", {
-	  value: true
-	});
-	importRepo.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$26 = dist;
-	function toKnownErr$24(e) {
-	  if (e instanceof xrpc_1$26.XRPCError) ;
-	  return e;
-	}
-	importRepo.toKnownErr = toKnownErr$24;
-
-	var listMissingBlobs = {};
-
-	Object.defineProperty(listMissingBlobs, "__esModule", {
-	  value: true
-	});
-	listMissingBlobs.validateRecordBlob = listMissingBlobs.isRecordBlob = listMissingBlobs.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$25 = dist;
-	const util_1$P = util$2;
-	const lexicons_1$O = lexicons;
-	function toKnownErr$23(e) {
-	  if (e instanceof xrpc_1$25.XRPCError) ;
-	  return e;
-	}
-	listMissingBlobs.toKnownErr = toKnownErr$23;
-	function isRecordBlob(v) {
-	  return (0, util_1$P.isObj)(v) && (0, util_1$P.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.listMissingBlobs#recordBlob';
-	}
-	listMissingBlobs.isRecordBlob = isRecordBlob;
-	function validateRecordBlob(v) {
-	  return lexicons_1$O.lexicons.validate('com.atproto.repo.listMissingBlobs#recordBlob', v);
-	}
-	listMissingBlobs.validateRecordBlob = validateRecordBlob;
-
-	var listRecords = {};
-
-	Object.defineProperty(listRecords, "__esModule", {
-	  value: true
-	});
-	listRecords.validateRecord = listRecords.isRecord = listRecords.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$24 = dist;
-	const util_1$O = util$2;
-	const lexicons_1$N = lexicons;
-	function toKnownErr$22(e) {
-	  if (e instanceof xrpc_1$24.XRPCError) ;
-	  return e;
-	}
-	listRecords.toKnownErr = toKnownErr$22;
-	function isRecord$f(v) {
-	  return (0, util_1$O.isObj)(v) && (0, util_1$O.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.listRecords#record';
-	}
-	listRecords.isRecord = isRecord$f;
-	function validateRecord$f(v) {
-	  return lexicons_1$N.lexicons.validate('com.atproto.repo.listRecords#record', v);
-	}
-	listRecords.validateRecord = validateRecord$f;
+	deleteRecord.toKnownErr = toKnownErr$2t;
 
 	var putRecord = {};
 
@@ -24714,68 +23193,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$23 = dist;
-	class InvalidSwapError extends xrpc_1$23.XRPCError {
+	const xrpc_1$C = dist;
+	class InvalidSwapError extends xrpc_1$C.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	putRecord.InvalidSwapError = InvalidSwapError;
-	function toKnownErr$21(e) {
-	  if (e instanceof xrpc_1$23.XRPCError) {
+	function toKnownErr$2s(e) {
+	  if (e instanceof xrpc_1$C.XRPCError) {
 	    if (e.error === 'InvalidSwap') return new InvalidSwapError(e);
 	  }
 	  return e;
 	}
-	putRecord.toKnownErr = toKnownErr$21;
-
-	var uploadBlob = {};
-
-	Object.defineProperty(uploadBlob, "__esModule", {
-	  value: true
-	});
-	uploadBlob.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$22 = dist;
-	function toKnownErr$20(e) {
-	  if (e instanceof xrpc_1$22.XRPCError) ;
-	  return e;
-	}
-	uploadBlob.toKnownErr = toKnownErr$20;
-
-	var activateAccount = {};
-
-	Object.defineProperty(activateAccount, "__esModule", {
-	  value: true
-	});
-	activateAccount.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$21 = dist;
-	function toKnownErr$1$(e) {
-	  if (e instanceof xrpc_1$21.XRPCError) ;
-	  return e;
-	}
-	activateAccount.toKnownErr = toKnownErr$1$;
-
-	var checkAccountStatus = {};
-
-	Object.defineProperty(checkAccountStatus, "__esModule", {
-	  value: true
-	});
-	checkAccountStatus.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$20 = dist;
-	function toKnownErr$1_(e) {
-	  if (e instanceof xrpc_1$20.XRPCError) ;
-	  return e;
-	}
-	checkAccountStatus.toKnownErr = toKnownErr$1_;
+	putRecord.toKnownErr = toKnownErr$2s;
 
 	var confirmEmail = {};
 
@@ -24786,33 +23219,41 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1$ = dist;
-	class AccountNotFoundError extends xrpc_1$1$.XRPCError {
+	const xrpc_1$B = dist;
+	class AccountNotFoundError extends xrpc_1$B.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	confirmEmail.AccountNotFoundError = AccountNotFoundError;
-	let ExpiredTokenError$3 = class ExpiredTokenError extends xrpc_1$1$.XRPCError {
+	let ExpiredTokenError$3 = class ExpiredTokenError extends xrpc_1$B.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	confirmEmail.ExpiredTokenError = ExpiredTokenError$3;
-	let InvalidTokenError$3 = class InvalidTokenError extends xrpc_1$1$.XRPCError {
+	let InvalidTokenError$3 = class InvalidTokenError extends xrpc_1$B.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	confirmEmail.InvalidTokenError = InvalidTokenError$3;
-	class InvalidEmailError extends xrpc_1$1$.XRPCError {
+	class InvalidEmailError extends xrpc_1$B.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	confirmEmail.InvalidEmailError = InvalidEmailError;
-	function toKnownErr$1Z(e) {
-	  if (e instanceof xrpc_1$1$.XRPCError) {
+	function toKnownErr$2r(e) {
+	  if (e instanceof xrpc_1$B.XRPCError) {
 	    if (e.error === 'AccountNotFound') return new AccountNotFoundError(e);
 	    if (e.error === 'ExpiredToken') return new ExpiredTokenError$3(e);
 	    if (e.error === 'InvalidToken') return new InvalidTokenError$3(e);
@@ -24820,7 +23261,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	confirmEmail.toKnownErr = toKnownErr$1Z;
+	confirmEmail.toKnownErr = toKnownErr$2r;
 
 	var createAccount = {};
 
@@ -24831,51 +23272,65 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1_ = dist;
-	class InvalidHandleError extends xrpc_1$1_.XRPCError {
+	const xrpc_1$A = dist;
+	class InvalidHandleError extends xrpc_1$A.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	createAccount.InvalidHandleError = InvalidHandleError;
-	class InvalidPasswordError extends xrpc_1$1_.XRPCError {
+	class InvalidPasswordError extends xrpc_1$A.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	createAccount.InvalidPasswordError = InvalidPasswordError;
-	class InvalidInviteCodeError extends xrpc_1$1_.XRPCError {
+	class InvalidInviteCodeError extends xrpc_1$A.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	createAccount.InvalidInviteCodeError = InvalidInviteCodeError;
-	class HandleNotAvailableError extends xrpc_1$1_.XRPCError {
+	class HandleNotAvailableError extends xrpc_1$A.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	createAccount.HandleNotAvailableError = HandleNotAvailableError;
-	class UnsupportedDomainError extends xrpc_1$1_.XRPCError {
+	class UnsupportedDomainError extends xrpc_1$A.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	createAccount.UnsupportedDomainError = UnsupportedDomainError;
-	class UnresolvableDidError extends xrpc_1$1_.XRPCError {
+	class UnresolvableDidError extends xrpc_1$A.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	createAccount.UnresolvableDidError = UnresolvableDidError;
-	class IncompatibleDidDocError extends xrpc_1$1_.XRPCError {
+	class IncompatibleDidDocError extends xrpc_1$A.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	createAccount.IncompatibleDidDocError = IncompatibleDidDocError;
-	function toKnownErr$1Y(e) {
-	  if (e instanceof xrpc_1$1_.XRPCError) {
+	function toKnownErr$2q(e) {
+	  if (e instanceof xrpc_1$A.XRPCError) {
 	    if (e.error === 'InvalidHandle') return new InvalidHandleError(e);
 	    if (e.error === 'InvalidPassword') return new InvalidPasswordError(e);
 	    if (e.error === 'InvalidInviteCode') return new InvalidInviteCodeError(e);
@@ -24886,7 +23341,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	createAccount.toKnownErr = toKnownErr$1Y;
+	createAccount.toKnownErr = toKnownErr$2q;
 
 	var createAppPassword = {};
 
@@ -24897,72 +23352,32 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1Z = dist;
-	const util_1$N = util$2;
-	const lexicons_1$M = lexicons;
-	let AccountTakedownError$3 = class AccountTakedownError extends xrpc_1$1Z.XRPCError {
+	const xrpc_1$z = dist;
+	const util_1$O = util$2;
+	const lexicons_1$N = lexicons;
+	let AccountTakedownError$3 = class AccountTakedownError extends xrpc_1$z.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	createAppPassword.AccountTakedownError = AccountTakedownError$3;
-	function toKnownErr$1X(e) {
-	  if (e instanceof xrpc_1$1Z.XRPCError) {
+	function toKnownErr$2p(e) {
+	  if (e instanceof xrpc_1$z.XRPCError) {
 	    if (e.error === 'AccountTakedown') return new AccountTakedownError$3(e);
 	  }
 	  return e;
 	}
-	createAppPassword.toKnownErr = toKnownErr$1X;
+	createAppPassword.toKnownErr = toKnownErr$2p;
 	function isAppPassword$1(v) {
-	  return (0, util_1$N.isObj)(v) && (0, util_1$N.hasProp)(v, '$type') && v.$type === 'com.atproto.server.createAppPassword#appPassword';
+	  return (0, util_1$O.isObj)(v) && (0, util_1$O.hasProp)(v, '$type') && v.$type === 'com.atproto.server.createAppPassword#appPassword';
 	}
 	createAppPassword.isAppPassword = isAppPassword$1;
 	function validateAppPassword$1(v) {
-	  return lexicons_1$M.lexicons.validate('com.atproto.server.createAppPassword#appPassword', v);
+	  return lexicons_1$N.lexicons.validate('com.atproto.server.createAppPassword#appPassword', v);
 	}
 	createAppPassword.validateAppPassword = validateAppPassword$1;
-
-	var createInviteCode = {};
-
-	Object.defineProperty(createInviteCode, "__esModule", {
-	  value: true
-	});
-	createInviteCode.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1Y = dist;
-	function toKnownErr$1W(e) {
-	  if (e instanceof xrpc_1$1Y.XRPCError) ;
-	  return e;
-	}
-	createInviteCode.toKnownErr = toKnownErr$1W;
-
-	var createInviteCodes = {};
-
-	Object.defineProperty(createInviteCodes, "__esModule", {
-	  value: true
-	});
-	createInviteCodes.validateAccountCodes = createInviteCodes.isAccountCodes = createInviteCodes.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1X = dist;
-	const util_1$M = util$2;
-	const lexicons_1$L = lexicons;
-	function toKnownErr$1V(e) {
-	  if (e instanceof xrpc_1$1X.XRPCError) ;
-	  return e;
-	}
-	createInviteCodes.toKnownErr = toKnownErr$1V;
-	function isAccountCodes(v) {
-	  return (0, util_1$M.isObj)(v) && (0, util_1$M.hasProp)(v, '$type') && v.$type === 'com.atproto.server.createInviteCodes#accountCodes';
-	}
-	createInviteCodes.isAccountCodes = isAccountCodes;
-	function validateAccountCodes(v) {
-	  return lexicons_1$L.lexicons.validate('com.atproto.server.createInviteCodes#accountCodes', v);
-	}
-	createInviteCodes.validateAccountCodes = validateAccountCodes;
 
 	var createSession = {};
 
@@ -24973,124 +23388,66 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1W = dist;
-	let AccountTakedownError$2 = class AccountTakedownError extends xrpc_1$1W.XRPCError {
+	const xrpc_1$y = dist;
+	let AccountTakedownError$2 = class AccountTakedownError extends xrpc_1$y.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	createSession.AccountTakedownError = AccountTakedownError$2;
-	class AuthFactorTokenRequiredError extends xrpc_1$1W.XRPCError {
+	class AuthFactorTokenRequiredError extends xrpc_1$y.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	createSession.AuthFactorTokenRequiredError = AuthFactorTokenRequiredError;
-	function toKnownErr$1U(e) {
-	  if (e instanceof xrpc_1$1W.XRPCError) {
+	function toKnownErr$2o(e) {
+	  if (e instanceof xrpc_1$y.XRPCError) {
 	    if (e.error === 'AccountTakedown') return new AccountTakedownError$2(e);
 	    if (e.error === 'AuthFactorTokenRequired') return new AuthFactorTokenRequiredError(e);
 	  }
 	  return e;
 	}
-	createSession.toKnownErr = toKnownErr$1U;
+	createSession.toKnownErr = toKnownErr$2o;
 
-	var deactivateAccount = {};
+	var deleteAccount$2 = {};
 
-	Object.defineProperty(deactivateAccount, "__esModule", {
+	Object.defineProperty(deleteAccount$2, "__esModule", {
 	  value: true
 	});
-	deactivateAccount.toKnownErr = void 0;
+	deleteAccount$2.toKnownErr = deleteAccount$2.InvalidTokenError = deleteAccount$2.ExpiredTokenError = void 0;
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1V = dist;
-	function toKnownErr$1T(e) {
-	  if (e instanceof xrpc_1$1V.XRPCError) ;
-	  return e;
-	}
-	deactivateAccount.toKnownErr = toKnownErr$1T;
-
-	var deleteAccount$1 = {};
-
-	Object.defineProperty(deleteAccount$1, "__esModule", {
-	  value: true
-	});
-	deleteAccount$1.toKnownErr = deleteAccount$1.InvalidTokenError = deleteAccount$1.ExpiredTokenError = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1U = dist;
-	let ExpiredTokenError$2 = class ExpiredTokenError extends xrpc_1$1U.XRPCError {
+	const xrpc_1$x = dist;
+	let ExpiredTokenError$2 = class ExpiredTokenError extends xrpc_1$x.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
-	deleteAccount$1.ExpiredTokenError = ExpiredTokenError$2;
-	let InvalidTokenError$2 = class InvalidTokenError extends xrpc_1$1U.XRPCError {
+	deleteAccount$2.ExpiredTokenError = ExpiredTokenError$2;
+	let InvalidTokenError$2 = class InvalidTokenError extends xrpc_1$x.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
-	deleteAccount$1.InvalidTokenError = InvalidTokenError$2;
-	function toKnownErr$1S(e) {
-	  if (e instanceof xrpc_1$1U.XRPCError) {
+	deleteAccount$2.InvalidTokenError = InvalidTokenError$2;
+	function toKnownErr$2n(e) {
+	  if (e instanceof xrpc_1$x.XRPCError) {
 	    if (e.error === 'ExpiredToken') return new ExpiredTokenError$2(e);
 	    if (e.error === 'InvalidToken') return new InvalidTokenError$2(e);
 	  }
 	  return e;
 	}
-	deleteAccount$1.toKnownErr = toKnownErr$1S;
-
-	var deleteSession = {};
-
-	Object.defineProperty(deleteSession, "__esModule", {
-	  value: true
-	});
-	deleteSession.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1T = dist;
-	function toKnownErr$1R(e) {
-	  if (e instanceof xrpc_1$1T.XRPCError) ;
-	  return e;
-	}
-	deleteSession.toKnownErr = toKnownErr$1R;
-
-	var describeServer = {};
-
-	Object.defineProperty(describeServer, "__esModule", {
-	  value: true
-	});
-	describeServer.validateContact = describeServer.isContact = describeServer.validateLinks = describeServer.isLinks = describeServer.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1S = dist;
-	const util_1$L = util$2;
-	const lexicons_1$K = lexicons;
-	function toKnownErr$1Q(e) {
-	  if (e instanceof xrpc_1$1S.XRPCError) ;
-	  return e;
-	}
-	describeServer.toKnownErr = toKnownErr$1Q;
-	function isLinks$1(v) {
-	  return (0, util_1$L.isObj)(v) && (0, util_1$L.hasProp)(v, '$type') && v.$type === 'com.atproto.server.describeServer#links';
-	}
-	describeServer.isLinks = isLinks$1;
-	function validateLinks$1(v) {
-	  return lexicons_1$K.lexicons.validate('com.atproto.server.describeServer#links', v);
-	}
-	describeServer.validateLinks = validateLinks$1;
-	function isContact(v) {
-	  return (0, util_1$L.isObj)(v) && (0, util_1$L.hasProp)(v, '$type') && v.$type === 'com.atproto.server.describeServer#contact';
-	}
-	describeServer.isContact = isContact;
-	function validateContact(v) {
-	  return lexicons_1$K.lexicons.validate('com.atproto.server.describeServer#contact', v);
-	}
-	describeServer.validateContact = validateContact;
+	deleteAccount$2.toKnownErr = toKnownErr$2n;
 
 	var getAccountInviteCodes = {};
 
@@ -25101,52 +23458,48 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1R = dist;
-	class DuplicateCreateError extends xrpc_1$1R.XRPCError {
+	const xrpc_1$w = dist;
+	class DuplicateCreateError extends xrpc_1$w.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	getAccountInviteCodes.DuplicateCreateError = DuplicateCreateError;
-	function toKnownErr$1P(e) {
-	  if (e instanceof xrpc_1$1R.XRPCError) {
+	function toKnownErr$2m(e) {
+	  if (e instanceof xrpc_1$w.XRPCError) {
 	    if (e.error === 'DuplicateCreate') return new DuplicateCreateError(e);
 	  }
 	  return e;
 	}
-	getAccountInviteCodes.toKnownErr = toKnownErr$1P;
+	getAccountInviteCodes.toKnownErr = toKnownErr$2m;
 
 	var getServiceAuth = {};
 
 	Object.defineProperty(getServiceAuth, "__esModule", {
 	  value: true
 	});
-	getServiceAuth.toKnownErr = void 0;
+	getServiceAuth.toKnownErr = getServiceAuth.BadExpirationError = void 0;
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1Q = dist;
-	function toKnownErr$1O(e) {
-	  if (e instanceof xrpc_1$1Q.XRPCError) ;
+	const xrpc_1$v = dist;
+	class BadExpirationError extends xrpc_1$v.XRPCError {
+	  constructor(src) {
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
+	  }
+	}
+	getServiceAuth.BadExpirationError = BadExpirationError;
+	function toKnownErr$2l(e) {
+	  if (e instanceof xrpc_1$v.XRPCError) {
+	    if (e.error === 'BadExpiration') return new BadExpirationError(e);
+	  }
 	  return e;
 	}
-	getServiceAuth.toKnownErr = toKnownErr$1O;
-
-	var getSession = {};
-
-	Object.defineProperty(getSession, "__esModule", {
-	  value: true
-	});
-	getSession.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1P = dist;
-	function toKnownErr$1N(e) {
-	  if (e instanceof xrpc_1$1P.XRPCError) ;
-	  return e;
-	}
-	getSession.toKnownErr = toKnownErr$1N;
+	getServiceAuth.toKnownErr = toKnownErr$2l;
 
 	var listAppPasswords = {};
 
@@ -25157,28 +23510,30 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1O = dist;
-	const util_1$K = util$2;
-	const lexicons_1$J = lexicons;
-	let AccountTakedownError$1 = class AccountTakedownError extends xrpc_1$1O.XRPCError {
+	const xrpc_1$u = dist;
+	const util_1$N = util$2;
+	const lexicons_1$M = lexicons;
+	let AccountTakedownError$1 = class AccountTakedownError extends xrpc_1$u.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	listAppPasswords.AccountTakedownError = AccountTakedownError$1;
-	function toKnownErr$1M(e) {
-	  if (e instanceof xrpc_1$1O.XRPCError) {
+	function toKnownErr$2k(e) {
+	  if (e instanceof xrpc_1$u.XRPCError) {
 	    if (e.error === 'AccountTakedown') return new AccountTakedownError$1(e);
 	  }
 	  return e;
 	}
-	listAppPasswords.toKnownErr = toKnownErr$1M;
+	listAppPasswords.toKnownErr = toKnownErr$2k;
 	function isAppPassword(v) {
-	  return (0, util_1$K.isObj)(v) && (0, util_1$K.hasProp)(v, '$type') && v.$type === 'com.atproto.server.listAppPasswords#appPassword';
+	  return (0, util_1$N.isObj)(v) && (0, util_1$N.hasProp)(v, '$type') && v.$type === 'com.atproto.server.listAppPasswords#appPassword';
 	}
 	listAppPasswords.isAppPassword = isAppPassword;
 	function validateAppPassword(v) {
-	  return lexicons_1$J.lexicons.validate('com.atproto.server.listAppPasswords#appPassword', v);
+	  return lexicons_1$M.lexicons.validate('com.atproto.server.listAppPasswords#appPassword', v);
 	}
 	listAppPasswords.validateAppPassword = validateAppPassword;
 
@@ -25191,100 +23546,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1N = dist;
-	class AccountTakedownError extends xrpc_1$1N.XRPCError {
+	const xrpc_1$t = dist;
+	class AccountTakedownError extends xrpc_1$t.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	refreshSession.AccountTakedownError = AccountTakedownError;
-	function toKnownErr$1L(e) {
-	  if (e instanceof xrpc_1$1N.XRPCError) {
+	function toKnownErr$2j(e) {
+	  if (e instanceof xrpc_1$t.XRPCError) {
 	    if (e.error === 'AccountTakedown') return new AccountTakedownError(e);
 	  }
 	  return e;
 	}
-	refreshSession.toKnownErr = toKnownErr$1L;
-
-	var requestAccountDelete = {};
-
-	Object.defineProperty(requestAccountDelete, "__esModule", {
-	  value: true
-	});
-	requestAccountDelete.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1M = dist;
-	function toKnownErr$1K(e) {
-	  if (e instanceof xrpc_1$1M.XRPCError) ;
-	  return e;
-	}
-	requestAccountDelete.toKnownErr = toKnownErr$1K;
-
-	var requestEmailConfirmation = {};
-
-	Object.defineProperty(requestEmailConfirmation, "__esModule", {
-	  value: true
-	});
-	requestEmailConfirmation.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1L = dist;
-	function toKnownErr$1J(e) {
-	  if (e instanceof xrpc_1$1L.XRPCError) ;
-	  return e;
-	}
-	requestEmailConfirmation.toKnownErr = toKnownErr$1J;
-
-	var requestEmailUpdate = {};
-
-	Object.defineProperty(requestEmailUpdate, "__esModule", {
-	  value: true
-	});
-	requestEmailUpdate.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1K = dist;
-	function toKnownErr$1I(e) {
-	  if (e instanceof xrpc_1$1K.XRPCError) ;
-	  return e;
-	}
-	requestEmailUpdate.toKnownErr = toKnownErr$1I;
-
-	var requestPasswordReset = {};
-
-	Object.defineProperty(requestPasswordReset, "__esModule", {
-	  value: true
-	});
-	requestPasswordReset.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1J = dist;
-	function toKnownErr$1H(e) {
-	  if (e instanceof xrpc_1$1J.XRPCError) ;
-	  return e;
-	}
-	requestPasswordReset.toKnownErr = toKnownErr$1H;
-
-	var reserveSigningKey = {};
-
-	Object.defineProperty(reserveSigningKey, "__esModule", {
-	  value: true
-	});
-	reserveSigningKey.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1I = dist;
-	function toKnownErr$1G(e) {
-	  if (e instanceof xrpc_1$1I.XRPCError) ;
-	  return e;
-	}
-	reserveSigningKey.toKnownErr = toKnownErr$1G;
+	refreshSession.toKnownErr = toKnownErr$2j;
 
 	var resetPassword = {};
 
@@ -25295,43 +23572,31 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1H = dist;
-	let ExpiredTokenError$1 = class ExpiredTokenError extends xrpc_1$1H.XRPCError {
+	const xrpc_1$s = dist;
+	let ExpiredTokenError$1 = class ExpiredTokenError extends xrpc_1$s.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	resetPassword.ExpiredTokenError = ExpiredTokenError$1;
-	let InvalidTokenError$1 = class InvalidTokenError extends xrpc_1$1H.XRPCError {
+	let InvalidTokenError$1 = class InvalidTokenError extends xrpc_1$s.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	resetPassword.InvalidTokenError = InvalidTokenError$1;
-	function toKnownErr$1F(e) {
-	  if (e instanceof xrpc_1$1H.XRPCError) {
+	function toKnownErr$2i(e) {
+	  if (e instanceof xrpc_1$s.XRPCError) {
 	    if (e.error === 'ExpiredToken') return new ExpiredTokenError$1(e);
 	    if (e.error === 'InvalidToken') return new InvalidTokenError$1(e);
 	  }
 	  return e;
 	}
-	resetPassword.toKnownErr = toKnownErr$1F;
-
-	var revokeAppPassword = {};
-
-	Object.defineProperty(revokeAppPassword, "__esModule", {
-	  value: true
-	});
-	revokeAppPassword.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1G = dist;
-	function toKnownErr$1E(e) {
-	  if (e instanceof xrpc_1$1G.XRPCError) ;
-	  return e;
-	}
-	revokeAppPassword.toKnownErr = toKnownErr$1E;
+	resetPassword.toKnownErr = toKnownErr$2i;
 
 	var updateEmail = {};
 
@@ -25342,34 +23607,40 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1F = dist;
-	class ExpiredTokenError extends xrpc_1$1F.XRPCError {
+	const xrpc_1$r = dist;
+	class ExpiredTokenError extends xrpc_1$r.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	updateEmail.ExpiredTokenError = ExpiredTokenError;
-	class InvalidTokenError extends xrpc_1$1F.XRPCError {
+	class InvalidTokenError extends xrpc_1$r.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	updateEmail.InvalidTokenError = InvalidTokenError;
-	class TokenRequiredError extends xrpc_1$1F.XRPCError {
+	class TokenRequiredError extends xrpc_1$r.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	updateEmail.TokenRequiredError = TokenRequiredError;
-	function toKnownErr$1D(e) {
-	  if (e instanceof xrpc_1$1F.XRPCError) {
+	function toKnownErr$2h(e) {
+	  if (e instanceof xrpc_1$r.XRPCError) {
 	    if (e.error === 'ExpiredToken') return new ExpiredTokenError(e);
 	    if (e.error === 'InvalidToken') return new InvalidTokenError(e);
 	    if (e.error === 'TokenRequired') return new TokenRequiredError(e);
 	  }
 	  return e;
 	}
-	updateEmail.toKnownErr = toKnownErr$1D;
+	updateEmail.toKnownErr = toKnownErr$2h;
 
 	var getBlob = {};
 
@@ -25380,39 +23651,49 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1E = dist;
-	class BlobNotFoundError extends xrpc_1$1E.XRPCError {
+	const xrpc_1$q = dist;
+	class BlobNotFoundError extends xrpc_1$q.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	getBlob.BlobNotFoundError = BlobNotFoundError;
-	let RepoNotFoundError$7 = class RepoNotFoundError extends xrpc_1$1E.XRPCError {
+	let RepoNotFoundError$7 = class RepoNotFoundError extends xrpc_1$q.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getBlob.RepoNotFoundError = RepoNotFoundError$7;
-	let RepoTakendownError$5 = class RepoTakendownError extends xrpc_1$1E.XRPCError {
+	let RepoTakendownError$5 = class RepoTakendownError extends xrpc_1$q.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getBlob.RepoTakendownError = RepoTakendownError$5;
-	let RepoSuspendedError$5 = class RepoSuspendedError extends xrpc_1$1E.XRPCError {
+	let RepoSuspendedError$5 = class RepoSuspendedError extends xrpc_1$q.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getBlob.RepoSuspendedError = RepoSuspendedError$5;
-	let RepoDeactivatedError$5 = class RepoDeactivatedError extends xrpc_1$1E.XRPCError {
+	let RepoDeactivatedError$5 = class RepoDeactivatedError extends xrpc_1$q.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getBlob.RepoDeactivatedError = RepoDeactivatedError$5;
-	function toKnownErr$1C(e) {
-	  if (e instanceof xrpc_1$1E.XRPCError) {
+	function toKnownErr$2g(e) {
+	  if (e instanceof xrpc_1$q.XRPCError) {
 	    if (e.error === 'BlobNotFound') return new BlobNotFoundError(e);
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$7(e);
 	    if (e.error === 'RepoTakendown') return new RepoTakendownError$5(e);
@@ -25421,7 +23702,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	getBlob.toKnownErr = toKnownErr$1C;
+	getBlob.toKnownErr = toKnownErr$2g;
 
 	var getBlocks$1 = {};
 
@@ -25432,39 +23713,49 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1D = dist;
-	class BlockNotFoundError extends xrpc_1$1D.XRPCError {
+	const xrpc_1$p = dist;
+	class BlockNotFoundError extends xrpc_1$p.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	getBlocks$1.BlockNotFoundError = BlockNotFoundError;
-	let RepoNotFoundError$6 = class RepoNotFoundError extends xrpc_1$1D.XRPCError {
+	let RepoNotFoundError$6 = class RepoNotFoundError extends xrpc_1$p.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getBlocks$1.RepoNotFoundError = RepoNotFoundError$6;
-	let RepoTakendownError$4 = class RepoTakendownError extends xrpc_1$1D.XRPCError {
+	let RepoTakendownError$4 = class RepoTakendownError extends xrpc_1$p.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getBlocks$1.RepoTakendownError = RepoTakendownError$4;
-	let RepoSuspendedError$4 = class RepoSuspendedError extends xrpc_1$1D.XRPCError {
+	let RepoSuspendedError$4 = class RepoSuspendedError extends xrpc_1$p.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getBlocks$1.RepoSuspendedError = RepoSuspendedError$4;
-	let RepoDeactivatedError$4 = class RepoDeactivatedError extends xrpc_1$1D.XRPCError {
+	let RepoDeactivatedError$4 = class RepoDeactivatedError extends xrpc_1$p.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getBlocks$1.RepoDeactivatedError = RepoDeactivatedError$4;
-	function toKnownErr$1B(e) {
-	  if (e instanceof xrpc_1$1D.XRPCError) {
+	function toKnownErr$2f(e) {
+	  if (e instanceof xrpc_1$p.XRPCError) {
 	    if (e.error === 'BlockNotFound') return new BlockNotFoundError(e);
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$6(e);
 	    if (e.error === 'RepoTakendown') return new RepoTakendownError$4(e);
@@ -25473,23 +23764,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	getBlocks$1.toKnownErr = toKnownErr$1B;
-
-	var getCheckout = {};
-
-	Object.defineProperty(getCheckout, "__esModule", {
-	  value: true
-	});
-	getCheckout.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1C = dist;
-	function toKnownErr$1A(e) {
-	  if (e instanceof xrpc_1$1C.XRPCError) ;
-	  return e;
-	}
-	getCheckout.toKnownErr = toKnownErr$1A;
+	getBlocks$1.toKnownErr = toKnownErr$2f;
 
 	var getHead = {};
 
@@ -25500,20 +23775,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1B = dist;
-	class HeadNotFoundError extends xrpc_1$1B.XRPCError {
+	const xrpc_1$o = dist;
+	class HeadNotFoundError extends xrpc_1$o.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	getHead.HeadNotFoundError = HeadNotFoundError;
-	function toKnownErr$1z(e) {
-	  if (e instanceof xrpc_1$1B.XRPCError) {
+	function toKnownErr$2e(e) {
+	  if (e instanceof xrpc_1$o.XRPCError) {
 	    if (e.error === 'HeadNotFound') return new HeadNotFoundError(e);
 	  }
 	  return e;
 	}
-	getHead.toKnownErr = toKnownErr$1z;
+	getHead.toKnownErr = toKnownErr$2e;
 
 	var getLatestCommit = {};
 
@@ -25524,33 +23801,41 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1A = dist;
-	let RepoNotFoundError$5 = class RepoNotFoundError extends xrpc_1$1A.XRPCError {
+	const xrpc_1$n = dist;
+	let RepoNotFoundError$5 = class RepoNotFoundError extends xrpc_1$n.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getLatestCommit.RepoNotFoundError = RepoNotFoundError$5;
-	let RepoTakendownError$3 = class RepoTakendownError extends xrpc_1$1A.XRPCError {
+	let RepoTakendownError$3 = class RepoTakendownError extends xrpc_1$n.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getLatestCommit.RepoTakendownError = RepoTakendownError$3;
-	let RepoSuspendedError$3 = class RepoSuspendedError extends xrpc_1$1A.XRPCError {
+	let RepoSuspendedError$3 = class RepoSuspendedError extends xrpc_1$n.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getLatestCommit.RepoSuspendedError = RepoSuspendedError$3;
-	let RepoDeactivatedError$3 = class RepoDeactivatedError extends xrpc_1$1A.XRPCError {
+	let RepoDeactivatedError$3 = class RepoDeactivatedError extends xrpc_1$n.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getLatestCommit.RepoDeactivatedError = RepoDeactivatedError$3;
-	function toKnownErr$1y(e) {
-	  if (e instanceof xrpc_1$1A.XRPCError) {
+	function toKnownErr$2d(e) {
+	  if (e instanceof xrpc_1$n.XRPCError) {
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$5(e);
 	    if (e.error === 'RepoTakendown') return new RepoTakendownError$3(e);
 	    if (e.error === 'RepoSuspended') return new RepoSuspendedError$3(e);
@@ -25558,50 +23843,60 @@ if (cid) {
 	  }
 	  return e;
 	}
-	getLatestCommit.toKnownErr = toKnownErr$1y;
+	getLatestCommit.toKnownErr = toKnownErr$2d;
 
-	var getRecord$1 = {};
+	var getRecord$2 = {};
 
-	Object.defineProperty(getRecord$1, "__esModule", {
+	Object.defineProperty(getRecord$2, "__esModule", {
 	  value: true
 	});
-	getRecord$1.toKnownErr = getRecord$1.RepoDeactivatedError = getRecord$1.RepoSuspendedError = getRecord$1.RepoTakendownError = getRecord$1.RepoNotFoundError = getRecord$1.RecordNotFoundError = void 0;
+	getRecord$2.toKnownErr = getRecord$2.RepoDeactivatedError = getRecord$2.RepoSuspendedError = getRecord$2.RepoTakendownError = getRecord$2.RepoNotFoundError = getRecord$2.RecordNotFoundError = void 0;
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1z = dist;
-	let RecordNotFoundError$1 = class RecordNotFoundError extends xrpc_1$1z.XRPCError {
+	const xrpc_1$m = dist;
+	let RecordNotFoundError$1 = class RecordNotFoundError extends xrpc_1$m.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
-	getRecord$1.RecordNotFoundError = RecordNotFoundError$1;
-	let RepoNotFoundError$4 = class RepoNotFoundError extends xrpc_1$1z.XRPCError {
+	getRecord$2.RecordNotFoundError = RecordNotFoundError$1;
+	let RepoNotFoundError$4 = class RepoNotFoundError extends xrpc_1$m.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
-	getRecord$1.RepoNotFoundError = RepoNotFoundError$4;
-	let RepoTakendownError$2 = class RepoTakendownError extends xrpc_1$1z.XRPCError {
+	getRecord$2.RepoNotFoundError = RepoNotFoundError$4;
+	let RepoTakendownError$2 = class RepoTakendownError extends xrpc_1$m.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
-	getRecord$1.RepoTakendownError = RepoTakendownError$2;
-	let RepoSuspendedError$2 = class RepoSuspendedError extends xrpc_1$1z.XRPCError {
+	getRecord$2.RepoTakendownError = RepoTakendownError$2;
+	let RepoSuspendedError$2 = class RepoSuspendedError extends xrpc_1$m.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
-	getRecord$1.RepoSuspendedError = RepoSuspendedError$2;
-	let RepoDeactivatedError$2 = class RepoDeactivatedError extends xrpc_1$1z.XRPCError {
+	getRecord$2.RepoSuspendedError = RepoSuspendedError$2;
+	let RepoDeactivatedError$2 = class RepoDeactivatedError extends xrpc_1$m.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
-	getRecord$1.RepoDeactivatedError = RepoDeactivatedError$2;
-	function toKnownErr$1x(e) {
-	  if (e instanceof xrpc_1$1z.XRPCError) {
+	getRecord$2.RepoDeactivatedError = RepoDeactivatedError$2;
+	function toKnownErr$2c(e) {
+	  if (e instanceof xrpc_1$m.XRPCError) {
 	    if (e.error === 'RecordNotFound') return new RecordNotFoundError$1(e);
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$4(e);
 	    if (e.error === 'RepoTakendown') return new RepoTakendownError$2(e);
@@ -25610,7 +23905,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	getRecord$1.toKnownErr = toKnownErr$1x;
+	getRecord$2.toKnownErr = toKnownErr$2c;
 
 	var getRepo$1 = {};
 
@@ -25621,33 +23916,41 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1y = dist;
-	let RepoNotFoundError$3 = class RepoNotFoundError extends xrpc_1$1y.XRPCError {
+	const xrpc_1$l = dist;
+	let RepoNotFoundError$3 = class RepoNotFoundError extends xrpc_1$l.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getRepo$1.RepoNotFoundError = RepoNotFoundError$3;
-	let RepoTakendownError$1 = class RepoTakendownError extends xrpc_1$1y.XRPCError {
+	let RepoTakendownError$1 = class RepoTakendownError extends xrpc_1$l.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getRepo$1.RepoTakendownError = RepoTakendownError$1;
-	let RepoSuspendedError$1 = class RepoSuspendedError extends xrpc_1$1y.XRPCError {
+	let RepoSuspendedError$1 = class RepoSuspendedError extends xrpc_1$l.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getRepo$1.RepoSuspendedError = RepoSuspendedError$1;
-	let RepoDeactivatedError$1 = class RepoDeactivatedError extends xrpc_1$1y.XRPCError {
+	let RepoDeactivatedError$1 = class RepoDeactivatedError extends xrpc_1$l.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getRepo$1.RepoDeactivatedError = RepoDeactivatedError$1;
-	function toKnownErr$1w(e) {
-	  if (e instanceof xrpc_1$1y.XRPCError) {
+	function toKnownErr$2b(e) {
+	  if (e instanceof xrpc_1$l.XRPCError) {
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$3(e);
 	    if (e.error === 'RepoTakendown') return new RepoTakendownError$1(e);
 	    if (e.error === 'RepoSuspended') return new RepoSuspendedError$1(e);
@@ -25655,7 +23958,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	getRepo$1.toKnownErr = toKnownErr$1w;
+	getRepo$1.toKnownErr = toKnownErr$2b;
 
 	var getRepoStatus = {};
 
@@ -25666,20 +23969,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1x = dist;
-	let RepoNotFoundError$2 = class RepoNotFoundError extends xrpc_1$1x.XRPCError {
+	const xrpc_1$k = dist;
+	let RepoNotFoundError$2 = class RepoNotFoundError extends xrpc_1$k.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getRepoStatus.RepoNotFoundError = RepoNotFoundError$2;
-	function toKnownErr$1v(e) {
-	  if (e instanceof xrpc_1$1x.XRPCError) {
+	function toKnownErr$2a(e) {
+	  if (e instanceof xrpc_1$k.XRPCError) {
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$2(e);
 	  }
 	  return e;
 	}
-	getRepoStatus.toKnownErr = toKnownErr$1v;
+	getRepoStatus.toKnownErr = toKnownErr$2a;
 
 	var listBlobs = {};
 
@@ -25690,33 +23995,41 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1w = dist;
-	let RepoNotFoundError$1 = class RepoNotFoundError extends xrpc_1$1w.XRPCError {
+	const xrpc_1$j = dist;
+	let RepoNotFoundError$1 = class RepoNotFoundError extends xrpc_1$j.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	listBlobs.RepoNotFoundError = RepoNotFoundError$1;
-	class RepoTakendownError extends xrpc_1$1w.XRPCError {
+	class RepoTakendownError extends xrpc_1$j.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	listBlobs.RepoTakendownError = RepoTakendownError;
-	class RepoSuspendedError extends xrpc_1$1w.XRPCError {
+	class RepoSuspendedError extends xrpc_1$j.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	listBlobs.RepoSuspendedError = RepoSuspendedError;
-	class RepoDeactivatedError extends xrpc_1$1w.XRPCError {
+	class RepoDeactivatedError extends xrpc_1$j.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	listBlobs.RepoDeactivatedError = RepoDeactivatedError;
-	function toKnownErr$1u(e) {
-	  if (e instanceof xrpc_1$1w.XRPCError) {
+	function toKnownErr$29(e) {
+	  if (e instanceof xrpc_1$j.XRPCError) {
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError$1(e);
 	    if (e.error === 'RepoTakendown') return new RepoTakendownError(e);
 	    if (e.error === 'RepoSuspended') return new RepoSuspendedError(e);
@@ -25724,275 +24037,7 @@ if (cid) {
 	  }
 	  return e;
 	}
-	listBlobs.toKnownErr = toKnownErr$1u;
-
-	var listRepos = {};
-
-	Object.defineProperty(listRepos, "__esModule", {
-	  value: true
-	});
-	listRepos.validateRepo = listRepos.isRepo = listRepos.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1v = dist;
-	const util_1$J = util$2;
-	const lexicons_1$I = lexicons;
-	function toKnownErr$1t(e) {
-	  if (e instanceof xrpc_1$1v.XRPCError) ;
-	  return e;
-	}
-	listRepos.toKnownErr = toKnownErr$1t;
-	function isRepo(v) {
-	  return (0, util_1$J.isObj)(v) && (0, util_1$J.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.listRepos#repo';
-	}
-	listRepos.isRepo = isRepo;
-	function validateRepo(v) {
-	  return lexicons_1$I.lexicons.validate('com.atproto.sync.listRepos#repo', v);
-	}
-	listRepos.validateRepo = validateRepo;
-
-	var notifyOfUpdate = {};
-
-	Object.defineProperty(notifyOfUpdate, "__esModule", {
-	  value: true
-	});
-	notifyOfUpdate.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1u = dist;
-	function toKnownErr$1s(e) {
-	  if (e instanceof xrpc_1$1u.XRPCError) ;
-	  return e;
-	}
-	notifyOfUpdate.toKnownErr = toKnownErr$1s;
-
-	var requestCrawl = {};
-
-	Object.defineProperty(requestCrawl, "__esModule", {
-	  value: true
-	});
-	requestCrawl.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1t = dist;
-	function toKnownErr$1r(e) {
-	  if (e instanceof xrpc_1$1t.XRPCError) ;
-	  return e;
-	}
-	requestCrawl.toKnownErr = toKnownErr$1r;
-
-	var checkSignupQueue = {};
-
-	Object.defineProperty(checkSignupQueue, "__esModule", {
-	  value: true
-	});
-	checkSignupQueue.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1s = dist;
-	function toKnownErr$1q(e) {
-	  if (e instanceof xrpc_1$1s.XRPCError) ;
-	  return e;
-	}
-	checkSignupQueue.toKnownErr = toKnownErr$1q;
-
-	var fetchLabels = {};
-
-	Object.defineProperty(fetchLabels, "__esModule", {
-	  value: true
-	});
-	fetchLabels.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1r = dist;
-	function toKnownErr$1p(e) {
-	  if (e instanceof xrpc_1$1r.XRPCError) ;
-	  return e;
-	}
-	fetchLabels.toKnownErr = toKnownErr$1p;
-
-	var requestPhoneVerification = {};
-
-	Object.defineProperty(requestPhoneVerification, "__esModule", {
-	  value: true
-	});
-	requestPhoneVerification.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1q = dist;
-	function toKnownErr$1o(e) {
-	  if (e instanceof xrpc_1$1q.XRPCError) ;
-	  return e;
-	}
-	requestPhoneVerification.toKnownErr = toKnownErr$1o;
-
-	var getPreferences = {};
-
-	Object.defineProperty(getPreferences, "__esModule", {
-	  value: true
-	});
-	getPreferences.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1p = dist;
-	function toKnownErr$1n(e) {
-	  if (e instanceof xrpc_1$1p.XRPCError) ;
-	  return e;
-	}
-	getPreferences.toKnownErr = toKnownErr$1n;
-
-	var getProfile = {};
-
-	Object.defineProperty(getProfile, "__esModule", {
-	  value: true
-	});
-	getProfile.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1o = dist;
-	function toKnownErr$1m(e) {
-	  if (e instanceof xrpc_1$1o.XRPCError) ;
-	  return e;
-	}
-	getProfile.toKnownErr = toKnownErr$1m;
-
-	var getProfiles = {};
-
-	Object.defineProperty(getProfiles, "__esModule", {
-	  value: true
-	});
-	getProfiles.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1n = dist;
-	function toKnownErr$1l(e) {
-	  if (e instanceof xrpc_1$1n.XRPCError) ;
-	  return e;
-	}
-	getProfiles.toKnownErr = toKnownErr$1l;
-
-	var getSuggestions = {};
-
-	Object.defineProperty(getSuggestions, "__esModule", {
-	  value: true
-	});
-	getSuggestions.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1m = dist;
-	function toKnownErr$1k(e) {
-	  if (e instanceof xrpc_1$1m.XRPCError) ;
-	  return e;
-	}
-	getSuggestions.toKnownErr = toKnownErr$1k;
-
-	var putPreferences$1 = {};
-
-	Object.defineProperty(putPreferences$1, "__esModule", {
-	  value: true
-	});
-	putPreferences$1.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1l = dist;
-	function toKnownErr$1j(e) {
-	  if (e instanceof xrpc_1$1l.XRPCError) ;
-	  return e;
-	}
-	putPreferences$1.toKnownErr = toKnownErr$1j;
-
-	var searchActors = {};
-
-	Object.defineProperty(searchActors, "__esModule", {
-	  value: true
-	});
-	searchActors.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1k = dist;
-	function toKnownErr$1i(e) {
-	  if (e instanceof xrpc_1$1k.XRPCError) ;
-	  return e;
-	}
-	searchActors.toKnownErr = toKnownErr$1i;
-
-	var searchActorsTypeahead = {};
-
-	Object.defineProperty(searchActorsTypeahead, "__esModule", {
-	  value: true
-	});
-	searchActorsTypeahead.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1j = dist;
-	function toKnownErr$1h(e) {
-	  if (e instanceof xrpc_1$1j.XRPCError) ;
-	  return e;
-	}
-	searchActorsTypeahead.toKnownErr = toKnownErr$1h;
-
-	var describeFeedGenerator = {};
-
-	Object.defineProperty(describeFeedGenerator, "__esModule", {
-	  value: true
-	});
-	describeFeedGenerator.validateLinks = describeFeedGenerator.isLinks = describeFeedGenerator.validateFeed = describeFeedGenerator.isFeed = describeFeedGenerator.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1i = dist;
-	const util_1$I = util$2;
-	const lexicons_1$H = lexicons;
-	function toKnownErr$1g(e) {
-	  if (e instanceof xrpc_1$1i.XRPCError) ;
-	  return e;
-	}
-	describeFeedGenerator.toKnownErr = toKnownErr$1g;
-	function isFeed(v) {
-	  return (0, util_1$I.isObj)(v) && (0, util_1$I.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.describeFeedGenerator#feed';
-	}
-	describeFeedGenerator.isFeed = isFeed;
-	function validateFeed(v) {
-	  return lexicons_1$H.lexicons.validate('app.bsky.feed.describeFeedGenerator#feed', v);
-	}
-	describeFeedGenerator.validateFeed = validateFeed;
-	function isLinks(v) {
-	  return (0, util_1$I.isObj)(v) && (0, util_1$I.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.describeFeedGenerator#links';
-	}
-	describeFeedGenerator.isLinks = isLinks;
-	function validateLinks(v) {
-	  return lexicons_1$H.lexicons.validate('app.bsky.feed.describeFeedGenerator#links', v);
-	}
-	describeFeedGenerator.validateLinks = validateLinks;
-
-	var getActorFeeds = {};
-
-	Object.defineProperty(getActorFeeds, "__esModule", {
-	  value: true
-	});
-	getActorFeeds.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1h = dist;
-	function toKnownErr$1f(e) {
-	  if (e instanceof xrpc_1$1h.XRPCError) ;
-	  return e;
-	}
-	getActorFeeds.toKnownErr = toKnownErr$1f;
+	listBlobs.toKnownErr = toKnownErr$29;
 
 	var getActorLikes = {};
 
@@ -26003,27 +24048,31 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1g = dist;
-	let BlockedActorError$1 = class BlockedActorError extends xrpc_1$1g.XRPCError {
+	const xrpc_1$i = dist;
+	let BlockedActorError$1 = class BlockedActorError extends xrpc_1$i.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getActorLikes.BlockedActorError = BlockedActorError$1;
-	let BlockedByActorError$1 = class BlockedByActorError extends xrpc_1$1g.XRPCError {
+	let BlockedByActorError$1 = class BlockedByActorError extends xrpc_1$i.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getActorLikes.BlockedByActorError = BlockedByActorError$1;
-	function toKnownErr$1e(e) {
-	  if (e instanceof xrpc_1$1g.XRPCError) {
+	function toKnownErr$28(e) {
+	  if (e instanceof xrpc_1$i.XRPCError) {
 	    if (e.error === 'BlockedActor') return new BlockedActorError$1(e);
 	    if (e.error === 'BlockedByActor') return new BlockedByActorError$1(e);
 	  }
 	  return e;
 	}
-	getActorLikes.toKnownErr = toKnownErr$1e;
+	getActorLikes.toKnownErr = toKnownErr$28;
 
 	var getAuthorFeed = {};
 
@@ -26034,27 +24083,31 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1f = dist;
-	class BlockedActorError extends xrpc_1$1f.XRPCError {
+	const xrpc_1$h = dist;
+	class BlockedActorError extends xrpc_1$h.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	getAuthorFeed.BlockedActorError = BlockedActorError;
-	class BlockedByActorError extends xrpc_1$1f.XRPCError {
+	class BlockedByActorError extends xrpc_1$h.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	getAuthorFeed.BlockedByActorError = BlockedByActorError;
-	function toKnownErr$1d(e) {
-	  if (e instanceof xrpc_1$1f.XRPCError) {
+	function toKnownErr$27(e) {
+	  if (e instanceof xrpc_1$h.XRPCError) {
 	    if (e.error === 'BlockedActor') return new BlockedActorError(e);
 	    if (e.error === 'BlockedByActor') return new BlockedByActorError(e);
 	  }
 	  return e;
 	}
-	getAuthorFeed.toKnownErr = toKnownErr$1d;
+	getAuthorFeed.toKnownErr = toKnownErr$27;
 
 	var getFeed = {};
 
@@ -26065,52 +24118,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1e = dist;
-	let UnknownFeedError$1 = class UnknownFeedError extends xrpc_1$1e.XRPCError {
+	const xrpc_1$g = dist;
+	let UnknownFeedError$1 = class UnknownFeedError extends xrpc_1$g.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	getFeed.UnknownFeedError = UnknownFeedError$1;
-	function toKnownErr$1c(e) {
-	  if (e instanceof xrpc_1$1e.XRPCError) {
+	function toKnownErr$26(e) {
+	  if (e instanceof xrpc_1$g.XRPCError) {
 	    if (e.error === 'UnknownFeed') return new UnknownFeedError$1(e);
 	  }
 	  return e;
 	}
-	getFeed.toKnownErr = toKnownErr$1c;
-
-	var getFeedGenerator = {};
-
-	Object.defineProperty(getFeedGenerator, "__esModule", {
-	  value: true
-	});
-	getFeedGenerator.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1d = dist;
-	function toKnownErr$1b(e) {
-	  if (e instanceof xrpc_1$1d.XRPCError) ;
-	  return e;
-	}
-	getFeedGenerator.toKnownErr = toKnownErr$1b;
-
-	var getFeedGenerators = {};
-
-	Object.defineProperty(getFeedGenerators, "__esModule", {
-	  value: true
-	});
-	getFeedGenerators.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1c = dist;
-	function toKnownErr$1a(e) {
-	  if (e instanceof xrpc_1$1c.XRPCError) ;
-	  return e;
-	}
-	getFeedGenerators.toKnownErr = toKnownErr$1a;
+	getFeed.toKnownErr = toKnownErr$26;
 
 	var getFeedSkeleton = {};
 
@@ -26121,46 +24144,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1b = dist;
-	class UnknownFeedError extends xrpc_1$1b.XRPCError {
+	const xrpc_1$f = dist;
+	class UnknownFeedError extends xrpc_1$f.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	getFeedSkeleton.UnknownFeedError = UnknownFeedError;
-	function toKnownErr$19(e) {
-	  if (e instanceof xrpc_1$1b.XRPCError) {
+	function toKnownErr$25(e) {
+	  if (e instanceof xrpc_1$f.XRPCError) {
 	    if (e.error === 'UnknownFeed') return new UnknownFeedError(e);
 	  }
 	  return e;
 	}
-	getFeedSkeleton.toKnownErr = toKnownErr$19;
-
-	var getLikes = {};
-
-	Object.defineProperty(getLikes, "__esModule", {
-	  value: true
-	});
-	getLikes.validateLike = getLikes.isLike = getLikes.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$1a = dist;
-	const util_1$H = util$2;
-	const lexicons_1$G = lexicons;
-	function toKnownErr$18(e) {
-	  if (e instanceof xrpc_1$1a.XRPCError) ;
-	  return e;
-	}
-	getLikes.toKnownErr = toKnownErr$18;
-	function isLike(v) {
-	  return (0, util_1$H.isObj)(v) && (0, util_1$H.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.getLikes#like';
-	}
-	getLikes.isLike = isLike;
-	function validateLike(v) {
-	  return lexicons_1$G.lexicons.validate('app.bsky.feed.getLikes#like', v);
-	}
-	getLikes.validateLike = validateLike;
+	getFeedSkeleton.toKnownErr = toKnownErr$25;
 
 	var getListFeed = {};
 
@@ -26171,20 +24170,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$19 = dist;
-	class UnknownListError extends xrpc_1$19.XRPCError {
+	const xrpc_1$e = dist;
+	class UnknownListError extends xrpc_1$e.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	getListFeed.UnknownListError = UnknownListError;
-	function toKnownErr$17(e) {
-	  if (e instanceof xrpc_1$19.XRPCError) {
+	function toKnownErr$24(e) {
+	  if (e instanceof xrpc_1$e.XRPCError) {
 	    if (e.error === 'UnknownList') return new UnknownListError(e);
 	  }
 	  return e;
 	}
-	getListFeed.toKnownErr = toKnownErr$17;
+	getListFeed.toKnownErr = toKnownErr$24;
 
 	var getPostThread = {};
 
@@ -26195,84 +24196,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$18 = dist;
-	class NotFoundError extends xrpc_1$18.XRPCError {
+	const xrpc_1$d = dist;
+	class NotFoundError extends xrpc_1$d.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	getPostThread.NotFoundError = NotFoundError;
-	function toKnownErr$16(e) {
-	  if (e instanceof xrpc_1$18.XRPCError) {
+	function toKnownErr$23(e) {
+	  if (e instanceof xrpc_1$d.XRPCError) {
 	    if (e.error === 'NotFound') return new NotFoundError(e);
 	  }
 	  return e;
 	}
-	getPostThread.toKnownErr = toKnownErr$16;
-
-	var getPosts = {};
-
-	Object.defineProperty(getPosts, "__esModule", {
-	  value: true
-	});
-	getPosts.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$17 = dist;
-	function toKnownErr$15(e) {
-	  if (e instanceof xrpc_1$17.XRPCError) ;
-	  return e;
-	}
-	getPosts.toKnownErr = toKnownErr$15;
-
-	var getRepostedBy = {};
-
-	Object.defineProperty(getRepostedBy, "__esModule", {
-	  value: true
-	});
-	getRepostedBy.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$16 = dist;
-	function toKnownErr$14(e) {
-	  if (e instanceof xrpc_1$16.XRPCError) ;
-	  return e;
-	}
-	getRepostedBy.toKnownErr = toKnownErr$14;
-
-	var getSuggestedFeeds = {};
-
-	Object.defineProperty(getSuggestedFeeds, "__esModule", {
-	  value: true
-	});
-	getSuggestedFeeds.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$15 = dist;
-	function toKnownErr$13(e) {
-	  if (e instanceof xrpc_1$15.XRPCError) ;
-	  return e;
-	}
-	getSuggestedFeeds.toKnownErr = toKnownErr$13;
-
-	var getTimeline = {};
-
-	Object.defineProperty(getTimeline, "__esModule", {
-	  value: true
-	});
-	getTimeline.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$14 = dist;
-	function toKnownErr$12(e) {
-	  if (e instanceof xrpc_1$14.XRPCError) ;
-	  return e;
-	}
-	getTimeline.toKnownErr = toKnownErr$12;
+	getPostThread.toKnownErr = toKnownErr$23;
 
 	var searchPosts = {};
 
@@ -26283,196 +24222,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$13 = dist;
-	let BadQueryStringError$2 = class BadQueryStringError extends xrpc_1$13.XRPCError {
+	const xrpc_1$c = dist;
+	let BadQueryStringError$2 = class BadQueryStringError extends xrpc_1$c.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	searchPosts.BadQueryStringError = BadQueryStringError$2;
-	function toKnownErr$11(e) {
-	  if (e instanceof xrpc_1$13.XRPCError) {
+	function toKnownErr$22(e) {
+	  if (e instanceof xrpc_1$c.XRPCError) {
 	    if (e.error === 'BadQueryString') return new BadQueryStringError$2(e);
 	  }
 	  return e;
 	}
-	searchPosts.toKnownErr = toKnownErr$11;
-
-	var sendInteractions = {};
-
-	Object.defineProperty(sendInteractions, "__esModule", {
-	  value: true
-	});
-	sendInteractions.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$12 = dist;
-	function toKnownErr$10(e) {
-	  if (e instanceof xrpc_1$12.XRPCError) ;
-	  return e;
-	}
-	sendInteractions.toKnownErr = toKnownErr$10;
-
-	var getActorStarterPacks = {};
-
-	Object.defineProperty(getActorStarterPacks, "__esModule", {
-	  value: true
-	});
-	getActorStarterPacks.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$11 = dist;
-	function toKnownErr$$(e) {
-	  if (e instanceof xrpc_1$11.XRPCError) ;
-	  return e;
-	}
-	getActorStarterPacks.toKnownErr = toKnownErr$$;
-
-	var getBlocks = {};
-
-	Object.defineProperty(getBlocks, "__esModule", {
-	  value: true
-	});
-	getBlocks.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$10 = dist;
-	function toKnownErr$_(e) {
-	  if (e instanceof xrpc_1$10.XRPCError) ;
-	  return e;
-	}
-	getBlocks.toKnownErr = toKnownErr$_;
-
-	var getFollowers = {};
-
-	Object.defineProperty(getFollowers, "__esModule", {
-	  value: true
-	});
-	getFollowers.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$$ = dist;
-	function toKnownErr$Z(e) {
-	  if (e instanceof xrpc_1$$.XRPCError) ;
-	  return e;
-	}
-	getFollowers.toKnownErr = toKnownErr$Z;
-
-	var getFollows = {};
-
-	Object.defineProperty(getFollows, "__esModule", {
-	  value: true
-	});
-	getFollows.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$_ = dist;
-	function toKnownErr$Y(e) {
-	  if (e instanceof xrpc_1$_.XRPCError) ;
-	  return e;
-	}
-	getFollows.toKnownErr = toKnownErr$Y;
-
-	var getKnownFollowers = {};
-
-	Object.defineProperty(getKnownFollowers, "__esModule", {
-	  value: true
-	});
-	getKnownFollowers.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$Z = dist;
-	function toKnownErr$X(e) {
-	  if (e instanceof xrpc_1$Z.XRPCError) ;
-	  return e;
-	}
-	getKnownFollowers.toKnownErr = toKnownErr$X;
-
-	var getList = {};
-
-	Object.defineProperty(getList, "__esModule", {
-	  value: true
-	});
-	getList.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$Y = dist;
-	function toKnownErr$W(e) {
-	  if (e instanceof xrpc_1$Y.XRPCError) ;
-	  return e;
-	}
-	getList.toKnownErr = toKnownErr$W;
-
-	var getListBlocks = {};
-
-	Object.defineProperty(getListBlocks, "__esModule", {
-	  value: true
-	});
-	getListBlocks.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$X = dist;
-	function toKnownErr$V(e) {
-	  if (e instanceof xrpc_1$X.XRPCError) ;
-	  return e;
-	}
-	getListBlocks.toKnownErr = toKnownErr$V;
-
-	var getListMutes = {};
-
-	Object.defineProperty(getListMutes, "__esModule", {
-	  value: true
-	});
-	getListMutes.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$W = dist;
-	function toKnownErr$U(e) {
-	  if (e instanceof xrpc_1$W.XRPCError) ;
-	  return e;
-	}
-	getListMutes.toKnownErr = toKnownErr$U;
-
-	var getLists = {};
-
-	Object.defineProperty(getLists, "__esModule", {
-	  value: true
-	});
-	getLists.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$V = dist;
-	function toKnownErr$T(e) {
-	  if (e instanceof xrpc_1$V.XRPCError) ;
-	  return e;
-	}
-	getLists.toKnownErr = toKnownErr$T;
-
-	var getMutes = {};
-
-	Object.defineProperty(getMutes, "__esModule", {
-	  value: true
-	});
-	getMutes.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$U = dist;
-	function toKnownErr$S(e) {
-	  if (e instanceof xrpc_1$U.XRPCError) ;
-	  return e;
-	}
-	getMutes.toKnownErr = toKnownErr$S;
+	searchPosts.toKnownErr = toKnownErr$22;
 
 	var getRelationships = {};
 
@@ -26483,328 +24248,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$T = dist;
-	class ActorNotFoundError extends xrpc_1$T.XRPCError {
+	const xrpc_1$b = dist;
+	class ActorNotFoundError extends xrpc_1$b.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	getRelationships.ActorNotFoundError = ActorNotFoundError;
-	function toKnownErr$R(e) {
-	  if (e instanceof xrpc_1$T.XRPCError) {
+	function toKnownErr$21(e) {
+	  if (e instanceof xrpc_1$b.XRPCError) {
 	    if (e.error === 'ActorNotFound') return new ActorNotFoundError(e);
 	  }
 	  return e;
 	}
-	getRelationships.toKnownErr = toKnownErr$R;
-
-	var getStarterPack = {};
-
-	Object.defineProperty(getStarterPack, "__esModule", {
-	  value: true
-	});
-	getStarterPack.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$S = dist;
-	function toKnownErr$Q(e) {
-	  if (e instanceof xrpc_1$S.XRPCError) ;
-	  return e;
-	}
-	getStarterPack.toKnownErr = toKnownErr$Q;
-
-	var getStarterPacks = {};
-
-	Object.defineProperty(getStarterPacks, "__esModule", {
-	  value: true
-	});
-	getStarterPacks.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$R = dist;
-	function toKnownErr$P(e) {
-	  if (e instanceof xrpc_1$R.XRPCError) ;
-	  return e;
-	}
-	getStarterPacks.toKnownErr = toKnownErr$P;
-
-	var getSuggestedFollowsByActor = {};
-
-	Object.defineProperty(getSuggestedFollowsByActor, "__esModule", {
-	  value: true
-	});
-	getSuggestedFollowsByActor.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$Q = dist;
-	function toKnownErr$O(e) {
-	  if (e instanceof xrpc_1$Q.XRPCError) ;
-	  return e;
-	}
-	getSuggestedFollowsByActor.toKnownErr = toKnownErr$O;
-
-	var muteActor = {};
-
-	Object.defineProperty(muteActor, "__esModule", {
-	  value: true
-	});
-	muteActor.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$P = dist;
-	function toKnownErr$N(e) {
-	  if (e instanceof xrpc_1$P.XRPCError) ;
-	  return e;
-	}
-	muteActor.toKnownErr = toKnownErr$N;
-
-	var muteActorList = {};
-
-	Object.defineProperty(muteActorList, "__esModule", {
-	  value: true
-	});
-	muteActorList.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$O = dist;
-	function toKnownErr$M(e) {
-	  if (e instanceof xrpc_1$O.XRPCError) ;
-	  return e;
-	}
-	muteActorList.toKnownErr = toKnownErr$M;
-
-	var muteThread = {};
-
-	Object.defineProperty(muteThread, "__esModule", {
-	  value: true
-	});
-	muteThread.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$N = dist;
-	function toKnownErr$L(e) {
-	  if (e instanceof xrpc_1$N.XRPCError) ;
-	  return e;
-	}
-	muteThread.toKnownErr = toKnownErr$L;
-
-	var unmuteActor = {};
-
-	Object.defineProperty(unmuteActor, "__esModule", {
-	  value: true
-	});
-	unmuteActor.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$M = dist;
-	function toKnownErr$K(e) {
-	  if (e instanceof xrpc_1$M.XRPCError) ;
-	  return e;
-	}
-	unmuteActor.toKnownErr = toKnownErr$K;
-
-	var unmuteActorList = {};
-
-	Object.defineProperty(unmuteActorList, "__esModule", {
-	  value: true
-	});
-	unmuteActorList.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$L = dist;
-	function toKnownErr$J(e) {
-	  if (e instanceof xrpc_1$L.XRPCError) ;
-	  return e;
-	}
-	unmuteActorList.toKnownErr = toKnownErr$J;
-
-	var unmuteThread = {};
-
-	Object.defineProperty(unmuteThread, "__esModule", {
-	  value: true
-	});
-	unmuteThread.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$K = dist;
-	function toKnownErr$I(e) {
-	  if (e instanceof xrpc_1$K.XRPCError) ;
-	  return e;
-	}
-	unmuteThread.toKnownErr = toKnownErr$I;
-
-	var getServices = {};
-
-	Object.defineProperty(getServices, "__esModule", {
-	  value: true
-	});
-	getServices.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$J = dist;
-	function toKnownErr$H(e) {
-	  if (e instanceof xrpc_1$J.XRPCError) ;
-	  return e;
-	}
-	getServices.toKnownErr = toKnownErr$H;
-
-	var getUnreadCount = {};
-
-	Object.defineProperty(getUnreadCount, "__esModule", {
-	  value: true
-	});
-	getUnreadCount.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$I = dist;
-	function toKnownErr$G(e) {
-	  if (e instanceof xrpc_1$I.XRPCError) ;
-	  return e;
-	}
-	getUnreadCount.toKnownErr = toKnownErr$G;
-
-	var listNotifications = {};
-
-	Object.defineProperty(listNotifications, "__esModule", {
-	  value: true
-	});
-	listNotifications.validateNotification = listNotifications.isNotification = listNotifications.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$H = dist;
-	const util_1$G = util$2;
-	const lexicons_1$F = lexicons;
-	function toKnownErr$F(e) {
-	  if (e instanceof xrpc_1$H.XRPCError) ;
-	  return e;
-	}
-	listNotifications.toKnownErr = toKnownErr$F;
-	function isNotification(v) {
-	  return (0, util_1$G.isObj)(v) && (0, util_1$G.hasProp)(v, '$type') && v.$type === 'app.bsky.notification.listNotifications#notification';
-	}
-	listNotifications.isNotification = isNotification;
-	function validateNotification(v) {
-	  return lexicons_1$F.lexicons.validate('app.bsky.notification.listNotifications#notification', v);
-	}
-	listNotifications.validateNotification = validateNotification;
-
-	var putPreferences = {};
-
-	Object.defineProperty(putPreferences, "__esModule", {
-	  value: true
-	});
-	putPreferences.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$G = dist;
-	function toKnownErr$E(e) {
-	  if (e instanceof xrpc_1$G.XRPCError) ;
-	  return e;
-	}
-	putPreferences.toKnownErr = toKnownErr$E;
-
-	var registerPush = {};
-
-	Object.defineProperty(registerPush, "__esModule", {
-	  value: true
-	});
-	registerPush.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$F = dist;
-	function toKnownErr$D(e) {
-	  if (e instanceof xrpc_1$F.XRPCError) ;
-	  return e;
-	}
-	registerPush.toKnownErr = toKnownErr$D;
-
-	var updateSeen = {};
-
-	Object.defineProperty(updateSeen, "__esModule", {
-	  value: true
-	});
-	updateSeen.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$E = dist;
-	function toKnownErr$C(e) {
-	  if (e instanceof xrpc_1$E.XRPCError) ;
-	  return e;
-	}
-	updateSeen.toKnownErr = toKnownErr$C;
-
-	var getPopularFeedGenerators = {};
-
-	Object.defineProperty(getPopularFeedGenerators, "__esModule", {
-	  value: true
-	});
-	getPopularFeedGenerators.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$D = dist;
-	function toKnownErr$B(e) {
-	  if (e instanceof xrpc_1$D.XRPCError) ;
-	  return e;
-	}
-	getPopularFeedGenerators.toKnownErr = toKnownErr$B;
-
-	var getSuggestionsSkeleton = {};
-
-	Object.defineProperty(getSuggestionsSkeleton, "__esModule", {
-	  value: true
-	});
-	getSuggestionsSkeleton.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$C = dist;
-	function toKnownErr$A(e) {
-	  if (e instanceof xrpc_1$C.XRPCError) ;
-	  return e;
-	}
-	getSuggestionsSkeleton.toKnownErr = toKnownErr$A;
-
-	var getTaggedSuggestions = {};
-
-	Object.defineProperty(getTaggedSuggestions, "__esModule", {
-	  value: true
-	});
-	getTaggedSuggestions.validateSuggestion = getTaggedSuggestions.isSuggestion = getTaggedSuggestions.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$B = dist;
-	const util_1$F = util$2;
-	const lexicons_1$E = lexicons;
-	function toKnownErr$z(e) {
-	  if (e instanceof xrpc_1$B.XRPCError) ;
-	  return e;
-	}
-	getTaggedSuggestions.toKnownErr = toKnownErr$z;
-	function isSuggestion(v) {
-	  return (0, util_1$F.isObj)(v) && (0, util_1$F.hasProp)(v, '$type') && v.$type === 'app.bsky.unspecced.getTaggedSuggestions#suggestion';
-	}
-	getTaggedSuggestions.isSuggestion = isSuggestion;
-	function validateSuggestion(v) {
-	  return lexicons_1$E.lexicons.validate('app.bsky.unspecced.getTaggedSuggestions#suggestion', v);
-	}
-	getTaggedSuggestions.validateSuggestion = validateSuggestion;
+	getRelationships.toKnownErr = toKnownErr$21;
 
 	var searchActorsSkeleton = {};
 
@@ -26815,20 +24274,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$A = dist;
-	let BadQueryStringError$1 = class BadQueryStringError extends xrpc_1$A.XRPCError {
+	const xrpc_1$a = dist;
+	let BadQueryStringError$1 = class BadQueryStringError extends xrpc_1$a.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	searchActorsSkeleton.BadQueryStringError = BadQueryStringError$1;
-	function toKnownErr$y(e) {
-	  if (e instanceof xrpc_1$A.XRPCError) {
+	function toKnownErr$20(e) {
+	  if (e instanceof xrpc_1$a.XRPCError) {
 	    if (e.error === 'BadQueryString') return new BadQueryStringError$1(e);
 	  }
 	  return e;
 	}
-	searchActorsSkeleton.toKnownErr = toKnownErr$y;
+	searchActorsSkeleton.toKnownErr = toKnownErr$20;
 
 	var searchPostsSkeleton = {};
 
@@ -26839,376 +24300,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$z = dist;
-	class BadQueryStringError extends xrpc_1$z.XRPCError {
+	const xrpc_1$9 = dist;
+	class BadQueryStringError extends xrpc_1$9.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	searchPostsSkeleton.BadQueryStringError = BadQueryStringError;
-	function toKnownErr$x(e) {
-	  if (e instanceof xrpc_1$z.XRPCError) {
+	function toKnownErr$1$(e) {
+	  if (e instanceof xrpc_1$9.XRPCError) {
 	    if (e.error === 'BadQueryString') return new BadQueryStringError(e);
 	  }
 	  return e;
 	}
-	searchPostsSkeleton.toKnownErr = toKnownErr$x;
-
-	var deleteAccount = {};
-
-	Object.defineProperty(deleteAccount, "__esModule", {
-	  value: true
-	});
-	deleteAccount.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$y = dist;
-	function toKnownErr$w(e) {
-	  if (e instanceof xrpc_1$y.XRPCError) ;
-	  return e;
-	}
-	deleteAccount.toKnownErr = toKnownErr$w;
-
-	var exportAccountData = {};
-
-	Object.defineProperty(exportAccountData, "__esModule", {
-	  value: true
-	});
-	exportAccountData.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$x = dist;
-	function toKnownErr$v(e) {
-	  if (e instanceof xrpc_1$x.XRPCError) ;
-	  return e;
-	}
-	exportAccountData.toKnownErr = toKnownErr$v;
-
-	var deleteMessageForSelf = {};
-
-	Object.defineProperty(deleteMessageForSelf, "__esModule", {
-	  value: true
-	});
-	deleteMessageForSelf.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$w = dist;
-	function toKnownErr$u(e) {
-	  if (e instanceof xrpc_1$w.XRPCError) ;
-	  return e;
-	}
-	deleteMessageForSelf.toKnownErr = toKnownErr$u;
-
-	var getConvo = {};
-
-	Object.defineProperty(getConvo, "__esModule", {
-	  value: true
-	});
-	getConvo.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$v = dist;
-	function toKnownErr$t(e) {
-	  if (e instanceof xrpc_1$v.XRPCError) ;
-	  return e;
-	}
-	getConvo.toKnownErr = toKnownErr$t;
-
-	var getConvoForMembers = {};
-
-	Object.defineProperty(getConvoForMembers, "__esModule", {
-	  value: true
-	});
-	getConvoForMembers.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$u = dist;
-	function toKnownErr$s(e) {
-	  if (e instanceof xrpc_1$u.XRPCError) ;
-	  return e;
-	}
-	getConvoForMembers.toKnownErr = toKnownErr$s;
-
-	var getLog = {};
-
-	Object.defineProperty(getLog, "__esModule", {
-	  value: true
-	});
-	getLog.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$t = dist;
-	function toKnownErr$r(e) {
-	  if (e instanceof xrpc_1$t.XRPCError) ;
-	  return e;
-	}
-	getLog.toKnownErr = toKnownErr$r;
-
-	var getMessages = {};
-
-	Object.defineProperty(getMessages, "__esModule", {
-	  value: true
-	});
-	getMessages.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$s = dist;
-	function toKnownErr$q(e) {
-	  if (e instanceof xrpc_1$s.XRPCError) ;
-	  return e;
-	}
-	getMessages.toKnownErr = toKnownErr$q;
-
-	var leaveConvo = {};
-
-	Object.defineProperty(leaveConvo, "__esModule", {
-	  value: true
-	});
-	leaveConvo.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$r = dist;
-	function toKnownErr$p(e) {
-	  if (e instanceof xrpc_1$r.XRPCError) ;
-	  return e;
-	}
-	leaveConvo.toKnownErr = toKnownErr$p;
-
-	var listConvos = {};
-
-	Object.defineProperty(listConvos, "__esModule", {
-	  value: true
-	});
-	listConvos.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$q = dist;
-	function toKnownErr$o(e) {
-	  if (e instanceof xrpc_1$q.XRPCError) ;
-	  return e;
-	}
-	listConvos.toKnownErr = toKnownErr$o;
-
-	var muteConvo = {};
-
-	Object.defineProperty(muteConvo, "__esModule", {
-	  value: true
-	});
-	muteConvo.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$p = dist;
-	function toKnownErr$n(e) {
-	  if (e instanceof xrpc_1$p.XRPCError) ;
-	  return e;
-	}
-	muteConvo.toKnownErr = toKnownErr$n;
-
-	var sendMessage = {};
-
-	Object.defineProperty(sendMessage, "__esModule", {
-	  value: true
-	});
-	sendMessage.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$o = dist;
-	function toKnownErr$m(e) {
-	  if (e instanceof xrpc_1$o.XRPCError) ;
-	  return e;
-	}
-	sendMessage.toKnownErr = toKnownErr$m;
-
-	var sendMessageBatch = {};
-
-	Object.defineProperty(sendMessageBatch, "__esModule", {
-	  value: true
-	});
-	sendMessageBatch.validateBatchItem = sendMessageBatch.isBatchItem = sendMessageBatch.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$n = dist;
-	const util_1$E = util$2;
-	const lexicons_1$D = lexicons;
-	function toKnownErr$l(e) {
-	  if (e instanceof xrpc_1$n.XRPCError) ;
-	  return e;
-	}
-	sendMessageBatch.toKnownErr = toKnownErr$l;
-	function isBatchItem(v) {
-	  return (0, util_1$E.isObj)(v) && (0, util_1$E.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.sendMessageBatch#batchItem';
-	}
-	sendMessageBatch.isBatchItem = isBatchItem;
-	function validateBatchItem(v) {
-	  return lexicons_1$D.lexicons.validate('chat.bsky.convo.sendMessageBatch#batchItem', v);
-	}
-	sendMessageBatch.validateBatchItem = validateBatchItem;
-
-	var unmuteConvo = {};
-
-	Object.defineProperty(unmuteConvo, "__esModule", {
-	  value: true
-	});
-	unmuteConvo.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$m = dist;
-	function toKnownErr$k(e) {
-	  if (e instanceof xrpc_1$m.XRPCError) ;
-	  return e;
-	}
-	unmuteConvo.toKnownErr = toKnownErr$k;
-
-	var updateRead = {};
-
-	Object.defineProperty(updateRead, "__esModule", {
-	  value: true
-	});
-	updateRead.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$l = dist;
-	function toKnownErr$j(e) {
-	  if (e instanceof xrpc_1$l.XRPCError) ;
-	  return e;
-	}
-	updateRead.toKnownErr = toKnownErr$j;
-
-	var getActorMetadata = {};
-
-	Object.defineProperty(getActorMetadata, "__esModule", {
-	  value: true
-	});
-	getActorMetadata.validateMetadata = getActorMetadata.isMetadata = getActorMetadata.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$k = dist;
-	const util_1$D = util$2;
-	const lexicons_1$C = lexicons;
-	function toKnownErr$i(e) {
-	  if (e instanceof xrpc_1$k.XRPCError) ;
-	  return e;
-	}
-	getActorMetadata.toKnownErr = toKnownErr$i;
-	function isMetadata(v) {
-	  return (0, util_1$D.isObj)(v) && (0, util_1$D.hasProp)(v, '$type') && v.$type === 'chat.bsky.moderation.getActorMetadata#metadata';
-	}
-	getActorMetadata.isMetadata = isMetadata;
-	function validateMetadata(v) {
-	  return lexicons_1$C.lexicons.validate('chat.bsky.moderation.getActorMetadata#metadata', v);
-	}
-	getActorMetadata.validateMetadata = validateMetadata;
-
-	var getMessageContext = {};
-
-	Object.defineProperty(getMessageContext, "__esModule", {
-	  value: true
-	});
-	getMessageContext.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$j = dist;
-	function toKnownErr$h(e) {
-	  if (e instanceof xrpc_1$j.XRPCError) ;
-	  return e;
-	}
-	getMessageContext.toKnownErr = toKnownErr$h;
-
-	var updateActorAccess = {};
-
-	Object.defineProperty(updateActorAccess, "__esModule", {
-	  value: true
-	});
-	updateActorAccess.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$i = dist;
-	function toKnownErr$g(e) {
-	  if (e instanceof xrpc_1$i.XRPCError) ;
-	  return e;
-	}
-	updateActorAccess.toKnownErr = toKnownErr$g;
-
-	var createTemplate = {};
-
-	Object.defineProperty(createTemplate, "__esModule", {
-	  value: true
-	});
-	createTemplate.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$h = dist;
-	function toKnownErr$f(e) {
-	  if (e instanceof xrpc_1$h.XRPCError) ;
-	  return e;
-	}
-	createTemplate.toKnownErr = toKnownErr$f;
-
-	var deleteTemplate = {};
-
-	Object.defineProperty(deleteTemplate, "__esModule", {
-	  value: true
-	});
-	deleteTemplate.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$g = dist;
-	function toKnownErr$e(e) {
-	  if (e instanceof xrpc_1$g.XRPCError) ;
-	  return e;
-	}
-	deleteTemplate.toKnownErr = toKnownErr$e;
-
-	var listTemplates = {};
-
-	Object.defineProperty(listTemplates, "__esModule", {
-	  value: true
-	});
-	listTemplates.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$f = dist;
-	function toKnownErr$d(e) {
-	  if (e instanceof xrpc_1$f.XRPCError) ;
-	  return e;
-	}
-	listTemplates.toKnownErr = toKnownErr$d;
-
-	var updateTemplate = {};
-
-	Object.defineProperty(updateTemplate, "__esModule", {
-	  value: true
-	});
-	updateTemplate.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$e = dist;
-	function toKnownErr$c(e) {
-	  if (e instanceof xrpc_1$e.XRPCError) ;
-	  return e;
-	}
-	updateTemplate.toKnownErr = toKnownErr$c;
+	searchPostsSkeleton.toKnownErr = toKnownErr$1$;
 
 	var emitEvent = {};
 
@@ -27219,60 +24326,48 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$d = dist;
-	class SubjectHasActionError extends xrpc_1$d.XRPCError {
+	const xrpc_1$8 = dist;
+	class SubjectHasActionError extends xrpc_1$8.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	emitEvent.SubjectHasActionError = SubjectHasActionError;
-	function toKnownErr$b(e) {
-	  if (e instanceof xrpc_1$d.XRPCError) {
+	function toKnownErr$1_(e) {
+	  if (e instanceof xrpc_1$8.XRPCError) {
 	    if (e.error === 'SubjectHasAction') return new SubjectHasActionError(e);
 	  }
 	  return e;
 	}
-	emitEvent.toKnownErr = toKnownErr$b;
+	emitEvent.toKnownErr = toKnownErr$1_;
 
-	var getEvent = {};
+	var getRecord$1 = {};
 
-	Object.defineProperty(getEvent, "__esModule", {
+	Object.defineProperty(getRecord$1, "__esModule", {
 	  value: true
 	});
-	getEvent.toKnownErr = void 0;
+	getRecord$1.toKnownErr = getRecord$1.RecordNotFoundError = void 0;
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$c = dist;
-	function toKnownErr$a(e) {
-	  if (e instanceof xrpc_1$c.XRPCError) ;
-	  return e;
-	}
-	getEvent.toKnownErr = toKnownErr$a;
-
-	var getRecord = {};
-
-	Object.defineProperty(getRecord, "__esModule", {
-	  value: true
-	});
-	getRecord.toKnownErr = getRecord.RecordNotFoundError = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$b = dist;
-	class RecordNotFoundError extends xrpc_1$b.XRPCError {
+	const xrpc_1$7 = dist;
+	class RecordNotFoundError extends xrpc_1$7.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
-	getRecord.RecordNotFoundError = RecordNotFoundError;
-	function toKnownErr$9(e) {
-	  if (e instanceof xrpc_1$b.XRPCError) {
+	getRecord$1.RecordNotFoundError = RecordNotFoundError;
+	function toKnownErr$1Z(e) {
+	  if (e instanceof xrpc_1$7.XRPCError) {
 	    if (e.error === 'RecordNotFound') return new RecordNotFoundError(e);
 	  }
 	  return e;
 	}
-	getRecord.toKnownErr = toKnownErr$9;
+	getRecord$1.toKnownErr = toKnownErr$1Z;
 
 	var getRepo = {};
 
@@ -27283,102 +24378,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$a = dist;
-	class RepoNotFoundError extends xrpc_1$a.XRPCError {
+	const xrpc_1$6 = dist;
+	class RepoNotFoundError extends xrpc_1$6.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	getRepo.RepoNotFoundError = RepoNotFoundError;
-	function toKnownErr$8(e) {
-	  if (e instanceof xrpc_1$a.XRPCError) {
+	function toKnownErr$1Y(e) {
+	  if (e instanceof xrpc_1$6.XRPCError) {
 	    if (e.error === 'RepoNotFound') return new RepoNotFoundError(e);
 	  }
 	  return e;
 	}
-	getRepo.toKnownErr = toKnownErr$8;
-
-	var queryEvents = {};
-
-	Object.defineProperty(queryEvents, "__esModule", {
-	  value: true
-	});
-	queryEvents.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$9 = dist;
-	function toKnownErr$7(e) {
-	  if (e instanceof xrpc_1$9.XRPCError) ;
-	  return e;
-	}
-	queryEvents.toKnownErr = toKnownErr$7;
-
-	var queryStatuses = {};
-
-	Object.defineProperty(queryStatuses, "__esModule", {
-	  value: true
-	});
-	queryStatuses.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$8 = dist;
-	function toKnownErr$6(e) {
-	  if (e instanceof xrpc_1$8.XRPCError) ;
-	  return e;
-	}
-	queryStatuses.toKnownErr = toKnownErr$6;
-
-	var searchRepos = {};
-
-	Object.defineProperty(searchRepos, "__esModule", {
-	  value: true
-	});
-	searchRepos.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$7 = dist;
-	function toKnownErr$5(e) {
-	  if (e instanceof xrpc_1$7.XRPCError) ;
-	  return e;
-	}
-	searchRepos.toKnownErr = toKnownErr$5;
-
-	var getConfig = {};
-
-	Object.defineProperty(getConfig, "__esModule", {
-	  value: true
-	});
-	getConfig.validateViewerConfig = getConfig.isViewerConfig = getConfig.validateServiceConfig = getConfig.isServiceConfig = getConfig.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$6 = dist;
-	const util_1$C = util$2;
-	const lexicons_1$B = lexicons;
-	function toKnownErr$4(e) {
-	  if (e instanceof xrpc_1$6.XRPCError) ;
-	  return e;
-	}
-	getConfig.toKnownErr = toKnownErr$4;
-	function isServiceConfig(v) {
-	  return (0, util_1$C.isObj)(v) && (0, util_1$C.hasProp)(v, '$type') && v.$type === 'tools.ozone.server.getConfig#serviceConfig';
-	}
-	getConfig.isServiceConfig = isServiceConfig;
-	function validateServiceConfig(v) {
-	  return lexicons_1$B.lexicons.validate('tools.ozone.server.getConfig#serviceConfig', v);
-	}
-	getConfig.validateServiceConfig = validateServiceConfig;
-	function isViewerConfig(v) {
-	  return (0, util_1$C.isObj)(v) && (0, util_1$C.hasProp)(v, '$type') && v.$type === 'tools.ozone.server.getConfig#viewerConfig';
-	}
-	getConfig.isViewerConfig = isViewerConfig;
-	function validateViewerConfig(v) {
-	  return lexicons_1$B.lexicons.validate('tools.ozone.server.getConfig#viewerConfig', v);
-	}
-	getConfig.validateViewerConfig = validateViewerConfig;
+	getRepo.toKnownErr = toKnownErr$1Y;
 
 	var addMember = {};
 
@@ -27392,17 +24407,19 @@ if (cid) {
 	const xrpc_1$5 = dist;
 	class MemberAlreadyExistsError extends xrpc_1$5.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	addMember.MemberAlreadyExistsError = MemberAlreadyExistsError;
-	function toKnownErr$3(e) {
+	function toKnownErr$1X(e) {
 	  if (e instanceof xrpc_1$5.XRPCError) {
 	    if (e.error === 'MemberAlreadyExists') return new MemberAlreadyExistsError(e);
 	  }
 	  return e;
 	}
-	addMember.toKnownErr = toKnownErr$3;
+	addMember.toKnownErr = toKnownErr$1X;
 
 	var deleteMember = {};
 
@@ -27416,40 +24433,28 @@ if (cid) {
 	const xrpc_1$4 = dist;
 	let MemberNotFoundError$1 = class MemberNotFoundError extends xrpc_1$4.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	};
 	deleteMember.MemberNotFoundError = MemberNotFoundError$1;
 	class CannotDeleteSelfError extends xrpc_1$4.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	deleteMember.CannotDeleteSelfError = CannotDeleteSelfError;
-	function toKnownErr$2(e) {
+	function toKnownErr$1W(e) {
 	  if (e instanceof xrpc_1$4.XRPCError) {
 	    if (e.error === 'MemberNotFound') return new MemberNotFoundError$1(e);
 	    if (e.error === 'CannotDeleteSelf') return new CannotDeleteSelfError(e);
 	  }
 	  return e;
 	}
-	deleteMember.toKnownErr = toKnownErr$2;
-
-	var listMembers = {};
-
-	Object.defineProperty(listMembers, "__esModule", {
-	  value: true
-	});
-	listMembers.toKnownErr = void 0;
-	/**
-	 * GENERATED CODE - DO NOT MODIFY
-	 */
-	const xrpc_1$3 = dist;
-	function toKnownErr$1(e) {
-	  if (e instanceof xrpc_1$3.XRPCError) ;
-	  return e;
-	}
-	listMembers.toKnownErr = toKnownErr$1;
+	deleteMember.toKnownErr = toKnownErr$1W;
 
 	var updateMember = {};
 
@@ -27460,20 +24465,22 @@ if (cid) {
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$2 = dist;
-	class MemberNotFoundError extends xrpc_1$2.XRPCError {
+	const xrpc_1$3 = dist;
+	class MemberNotFoundError extends xrpc_1$3.XRPCError {
 	  constructor(src) {
-	    super(src.status, src.error, src.message, src.headers);
+	    super(src.status, src.error, src.message, src.headers, {
+	      cause: src
+	    });
 	  }
 	}
 	updateMember.MemberNotFoundError = MemberNotFoundError;
-	function toKnownErr(e) {
-	  if (e instanceof xrpc_1$2.XRPCError) {
+	function toKnownErr$1V(e) {
+	  if (e instanceof xrpc_1$3.XRPCError) {
 	    if (e.error === 'MemberNotFound') return new MemberNotFoundError(e);
 	  }
 	  return e;
 	}
-	updateMember.toKnownErr = toKnownErr;
+	updateMember.toKnownErr = toKnownErr$1V;
 
 	var defs$d = {};
 
@@ -27481,40 +24488,260 @@ if (cid) {
 	  value: true
 	});
 	defs$d.validateRepoBlobRef = defs$d.isRepoBlobRef = defs$d.validateRepoRef = defs$d.isRepoRef = defs$d.validateAccountView = defs$d.isAccountView = defs$d.validateStatusAttr = defs$d.isStatusAttr = void 0;
-	const util_1$B = util$2;
-	const lexicons_1$A = lexicons;
+	const util_1$M = util$2;
+	const lexicons_1$L = lexicons;
 	function isStatusAttr(v) {
-	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'com.atproto.admin.defs#statusAttr';
+	  return (0, util_1$M.isObj)(v) && (0, util_1$M.hasProp)(v, '$type') && v.$type === 'com.atproto.admin.defs#statusAttr';
 	}
 	defs$d.isStatusAttr = isStatusAttr;
 	function validateStatusAttr(v) {
-	  return lexicons_1$A.lexicons.validate('com.atproto.admin.defs#statusAttr', v);
+	  return lexicons_1$L.lexicons.validate('com.atproto.admin.defs#statusAttr', v);
 	}
 	defs$d.validateStatusAttr = validateStatusAttr;
 	function isAccountView(v) {
-	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'com.atproto.admin.defs#accountView';
+	  return (0, util_1$M.isObj)(v) && (0, util_1$M.hasProp)(v, '$type') && v.$type === 'com.atproto.admin.defs#accountView';
 	}
 	defs$d.isAccountView = isAccountView;
 	function validateAccountView(v) {
-	  return lexicons_1$A.lexicons.validate('com.atproto.admin.defs#accountView', v);
+	  return lexicons_1$L.lexicons.validate('com.atproto.admin.defs#accountView', v);
 	}
 	defs$d.validateAccountView = validateAccountView;
 	function isRepoRef(v) {
-	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'com.atproto.admin.defs#repoRef';
+	  return (0, util_1$M.isObj)(v) && (0, util_1$M.hasProp)(v, '$type') && v.$type === 'com.atproto.admin.defs#repoRef';
 	}
 	defs$d.isRepoRef = isRepoRef;
 	function validateRepoRef(v) {
-	  return lexicons_1$A.lexicons.validate('com.atproto.admin.defs#repoRef', v);
+	  return lexicons_1$L.lexicons.validate('com.atproto.admin.defs#repoRef', v);
 	}
 	defs$d.validateRepoRef = validateRepoRef;
 	function isRepoBlobRef(v) {
-	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'com.atproto.admin.defs#repoBlobRef';
+	  return (0, util_1$M.isObj)(v) && (0, util_1$M.hasProp)(v, '$type') && v.$type === 'com.atproto.admin.defs#repoBlobRef';
 	}
 	defs$d.isRepoBlobRef = isRepoBlobRef;
 	function validateRepoBlobRef(v) {
-	  return lexicons_1$A.lexicons.validate('com.atproto.admin.defs#repoBlobRef', v);
+	  return lexicons_1$L.lexicons.validate('com.atproto.admin.defs#repoBlobRef', v);
 	}
 	defs$d.validateRepoBlobRef = validateRepoBlobRef;
+
+	var deleteAccount$1 = {};
+
+	Object.defineProperty(deleteAccount$1, "__esModule", {
+	  value: true
+	});
+	deleteAccount$1.toKnownErr = void 0;
+	function toKnownErr$1U(e) {
+	  return e;
+	}
+	deleteAccount$1.toKnownErr = toKnownErr$1U;
+
+	var disableAccountInvites = {};
+
+	Object.defineProperty(disableAccountInvites, "__esModule", {
+	  value: true
+	});
+	disableAccountInvites.toKnownErr = void 0;
+	function toKnownErr$1T(e) {
+	  return e;
+	}
+	disableAccountInvites.toKnownErr = toKnownErr$1T;
+
+	var disableInviteCodes = {};
+
+	Object.defineProperty(disableInviteCodes, "__esModule", {
+	  value: true
+	});
+	disableInviteCodes.toKnownErr = void 0;
+	function toKnownErr$1S(e) {
+	  return e;
+	}
+	disableInviteCodes.toKnownErr = toKnownErr$1S;
+
+	var enableAccountInvites = {};
+
+	Object.defineProperty(enableAccountInvites, "__esModule", {
+	  value: true
+	});
+	enableAccountInvites.toKnownErr = void 0;
+	function toKnownErr$1R(e) {
+	  return e;
+	}
+	enableAccountInvites.toKnownErr = toKnownErr$1R;
+
+	var getAccountInfo = {};
+
+	Object.defineProperty(getAccountInfo, "__esModule", {
+	  value: true
+	});
+	getAccountInfo.toKnownErr = void 0;
+	function toKnownErr$1Q(e) {
+	  return e;
+	}
+	getAccountInfo.toKnownErr = toKnownErr$1Q;
+
+	var getAccountInfos = {};
+
+	Object.defineProperty(getAccountInfos, "__esModule", {
+	  value: true
+	});
+	getAccountInfos.toKnownErr = void 0;
+	function toKnownErr$1P(e) {
+	  return e;
+	}
+	getAccountInfos.toKnownErr = toKnownErr$1P;
+
+	var getInviteCodes = {};
+
+	Object.defineProperty(getInviteCodes, "__esModule", {
+	  value: true
+	});
+	getInviteCodes.toKnownErr = void 0;
+	function toKnownErr$1O(e) {
+	  return e;
+	}
+	getInviteCodes.toKnownErr = toKnownErr$1O;
+
+	var getSubjectStatus = {};
+
+	Object.defineProperty(getSubjectStatus, "__esModule", {
+	  value: true
+	});
+	getSubjectStatus.toKnownErr = void 0;
+	function toKnownErr$1N(e) {
+	  return e;
+	}
+	getSubjectStatus.toKnownErr = toKnownErr$1N;
+
+	var searchAccounts = {};
+
+	Object.defineProperty(searchAccounts, "__esModule", {
+	  value: true
+	});
+	searchAccounts.toKnownErr = void 0;
+	function toKnownErr$1M(e) {
+	  return e;
+	}
+	searchAccounts.toKnownErr = toKnownErr$1M;
+
+	var sendEmail = {};
+
+	Object.defineProperty(sendEmail, "__esModule", {
+	  value: true
+	});
+	sendEmail.toKnownErr = void 0;
+	function toKnownErr$1L(e) {
+	  return e;
+	}
+	sendEmail.toKnownErr = toKnownErr$1L;
+
+	var updateAccountEmail = {};
+
+	Object.defineProperty(updateAccountEmail, "__esModule", {
+	  value: true
+	});
+	updateAccountEmail.toKnownErr = void 0;
+	function toKnownErr$1K(e) {
+	  return e;
+	}
+	updateAccountEmail.toKnownErr = toKnownErr$1K;
+
+	var updateAccountHandle = {};
+
+	Object.defineProperty(updateAccountHandle, "__esModule", {
+	  value: true
+	});
+	updateAccountHandle.toKnownErr = void 0;
+	function toKnownErr$1J(e) {
+	  return e;
+	}
+	updateAccountHandle.toKnownErr = toKnownErr$1J;
+
+	var updateAccountPassword = {};
+
+	Object.defineProperty(updateAccountPassword, "__esModule", {
+	  value: true
+	});
+	updateAccountPassword.toKnownErr = void 0;
+	function toKnownErr$1I(e) {
+	  return e;
+	}
+	updateAccountPassword.toKnownErr = toKnownErr$1I;
+
+	var updateSubjectStatus = {};
+
+	Object.defineProperty(updateSubjectStatus, "__esModule", {
+	  value: true
+	});
+	updateSubjectStatus.toKnownErr = void 0;
+	function toKnownErr$1H(e) {
+	  return e;
+	}
+	updateSubjectStatus.toKnownErr = toKnownErr$1H;
+
+	var getRecommendedDidCredentials = {};
+
+	Object.defineProperty(getRecommendedDidCredentials, "__esModule", {
+	  value: true
+	});
+	getRecommendedDidCredentials.toKnownErr = void 0;
+	function toKnownErr$1G(e) {
+	  return e;
+	}
+	getRecommendedDidCredentials.toKnownErr = toKnownErr$1G;
+
+	var requestPlcOperationSignature = {};
+
+	Object.defineProperty(requestPlcOperationSignature, "__esModule", {
+	  value: true
+	});
+	requestPlcOperationSignature.toKnownErr = void 0;
+	function toKnownErr$1F(e) {
+	  return e;
+	}
+	requestPlcOperationSignature.toKnownErr = toKnownErr$1F;
+
+	var resolveHandle = {};
+
+	Object.defineProperty(resolveHandle, "__esModule", {
+	  value: true
+	});
+	resolveHandle.toKnownErr = void 0;
+	function toKnownErr$1E(e) {
+	  return e;
+	}
+	resolveHandle.toKnownErr = toKnownErr$1E;
+
+	var signPlcOperation = {};
+
+	Object.defineProperty(signPlcOperation, "__esModule", {
+	  value: true
+	});
+	signPlcOperation.toKnownErr = void 0;
+	function toKnownErr$1D(e) {
+	  return e;
+	}
+	signPlcOperation.toKnownErr = toKnownErr$1D;
+
+	var submitPlcOperation = {};
+
+	Object.defineProperty(submitPlcOperation, "__esModule", {
+	  value: true
+	});
+	submitPlcOperation.toKnownErr = void 0;
+	function toKnownErr$1C(e) {
+	  return e;
+	}
+	submitPlcOperation.toKnownErr = toKnownErr$1C;
+
+	var updateHandle = {};
+
+	Object.defineProperty(updateHandle, "__esModule", {
+	  value: true
+	});
+	updateHandle.toKnownErr = void 0;
+	function toKnownErr$1B(e) {
+	  return e;
+	}
+	updateHandle.toKnownErr = toKnownErr$1B;
 
 	var defs$c = {};
 
@@ -27522,48 +24749,59 @@ if (cid) {
 	  value: true
 	});
 	defs$c.validateLabelValueDefinitionStrings = defs$c.isLabelValueDefinitionStrings = defs$c.validateLabelValueDefinition = defs$c.isLabelValueDefinition = defs$c.validateSelfLabel = defs$c.isSelfLabel = defs$c.validateSelfLabels = defs$c.isSelfLabels = defs$c.validateLabel = defs$c.isLabel = void 0;
-	const util_1$A = util$2;
-	const lexicons_1$z = lexicons;
+	const util_1$L = util$2;
+	const lexicons_1$K = lexicons;
 	function isLabel(v) {
-	  return (0, util_1$A.isObj)(v) && (0, util_1$A.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#label';
+	  return (0, util_1$L.isObj)(v) && (0, util_1$L.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#label';
 	}
 	defs$c.isLabel = isLabel;
 	function validateLabel(v) {
-	  return lexicons_1$z.lexicons.validate('com.atproto.label.defs#label', v);
+	  return lexicons_1$K.lexicons.validate('com.atproto.label.defs#label', v);
 	}
 	defs$c.validateLabel = validateLabel;
 	function isSelfLabels(v) {
-	  return (0, util_1$A.isObj)(v) && (0, util_1$A.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#selfLabels';
+	  return (0, util_1$L.isObj)(v) && (0, util_1$L.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#selfLabels';
 	}
 	defs$c.isSelfLabels = isSelfLabels;
 	function validateSelfLabels(v) {
-	  return lexicons_1$z.lexicons.validate('com.atproto.label.defs#selfLabels', v);
+	  return lexicons_1$K.lexicons.validate('com.atproto.label.defs#selfLabels', v);
 	}
 	defs$c.validateSelfLabels = validateSelfLabels;
 	function isSelfLabel(v) {
-	  return (0, util_1$A.isObj)(v) && (0, util_1$A.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#selfLabel';
+	  return (0, util_1$L.isObj)(v) && (0, util_1$L.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#selfLabel';
 	}
 	defs$c.isSelfLabel = isSelfLabel;
 	function validateSelfLabel(v) {
-	  return lexicons_1$z.lexicons.validate('com.atproto.label.defs#selfLabel', v);
+	  return lexicons_1$K.lexicons.validate('com.atproto.label.defs#selfLabel', v);
 	}
 	defs$c.validateSelfLabel = validateSelfLabel;
 	function isLabelValueDefinition(v) {
-	  return (0, util_1$A.isObj)(v) && (0, util_1$A.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#labelValueDefinition';
+	  return (0, util_1$L.isObj)(v) && (0, util_1$L.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#labelValueDefinition';
 	}
 	defs$c.isLabelValueDefinition = isLabelValueDefinition;
 	function validateLabelValueDefinition(v) {
-	  return lexicons_1$z.lexicons.validate('com.atproto.label.defs#labelValueDefinition', v);
+	  return lexicons_1$K.lexicons.validate('com.atproto.label.defs#labelValueDefinition', v);
 	}
 	defs$c.validateLabelValueDefinition = validateLabelValueDefinition;
 	function isLabelValueDefinitionStrings(v) {
-	  return (0, util_1$A.isObj)(v) && (0, util_1$A.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#labelValueDefinitionStrings';
+	  return (0, util_1$L.isObj)(v) && (0, util_1$L.hasProp)(v, '$type') && v.$type === 'com.atproto.label.defs#labelValueDefinitionStrings';
 	}
 	defs$c.isLabelValueDefinitionStrings = isLabelValueDefinitionStrings;
 	function validateLabelValueDefinitionStrings(v) {
-	  return lexicons_1$z.lexicons.validate('com.atproto.label.defs#labelValueDefinitionStrings', v);
+	  return lexicons_1$K.lexicons.validate('com.atproto.label.defs#labelValueDefinitionStrings', v);
 	}
 	defs$c.validateLabelValueDefinitionStrings = validateLabelValueDefinitionStrings;
+
+	var queryLabels = {};
+
+	Object.defineProperty(queryLabels, "__esModule", {
+	  value: true
+	});
+	queryLabels.toKnownErr = void 0;
+	function toKnownErr$1A(e) {
+	  return e;
+	}
+	queryLabels.toKnownErr = toKnownErr$1A;
 
 	var subscribeLabels = {};
 
@@ -27571,24 +24809,35 @@ if (cid) {
 	  value: true
 	});
 	subscribeLabels.validateInfo = subscribeLabels.isInfo = subscribeLabels.validateLabels = subscribeLabels.isLabels = void 0;
-	const util_1$z = util$2;
-	const lexicons_1$y = lexicons;
+	const util_1$K = util$2;
+	const lexicons_1$J = lexicons;
 	function isLabels(v) {
-	  return (0, util_1$z.isObj)(v) && (0, util_1$z.hasProp)(v, '$type') && v.$type === 'com.atproto.label.subscribeLabels#labels';
+	  return (0, util_1$K.isObj)(v) && (0, util_1$K.hasProp)(v, '$type') && v.$type === 'com.atproto.label.subscribeLabels#labels';
 	}
 	subscribeLabels.isLabels = isLabels;
 	function validateLabels(v) {
-	  return lexicons_1$y.lexicons.validate('com.atproto.label.subscribeLabels#labels', v);
+	  return lexicons_1$J.lexicons.validate('com.atproto.label.subscribeLabels#labels', v);
 	}
 	subscribeLabels.validateLabels = validateLabels;
 	function isInfo$1(v) {
-	  return (0, util_1$z.isObj)(v) && (0, util_1$z.hasProp)(v, '$type') && v.$type === 'com.atproto.label.subscribeLabels#info';
+	  return (0, util_1$K.isObj)(v) && (0, util_1$K.hasProp)(v, '$type') && v.$type === 'com.atproto.label.subscribeLabels#info';
 	}
 	subscribeLabels.isInfo = isInfo$1;
 	function validateInfo$1(v) {
-	  return lexicons_1$y.lexicons.validate('com.atproto.label.subscribeLabels#info', v);
+	  return lexicons_1$J.lexicons.validate('com.atproto.label.subscribeLabels#info', v);
 	}
 	subscribeLabels.validateInfo = validateInfo$1;
+
+	var createReport = {};
+
+	Object.defineProperty(createReport, "__esModule", {
+	  value: true
+	});
+	createReport.toKnownErr = void 0;
+	function toKnownErr$1z(e) {
+	  return e;
+	}
+	createReport.toKnownErr = toKnownErr$1z;
 
 	var defs$b = {};
 
@@ -27611,22 +24860,173 @@ if (cid) {
 	/** Appeal: appeal a previously taken moderation action */
 	defs$b.REASONAPPEAL = 'com.atproto.moderation.defs#reasonAppeal';
 
+	var describeRepo = {};
+
+	Object.defineProperty(describeRepo, "__esModule", {
+	  value: true
+	});
+	describeRepo.toKnownErr = void 0;
+	function toKnownErr$1y(e) {
+	  return e;
+	}
+	describeRepo.toKnownErr = toKnownErr$1y;
+
+	var getRecord = {};
+
+	Object.defineProperty(getRecord, "__esModule", {
+	  value: true
+	});
+	getRecord.toKnownErr = void 0;
+	function toKnownErr$1x(e) {
+	  return e;
+	}
+	getRecord.toKnownErr = toKnownErr$1x;
+
+	var importRepo = {};
+
+	Object.defineProperty(importRepo, "__esModule", {
+	  value: true
+	});
+	importRepo.toKnownErr = void 0;
+	function toKnownErr$1w(e) {
+	  return e;
+	}
+	importRepo.toKnownErr = toKnownErr$1w;
+
+	var listMissingBlobs = {};
+
+	Object.defineProperty(listMissingBlobs, "__esModule", {
+	  value: true
+	});
+	listMissingBlobs.validateRecordBlob = listMissingBlobs.isRecordBlob = listMissingBlobs.toKnownErr = void 0;
+	const util_1$J = util$2;
+	const lexicons_1$I = lexicons;
+	function toKnownErr$1v(e) {
+	  return e;
+	}
+	listMissingBlobs.toKnownErr = toKnownErr$1v;
+	function isRecordBlob(v) {
+	  return (0, util_1$J.isObj)(v) && (0, util_1$J.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.listMissingBlobs#recordBlob';
+	}
+	listMissingBlobs.isRecordBlob = isRecordBlob;
+	function validateRecordBlob(v) {
+	  return lexicons_1$I.lexicons.validate('com.atproto.repo.listMissingBlobs#recordBlob', v);
+	}
+	listMissingBlobs.validateRecordBlob = validateRecordBlob;
+
+	var listRecords = {};
+
+	Object.defineProperty(listRecords, "__esModule", {
+	  value: true
+	});
+	listRecords.validateRecord = listRecords.isRecord = listRecords.toKnownErr = void 0;
+	const util_1$I = util$2;
+	const lexicons_1$H = lexicons;
+	function toKnownErr$1u(e) {
+	  return e;
+	}
+	listRecords.toKnownErr = toKnownErr$1u;
+	function isRecord$e(v) {
+	  return (0, util_1$I.isObj)(v) && (0, util_1$I.hasProp)(v, '$type') && v.$type === 'com.atproto.repo.listRecords#record';
+	}
+	listRecords.isRecord = isRecord$e;
+	function validateRecord$e(v) {
+	  return lexicons_1$H.lexicons.validate('com.atproto.repo.listRecords#record', v);
+	}
+	listRecords.validateRecord = validateRecord$e;
+
 	var strongRef = {};
 
 	Object.defineProperty(strongRef, "__esModule", {
 	  value: true
 	});
 	strongRef.validateMain = strongRef.isMain = void 0;
-	const util_1$y = util$2;
-	const lexicons_1$x = lexicons;
+	const util_1$H = util$2;
+	const lexicons_1$G = lexicons;
 	function isMain$5(v) {
-	  return (0, util_1$y.isObj)(v) && (0, util_1$y.hasProp)(v, '$type') && (v.$type === 'com.atproto.repo.strongRef#main' || v.$type === 'com.atproto.repo.strongRef');
+	  return (0, util_1$H.isObj)(v) && (0, util_1$H.hasProp)(v, '$type') && (v.$type === 'com.atproto.repo.strongRef#main' || v.$type === 'com.atproto.repo.strongRef');
 	}
 	strongRef.isMain = isMain$5;
 	function validateMain$5(v) {
-	  return lexicons_1$x.lexicons.validate('com.atproto.repo.strongRef#main', v);
+	  return lexicons_1$G.lexicons.validate('com.atproto.repo.strongRef#main', v);
 	}
 	strongRef.validateMain = validateMain$5;
+
+	var uploadBlob = {};
+
+	Object.defineProperty(uploadBlob, "__esModule", {
+	  value: true
+	});
+	uploadBlob.toKnownErr = void 0;
+	function toKnownErr$1t(e) {
+	  return e;
+	}
+	uploadBlob.toKnownErr = toKnownErr$1t;
+
+	var activateAccount = {};
+
+	Object.defineProperty(activateAccount, "__esModule", {
+	  value: true
+	});
+	activateAccount.toKnownErr = void 0;
+	function toKnownErr$1s(e) {
+	  return e;
+	}
+	activateAccount.toKnownErr = toKnownErr$1s;
+
+	var checkAccountStatus = {};
+
+	Object.defineProperty(checkAccountStatus, "__esModule", {
+	  value: true
+	});
+	checkAccountStatus.toKnownErr = void 0;
+	function toKnownErr$1r(e) {
+	  return e;
+	}
+	checkAccountStatus.toKnownErr = toKnownErr$1r;
+
+	var createInviteCode = {};
+
+	Object.defineProperty(createInviteCode, "__esModule", {
+	  value: true
+	});
+	createInviteCode.toKnownErr = void 0;
+	function toKnownErr$1q(e) {
+	  return e;
+	}
+	createInviteCode.toKnownErr = toKnownErr$1q;
+
+	var createInviteCodes = {};
+
+	Object.defineProperty(createInviteCodes, "__esModule", {
+	  value: true
+	});
+	createInviteCodes.validateAccountCodes = createInviteCodes.isAccountCodes = createInviteCodes.toKnownErr = void 0;
+	const util_1$G = util$2;
+	const lexicons_1$F = lexicons;
+	function toKnownErr$1p(e) {
+	  return e;
+	}
+	createInviteCodes.toKnownErr = toKnownErr$1p;
+	function isAccountCodes(v) {
+	  return (0, util_1$G.isObj)(v) && (0, util_1$G.hasProp)(v, '$type') && v.$type === 'com.atproto.server.createInviteCodes#accountCodes';
+	}
+	createInviteCodes.isAccountCodes = isAccountCodes;
+	function validateAccountCodes(v) {
+	  return lexicons_1$F.lexicons.validate('com.atproto.server.createInviteCodes#accountCodes', v);
+	}
+	createInviteCodes.validateAccountCodes = validateAccountCodes;
+
+	var deactivateAccount = {};
+
+	Object.defineProperty(deactivateAccount, "__esModule", {
+	  value: true
+	});
+	deactivateAccount.toKnownErr = void 0;
+	function toKnownErr$1o(e) {
+	  return e;
+	}
+	deactivateAccount.toKnownErr = toKnownErr$1o;
 
 	var defs$a = {};
 
@@ -27634,24 +25034,195 @@ if (cid) {
 	  value: true
 	});
 	defs$a.validateInviteCodeUse = defs$a.isInviteCodeUse = defs$a.validateInviteCode = defs$a.isInviteCode = void 0;
-	const util_1$x = util$2;
-	const lexicons_1$w = lexicons;
+	const util_1$F = util$2;
+	const lexicons_1$E = lexicons;
 	function isInviteCode(v) {
-	  return (0, util_1$x.isObj)(v) && (0, util_1$x.hasProp)(v, '$type') && v.$type === 'com.atproto.server.defs#inviteCode';
+	  return (0, util_1$F.isObj)(v) && (0, util_1$F.hasProp)(v, '$type') && v.$type === 'com.atproto.server.defs#inviteCode';
 	}
 	defs$a.isInviteCode = isInviteCode;
 	function validateInviteCode(v) {
-	  return lexicons_1$w.lexicons.validate('com.atproto.server.defs#inviteCode', v);
+	  return lexicons_1$E.lexicons.validate('com.atproto.server.defs#inviteCode', v);
 	}
 	defs$a.validateInviteCode = validateInviteCode;
 	function isInviteCodeUse(v) {
-	  return (0, util_1$x.isObj)(v) && (0, util_1$x.hasProp)(v, '$type') && v.$type === 'com.atproto.server.defs#inviteCodeUse';
+	  return (0, util_1$F.isObj)(v) && (0, util_1$F.hasProp)(v, '$type') && v.$type === 'com.atproto.server.defs#inviteCodeUse';
 	}
 	defs$a.isInviteCodeUse = isInviteCodeUse;
 	function validateInviteCodeUse(v) {
-	  return lexicons_1$w.lexicons.validate('com.atproto.server.defs#inviteCodeUse', v);
+	  return lexicons_1$E.lexicons.validate('com.atproto.server.defs#inviteCodeUse', v);
 	}
 	defs$a.validateInviteCodeUse = validateInviteCodeUse;
+
+	var deleteSession = {};
+
+	Object.defineProperty(deleteSession, "__esModule", {
+	  value: true
+	});
+	deleteSession.toKnownErr = void 0;
+	function toKnownErr$1n(e) {
+	  return e;
+	}
+	deleteSession.toKnownErr = toKnownErr$1n;
+
+	var describeServer = {};
+
+	Object.defineProperty(describeServer, "__esModule", {
+	  value: true
+	});
+	describeServer.validateContact = describeServer.isContact = describeServer.validateLinks = describeServer.isLinks = describeServer.toKnownErr = void 0;
+	const util_1$E = util$2;
+	const lexicons_1$D = lexicons;
+	function toKnownErr$1m(e) {
+	  return e;
+	}
+	describeServer.toKnownErr = toKnownErr$1m;
+	function isLinks$1(v) {
+	  return (0, util_1$E.isObj)(v) && (0, util_1$E.hasProp)(v, '$type') && v.$type === 'com.atproto.server.describeServer#links';
+	}
+	describeServer.isLinks = isLinks$1;
+	function validateLinks$1(v) {
+	  return lexicons_1$D.lexicons.validate('com.atproto.server.describeServer#links', v);
+	}
+	describeServer.validateLinks = validateLinks$1;
+	function isContact(v) {
+	  return (0, util_1$E.isObj)(v) && (0, util_1$E.hasProp)(v, '$type') && v.$type === 'com.atproto.server.describeServer#contact';
+	}
+	describeServer.isContact = isContact;
+	function validateContact(v) {
+	  return lexicons_1$D.lexicons.validate('com.atproto.server.describeServer#contact', v);
+	}
+	describeServer.validateContact = validateContact;
+
+	var getSession = {};
+
+	Object.defineProperty(getSession, "__esModule", {
+	  value: true
+	});
+	getSession.toKnownErr = void 0;
+	function toKnownErr$1l(e) {
+	  return e;
+	}
+	getSession.toKnownErr = toKnownErr$1l;
+
+	var requestAccountDelete = {};
+
+	Object.defineProperty(requestAccountDelete, "__esModule", {
+	  value: true
+	});
+	requestAccountDelete.toKnownErr = void 0;
+	function toKnownErr$1k(e) {
+	  return e;
+	}
+	requestAccountDelete.toKnownErr = toKnownErr$1k;
+
+	var requestEmailConfirmation = {};
+
+	Object.defineProperty(requestEmailConfirmation, "__esModule", {
+	  value: true
+	});
+	requestEmailConfirmation.toKnownErr = void 0;
+	function toKnownErr$1j(e) {
+	  return e;
+	}
+	requestEmailConfirmation.toKnownErr = toKnownErr$1j;
+
+	var requestEmailUpdate = {};
+
+	Object.defineProperty(requestEmailUpdate, "__esModule", {
+	  value: true
+	});
+	requestEmailUpdate.toKnownErr = void 0;
+	function toKnownErr$1i(e) {
+	  return e;
+	}
+	requestEmailUpdate.toKnownErr = toKnownErr$1i;
+
+	var requestPasswordReset = {};
+
+	Object.defineProperty(requestPasswordReset, "__esModule", {
+	  value: true
+	});
+	requestPasswordReset.toKnownErr = void 0;
+	function toKnownErr$1h(e) {
+	  return e;
+	}
+	requestPasswordReset.toKnownErr = toKnownErr$1h;
+
+	var reserveSigningKey = {};
+
+	Object.defineProperty(reserveSigningKey, "__esModule", {
+	  value: true
+	});
+	reserveSigningKey.toKnownErr = void 0;
+	function toKnownErr$1g(e) {
+	  return e;
+	}
+	reserveSigningKey.toKnownErr = toKnownErr$1g;
+
+	var revokeAppPassword = {};
+
+	Object.defineProperty(revokeAppPassword, "__esModule", {
+	  value: true
+	});
+	revokeAppPassword.toKnownErr = void 0;
+	function toKnownErr$1f(e) {
+	  return e;
+	}
+	revokeAppPassword.toKnownErr = toKnownErr$1f;
+
+	var getCheckout = {};
+
+	Object.defineProperty(getCheckout, "__esModule", {
+	  value: true
+	});
+	getCheckout.toKnownErr = void 0;
+	function toKnownErr$1e(e) {
+	  return e;
+	}
+	getCheckout.toKnownErr = toKnownErr$1e;
+
+	var listRepos = {};
+
+	Object.defineProperty(listRepos, "__esModule", {
+	  value: true
+	});
+	listRepos.validateRepo = listRepos.isRepo = listRepos.toKnownErr = void 0;
+	const util_1$D = util$2;
+	const lexicons_1$C = lexicons;
+	function toKnownErr$1d(e) {
+	  return e;
+	}
+	listRepos.toKnownErr = toKnownErr$1d;
+	function isRepo(v) {
+	  return (0, util_1$D.isObj)(v) && (0, util_1$D.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.listRepos#repo';
+	}
+	listRepos.isRepo = isRepo;
+	function validateRepo(v) {
+	  return lexicons_1$C.lexicons.validate('com.atproto.sync.listRepos#repo', v);
+	}
+	listRepos.validateRepo = validateRepo;
+
+	var notifyOfUpdate = {};
+
+	Object.defineProperty(notifyOfUpdate, "__esModule", {
+	  value: true
+	});
+	notifyOfUpdate.toKnownErr = void 0;
+	function toKnownErr$1c(e) {
+	  return e;
+	}
+	notifyOfUpdate.toKnownErr = toKnownErr$1c;
+
+	var requestCrawl = {};
+
+	Object.defineProperty(requestCrawl, "__esModule", {
+	  value: true
+	});
+	requestCrawl.toKnownErr = void 0;
+	function toKnownErr$1b(e) {
+	  return e;
+	}
+	requestCrawl.toKnownErr = toKnownErr$1b;
 
 	var subscribeRepos = {};
 
@@ -27659,72 +25230,105 @@ if (cid) {
 	  value: true
 	});
 	subscribeRepos.validateRepoOp = subscribeRepos.isRepoOp = subscribeRepos.validateInfo = subscribeRepos.isInfo = subscribeRepos.validateTombstone = subscribeRepos.isTombstone = subscribeRepos.validateMigrate = subscribeRepos.isMigrate = subscribeRepos.validateHandle = subscribeRepos.isHandle = subscribeRepos.validateAccount = subscribeRepos.isAccount = subscribeRepos.validateIdentity = subscribeRepos.isIdentity = subscribeRepos.validateCommit = subscribeRepos.isCommit = void 0;
-	const util_1$w = util$2;
-	const lexicons_1$v = lexicons;
+	const util_1$C = util$2;
+	const lexicons_1$B = lexicons;
 	function isCommit(v) {
-	  return (0, util_1$w.isObj)(v) && (0, util_1$w.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#commit';
+	  return (0, util_1$C.isObj)(v) && (0, util_1$C.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#commit';
 	}
 	subscribeRepos.isCommit = isCommit;
 	function validateCommit(v) {
-	  return lexicons_1$v.lexicons.validate('com.atproto.sync.subscribeRepos#commit', v);
+	  return lexicons_1$B.lexicons.validate('com.atproto.sync.subscribeRepos#commit', v);
 	}
 	subscribeRepos.validateCommit = validateCommit;
 	function isIdentity(v) {
-	  return (0, util_1$w.isObj)(v) && (0, util_1$w.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#identity';
+	  return (0, util_1$C.isObj)(v) && (0, util_1$C.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#identity';
 	}
 	subscribeRepos.isIdentity = isIdentity;
 	function validateIdentity(v) {
-	  return lexicons_1$v.lexicons.validate('com.atproto.sync.subscribeRepos#identity', v);
+	  return lexicons_1$B.lexicons.validate('com.atproto.sync.subscribeRepos#identity', v);
 	}
 	subscribeRepos.validateIdentity = validateIdentity;
 	function isAccount(v) {
-	  return (0, util_1$w.isObj)(v) && (0, util_1$w.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#account';
+	  return (0, util_1$C.isObj)(v) && (0, util_1$C.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#account';
 	}
 	subscribeRepos.isAccount = isAccount;
 	function validateAccount(v) {
-	  return lexicons_1$v.lexicons.validate('com.atproto.sync.subscribeRepos#account', v);
+	  return lexicons_1$B.lexicons.validate('com.atproto.sync.subscribeRepos#account', v);
 	}
 	subscribeRepos.validateAccount = validateAccount;
 	function isHandle(v) {
-	  return (0, util_1$w.isObj)(v) && (0, util_1$w.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#handle';
+	  return (0, util_1$C.isObj)(v) && (0, util_1$C.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#handle';
 	}
 	subscribeRepos.isHandle = isHandle;
 	function validateHandle(v) {
-	  return lexicons_1$v.lexicons.validate('com.atproto.sync.subscribeRepos#handle', v);
+	  return lexicons_1$B.lexicons.validate('com.atproto.sync.subscribeRepos#handle', v);
 	}
 	subscribeRepos.validateHandle = validateHandle;
 	function isMigrate(v) {
-	  return (0, util_1$w.isObj)(v) && (0, util_1$w.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#migrate';
+	  return (0, util_1$C.isObj)(v) && (0, util_1$C.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#migrate';
 	}
 	subscribeRepos.isMigrate = isMigrate;
 	function validateMigrate(v) {
-	  return lexicons_1$v.lexicons.validate('com.atproto.sync.subscribeRepos#migrate', v);
+	  return lexicons_1$B.lexicons.validate('com.atproto.sync.subscribeRepos#migrate', v);
 	}
 	subscribeRepos.validateMigrate = validateMigrate;
 	function isTombstone(v) {
-	  return (0, util_1$w.isObj)(v) && (0, util_1$w.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#tombstone';
+	  return (0, util_1$C.isObj)(v) && (0, util_1$C.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#tombstone';
 	}
 	subscribeRepos.isTombstone = isTombstone;
 	function validateTombstone(v) {
-	  return lexicons_1$v.lexicons.validate('com.atproto.sync.subscribeRepos#tombstone', v);
+	  return lexicons_1$B.lexicons.validate('com.atproto.sync.subscribeRepos#tombstone', v);
 	}
 	subscribeRepos.validateTombstone = validateTombstone;
 	function isInfo(v) {
-	  return (0, util_1$w.isObj)(v) && (0, util_1$w.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#info';
+	  return (0, util_1$C.isObj)(v) && (0, util_1$C.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#info';
 	}
 	subscribeRepos.isInfo = isInfo;
 	function validateInfo(v) {
-	  return lexicons_1$v.lexicons.validate('com.atproto.sync.subscribeRepos#info', v);
+	  return lexicons_1$B.lexicons.validate('com.atproto.sync.subscribeRepos#info', v);
 	}
 	subscribeRepos.validateInfo = validateInfo;
 	function isRepoOp(v) {
-	  return (0, util_1$w.isObj)(v) && (0, util_1$w.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#repoOp';
+	  return (0, util_1$C.isObj)(v) && (0, util_1$C.hasProp)(v, '$type') && v.$type === 'com.atproto.sync.subscribeRepos#repoOp';
 	}
 	subscribeRepos.isRepoOp = isRepoOp;
 	function validateRepoOp(v) {
-	  return lexicons_1$v.lexicons.validate('com.atproto.sync.subscribeRepos#repoOp', v);
+	  return lexicons_1$B.lexicons.validate('com.atproto.sync.subscribeRepos#repoOp', v);
 	}
 	subscribeRepos.validateRepoOp = validateRepoOp;
+
+	var checkSignupQueue = {};
+
+	Object.defineProperty(checkSignupQueue, "__esModule", {
+	  value: true
+	});
+	checkSignupQueue.toKnownErr = void 0;
+	function toKnownErr$1a(e) {
+	  return e;
+	}
+	checkSignupQueue.toKnownErr = toKnownErr$1a;
+
+	var fetchLabels = {};
+
+	Object.defineProperty(fetchLabels, "__esModule", {
+	  value: true
+	});
+	fetchLabels.toKnownErr = void 0;
+	function toKnownErr$19(e) {
+	  return e;
+	}
+	fetchLabels.toKnownErr = toKnownErr$19;
+
+	var requestPhoneVerification = {};
+
+	Object.defineProperty(requestPhoneVerification, "__esModule", {
+	  value: true
+	});
+	requestPhoneVerification.toKnownErr = void 0;
+	function toKnownErr$18(e) {
+	  return e;
+	}
+	requestPhoneVerification.toKnownErr = toKnownErr$18;
 
 	var defs$9 = {};
 
@@ -27732,192 +25336,236 @@ if (cid) {
 	  value: true
 	});
 	defs$9.validateBskyAppProgressGuide = defs$9.isBskyAppProgressGuide = defs$9.validateBskyAppStatePref = defs$9.isBskyAppStatePref = defs$9.validateLabelerPrefItem = defs$9.isLabelerPrefItem = defs$9.validateLabelersPref = defs$9.isLabelersPref = defs$9.validateHiddenPostsPref = defs$9.isHiddenPostsPref = defs$9.validateMutedWordsPref = defs$9.isMutedWordsPref = defs$9.validateMutedWord = defs$9.isMutedWord = defs$9.validateInterestsPref = defs$9.isInterestsPref = defs$9.validateThreadViewPref = defs$9.isThreadViewPref = defs$9.validateFeedViewPref = defs$9.isFeedViewPref = defs$9.validatePersonalDetailsPref = defs$9.isPersonalDetailsPref = defs$9.validateSavedFeedsPref = defs$9.isSavedFeedsPref = defs$9.validateSavedFeedsPrefV2 = defs$9.isSavedFeedsPrefV2 = defs$9.validateSavedFeed = defs$9.isSavedFeed = defs$9.validateContentLabelPref = defs$9.isContentLabelPref = defs$9.validateAdultContentPref = defs$9.isAdultContentPref = defs$9.validateKnownFollowers = defs$9.isKnownFollowers = defs$9.validateViewerState = defs$9.isViewerState = defs$9.validateProfileAssociatedChat = defs$9.isProfileAssociatedChat = defs$9.validateProfileAssociated = defs$9.isProfileAssociated = defs$9.validateProfileViewDetailed = defs$9.isProfileViewDetailed = defs$9.validateProfileView = defs$9.isProfileView = defs$9.validateProfileViewBasic = defs$9.isProfileViewBasic = void 0;
-	const util_1$v = util$2;
-	const lexicons_1$u = lexicons;
+	const util_1$B = util$2;
+	const lexicons_1$A = lexicons;
 	function isProfileViewBasic$1(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileViewBasic';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileViewBasic';
 	}
 	defs$9.isProfileViewBasic = isProfileViewBasic$1;
 	function validateProfileViewBasic$1(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#profileViewBasic', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#profileViewBasic', v);
 	}
 	defs$9.validateProfileViewBasic = validateProfileViewBasic$1;
 	function isProfileView(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileView';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileView';
 	}
 	defs$9.isProfileView = isProfileView;
 	function validateProfileView(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#profileView', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#profileView', v);
 	}
 	defs$9.validateProfileView = validateProfileView;
 	function isProfileViewDetailed(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileViewDetailed';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileViewDetailed';
 	}
 	defs$9.isProfileViewDetailed = isProfileViewDetailed;
 	function validateProfileViewDetailed(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#profileViewDetailed', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#profileViewDetailed', v);
 	}
 	defs$9.validateProfileViewDetailed = validateProfileViewDetailed;
 	function isProfileAssociated(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileAssociated';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileAssociated';
 	}
 	defs$9.isProfileAssociated = isProfileAssociated;
 	function validateProfileAssociated(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#profileAssociated', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#profileAssociated', v);
 	}
 	defs$9.validateProfileAssociated = validateProfileAssociated;
 	function isProfileAssociatedChat(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileAssociatedChat';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#profileAssociatedChat';
 	}
 	defs$9.isProfileAssociatedChat = isProfileAssociatedChat;
 	function validateProfileAssociatedChat(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#profileAssociatedChat', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#profileAssociatedChat', v);
 	}
 	defs$9.validateProfileAssociatedChat = validateProfileAssociatedChat;
 	function isViewerState$1(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#viewerState';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#viewerState';
 	}
 	defs$9.isViewerState = isViewerState$1;
 	function validateViewerState$1(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#viewerState', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#viewerState', v);
 	}
 	defs$9.validateViewerState = validateViewerState$1;
 	function isKnownFollowers(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#knownFollowers';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#knownFollowers';
 	}
 	defs$9.isKnownFollowers = isKnownFollowers;
 	function validateKnownFollowers(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#knownFollowers', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#knownFollowers', v);
 	}
 	defs$9.validateKnownFollowers = validateKnownFollowers;
 	function isAdultContentPref(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#adultContentPref';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#adultContentPref';
 	}
 	defs$9.isAdultContentPref = isAdultContentPref;
 	function validateAdultContentPref(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#adultContentPref', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#adultContentPref', v);
 	}
 	defs$9.validateAdultContentPref = validateAdultContentPref;
 	function isContentLabelPref(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#contentLabelPref';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#contentLabelPref';
 	}
 	defs$9.isContentLabelPref = isContentLabelPref;
 	function validateContentLabelPref(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#contentLabelPref', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#contentLabelPref', v);
 	}
 	defs$9.validateContentLabelPref = validateContentLabelPref;
 	function isSavedFeed(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#savedFeed';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#savedFeed';
 	}
 	defs$9.isSavedFeed = isSavedFeed;
 	function validateSavedFeed(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#savedFeed', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#savedFeed', v);
 	}
 	defs$9.validateSavedFeed = validateSavedFeed;
 	function isSavedFeedsPrefV2(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#savedFeedsPrefV2';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#savedFeedsPrefV2';
 	}
 	defs$9.isSavedFeedsPrefV2 = isSavedFeedsPrefV2;
 	function validateSavedFeedsPrefV2(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#savedFeedsPrefV2', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#savedFeedsPrefV2', v);
 	}
 	defs$9.validateSavedFeedsPrefV2 = validateSavedFeedsPrefV2;
 	function isSavedFeedsPref(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#savedFeedsPref';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#savedFeedsPref';
 	}
 	defs$9.isSavedFeedsPref = isSavedFeedsPref;
 	function validateSavedFeedsPref(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#savedFeedsPref', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#savedFeedsPref', v);
 	}
 	defs$9.validateSavedFeedsPref = validateSavedFeedsPref;
 	function isPersonalDetailsPref(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#personalDetailsPref';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#personalDetailsPref';
 	}
 	defs$9.isPersonalDetailsPref = isPersonalDetailsPref;
 	function validatePersonalDetailsPref(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#personalDetailsPref', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#personalDetailsPref', v);
 	}
 	defs$9.validatePersonalDetailsPref = validatePersonalDetailsPref;
 	function isFeedViewPref(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#feedViewPref';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#feedViewPref';
 	}
 	defs$9.isFeedViewPref = isFeedViewPref;
 	function validateFeedViewPref(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#feedViewPref', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#feedViewPref', v);
 	}
 	defs$9.validateFeedViewPref = validateFeedViewPref;
 	function isThreadViewPref(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#threadViewPref';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#threadViewPref';
 	}
 	defs$9.isThreadViewPref = isThreadViewPref;
 	function validateThreadViewPref(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#threadViewPref', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#threadViewPref', v);
 	}
 	defs$9.validateThreadViewPref = validateThreadViewPref;
 	function isInterestsPref(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#interestsPref';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#interestsPref';
 	}
 	defs$9.isInterestsPref = isInterestsPref;
 	function validateInterestsPref(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#interestsPref', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#interestsPref', v);
 	}
 	defs$9.validateInterestsPref = validateInterestsPref;
 	function isMutedWord(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#mutedWord';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#mutedWord';
 	}
 	defs$9.isMutedWord = isMutedWord;
 	function validateMutedWord(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#mutedWord', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#mutedWord', v);
 	}
 	defs$9.validateMutedWord = validateMutedWord;
 	function isMutedWordsPref(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#mutedWordsPref';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#mutedWordsPref';
 	}
 	defs$9.isMutedWordsPref = isMutedWordsPref;
 	function validateMutedWordsPref(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#mutedWordsPref', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#mutedWordsPref', v);
 	}
 	defs$9.validateMutedWordsPref = validateMutedWordsPref;
 	function isHiddenPostsPref(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#hiddenPostsPref';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#hiddenPostsPref';
 	}
 	defs$9.isHiddenPostsPref = isHiddenPostsPref;
 	function validateHiddenPostsPref(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#hiddenPostsPref', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#hiddenPostsPref', v);
 	}
 	defs$9.validateHiddenPostsPref = validateHiddenPostsPref;
 	function isLabelersPref(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#labelersPref';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#labelersPref';
 	}
 	defs$9.isLabelersPref = isLabelersPref;
 	function validateLabelersPref(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#labelersPref', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#labelersPref', v);
 	}
 	defs$9.validateLabelersPref = validateLabelersPref;
 	function isLabelerPrefItem(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#labelerPrefItem';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#labelerPrefItem';
 	}
 	defs$9.isLabelerPrefItem = isLabelerPrefItem;
 	function validateLabelerPrefItem(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#labelerPrefItem', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#labelerPrefItem', v);
 	}
 	defs$9.validateLabelerPrefItem = validateLabelerPrefItem;
 	function isBskyAppStatePref(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#bskyAppStatePref';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#bskyAppStatePref';
 	}
 	defs$9.isBskyAppStatePref = isBskyAppStatePref;
 	function validateBskyAppStatePref(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#bskyAppStatePref', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#bskyAppStatePref', v);
 	}
 	defs$9.validateBskyAppStatePref = validateBskyAppStatePref;
 	function isBskyAppProgressGuide(v) {
-	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#bskyAppProgressGuide';
+	  return (0, util_1$B.isObj)(v) && (0, util_1$B.hasProp)(v, '$type') && v.$type === 'app.bsky.actor.defs#bskyAppProgressGuide';
 	}
 	defs$9.isBskyAppProgressGuide = isBskyAppProgressGuide;
 	function validateBskyAppProgressGuide(v) {
-	  return lexicons_1$u.lexicons.validate('app.bsky.actor.defs#bskyAppProgressGuide', v);
+	  return lexicons_1$A.lexicons.validate('app.bsky.actor.defs#bskyAppProgressGuide', v);
 	}
 	defs$9.validateBskyAppProgressGuide = validateBskyAppProgressGuide;
+
+	var getPreferences = {};
+
+	Object.defineProperty(getPreferences, "__esModule", {
+	  value: true
+	});
+	getPreferences.toKnownErr = void 0;
+	function toKnownErr$17(e) {
+	  return e;
+	}
+	getPreferences.toKnownErr = toKnownErr$17;
+
+	var getProfile = {};
+
+	Object.defineProperty(getProfile, "__esModule", {
+	  value: true
+	});
+	getProfile.toKnownErr = void 0;
+	function toKnownErr$16(e) {
+	  return e;
+	}
+	getProfile.toKnownErr = toKnownErr$16;
+
+	var getProfiles = {};
+
+	Object.defineProperty(getProfiles, "__esModule", {
+	  value: true
+	});
+	getProfiles.toKnownErr = void 0;
+	function toKnownErr$15(e) {
+	  return e;
+	}
+	getProfiles.toKnownErr = toKnownErr$15;
+
+	var getSuggestions = {};
+
+	Object.defineProperty(getSuggestions, "__esModule", {
+	  value: true
+	});
+	getSuggestions.toKnownErr = void 0;
+	function toKnownErr$14(e) {
+	  return e;
+	}
+	getSuggestions.toKnownErr = toKnownErr$14;
 
 	var profile$1 = {};
 
@@ -27925,16 +25573,49 @@ if (cid) {
 	  value: true
 	});
 	profile$1.validateRecord = profile$1.isRecord = void 0;
-	const util_1$u = util$2;
-	const lexicons_1$t = lexicons;
-	function isRecord$e(v) {
-	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && (v.$type === 'app.bsky.actor.profile#main' || v.$type === 'app.bsky.actor.profile');
+	const util_1$A = util$2;
+	const lexicons_1$z = lexicons;
+	function isRecord$d(v) {
+	  return (0, util_1$A.isObj)(v) && (0, util_1$A.hasProp)(v, '$type') && (v.$type === 'app.bsky.actor.profile#main' || v.$type === 'app.bsky.actor.profile');
 	}
-	profile$1.isRecord = isRecord$e;
-	function validateRecord$e(v) {
-	  return lexicons_1$t.lexicons.validate('app.bsky.actor.profile#main', v);
+	profile$1.isRecord = isRecord$d;
+	function validateRecord$d(v) {
+	  return lexicons_1$z.lexicons.validate('app.bsky.actor.profile#main', v);
 	}
-	profile$1.validateRecord = validateRecord$e;
+	profile$1.validateRecord = validateRecord$d;
+
+	var putPreferences$1 = {};
+
+	Object.defineProperty(putPreferences$1, "__esModule", {
+	  value: true
+	});
+	putPreferences$1.toKnownErr = void 0;
+	function toKnownErr$13(e) {
+	  return e;
+	}
+	putPreferences$1.toKnownErr = toKnownErr$13;
+
+	var searchActors = {};
+
+	Object.defineProperty(searchActors, "__esModule", {
+	  value: true
+	});
+	searchActors.toKnownErr = void 0;
+	function toKnownErr$12(e) {
+	  return e;
+	}
+	searchActors.toKnownErr = toKnownErr$12;
+
+	var searchActorsTypeahead = {};
+
+	Object.defineProperty(searchActorsTypeahead, "__esModule", {
+	  value: true
+	});
+	searchActorsTypeahead.toKnownErr = void 0;
+	function toKnownErr$11(e) {
+	  return e;
+	}
+	searchActorsTypeahead.toKnownErr = toKnownErr$11;
 
 	var external = {};
 
@@ -27942,38 +25623,38 @@ if (cid) {
 	  value: true
 	});
 	external.validateViewExternal = external.isViewExternal = external.validateView = external.isView = external.validateExternal = external.isExternal = external.validateMain = external.isMain = void 0;
-	const util_1$t = util$2;
-	const lexicons_1$s = lexicons;
+	const util_1$z = util$2;
+	const lexicons_1$y = lexicons;
 	function isMain$4(v) {
-	  return (0, util_1$t.isObj)(v) && (0, util_1$t.hasProp)(v, '$type') && (v.$type === 'app.bsky.embed.external#main' || v.$type === 'app.bsky.embed.external');
+	  return (0, util_1$z.isObj)(v) && (0, util_1$z.hasProp)(v, '$type') && (v.$type === 'app.bsky.embed.external#main' || v.$type === 'app.bsky.embed.external');
 	}
 	external.isMain = isMain$4;
 	function validateMain$4(v) {
-	  return lexicons_1$s.lexicons.validate('app.bsky.embed.external#main', v);
+	  return lexicons_1$y.lexicons.validate('app.bsky.embed.external#main', v);
 	}
 	external.validateMain = validateMain$4;
 	function isExternal(v) {
-	  return (0, util_1$t.isObj)(v) && (0, util_1$t.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.external#external';
+	  return (0, util_1$z.isObj)(v) && (0, util_1$z.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.external#external';
 	}
 	external.isExternal = isExternal;
 	function validateExternal(v) {
-	  return lexicons_1$s.lexicons.validate('app.bsky.embed.external#external', v);
+	  return lexicons_1$y.lexicons.validate('app.bsky.embed.external#external', v);
 	}
 	external.validateExternal = validateExternal;
 	function isView$3(v) {
-	  return (0, util_1$t.isObj)(v) && (0, util_1$t.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.external#view';
+	  return (0, util_1$z.isObj)(v) && (0, util_1$z.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.external#view';
 	}
 	external.isView = isView$3;
 	function validateView$3(v) {
-	  return lexicons_1$s.lexicons.validate('app.bsky.embed.external#view', v);
+	  return lexicons_1$y.lexicons.validate('app.bsky.embed.external#view', v);
 	}
 	external.validateView = validateView$3;
 	function isViewExternal(v) {
-	  return (0, util_1$t.isObj)(v) && (0, util_1$t.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.external#viewExternal';
+	  return (0, util_1$z.isObj)(v) && (0, util_1$z.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.external#viewExternal';
 	}
 	external.isViewExternal = isViewExternal;
 	function validateViewExternal(v) {
-	  return lexicons_1$s.lexicons.validate('app.bsky.embed.external#viewExternal', v);
+	  return lexicons_1$y.lexicons.validate('app.bsky.embed.external#viewExternal', v);
 	}
 	external.validateViewExternal = validateViewExternal;
 
@@ -27983,46 +25664,46 @@ if (cid) {
 	  value: true
 	});
 	images.validateViewImage = images.isViewImage = images.validateView = images.isView = images.validateAspectRatio = images.isAspectRatio = images.validateImage = images.isImage = images.validateMain = images.isMain = void 0;
-	const util_1$s = util$2;
-	const lexicons_1$r = lexicons;
+	const util_1$y = util$2;
+	const lexicons_1$x = lexicons;
 	function isMain$3(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && (v.$type === 'app.bsky.embed.images#main' || v.$type === 'app.bsky.embed.images');
+	  return (0, util_1$y.isObj)(v) && (0, util_1$y.hasProp)(v, '$type') && (v.$type === 'app.bsky.embed.images#main' || v.$type === 'app.bsky.embed.images');
 	}
 	images.isMain = isMain$3;
 	function validateMain$3(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.embed.images#main', v);
+	  return lexicons_1$x.lexicons.validate('app.bsky.embed.images#main', v);
 	}
 	images.validateMain = validateMain$3;
 	function isImage(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.images#image';
+	  return (0, util_1$y.isObj)(v) && (0, util_1$y.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.images#image';
 	}
 	images.isImage = isImage;
 	function validateImage(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.embed.images#image', v);
+	  return lexicons_1$x.lexicons.validate('app.bsky.embed.images#image', v);
 	}
 	images.validateImage = validateImage;
 	function isAspectRatio(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.images#aspectRatio';
+	  return (0, util_1$y.isObj)(v) && (0, util_1$y.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.images#aspectRatio';
 	}
 	images.isAspectRatio = isAspectRatio;
 	function validateAspectRatio(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.embed.images#aspectRatio', v);
+	  return lexicons_1$x.lexicons.validate('app.bsky.embed.images#aspectRatio', v);
 	}
 	images.validateAspectRatio = validateAspectRatio;
 	function isView$2(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.images#view';
+	  return (0, util_1$y.isObj)(v) && (0, util_1$y.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.images#view';
 	}
 	images.isView = isView$2;
 	function validateView$2(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.embed.images#view', v);
+	  return lexicons_1$x.lexicons.validate('app.bsky.embed.images#view', v);
 	}
 	images.validateView = validateView$2;
 	function isViewImage(v) {
-	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.images#viewImage';
+	  return (0, util_1$y.isObj)(v) && (0, util_1$y.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.images#viewImage';
 	}
 	images.isViewImage = isViewImage;
 	function validateViewImage(v) {
-	  return lexicons_1$r.lexicons.validate('app.bsky.embed.images#viewImage', v);
+	  return lexicons_1$x.lexicons.validate('app.bsky.embed.images#viewImage', v);
 	}
 	images.validateViewImage = validateViewImage;
 
@@ -28032,46 +25713,46 @@ if (cid) {
 	  value: true
 	});
 	record.validateViewBlocked = record.isViewBlocked = record.validateViewNotFound = record.isViewNotFound = record.validateViewRecord = record.isViewRecord = record.validateView = record.isView = record.validateMain = record.isMain = void 0;
-	const util_1$r = util$2;
-	const lexicons_1$q = lexicons;
+	const util_1$x = util$2;
+	const lexicons_1$w = lexicons;
 	function isMain$2(v) {
-	  return (0, util_1$r.isObj)(v) && (0, util_1$r.hasProp)(v, '$type') && (v.$type === 'app.bsky.embed.record#main' || v.$type === 'app.bsky.embed.record');
+	  return (0, util_1$x.isObj)(v) && (0, util_1$x.hasProp)(v, '$type') && (v.$type === 'app.bsky.embed.record#main' || v.$type === 'app.bsky.embed.record');
 	}
 	record.isMain = isMain$2;
 	function validateMain$2(v) {
-	  return lexicons_1$q.lexicons.validate('app.bsky.embed.record#main', v);
+	  return lexicons_1$w.lexicons.validate('app.bsky.embed.record#main', v);
 	}
 	record.validateMain = validateMain$2;
 	function isView$1(v) {
-	  return (0, util_1$r.isObj)(v) && (0, util_1$r.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.record#view';
+	  return (0, util_1$x.isObj)(v) && (0, util_1$x.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.record#view';
 	}
 	record.isView = isView$1;
 	function validateView$1(v) {
-	  return lexicons_1$q.lexicons.validate('app.bsky.embed.record#view', v);
+	  return lexicons_1$w.lexicons.validate('app.bsky.embed.record#view', v);
 	}
 	record.validateView = validateView$1;
 	function isViewRecord(v) {
-	  return (0, util_1$r.isObj)(v) && (0, util_1$r.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.record#viewRecord';
+	  return (0, util_1$x.isObj)(v) && (0, util_1$x.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.record#viewRecord';
 	}
 	record.isViewRecord = isViewRecord;
 	function validateViewRecord(v) {
-	  return lexicons_1$q.lexicons.validate('app.bsky.embed.record#viewRecord', v);
+	  return lexicons_1$w.lexicons.validate('app.bsky.embed.record#viewRecord', v);
 	}
 	record.validateViewRecord = validateViewRecord;
 	function isViewNotFound(v) {
-	  return (0, util_1$r.isObj)(v) && (0, util_1$r.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.record#viewNotFound';
+	  return (0, util_1$x.isObj)(v) && (0, util_1$x.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.record#viewNotFound';
 	}
 	record.isViewNotFound = isViewNotFound;
 	function validateViewNotFound(v) {
-	  return lexicons_1$q.lexicons.validate('app.bsky.embed.record#viewNotFound', v);
+	  return lexicons_1$w.lexicons.validate('app.bsky.embed.record#viewNotFound', v);
 	}
 	record.validateViewNotFound = validateViewNotFound;
 	function isViewBlocked(v) {
-	  return (0, util_1$r.isObj)(v) && (0, util_1$r.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.record#viewBlocked';
+	  return (0, util_1$x.isObj)(v) && (0, util_1$x.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.record#viewBlocked';
 	}
 	record.isViewBlocked = isViewBlocked;
 	function validateViewBlocked(v) {
-	  return lexicons_1$q.lexicons.validate('app.bsky.embed.record#viewBlocked', v);
+	  return lexicons_1$w.lexicons.validate('app.bsky.embed.record#viewBlocked', v);
 	}
 	record.validateViewBlocked = validateViewBlocked;
 
@@ -28081,22 +25762,22 @@ if (cid) {
 	  value: true
 	});
 	recordWithMedia.validateView = recordWithMedia.isView = recordWithMedia.validateMain = recordWithMedia.isMain = void 0;
-	const util_1$q = util$2;
-	const lexicons_1$p = lexicons;
+	const util_1$w = util$2;
+	const lexicons_1$v = lexicons;
 	function isMain$1(v) {
-	  return (0, util_1$q.isObj)(v) && (0, util_1$q.hasProp)(v, '$type') && (v.$type === 'app.bsky.embed.recordWithMedia#main' || v.$type === 'app.bsky.embed.recordWithMedia');
+	  return (0, util_1$w.isObj)(v) && (0, util_1$w.hasProp)(v, '$type') && (v.$type === 'app.bsky.embed.recordWithMedia#main' || v.$type === 'app.bsky.embed.recordWithMedia');
 	}
 	recordWithMedia.isMain = isMain$1;
 	function validateMain$1(v) {
-	  return lexicons_1$p.lexicons.validate('app.bsky.embed.recordWithMedia#main', v);
+	  return lexicons_1$v.lexicons.validate('app.bsky.embed.recordWithMedia#main', v);
 	}
 	recordWithMedia.validateMain = validateMain$1;
 	function isView(v) {
-	  return (0, util_1$q.isObj)(v) && (0, util_1$q.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.recordWithMedia#view';
+	  return (0, util_1$w.isObj)(v) && (0, util_1$w.hasProp)(v, '$type') && v.$type === 'app.bsky.embed.recordWithMedia#view';
 	}
 	recordWithMedia.isView = isView;
 	function validateView(v) {
-	  return lexicons_1$p.lexicons.validate('app.bsky.embed.recordWithMedia#view', v);
+	  return lexicons_1$v.lexicons.validate('app.bsky.embed.recordWithMedia#view', v);
 	}
 	recordWithMedia.validateView = validateView;
 
@@ -28106,126 +25787,126 @@ if (cid) {
 	  value: true
 	});
 	defs$8.INTERACTIONSHARE = defs$8.INTERACTIONQUOTE = defs$8.INTERACTIONREPLY = defs$8.INTERACTIONREPOST = defs$8.INTERACTIONLIKE = defs$8.INTERACTIONSEEN = defs$8.CLICKTHROUGHEMBED = defs$8.CLICKTHROUGHREPOSTER = defs$8.CLICKTHROUGHAUTHOR = defs$8.CLICKTHROUGHITEM = defs$8.REQUESTMORE = defs$8.REQUESTLESS = defs$8.validateInteraction = defs$8.isInteraction = defs$8.validateThreadgateView = defs$8.isThreadgateView = defs$8.validateSkeletonReasonRepost = defs$8.isSkeletonReasonRepost = defs$8.validateSkeletonFeedPost = defs$8.isSkeletonFeedPost = defs$8.validateGeneratorViewerState = defs$8.isGeneratorViewerState = defs$8.validateGeneratorView = defs$8.isGeneratorView = defs$8.validateBlockedAuthor = defs$8.isBlockedAuthor = defs$8.validateBlockedPost = defs$8.isBlockedPost = defs$8.validateNotFoundPost = defs$8.isNotFoundPost = defs$8.validateThreadViewPost = defs$8.isThreadViewPost = defs$8.validateReasonRepost = defs$8.isReasonRepost = defs$8.validateReplyRef = defs$8.isReplyRef = defs$8.validateFeedViewPost = defs$8.isFeedViewPost = defs$8.validateViewerState = defs$8.isViewerState = defs$8.validatePostView = defs$8.isPostView = void 0;
-	const util_1$p = util$2;
-	const lexicons_1$o = lexicons;
+	const util_1$v = util$2;
+	const lexicons_1$u = lexicons;
 	function isPostView(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#postView';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#postView';
 	}
 	defs$8.isPostView = isPostView;
 	function validatePostView(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.feed.defs#postView', v);
+	  return lexicons_1$u.lexicons.validate('app.bsky.feed.defs#postView', v);
 	}
 	defs$8.validatePostView = validatePostView;
 	function isViewerState(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#viewerState';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#viewerState';
 	}
 	defs$8.isViewerState = isViewerState;
 	function validateViewerState(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.feed.defs#viewerState', v);
+	  return lexicons_1$u.lexicons.validate('app.bsky.feed.defs#viewerState', v);
 	}
 	defs$8.validateViewerState = validateViewerState;
 	function isFeedViewPost(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#feedViewPost';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#feedViewPost';
 	}
 	defs$8.isFeedViewPost = isFeedViewPost;
 	function validateFeedViewPost(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.feed.defs#feedViewPost', v);
+	  return lexicons_1$u.lexicons.validate('app.bsky.feed.defs#feedViewPost', v);
 	}
 	defs$8.validateFeedViewPost = validateFeedViewPost;
 	function isReplyRef$1(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#replyRef';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#replyRef';
 	}
 	defs$8.isReplyRef = isReplyRef$1;
 	function validateReplyRef$1(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.feed.defs#replyRef', v);
+	  return lexicons_1$u.lexicons.validate('app.bsky.feed.defs#replyRef', v);
 	}
 	defs$8.validateReplyRef = validateReplyRef$1;
 	function isReasonRepost(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#reasonRepost';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#reasonRepost';
 	}
 	defs$8.isReasonRepost = isReasonRepost;
 	function validateReasonRepost(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.feed.defs#reasonRepost', v);
+	  return lexicons_1$u.lexicons.validate('app.bsky.feed.defs#reasonRepost', v);
 	}
 	defs$8.validateReasonRepost = validateReasonRepost;
 	function isThreadViewPost(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#threadViewPost';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#threadViewPost';
 	}
 	defs$8.isThreadViewPost = isThreadViewPost;
 	function validateThreadViewPost(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.feed.defs#threadViewPost', v);
+	  return lexicons_1$u.lexicons.validate('app.bsky.feed.defs#threadViewPost', v);
 	}
 	defs$8.validateThreadViewPost = validateThreadViewPost;
 	function isNotFoundPost(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#notFoundPost';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#notFoundPost';
 	}
 	defs$8.isNotFoundPost = isNotFoundPost;
 	function validateNotFoundPost(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.feed.defs#notFoundPost', v);
+	  return lexicons_1$u.lexicons.validate('app.bsky.feed.defs#notFoundPost', v);
 	}
 	defs$8.validateNotFoundPost = validateNotFoundPost;
 	function isBlockedPost(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#blockedPost';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#blockedPost';
 	}
 	defs$8.isBlockedPost = isBlockedPost;
 	function validateBlockedPost(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.feed.defs#blockedPost', v);
+	  return lexicons_1$u.lexicons.validate('app.bsky.feed.defs#blockedPost', v);
 	}
 	defs$8.validateBlockedPost = validateBlockedPost;
 	function isBlockedAuthor(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#blockedAuthor';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#blockedAuthor';
 	}
 	defs$8.isBlockedAuthor = isBlockedAuthor;
 	function validateBlockedAuthor(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.feed.defs#blockedAuthor', v);
+	  return lexicons_1$u.lexicons.validate('app.bsky.feed.defs#blockedAuthor', v);
 	}
 	defs$8.validateBlockedAuthor = validateBlockedAuthor;
 	function isGeneratorView(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#generatorView';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#generatorView';
 	}
 	defs$8.isGeneratorView = isGeneratorView;
 	function validateGeneratorView(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.feed.defs#generatorView', v);
+	  return lexicons_1$u.lexicons.validate('app.bsky.feed.defs#generatorView', v);
 	}
 	defs$8.validateGeneratorView = validateGeneratorView;
 	function isGeneratorViewerState(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#generatorViewerState';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#generatorViewerState';
 	}
 	defs$8.isGeneratorViewerState = isGeneratorViewerState;
 	function validateGeneratorViewerState(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.feed.defs#generatorViewerState', v);
+	  return lexicons_1$u.lexicons.validate('app.bsky.feed.defs#generatorViewerState', v);
 	}
 	defs$8.validateGeneratorViewerState = validateGeneratorViewerState;
 	function isSkeletonFeedPost(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#skeletonFeedPost';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#skeletonFeedPost';
 	}
 	defs$8.isSkeletonFeedPost = isSkeletonFeedPost;
 	function validateSkeletonFeedPost(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.feed.defs#skeletonFeedPost', v);
+	  return lexicons_1$u.lexicons.validate('app.bsky.feed.defs#skeletonFeedPost', v);
 	}
 	defs$8.validateSkeletonFeedPost = validateSkeletonFeedPost;
 	function isSkeletonReasonRepost(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#skeletonReasonRepost';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#skeletonReasonRepost';
 	}
 	defs$8.isSkeletonReasonRepost = isSkeletonReasonRepost;
 	function validateSkeletonReasonRepost(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.feed.defs#skeletonReasonRepost', v);
+	  return lexicons_1$u.lexicons.validate('app.bsky.feed.defs#skeletonReasonRepost', v);
 	}
 	defs$8.validateSkeletonReasonRepost = validateSkeletonReasonRepost;
 	function isThreadgateView(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#threadgateView';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#threadgateView';
 	}
 	defs$8.isThreadgateView = isThreadgateView;
 	function validateThreadgateView(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.feed.defs#threadgateView', v);
+	  return lexicons_1$u.lexicons.validate('app.bsky.feed.defs#threadgateView', v);
 	}
 	defs$8.validateThreadgateView = validateThreadgateView;
 	function isInteraction(v) {
-	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#interaction';
+	  return (0, util_1$v.isObj)(v) && (0, util_1$v.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.defs#interaction';
 	}
 	defs$8.isInteraction = isInteraction;
 	function validateInteraction(v) {
-	  return lexicons_1$o.lexicons.validate('app.bsky.feed.defs#interaction', v);
+	  return lexicons_1$u.lexicons.validate('app.bsky.feed.defs#interaction', v);
 	}
 	defs$8.validateInteraction = validateInteraction;
 	/** Request that less content like the given feed item be shown in the feed */
@@ -28253,22 +25934,34 @@ if (cid) {
 	/** User shared the feed item */
 	defs$8.INTERACTIONSHARE = 'app.bsky.feed.defs#interactionShare';
 
-	var detach = {};
+	var describeFeedGenerator = {};
 
-	Object.defineProperty(detach, "__esModule", {
+	Object.defineProperty(describeFeedGenerator, "__esModule", {
 	  value: true
 	});
-	detach.validateRecord = detach.isRecord = void 0;
-	const util_1$o = util$2;
-	const lexicons_1$n = lexicons;
-	function isRecord$d(v) {
-	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.detach#main' || v.$type === 'app.bsky.feed.detach');
+	describeFeedGenerator.validateLinks = describeFeedGenerator.isLinks = describeFeedGenerator.validateFeed = describeFeedGenerator.isFeed = describeFeedGenerator.toKnownErr = void 0;
+	const util_1$u = util$2;
+	const lexicons_1$t = lexicons;
+	function toKnownErr$10(e) {
+	  return e;
 	}
-	detach.isRecord = isRecord$d;
-	function validateRecord$d(v) {
-	  return lexicons_1$n.lexicons.validate('app.bsky.feed.detach#main', v);
+	describeFeedGenerator.toKnownErr = toKnownErr$10;
+	function isFeed(v) {
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.describeFeedGenerator#feed';
 	}
-	detach.validateRecord = validateRecord$d;
+	describeFeedGenerator.isFeed = isFeed;
+	function validateFeed(v) {
+	  return lexicons_1$t.lexicons.validate('app.bsky.feed.describeFeedGenerator#feed', v);
+	}
+	describeFeedGenerator.validateFeed = validateFeed;
+	function isLinks(v) {
+	  return (0, util_1$u.isObj)(v) && (0, util_1$u.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.describeFeedGenerator#links';
+	}
+	describeFeedGenerator.isLinks = isLinks;
+	function validateLinks(v) {
+	  return lexicons_1$t.lexicons.validate('app.bsky.feed.describeFeedGenerator#links', v);
+	}
+	describeFeedGenerator.validateLinks = validateLinks;
 
 	var generator = {};
 
@@ -28276,16 +25969,114 @@ if (cid) {
 	  value: true
 	});
 	generator.validateRecord = generator.isRecord = void 0;
-	const util_1$n = util$2;
-	const lexicons_1$m = lexicons;
+	const util_1$t = util$2;
+	const lexicons_1$s = lexicons;
 	function isRecord$c(v) {
-	  return (0, util_1$n.isObj)(v) && (0, util_1$n.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.generator#main' || v.$type === 'app.bsky.feed.generator');
+	  return (0, util_1$t.isObj)(v) && (0, util_1$t.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.generator#main' || v.$type === 'app.bsky.feed.generator');
 	}
 	generator.isRecord = isRecord$c;
 	function validateRecord$c(v) {
-	  return lexicons_1$m.lexicons.validate('app.bsky.feed.generator#main', v);
+	  return lexicons_1$s.lexicons.validate('app.bsky.feed.generator#main', v);
 	}
 	generator.validateRecord = validateRecord$c;
+
+	var getActorFeeds = {};
+
+	Object.defineProperty(getActorFeeds, "__esModule", {
+	  value: true
+	});
+	getActorFeeds.toKnownErr = void 0;
+	function toKnownErr$$(e) {
+	  return e;
+	}
+	getActorFeeds.toKnownErr = toKnownErr$$;
+
+	var getFeedGenerator = {};
+
+	Object.defineProperty(getFeedGenerator, "__esModule", {
+	  value: true
+	});
+	getFeedGenerator.toKnownErr = void 0;
+	function toKnownErr$_(e) {
+	  return e;
+	}
+	getFeedGenerator.toKnownErr = toKnownErr$_;
+
+	var getFeedGenerators = {};
+
+	Object.defineProperty(getFeedGenerators, "__esModule", {
+	  value: true
+	});
+	getFeedGenerators.toKnownErr = void 0;
+	function toKnownErr$Z(e) {
+	  return e;
+	}
+	getFeedGenerators.toKnownErr = toKnownErr$Z;
+
+	var getLikes = {};
+
+	Object.defineProperty(getLikes, "__esModule", {
+	  value: true
+	});
+	getLikes.validateLike = getLikes.isLike = getLikes.toKnownErr = void 0;
+	const util_1$s = util$2;
+	const lexicons_1$r = lexicons;
+	function toKnownErr$Y(e) {
+	  return e;
+	}
+	getLikes.toKnownErr = toKnownErr$Y;
+	function isLike(v) {
+	  return (0, util_1$s.isObj)(v) && (0, util_1$s.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.getLikes#like';
+	}
+	getLikes.isLike = isLike;
+	function validateLike(v) {
+	  return lexicons_1$r.lexicons.validate('app.bsky.feed.getLikes#like', v);
+	}
+	getLikes.validateLike = validateLike;
+
+	var getPosts = {};
+
+	Object.defineProperty(getPosts, "__esModule", {
+	  value: true
+	});
+	getPosts.toKnownErr = void 0;
+	function toKnownErr$X(e) {
+	  return e;
+	}
+	getPosts.toKnownErr = toKnownErr$X;
+
+	var getRepostedBy = {};
+
+	Object.defineProperty(getRepostedBy, "__esModule", {
+	  value: true
+	});
+	getRepostedBy.toKnownErr = void 0;
+	function toKnownErr$W(e) {
+	  return e;
+	}
+	getRepostedBy.toKnownErr = toKnownErr$W;
+
+	var getSuggestedFeeds = {};
+
+	Object.defineProperty(getSuggestedFeeds, "__esModule", {
+	  value: true
+	});
+	getSuggestedFeeds.toKnownErr = void 0;
+	function toKnownErr$V(e) {
+	  return e;
+	}
+	getSuggestedFeeds.toKnownErr = toKnownErr$V;
+
+	var getTimeline = {};
+
+	Object.defineProperty(getTimeline, "__esModule", {
+	  value: true
+	});
+	getTimeline.toKnownErr = void 0;
+	function toKnownErr$U(e) {
+	  return e;
+	}
+	getTimeline.toKnownErr = toKnownErr$U;
 
 	var like = {};
 
@@ -28293,14 +26084,14 @@ if (cid) {
 	  value: true
 	});
 	like.validateRecord = like.isRecord = void 0;
-	const util_1$m = util$2;
-	const lexicons_1$l = lexicons;
+	const util_1$r = util$2;
+	const lexicons_1$q = lexicons;
 	function isRecord$b(v) {
-	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.like#main' || v.$type === 'app.bsky.feed.like');
+	  return (0, util_1$r.isObj)(v) && (0, util_1$r.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.like#main' || v.$type === 'app.bsky.feed.like');
 	}
 	like.isRecord = isRecord$b;
 	function validateRecord$b(v) {
-	  return lexicons_1$l.lexicons.validate('app.bsky.feed.like#main', v);
+	  return lexicons_1$q.lexicons.validate('app.bsky.feed.like#main', v);
 	}
 	like.validateRecord = validateRecord$b;
 
@@ -28310,38 +26101,38 @@ if (cid) {
 	  value: true
 	});
 	post$1.validateTextSlice = post$1.isTextSlice = post$1.validateEntity = post$1.isEntity = post$1.validateReplyRef = post$1.isReplyRef = post$1.validateRecord = post$1.isRecord = void 0;
-	const util_1$l = util$2;
-	const lexicons_1$k = lexicons;
+	const util_1$q = util$2;
+	const lexicons_1$p = lexicons;
 	function isRecord$a(v) {
-	  return (0, util_1$l.isObj)(v) && (0, util_1$l.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.post#main' || v.$type === 'app.bsky.feed.post');
+	  return (0, util_1$q.isObj)(v) && (0, util_1$q.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.post#main' || v.$type === 'app.bsky.feed.post');
 	}
 	post$1.isRecord = isRecord$a;
 	function validateRecord$a(v) {
-	  return lexicons_1$k.lexicons.validate('app.bsky.feed.post#main', v);
+	  return lexicons_1$p.lexicons.validate('app.bsky.feed.post#main', v);
 	}
 	post$1.validateRecord = validateRecord$a;
 	function isReplyRef(v) {
-	  return (0, util_1$l.isObj)(v) && (0, util_1$l.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.post#replyRef';
+	  return (0, util_1$q.isObj)(v) && (0, util_1$q.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.post#replyRef';
 	}
 	post$1.isReplyRef = isReplyRef;
 	function validateReplyRef(v) {
-	  return lexicons_1$k.lexicons.validate('app.bsky.feed.post#replyRef', v);
+	  return lexicons_1$p.lexicons.validate('app.bsky.feed.post#replyRef', v);
 	}
 	post$1.validateReplyRef = validateReplyRef;
 	function isEntity(v) {
-	  return (0, util_1$l.isObj)(v) && (0, util_1$l.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.post#entity';
+	  return (0, util_1$q.isObj)(v) && (0, util_1$q.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.post#entity';
 	}
 	post$1.isEntity = isEntity;
 	function validateEntity(v) {
-	  return lexicons_1$k.lexicons.validate('app.bsky.feed.post#entity', v);
+	  return lexicons_1$p.lexicons.validate('app.bsky.feed.post#entity', v);
 	}
 	post$1.validateEntity = validateEntity;
 	function isTextSlice(v) {
-	  return (0, util_1$l.isObj)(v) && (0, util_1$l.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.post#textSlice';
+	  return (0, util_1$q.isObj)(v) && (0, util_1$q.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.post#textSlice';
 	}
 	post$1.isTextSlice = isTextSlice;
 	function validateTextSlice(v) {
-	  return lexicons_1$k.lexicons.validate('app.bsky.feed.post#textSlice', v);
+	  return lexicons_1$p.lexicons.validate('app.bsky.feed.post#textSlice', v);
 	}
 	post$1.validateTextSlice = validateTextSlice;
 
@@ -28351,16 +26142,27 @@ if (cid) {
 	  value: true
 	});
 	repost.validateRecord = repost.isRecord = void 0;
-	const util_1$k = util$2;
-	const lexicons_1$j = lexicons;
+	const util_1$p = util$2;
+	const lexicons_1$o = lexicons;
 	function isRecord$9(v) {
-	  return (0, util_1$k.isObj)(v) && (0, util_1$k.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.repost#main' || v.$type === 'app.bsky.feed.repost');
+	  return (0, util_1$p.isObj)(v) && (0, util_1$p.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.repost#main' || v.$type === 'app.bsky.feed.repost');
 	}
 	repost.isRecord = isRecord$9;
 	function validateRecord$9(v) {
-	  return lexicons_1$j.lexicons.validate('app.bsky.feed.repost#main', v);
+	  return lexicons_1$o.lexicons.validate('app.bsky.feed.repost#main', v);
 	}
 	repost.validateRecord = validateRecord$9;
+
+	var sendInteractions = {};
+
+	Object.defineProperty(sendInteractions, "__esModule", {
+	  value: true
+	});
+	sendInteractions.toKnownErr = void 0;
+	function toKnownErr$T(e) {
+	  return e;
+	}
+	sendInteractions.toKnownErr = toKnownErr$T;
 
 	var threadgate = {};
 
@@ -28368,38 +26170,38 @@ if (cid) {
 	  value: true
 	});
 	threadgate.validateListRule = threadgate.isListRule = threadgate.validateFollowingRule = threadgate.isFollowingRule = threadgate.validateMentionRule = threadgate.isMentionRule = threadgate.validateRecord = threadgate.isRecord = void 0;
-	const util_1$j = util$2;
-	const lexicons_1$i = lexicons;
+	const util_1$o = util$2;
+	const lexicons_1$n = lexicons;
 	function isRecord$8(v) {
-	  return (0, util_1$j.isObj)(v) && (0, util_1$j.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.threadgate#main' || v.$type === 'app.bsky.feed.threadgate');
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && (v.$type === 'app.bsky.feed.threadgate#main' || v.$type === 'app.bsky.feed.threadgate');
 	}
 	threadgate.isRecord = isRecord$8;
 	function validateRecord$8(v) {
-	  return lexicons_1$i.lexicons.validate('app.bsky.feed.threadgate#main', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.threadgate#main', v);
 	}
 	threadgate.validateRecord = validateRecord$8;
 	function isMentionRule(v) {
-	  return (0, util_1$j.isObj)(v) && (0, util_1$j.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.threadgate#mentionRule';
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.threadgate#mentionRule';
 	}
 	threadgate.isMentionRule = isMentionRule;
 	function validateMentionRule(v) {
-	  return lexicons_1$i.lexicons.validate('app.bsky.feed.threadgate#mentionRule', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.threadgate#mentionRule', v);
 	}
 	threadgate.validateMentionRule = validateMentionRule;
 	function isFollowingRule(v) {
-	  return (0, util_1$j.isObj)(v) && (0, util_1$j.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.threadgate#followingRule';
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.threadgate#followingRule';
 	}
 	threadgate.isFollowingRule = isFollowingRule;
 	function validateFollowingRule(v) {
-	  return lexicons_1$i.lexicons.validate('app.bsky.feed.threadgate#followingRule', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.threadgate#followingRule', v);
 	}
 	threadgate.validateFollowingRule = validateFollowingRule;
 	function isListRule(v) {
-	  return (0, util_1$j.isObj)(v) && (0, util_1$j.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.threadgate#listRule';
+	  return (0, util_1$o.isObj)(v) && (0, util_1$o.hasProp)(v, '$type') && v.$type === 'app.bsky.feed.threadgate#listRule';
 	}
 	threadgate.isListRule = isListRule;
 	function validateListRule(v) {
-	  return lexicons_1$i.lexicons.validate('app.bsky.feed.threadgate#listRule', v);
+	  return lexicons_1$n.lexicons.validate('app.bsky.feed.threadgate#listRule', v);
 	}
 	threadgate.validateListRule = validateListRule;
 
@@ -28409,14 +26211,14 @@ if (cid) {
 	  value: true
 	});
 	block.validateRecord = block.isRecord = void 0;
-	const util_1$i = util$2;
-	const lexicons_1$h = lexicons;
+	const util_1$n = util$2;
+	const lexicons_1$m = lexicons;
 	function isRecord$7(v) {
-	  return (0, util_1$i.isObj)(v) && (0, util_1$i.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.block#main' || v.$type === 'app.bsky.graph.block');
+	  return (0, util_1$n.isObj)(v) && (0, util_1$n.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.block#main' || v.$type === 'app.bsky.graph.block');
 	}
 	block.isRecord = isRecord$7;
 	function validateRecord$7(v) {
-	  return lexicons_1$h.lexicons.validate('app.bsky.graph.block#main', v);
+	  return lexicons_1$m.lexicons.validate('app.bsky.graph.block#main', v);
 	}
 	block.validateRecord = validateRecord$7;
 
@@ -28426,46 +26228,46 @@ if (cid) {
 	  value: true
 	});
 	defs$7.validateRelationship = defs$7.isRelationship = defs$7.validateNotFoundActor = defs$7.isNotFoundActor = defs$7.validateListViewerState = defs$7.isListViewerState = defs$7.REFERENCELIST = defs$7.CURATELIST = defs$7.MODLIST = defs$7.validateStarterPackViewBasic = defs$7.isStarterPackViewBasic = defs$7.validateStarterPackView = defs$7.isStarterPackView = defs$7.validateListItemView = defs$7.isListItemView = defs$7.validateListView = defs$7.isListView = defs$7.validateListViewBasic = defs$7.isListViewBasic = void 0;
-	const util_1$h = util$2;
-	const lexicons_1$g = lexicons;
+	const util_1$m = util$2;
+	const lexicons_1$l = lexicons;
 	function isListViewBasic(v) {
-	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#listViewBasic';
+	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#listViewBasic';
 	}
 	defs$7.isListViewBasic = isListViewBasic;
 	function validateListViewBasic(v) {
-	  return lexicons_1$g.lexicons.validate('app.bsky.graph.defs#listViewBasic', v);
+	  return lexicons_1$l.lexicons.validate('app.bsky.graph.defs#listViewBasic', v);
 	}
 	defs$7.validateListViewBasic = validateListViewBasic;
 	function isListView(v) {
-	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#listView';
+	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#listView';
 	}
 	defs$7.isListView = isListView;
 	function validateListView(v) {
-	  return lexicons_1$g.lexicons.validate('app.bsky.graph.defs#listView', v);
+	  return lexicons_1$l.lexicons.validate('app.bsky.graph.defs#listView', v);
 	}
 	defs$7.validateListView = validateListView;
 	function isListItemView(v) {
-	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#listItemView';
+	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#listItemView';
 	}
 	defs$7.isListItemView = isListItemView;
 	function validateListItemView(v) {
-	  return lexicons_1$g.lexicons.validate('app.bsky.graph.defs#listItemView', v);
+	  return lexicons_1$l.lexicons.validate('app.bsky.graph.defs#listItemView', v);
 	}
 	defs$7.validateListItemView = validateListItemView;
 	function isStarterPackView(v) {
-	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#starterPackView';
+	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#starterPackView';
 	}
 	defs$7.isStarterPackView = isStarterPackView;
 	function validateStarterPackView(v) {
-	  return lexicons_1$g.lexicons.validate('app.bsky.graph.defs#starterPackView', v);
+	  return lexicons_1$l.lexicons.validate('app.bsky.graph.defs#starterPackView', v);
 	}
 	defs$7.validateStarterPackView = validateStarterPackView;
 	function isStarterPackViewBasic(v) {
-	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#starterPackViewBasic';
+	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#starterPackViewBasic';
 	}
 	defs$7.isStarterPackViewBasic = isStarterPackViewBasic;
 	function validateStarterPackViewBasic(v) {
-	  return lexicons_1$g.lexicons.validate('app.bsky.graph.defs#starterPackViewBasic', v);
+	  return lexicons_1$l.lexicons.validate('app.bsky.graph.defs#starterPackViewBasic', v);
 	}
 	defs$7.validateStarterPackViewBasic = validateStarterPackViewBasic;
 	/** A list of actors to apply an aggregate moderation action (mute/block) on. */
@@ -28475,27 +26277,27 @@ if (cid) {
 	/** A list of actors used for only for reference purposes such as within a starter pack. */
 	defs$7.REFERENCELIST = 'app.bsky.graph.defs#referencelist';
 	function isListViewerState(v) {
-	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#listViewerState';
+	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#listViewerState';
 	}
 	defs$7.isListViewerState = isListViewerState;
 	function validateListViewerState(v) {
-	  return lexicons_1$g.lexicons.validate('app.bsky.graph.defs#listViewerState', v);
+	  return lexicons_1$l.lexicons.validate('app.bsky.graph.defs#listViewerState', v);
 	}
 	defs$7.validateListViewerState = validateListViewerState;
 	function isNotFoundActor(v) {
-	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#notFoundActor';
+	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#notFoundActor';
 	}
 	defs$7.isNotFoundActor = isNotFoundActor;
 	function validateNotFoundActor(v) {
-	  return lexicons_1$g.lexicons.validate('app.bsky.graph.defs#notFoundActor', v);
+	  return lexicons_1$l.lexicons.validate('app.bsky.graph.defs#notFoundActor', v);
 	}
 	defs$7.validateNotFoundActor = validateNotFoundActor;
 	function isRelationship(v) {
-	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#relationship';
+	  return (0, util_1$m.isObj)(v) && (0, util_1$m.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.defs#relationship';
 	}
 	defs$7.isRelationship = isRelationship;
 	function validateRelationship(v) {
-	  return lexicons_1$g.lexicons.validate('app.bsky.graph.defs#relationship', v);
+	  return lexicons_1$l.lexicons.validate('app.bsky.graph.defs#relationship', v);
 	}
 	defs$7.validateRelationship = validateRelationship;
 
@@ -28505,16 +26307,159 @@ if (cid) {
 	  value: true
 	});
 	follow.validateRecord = follow.isRecord = void 0;
-	const util_1$g = util$2;
-	const lexicons_1$f = lexicons;
+	const util_1$l = util$2;
+	const lexicons_1$k = lexicons;
 	function isRecord$6(v) {
-	  return (0, util_1$g.isObj)(v) && (0, util_1$g.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.follow#main' || v.$type === 'app.bsky.graph.follow');
+	  return (0, util_1$l.isObj)(v) && (0, util_1$l.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.follow#main' || v.$type === 'app.bsky.graph.follow');
 	}
 	follow.isRecord = isRecord$6;
 	function validateRecord$6(v) {
-	  return lexicons_1$f.lexicons.validate('app.bsky.graph.follow#main', v);
+	  return lexicons_1$k.lexicons.validate('app.bsky.graph.follow#main', v);
 	}
 	follow.validateRecord = validateRecord$6;
+
+	var getActorStarterPacks = {};
+
+	Object.defineProperty(getActorStarterPacks, "__esModule", {
+	  value: true
+	});
+	getActorStarterPacks.toKnownErr = void 0;
+	function toKnownErr$S(e) {
+	  return e;
+	}
+	getActorStarterPacks.toKnownErr = toKnownErr$S;
+
+	var getBlocks = {};
+
+	Object.defineProperty(getBlocks, "__esModule", {
+	  value: true
+	});
+	getBlocks.toKnownErr = void 0;
+	function toKnownErr$R(e) {
+	  return e;
+	}
+	getBlocks.toKnownErr = toKnownErr$R;
+
+	var getFollowers = {};
+
+	Object.defineProperty(getFollowers, "__esModule", {
+	  value: true
+	});
+	getFollowers.toKnownErr = void 0;
+	function toKnownErr$Q(e) {
+	  return e;
+	}
+	getFollowers.toKnownErr = toKnownErr$Q;
+
+	var getFollows = {};
+
+	Object.defineProperty(getFollows, "__esModule", {
+	  value: true
+	});
+	getFollows.toKnownErr = void 0;
+	function toKnownErr$P(e) {
+	  return e;
+	}
+	getFollows.toKnownErr = toKnownErr$P;
+
+	var getKnownFollowers = {};
+
+	Object.defineProperty(getKnownFollowers, "__esModule", {
+	  value: true
+	});
+	getKnownFollowers.toKnownErr = void 0;
+	function toKnownErr$O(e) {
+	  return e;
+	}
+	getKnownFollowers.toKnownErr = toKnownErr$O;
+
+	var getList = {};
+
+	Object.defineProperty(getList, "__esModule", {
+	  value: true
+	});
+	getList.toKnownErr = void 0;
+	function toKnownErr$N(e) {
+	  return e;
+	}
+	getList.toKnownErr = toKnownErr$N;
+
+	var getListBlocks = {};
+
+	Object.defineProperty(getListBlocks, "__esModule", {
+	  value: true
+	});
+	getListBlocks.toKnownErr = void 0;
+	function toKnownErr$M(e) {
+	  return e;
+	}
+	getListBlocks.toKnownErr = toKnownErr$M;
+
+	var getListMutes = {};
+
+	Object.defineProperty(getListMutes, "__esModule", {
+	  value: true
+	});
+	getListMutes.toKnownErr = void 0;
+	function toKnownErr$L(e) {
+	  return e;
+	}
+	getListMutes.toKnownErr = toKnownErr$L;
+
+	var getLists = {};
+
+	Object.defineProperty(getLists, "__esModule", {
+	  value: true
+	});
+	getLists.toKnownErr = void 0;
+	function toKnownErr$K(e) {
+	  return e;
+	}
+	getLists.toKnownErr = toKnownErr$K;
+
+	var getMutes = {};
+
+	Object.defineProperty(getMutes, "__esModule", {
+	  value: true
+	});
+	getMutes.toKnownErr = void 0;
+	function toKnownErr$J(e) {
+	  return e;
+	}
+	getMutes.toKnownErr = toKnownErr$J;
+
+	var getStarterPack = {};
+
+	Object.defineProperty(getStarterPack, "__esModule", {
+	  value: true
+	});
+	getStarterPack.toKnownErr = void 0;
+	function toKnownErr$I(e) {
+	  return e;
+	}
+	getStarterPack.toKnownErr = toKnownErr$I;
+
+	var getStarterPacks = {};
+
+	Object.defineProperty(getStarterPacks, "__esModule", {
+	  value: true
+	});
+	getStarterPacks.toKnownErr = void 0;
+	function toKnownErr$H(e) {
+	  return e;
+	}
+	getStarterPacks.toKnownErr = toKnownErr$H;
+
+	var getSuggestedFollowsByActor = {};
+
+	Object.defineProperty(getSuggestedFollowsByActor, "__esModule", {
+	  value: true
+	});
+	getSuggestedFollowsByActor.toKnownErr = void 0;
+	function toKnownErr$G(e) {
+	  return e;
+	}
+	getSuggestedFollowsByActor.toKnownErr = toKnownErr$G;
 
 	var list = {};
 
@@ -28522,14 +26467,14 @@ if (cid) {
 	  value: true
 	});
 	list.validateRecord = list.isRecord = void 0;
-	const util_1$f = util$2;
-	const lexicons_1$e = lexicons;
+	const util_1$k = util$2;
+	const lexicons_1$j = lexicons;
 	function isRecord$5(v) {
-	  return (0, util_1$f.isObj)(v) && (0, util_1$f.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.list#main' || v.$type === 'app.bsky.graph.list');
+	  return (0, util_1$k.isObj)(v) && (0, util_1$k.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.list#main' || v.$type === 'app.bsky.graph.list');
 	}
 	list.isRecord = isRecord$5;
 	function validateRecord$5(v) {
-	  return lexicons_1$e.lexicons.validate('app.bsky.graph.list#main', v);
+	  return lexicons_1$j.lexicons.validate('app.bsky.graph.list#main', v);
 	}
 	list.validateRecord = validateRecord$5;
 
@@ -28539,14 +26484,14 @@ if (cid) {
 	  value: true
 	});
 	listblock.validateRecord = listblock.isRecord = void 0;
-	const util_1$e = util$2;
-	const lexicons_1$d = lexicons;
+	const util_1$j = util$2;
+	const lexicons_1$i = lexicons;
 	function isRecord$4(v) {
-	  return (0, util_1$e.isObj)(v) && (0, util_1$e.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.listblock#main' || v.$type === 'app.bsky.graph.listblock');
+	  return (0, util_1$j.isObj)(v) && (0, util_1$j.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.listblock#main' || v.$type === 'app.bsky.graph.listblock');
 	}
 	listblock.isRecord = isRecord$4;
 	function validateRecord$4(v) {
-	  return lexicons_1$d.lexicons.validate('app.bsky.graph.listblock#main', v);
+	  return lexicons_1$i.lexicons.validate('app.bsky.graph.listblock#main', v);
 	}
 	listblock.validateRecord = validateRecord$4;
 
@@ -28556,16 +26501,49 @@ if (cid) {
 	  value: true
 	});
 	listitem.validateRecord = listitem.isRecord = void 0;
-	const util_1$d = util$2;
-	const lexicons_1$c = lexicons;
+	const util_1$i = util$2;
+	const lexicons_1$h = lexicons;
 	function isRecord$3(v) {
-	  return (0, util_1$d.isObj)(v) && (0, util_1$d.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.listitem#main' || v.$type === 'app.bsky.graph.listitem');
+	  return (0, util_1$i.isObj)(v) && (0, util_1$i.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.listitem#main' || v.$type === 'app.bsky.graph.listitem');
 	}
 	listitem.isRecord = isRecord$3;
 	function validateRecord$3(v) {
-	  return lexicons_1$c.lexicons.validate('app.bsky.graph.listitem#main', v);
+	  return lexicons_1$h.lexicons.validate('app.bsky.graph.listitem#main', v);
 	}
 	listitem.validateRecord = validateRecord$3;
+
+	var muteActor = {};
+
+	Object.defineProperty(muteActor, "__esModule", {
+	  value: true
+	});
+	muteActor.toKnownErr = void 0;
+	function toKnownErr$F(e) {
+	  return e;
+	}
+	muteActor.toKnownErr = toKnownErr$F;
+
+	var muteActorList = {};
+
+	Object.defineProperty(muteActorList, "__esModule", {
+	  value: true
+	});
+	muteActorList.toKnownErr = void 0;
+	function toKnownErr$E(e) {
+	  return e;
+	}
+	muteActorList.toKnownErr = toKnownErr$E;
+
+	var muteThread = {};
+
+	Object.defineProperty(muteThread, "__esModule", {
+	  value: true
+	});
+	muteThread.toKnownErr = void 0;
+	function toKnownErr$D(e) {
+	  return e;
+	}
+	muteThread.toKnownErr = toKnownErr$D;
 
 	var starterpack = {};
 
@@ -28573,24 +26551,57 @@ if (cid) {
 	  value: true
 	});
 	starterpack.validateFeedItem = starterpack.isFeedItem = starterpack.validateRecord = starterpack.isRecord = void 0;
-	const util_1$c = util$2;
-	const lexicons_1$b = lexicons;
+	const util_1$h = util$2;
+	const lexicons_1$g = lexicons;
 	function isRecord$2(v) {
-	  return (0, util_1$c.isObj)(v) && (0, util_1$c.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.starterpack#main' || v.$type === 'app.bsky.graph.starterpack');
+	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && (v.$type === 'app.bsky.graph.starterpack#main' || v.$type === 'app.bsky.graph.starterpack');
 	}
 	starterpack.isRecord = isRecord$2;
 	function validateRecord$2(v) {
-	  return lexicons_1$b.lexicons.validate('app.bsky.graph.starterpack#main', v);
+	  return lexicons_1$g.lexicons.validate('app.bsky.graph.starterpack#main', v);
 	}
 	starterpack.validateRecord = validateRecord$2;
 	function isFeedItem(v) {
-	  return (0, util_1$c.isObj)(v) && (0, util_1$c.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.starterpack#feedItem';
+	  return (0, util_1$h.isObj)(v) && (0, util_1$h.hasProp)(v, '$type') && v.$type === 'app.bsky.graph.starterpack#feedItem';
 	}
 	starterpack.isFeedItem = isFeedItem;
 	function validateFeedItem(v) {
-	  return lexicons_1$b.lexicons.validate('app.bsky.graph.starterpack#feedItem', v);
+	  return lexicons_1$g.lexicons.validate('app.bsky.graph.starterpack#feedItem', v);
 	}
 	starterpack.validateFeedItem = validateFeedItem;
+
+	var unmuteActor = {};
+
+	Object.defineProperty(unmuteActor, "__esModule", {
+	  value: true
+	});
+	unmuteActor.toKnownErr = void 0;
+	function toKnownErr$C(e) {
+	  return e;
+	}
+	unmuteActor.toKnownErr = toKnownErr$C;
+
+	var unmuteActorList = {};
+
+	Object.defineProperty(unmuteActorList, "__esModule", {
+	  value: true
+	});
+	unmuteActorList.toKnownErr = void 0;
+	function toKnownErr$B(e) {
+	  return e;
+	}
+	unmuteActorList.toKnownErr = toKnownErr$B;
+
+	var unmuteThread = {};
+
+	Object.defineProperty(unmuteThread, "__esModule", {
+	  value: true
+	});
+	unmuteThread.toKnownErr = void 0;
+	function toKnownErr$A(e) {
+	  return e;
+	}
+	unmuteThread.toKnownErr = toKnownErr$A;
 
 	var defs$6 = {};
 
@@ -28598,40 +26609,51 @@ if (cid) {
 	  value: true
 	});
 	defs$6.validateLabelerPolicies = defs$6.isLabelerPolicies = defs$6.validateLabelerViewerState = defs$6.isLabelerViewerState = defs$6.validateLabelerViewDetailed = defs$6.isLabelerViewDetailed = defs$6.validateLabelerView = defs$6.isLabelerView = void 0;
-	const util_1$b = util$2;
-	const lexicons_1$a = lexicons;
+	const util_1$g = util$2;
+	const lexicons_1$f = lexicons;
 	function isLabelerView(v) {
-	  return (0, util_1$b.isObj)(v) && (0, util_1$b.hasProp)(v, '$type') && v.$type === 'app.bsky.labeler.defs#labelerView';
+	  return (0, util_1$g.isObj)(v) && (0, util_1$g.hasProp)(v, '$type') && v.$type === 'app.bsky.labeler.defs#labelerView';
 	}
 	defs$6.isLabelerView = isLabelerView;
 	function validateLabelerView(v) {
-	  return lexicons_1$a.lexicons.validate('app.bsky.labeler.defs#labelerView', v);
+	  return lexicons_1$f.lexicons.validate('app.bsky.labeler.defs#labelerView', v);
 	}
 	defs$6.validateLabelerView = validateLabelerView;
 	function isLabelerViewDetailed(v) {
-	  return (0, util_1$b.isObj)(v) && (0, util_1$b.hasProp)(v, '$type') && v.$type === 'app.bsky.labeler.defs#labelerViewDetailed';
+	  return (0, util_1$g.isObj)(v) && (0, util_1$g.hasProp)(v, '$type') && v.$type === 'app.bsky.labeler.defs#labelerViewDetailed';
 	}
 	defs$6.isLabelerViewDetailed = isLabelerViewDetailed;
 	function validateLabelerViewDetailed(v) {
-	  return lexicons_1$a.lexicons.validate('app.bsky.labeler.defs#labelerViewDetailed', v);
+	  return lexicons_1$f.lexicons.validate('app.bsky.labeler.defs#labelerViewDetailed', v);
 	}
 	defs$6.validateLabelerViewDetailed = validateLabelerViewDetailed;
 	function isLabelerViewerState(v) {
-	  return (0, util_1$b.isObj)(v) && (0, util_1$b.hasProp)(v, '$type') && v.$type === 'app.bsky.labeler.defs#labelerViewerState';
+	  return (0, util_1$g.isObj)(v) && (0, util_1$g.hasProp)(v, '$type') && v.$type === 'app.bsky.labeler.defs#labelerViewerState';
 	}
 	defs$6.isLabelerViewerState = isLabelerViewerState;
 	function validateLabelerViewerState(v) {
-	  return lexicons_1$a.lexicons.validate('app.bsky.labeler.defs#labelerViewerState', v);
+	  return lexicons_1$f.lexicons.validate('app.bsky.labeler.defs#labelerViewerState', v);
 	}
 	defs$6.validateLabelerViewerState = validateLabelerViewerState;
 	function isLabelerPolicies(v) {
-	  return (0, util_1$b.isObj)(v) && (0, util_1$b.hasProp)(v, '$type') && v.$type === 'app.bsky.labeler.defs#labelerPolicies';
+	  return (0, util_1$g.isObj)(v) && (0, util_1$g.hasProp)(v, '$type') && v.$type === 'app.bsky.labeler.defs#labelerPolicies';
 	}
 	defs$6.isLabelerPolicies = isLabelerPolicies;
 	function validateLabelerPolicies(v) {
-	  return lexicons_1$a.lexicons.validate('app.bsky.labeler.defs#labelerPolicies', v);
+	  return lexicons_1$f.lexicons.validate('app.bsky.labeler.defs#labelerPolicies', v);
 	}
 	defs$6.validateLabelerPolicies = validateLabelerPolicies;
+
+	var getServices = {};
+
+	Object.defineProperty(getServices, "__esModule", {
+	  value: true
+	});
+	getServices.toKnownErr = void 0;
+	function toKnownErr$z(e) {
+	  return e;
+	}
+	getServices.toKnownErr = toKnownErr$z;
 
 	var service = {};
 
@@ -28639,16 +26661,81 @@ if (cid) {
 	  value: true
 	});
 	service.validateRecord = service.isRecord = void 0;
-	const util_1$a = util$2;
-	const lexicons_1$9 = lexicons;
+	const util_1$f = util$2;
+	const lexicons_1$e = lexicons;
 	function isRecord$1(v) {
-	  return (0, util_1$a.isObj)(v) && (0, util_1$a.hasProp)(v, '$type') && (v.$type === 'app.bsky.labeler.service#main' || v.$type === 'app.bsky.labeler.service');
+	  return (0, util_1$f.isObj)(v) && (0, util_1$f.hasProp)(v, '$type') && (v.$type === 'app.bsky.labeler.service#main' || v.$type === 'app.bsky.labeler.service');
 	}
 	service.isRecord = isRecord$1;
 	function validateRecord$1(v) {
-	  return lexicons_1$9.lexicons.validate('app.bsky.labeler.service#main', v);
+	  return lexicons_1$e.lexicons.validate('app.bsky.labeler.service#main', v);
 	}
 	service.validateRecord = validateRecord$1;
+
+	var getUnreadCount = {};
+
+	Object.defineProperty(getUnreadCount, "__esModule", {
+	  value: true
+	});
+	getUnreadCount.toKnownErr = void 0;
+	function toKnownErr$y(e) {
+	  return e;
+	}
+	getUnreadCount.toKnownErr = toKnownErr$y;
+
+	var listNotifications = {};
+
+	Object.defineProperty(listNotifications, "__esModule", {
+	  value: true
+	});
+	listNotifications.validateNotification = listNotifications.isNotification = listNotifications.toKnownErr = void 0;
+	const util_1$e = util$2;
+	const lexicons_1$d = lexicons;
+	function toKnownErr$x(e) {
+	  return e;
+	}
+	listNotifications.toKnownErr = toKnownErr$x;
+	function isNotification(v) {
+	  return (0, util_1$e.isObj)(v) && (0, util_1$e.hasProp)(v, '$type') && v.$type === 'app.bsky.notification.listNotifications#notification';
+	}
+	listNotifications.isNotification = isNotification;
+	function validateNotification(v) {
+	  return lexicons_1$d.lexicons.validate('app.bsky.notification.listNotifications#notification', v);
+	}
+	listNotifications.validateNotification = validateNotification;
+
+	var putPreferences = {};
+
+	Object.defineProperty(putPreferences, "__esModule", {
+	  value: true
+	});
+	putPreferences.toKnownErr = void 0;
+	function toKnownErr$w(e) {
+	  return e;
+	}
+	putPreferences.toKnownErr = toKnownErr$w;
+
+	var registerPush = {};
+
+	Object.defineProperty(registerPush, "__esModule", {
+	  value: true
+	});
+	registerPush.toKnownErr = void 0;
+	function toKnownErr$v(e) {
+	  return e;
+	}
+	registerPush.toKnownErr = toKnownErr$v;
+
+	var updateSeen = {};
+
+	Object.defineProperty(updateSeen, "__esModule", {
+	  value: true
+	});
+	updateSeen.toKnownErr = void 0;
+	function toKnownErr$u(e) {
+	  return e;
+	}
+	updateSeen.toKnownErr = toKnownErr$u;
 
 	var facet = {};
 
@@ -28656,46 +26743,46 @@ if (cid) {
 	  value: true
 	});
 	facet.validateByteSlice = facet.isByteSlice = facet.validateTag = facet.isTag = facet.validateLink = facet.isLink = facet.validateMention = facet.isMention = facet.validateMain = facet.isMain = void 0;
-	const util_1$9 = util$2;
-	const lexicons_1$8 = lexicons;
+	const util_1$d = util$2;
+	const lexicons_1$c = lexicons;
 	function isMain(v) {
-	  return (0, util_1$9.isObj)(v) && (0, util_1$9.hasProp)(v, '$type') && (v.$type === 'app.bsky.richtext.facet#main' || v.$type === 'app.bsky.richtext.facet');
+	  return (0, util_1$d.isObj)(v) && (0, util_1$d.hasProp)(v, '$type') && (v.$type === 'app.bsky.richtext.facet#main' || v.$type === 'app.bsky.richtext.facet');
 	}
 	facet.isMain = isMain;
 	function validateMain(v) {
-	  return lexicons_1$8.lexicons.validate('app.bsky.richtext.facet#main', v);
+	  return lexicons_1$c.lexicons.validate('app.bsky.richtext.facet#main', v);
 	}
 	facet.validateMain = validateMain;
 	function isMention(v) {
-	  return (0, util_1$9.isObj)(v) && (0, util_1$9.hasProp)(v, '$type') && v.$type === 'app.bsky.richtext.facet#mention';
+	  return (0, util_1$d.isObj)(v) && (0, util_1$d.hasProp)(v, '$type') && v.$type === 'app.bsky.richtext.facet#mention';
 	}
 	facet.isMention = isMention;
 	function validateMention(v) {
-	  return lexicons_1$8.lexicons.validate('app.bsky.richtext.facet#mention', v);
+	  return lexicons_1$c.lexicons.validate('app.bsky.richtext.facet#mention', v);
 	}
 	facet.validateMention = validateMention;
 	function isLink(v) {
-	  return (0, util_1$9.isObj)(v) && (0, util_1$9.hasProp)(v, '$type') && v.$type === 'app.bsky.richtext.facet#link';
+	  return (0, util_1$d.isObj)(v) && (0, util_1$d.hasProp)(v, '$type') && v.$type === 'app.bsky.richtext.facet#link';
 	}
 	facet.isLink = isLink;
 	function validateLink(v) {
-	  return lexicons_1$8.lexicons.validate('app.bsky.richtext.facet#link', v);
+	  return lexicons_1$c.lexicons.validate('app.bsky.richtext.facet#link', v);
 	}
 	facet.validateLink = validateLink;
 	function isTag(v) {
-	  return (0, util_1$9.isObj)(v) && (0, util_1$9.hasProp)(v, '$type') && v.$type === 'app.bsky.richtext.facet#tag';
+	  return (0, util_1$d.isObj)(v) && (0, util_1$d.hasProp)(v, '$type') && v.$type === 'app.bsky.richtext.facet#tag';
 	}
 	facet.isTag = isTag;
 	function validateTag(v) {
-	  return lexicons_1$8.lexicons.validate('app.bsky.richtext.facet#tag', v);
+	  return lexicons_1$c.lexicons.validate('app.bsky.richtext.facet#tag', v);
 	}
 	facet.validateTag = validateTag;
 	function isByteSlice(v) {
-	  return (0, util_1$9.isObj)(v) && (0, util_1$9.hasProp)(v, '$type') && v.$type === 'app.bsky.richtext.facet#byteSlice';
+	  return (0, util_1$d.isObj)(v) && (0, util_1$d.hasProp)(v, '$type') && v.$type === 'app.bsky.richtext.facet#byteSlice';
 	}
 	facet.isByteSlice = isByteSlice;
 	function validateByteSlice(v) {
-	  return lexicons_1$8.lexicons.validate('app.bsky.richtext.facet#byteSlice', v);
+	  return lexicons_1$c.lexicons.validate('app.bsky.richtext.facet#byteSlice', v);
 	}
 	facet.validateByteSlice = validateByteSlice;
 
@@ -28705,24 +26792,67 @@ if (cid) {
 	  value: true
 	});
 	defs$5.validateSkeletonSearchActor = defs$5.isSkeletonSearchActor = defs$5.validateSkeletonSearchPost = defs$5.isSkeletonSearchPost = void 0;
-	const util_1$8 = util$2;
-	const lexicons_1$7 = lexicons;
+	const util_1$c = util$2;
+	const lexicons_1$b = lexicons;
 	function isSkeletonSearchPost(v) {
-	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && v.$type === 'app.bsky.unspecced.defs#skeletonSearchPost';
+	  return (0, util_1$c.isObj)(v) && (0, util_1$c.hasProp)(v, '$type') && v.$type === 'app.bsky.unspecced.defs#skeletonSearchPost';
 	}
 	defs$5.isSkeletonSearchPost = isSkeletonSearchPost;
 	function validateSkeletonSearchPost(v) {
-	  return lexicons_1$7.lexicons.validate('app.bsky.unspecced.defs#skeletonSearchPost', v);
+	  return lexicons_1$b.lexicons.validate('app.bsky.unspecced.defs#skeletonSearchPost', v);
 	}
 	defs$5.validateSkeletonSearchPost = validateSkeletonSearchPost;
 	function isSkeletonSearchActor(v) {
-	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && v.$type === 'app.bsky.unspecced.defs#skeletonSearchActor';
+	  return (0, util_1$c.isObj)(v) && (0, util_1$c.hasProp)(v, '$type') && v.$type === 'app.bsky.unspecced.defs#skeletonSearchActor';
 	}
 	defs$5.isSkeletonSearchActor = isSkeletonSearchActor;
 	function validateSkeletonSearchActor(v) {
-	  return lexicons_1$7.lexicons.validate('app.bsky.unspecced.defs#skeletonSearchActor', v);
+	  return lexicons_1$b.lexicons.validate('app.bsky.unspecced.defs#skeletonSearchActor', v);
 	}
 	defs$5.validateSkeletonSearchActor = validateSkeletonSearchActor;
+
+	var getPopularFeedGenerators = {};
+
+	Object.defineProperty(getPopularFeedGenerators, "__esModule", {
+	  value: true
+	});
+	getPopularFeedGenerators.toKnownErr = void 0;
+	function toKnownErr$t(e) {
+	  return e;
+	}
+	getPopularFeedGenerators.toKnownErr = toKnownErr$t;
+
+	var getSuggestionsSkeleton = {};
+
+	Object.defineProperty(getSuggestionsSkeleton, "__esModule", {
+	  value: true
+	});
+	getSuggestionsSkeleton.toKnownErr = void 0;
+	function toKnownErr$s(e) {
+	  return e;
+	}
+	getSuggestionsSkeleton.toKnownErr = toKnownErr$s;
+
+	var getTaggedSuggestions = {};
+
+	Object.defineProperty(getTaggedSuggestions, "__esModule", {
+	  value: true
+	});
+	getTaggedSuggestions.validateSuggestion = getTaggedSuggestions.isSuggestion = getTaggedSuggestions.toKnownErr = void 0;
+	const util_1$b = util$2;
+	const lexicons_1$a = lexicons;
+	function toKnownErr$r(e) {
+	  return e;
+	}
+	getTaggedSuggestions.toKnownErr = toKnownErr$r;
+	function isSuggestion(v) {
+	  return (0, util_1$b.isObj)(v) && (0, util_1$b.hasProp)(v, '$type') && v.$type === 'app.bsky.unspecced.getTaggedSuggestions#suggestion';
+	}
+	getTaggedSuggestions.isSuggestion = isSuggestion;
+	function validateSuggestion(v) {
+	  return lexicons_1$a.lexicons.validate('app.bsky.unspecced.getTaggedSuggestions#suggestion', v);
+	}
+	getTaggedSuggestions.validateSuggestion = validateSuggestion;
 
 	var declaration = {};
 
@@ -28730,14 +26860,14 @@ if (cid) {
 	  value: true
 	});
 	declaration.validateRecord = declaration.isRecord = void 0;
-	const util_1$7 = util$2;
-	const lexicons_1$6 = lexicons;
+	const util_1$a = util$2;
+	const lexicons_1$9 = lexicons;
 	function isRecord(v) {
-	  return (0, util_1$7.isObj)(v) && (0, util_1$7.hasProp)(v, '$type') && (v.$type === 'chat.bsky.actor.declaration#main' || v.$type === 'chat.bsky.actor.declaration');
+	  return (0, util_1$a.isObj)(v) && (0, util_1$a.hasProp)(v, '$type') && (v.$type === 'chat.bsky.actor.declaration#main' || v.$type === 'chat.bsky.actor.declaration');
 	}
 	declaration.isRecord = isRecord;
 	function validateRecord(v) {
-	  return lexicons_1$6.lexicons.validate('chat.bsky.actor.declaration#main', v);
+	  return lexicons_1$9.lexicons.validate('chat.bsky.actor.declaration#main', v);
 	}
 	declaration.validateRecord = validateRecord;
 
@@ -28747,16 +26877,38 @@ if (cid) {
 	  value: true
 	});
 	defs$4.validateProfileViewBasic = defs$4.isProfileViewBasic = void 0;
-	const util_1$6 = util$2;
-	const lexicons_1$5 = lexicons;
+	const util_1$9 = util$2;
+	const lexicons_1$8 = lexicons;
 	function isProfileViewBasic(v) {
-	  return (0, util_1$6.isObj)(v) && (0, util_1$6.hasProp)(v, '$type') && v.$type === 'chat.bsky.actor.defs#profileViewBasic';
+	  return (0, util_1$9.isObj)(v) && (0, util_1$9.hasProp)(v, '$type') && v.$type === 'chat.bsky.actor.defs#profileViewBasic';
 	}
 	defs$4.isProfileViewBasic = isProfileViewBasic;
 	function validateProfileViewBasic(v) {
-	  return lexicons_1$5.lexicons.validate('chat.bsky.actor.defs#profileViewBasic', v);
+	  return lexicons_1$8.lexicons.validate('chat.bsky.actor.defs#profileViewBasic', v);
 	}
 	defs$4.validateProfileViewBasic = validateProfileViewBasic;
+
+	var deleteAccount = {};
+
+	Object.defineProperty(deleteAccount, "__esModule", {
+	  value: true
+	});
+	deleteAccount.toKnownErr = void 0;
+	function toKnownErr$q(e) {
+	  return e;
+	}
+	deleteAccount.toKnownErr = toKnownErr$q;
+
+	var exportAccountData = {};
+
+	Object.defineProperty(exportAccountData, "__esModule", {
+	  value: true
+	});
+	exportAccountData.toKnownErr = void 0;
+	function toKnownErr$p(e) {
+	  return e;
+	}
+	exportAccountData.toKnownErr = toKnownErr$p;
 
 	var defs$3 = {};
 
@@ -28764,88 +26916,284 @@ if (cid) {
 	  value: true
 	});
 	defs$3.validateLogDeleteMessage = defs$3.isLogDeleteMessage = defs$3.validateLogCreateMessage = defs$3.isLogCreateMessage = defs$3.validateLogLeaveConvo = defs$3.isLogLeaveConvo = defs$3.validateLogBeginConvo = defs$3.isLogBeginConvo = defs$3.validateConvoView = defs$3.isConvoView = defs$3.validateMessageViewSender = defs$3.isMessageViewSender = defs$3.validateDeletedMessageView = defs$3.isDeletedMessageView = defs$3.validateMessageView = defs$3.isMessageView = defs$3.validateMessageInput = defs$3.isMessageInput = defs$3.validateMessageRef = defs$3.isMessageRef = void 0;
-	const util_1$5 = util$2;
-	const lexicons_1$4 = lexicons;
+	const util_1$8 = util$2;
+	const lexicons_1$7 = lexicons;
 	function isMessageRef(v) {
-	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#messageRef';
+	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#messageRef';
 	}
 	defs$3.isMessageRef = isMessageRef;
 	function validateMessageRef(v) {
-	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#messageRef', v);
+	  return lexicons_1$7.lexicons.validate('chat.bsky.convo.defs#messageRef', v);
 	}
 	defs$3.validateMessageRef = validateMessageRef;
 	function isMessageInput(v) {
-	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#messageInput';
+	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#messageInput';
 	}
 	defs$3.isMessageInput = isMessageInput;
 	function validateMessageInput(v) {
-	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#messageInput', v);
+	  return lexicons_1$7.lexicons.validate('chat.bsky.convo.defs#messageInput', v);
 	}
 	defs$3.validateMessageInput = validateMessageInput;
 	function isMessageView(v) {
-	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#messageView';
+	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#messageView';
 	}
 	defs$3.isMessageView = isMessageView;
 	function validateMessageView(v) {
-	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#messageView', v);
+	  return lexicons_1$7.lexicons.validate('chat.bsky.convo.defs#messageView', v);
 	}
 	defs$3.validateMessageView = validateMessageView;
 	function isDeletedMessageView(v) {
-	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#deletedMessageView';
+	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#deletedMessageView';
 	}
 	defs$3.isDeletedMessageView = isDeletedMessageView;
 	function validateDeletedMessageView(v) {
-	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#deletedMessageView', v);
+	  return lexicons_1$7.lexicons.validate('chat.bsky.convo.defs#deletedMessageView', v);
 	}
 	defs$3.validateDeletedMessageView = validateDeletedMessageView;
 	function isMessageViewSender(v) {
-	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#messageViewSender';
+	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#messageViewSender';
 	}
 	defs$3.isMessageViewSender = isMessageViewSender;
 	function validateMessageViewSender(v) {
-	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#messageViewSender', v);
+	  return lexicons_1$7.lexicons.validate('chat.bsky.convo.defs#messageViewSender', v);
 	}
 	defs$3.validateMessageViewSender = validateMessageViewSender;
 	function isConvoView(v) {
-	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#convoView';
+	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#convoView';
 	}
 	defs$3.isConvoView = isConvoView;
 	function validateConvoView(v) {
-	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#convoView', v);
+	  return lexicons_1$7.lexicons.validate('chat.bsky.convo.defs#convoView', v);
 	}
 	defs$3.validateConvoView = validateConvoView;
 	function isLogBeginConvo(v) {
-	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#logBeginConvo';
+	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#logBeginConvo';
 	}
 	defs$3.isLogBeginConvo = isLogBeginConvo;
 	function validateLogBeginConvo(v) {
-	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#logBeginConvo', v);
+	  return lexicons_1$7.lexicons.validate('chat.bsky.convo.defs#logBeginConvo', v);
 	}
 	defs$3.validateLogBeginConvo = validateLogBeginConvo;
 	function isLogLeaveConvo(v) {
-	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#logLeaveConvo';
+	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#logLeaveConvo';
 	}
 	defs$3.isLogLeaveConvo = isLogLeaveConvo;
 	function validateLogLeaveConvo(v) {
-	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#logLeaveConvo', v);
+	  return lexicons_1$7.lexicons.validate('chat.bsky.convo.defs#logLeaveConvo', v);
 	}
 	defs$3.validateLogLeaveConvo = validateLogLeaveConvo;
 	function isLogCreateMessage(v) {
-	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#logCreateMessage';
+	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#logCreateMessage';
 	}
 	defs$3.isLogCreateMessage = isLogCreateMessage;
 	function validateLogCreateMessage(v) {
-	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#logCreateMessage', v);
+	  return lexicons_1$7.lexicons.validate('chat.bsky.convo.defs#logCreateMessage', v);
 	}
 	defs$3.validateLogCreateMessage = validateLogCreateMessage;
 	function isLogDeleteMessage(v) {
-	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#logDeleteMessage';
+	  return (0, util_1$8.isObj)(v) && (0, util_1$8.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.defs#logDeleteMessage';
 	}
 	defs$3.isLogDeleteMessage = isLogDeleteMessage;
 	function validateLogDeleteMessage(v) {
-	  return lexicons_1$4.lexicons.validate('chat.bsky.convo.defs#logDeleteMessage', v);
+	  return lexicons_1$7.lexicons.validate('chat.bsky.convo.defs#logDeleteMessage', v);
 	}
 	defs$3.validateLogDeleteMessage = validateLogDeleteMessage;
+
+	var deleteMessageForSelf = {};
+
+	Object.defineProperty(deleteMessageForSelf, "__esModule", {
+	  value: true
+	});
+	deleteMessageForSelf.toKnownErr = void 0;
+	function toKnownErr$o(e) {
+	  return e;
+	}
+	deleteMessageForSelf.toKnownErr = toKnownErr$o;
+
+	var getConvo = {};
+
+	Object.defineProperty(getConvo, "__esModule", {
+	  value: true
+	});
+	getConvo.toKnownErr = void 0;
+	function toKnownErr$n(e) {
+	  return e;
+	}
+	getConvo.toKnownErr = toKnownErr$n;
+
+	var getConvoForMembers = {};
+
+	Object.defineProperty(getConvoForMembers, "__esModule", {
+	  value: true
+	});
+	getConvoForMembers.toKnownErr = void 0;
+	function toKnownErr$m(e) {
+	  return e;
+	}
+	getConvoForMembers.toKnownErr = toKnownErr$m;
+
+	var getLog = {};
+
+	Object.defineProperty(getLog, "__esModule", {
+	  value: true
+	});
+	getLog.toKnownErr = void 0;
+	function toKnownErr$l(e) {
+	  return e;
+	}
+	getLog.toKnownErr = toKnownErr$l;
+
+	var getMessages = {};
+
+	Object.defineProperty(getMessages, "__esModule", {
+	  value: true
+	});
+	getMessages.toKnownErr = void 0;
+	function toKnownErr$k(e) {
+	  return e;
+	}
+	getMessages.toKnownErr = toKnownErr$k;
+
+	var leaveConvo = {};
+
+	Object.defineProperty(leaveConvo, "__esModule", {
+	  value: true
+	});
+	leaveConvo.toKnownErr = void 0;
+	function toKnownErr$j(e) {
+	  return e;
+	}
+	leaveConvo.toKnownErr = toKnownErr$j;
+
+	var listConvos = {};
+
+	Object.defineProperty(listConvos, "__esModule", {
+	  value: true
+	});
+	listConvos.toKnownErr = void 0;
+	function toKnownErr$i(e) {
+	  return e;
+	}
+	listConvos.toKnownErr = toKnownErr$i;
+
+	var muteConvo = {};
+
+	Object.defineProperty(muteConvo, "__esModule", {
+	  value: true
+	});
+	muteConvo.toKnownErr = void 0;
+	function toKnownErr$h(e) {
+	  return e;
+	}
+	muteConvo.toKnownErr = toKnownErr$h;
+
+	var sendMessage = {};
+
+	Object.defineProperty(sendMessage, "__esModule", {
+	  value: true
+	});
+	sendMessage.toKnownErr = void 0;
+	function toKnownErr$g(e) {
+	  return e;
+	}
+	sendMessage.toKnownErr = toKnownErr$g;
+
+	var sendMessageBatch = {};
+
+	Object.defineProperty(sendMessageBatch, "__esModule", {
+	  value: true
+	});
+	sendMessageBatch.validateBatchItem = sendMessageBatch.isBatchItem = sendMessageBatch.toKnownErr = void 0;
+	const util_1$7 = util$2;
+	const lexicons_1$6 = lexicons;
+	function toKnownErr$f(e) {
+	  return e;
+	}
+	sendMessageBatch.toKnownErr = toKnownErr$f;
+	function isBatchItem(v) {
+	  return (0, util_1$7.isObj)(v) && (0, util_1$7.hasProp)(v, '$type') && v.$type === 'chat.bsky.convo.sendMessageBatch#batchItem';
+	}
+	sendMessageBatch.isBatchItem = isBatchItem;
+	function validateBatchItem(v) {
+	  return lexicons_1$6.lexicons.validate('chat.bsky.convo.sendMessageBatch#batchItem', v);
+	}
+	sendMessageBatch.validateBatchItem = validateBatchItem;
+
+	var unmuteConvo = {};
+
+	Object.defineProperty(unmuteConvo, "__esModule", {
+	  value: true
+	});
+	unmuteConvo.toKnownErr = void 0;
+	function toKnownErr$e(e) {
+	  return e;
+	}
+	unmuteConvo.toKnownErr = toKnownErr$e;
+
+	var updateRead = {};
+
+	Object.defineProperty(updateRead, "__esModule", {
+	  value: true
+	});
+	updateRead.toKnownErr = void 0;
+	function toKnownErr$d(e) {
+	  return e;
+	}
+	updateRead.toKnownErr = toKnownErr$d;
+
+	var getActorMetadata = {};
+
+	Object.defineProperty(getActorMetadata, "__esModule", {
+	  value: true
+	});
+	getActorMetadata.validateMetadata = getActorMetadata.isMetadata = getActorMetadata.toKnownErr = void 0;
+	const util_1$6 = util$2;
+	const lexicons_1$5 = lexicons;
+	function toKnownErr$c(e) {
+	  return e;
+	}
+	getActorMetadata.toKnownErr = toKnownErr$c;
+	function isMetadata(v) {
+	  return (0, util_1$6.isObj)(v) && (0, util_1$6.hasProp)(v, '$type') && v.$type === 'chat.bsky.moderation.getActorMetadata#metadata';
+	}
+	getActorMetadata.isMetadata = isMetadata;
+	function validateMetadata(v) {
+	  return lexicons_1$5.lexicons.validate('chat.bsky.moderation.getActorMetadata#metadata', v);
+	}
+	getActorMetadata.validateMetadata = validateMetadata;
+
+	var getMessageContext = {};
+
+	Object.defineProperty(getMessageContext, "__esModule", {
+	  value: true
+	});
+	getMessageContext.toKnownErr = void 0;
+	function toKnownErr$b(e) {
+	  return e;
+	}
+	getMessageContext.toKnownErr = toKnownErr$b;
+
+	var updateActorAccess = {};
+
+	Object.defineProperty(updateActorAccess, "__esModule", {
+	  value: true
+	});
+	updateActorAccess.toKnownErr = void 0;
+	function toKnownErr$a(e) {
+	  return e;
+	}
+	updateActorAccess.toKnownErr = toKnownErr$a;
+
+	var createTemplate = {};
+
+	Object.defineProperty(createTemplate, "__esModule", {
+	  value: true
+	});
+	createTemplate.toKnownErr = void 0;
+	function toKnownErr$9(e) {
+	  return e;
+	}
+	createTemplate.toKnownErr = toKnownErr$9;
 
 	var defs$2 = {};
 
@@ -28853,16 +27201,49 @@ if (cid) {
 	  value: true
 	});
 	defs$2.validateTemplateView = defs$2.isTemplateView = void 0;
-	const util_1$4 = util$2;
-	const lexicons_1$3 = lexicons;
+	const util_1$5 = util$2;
+	const lexicons_1$4 = lexicons;
 	function isTemplateView(v) {
-	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.communication.defs#templateView';
+	  return (0, util_1$5.isObj)(v) && (0, util_1$5.hasProp)(v, '$type') && v.$type === 'tools.ozone.communication.defs#templateView';
 	}
 	defs$2.isTemplateView = isTemplateView;
 	function validateTemplateView(v) {
-	  return lexicons_1$3.lexicons.validate('tools.ozone.communication.defs#templateView', v);
+	  return lexicons_1$4.lexicons.validate('tools.ozone.communication.defs#templateView', v);
 	}
 	defs$2.validateTemplateView = validateTemplateView;
+
+	var deleteTemplate = {};
+
+	Object.defineProperty(deleteTemplate, "__esModule", {
+	  value: true
+	});
+	deleteTemplate.toKnownErr = void 0;
+	function toKnownErr$8(e) {
+	  return e;
+	}
+	deleteTemplate.toKnownErr = toKnownErr$8;
+
+	var listTemplates = {};
+
+	Object.defineProperty(listTemplates, "__esModule", {
+	  value: true
+	});
+	listTemplates.toKnownErr = void 0;
+	function toKnownErr$7(e) {
+	  return e;
+	}
+	listTemplates.toKnownErr = toKnownErr$7;
+
+	var updateTemplate = {};
+
+	Object.defineProperty(updateTemplate, "__esModule", {
+	  value: true
+	});
+	updateTemplate.toKnownErr = void 0;
+	function toKnownErr$6(e) {
+	  return e;
+	}
+	updateTemplate.toKnownErr = toKnownErr$6;
 
 	var defs$1 = {};
 
@@ -28871,30 +27252,30 @@ if (cid) {
 	});
 	defs$1.validateRecordViewDetail = defs$1.isRecordViewDetail = defs$1.validateRecordView = defs$1.isRecordView = defs$1.validateRepoViewNotFound = defs$1.isRepoViewNotFound = defs$1.validateRepoViewDetail = defs$1.isRepoViewDetail = defs$1.validateRepoView = defs$1.isRepoView = defs$1.validateModEventTag = defs$1.isModEventTag = defs$1.validateModEventDivert = defs$1.isModEventDivert = defs$1.validateModEventEmail = defs$1.isModEventEmail = defs$1.validateModEventUnmuteReporter = defs$1.isModEventUnmuteReporter = defs$1.validateModEventMuteReporter = defs$1.isModEventMuteReporter = defs$1.validateModEventUnmute = defs$1.isModEventUnmute = defs$1.validateModEventMute = defs$1.isModEventMute = defs$1.validateModEventEscalate = defs$1.isModEventEscalate = defs$1.validateModEventAcknowledge = defs$1.isModEventAcknowledge = defs$1.validateModEventLabel = defs$1.isModEventLabel = defs$1.validateModEventReport = defs$1.isModEventReport = defs$1.validateModEventComment = defs$1.isModEventComment = defs$1.validateModEventResolveAppeal = defs$1.isModEventResolveAppeal = defs$1.validateModEventReverseTakedown = defs$1.isModEventReverseTakedown = defs$1.validateModEventTakedown = defs$1.isModEventTakedown = defs$1.REVIEWNONE = defs$1.REVIEWCLOSED = defs$1.REVIEWESCALATED = defs$1.REVIEWOPEN = defs$1.validateSubjectStatusView = defs$1.isSubjectStatusView = defs$1.validateModEventViewDetail = defs$1.isModEventViewDetail = defs$1.validateModEventView = defs$1.isModEventView = void 0;
 	defs$1.validateVideoDetails = defs$1.isVideoDetails = defs$1.validateImageDetails = defs$1.isImageDetails = defs$1.validateBlobView = defs$1.isBlobView = defs$1.validateModerationDetail = defs$1.isModerationDetail = defs$1.validateModeration = defs$1.isModeration = defs$1.validateRecordViewNotFound = defs$1.isRecordViewNotFound = void 0;
-	const util_1$3 = util$2;
-	const lexicons_1$2 = lexicons;
+	const util_1$4 = util$2;
+	const lexicons_1$3 = lexicons;
 	function isModEventView(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventView';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventView';
 	}
 	defs$1.isModEventView = isModEventView;
 	function validateModEventView(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventView', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#modEventView', v);
 	}
 	defs$1.validateModEventView = validateModEventView;
 	function isModEventViewDetail(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventViewDetail';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventViewDetail';
 	}
 	defs$1.isModEventViewDetail = isModEventViewDetail;
 	function validateModEventViewDetail(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventViewDetail', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#modEventViewDetail', v);
 	}
 	defs$1.validateModEventViewDetail = validateModEventViewDetail;
 	function isSubjectStatusView(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#subjectStatusView';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#subjectStatusView';
 	}
 	defs$1.isSubjectStatusView = isSubjectStatusView;
 	function validateSubjectStatusView(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#subjectStatusView', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#subjectStatusView', v);
 	}
 	defs$1.validateSubjectStatusView = validateSubjectStatusView;
 	/** Moderator review status of a subject: Open. Indicates that the subject needs to be reviewed by a moderator */
@@ -28906,213 +27287,286 @@ if (cid) {
 	/** Moderator review status of a subject: Unnecessary. Indicates that the subject does not need a review at the moment but there is probably some moderation related metadata available for it */
 	defs$1.REVIEWNONE = 'tools.ozone.moderation.defs#reviewNone';
 	function isModEventTakedown(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventTakedown';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventTakedown';
 	}
 	defs$1.isModEventTakedown = isModEventTakedown;
 	function validateModEventTakedown(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventTakedown', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#modEventTakedown', v);
 	}
 	defs$1.validateModEventTakedown = validateModEventTakedown;
 	function isModEventReverseTakedown(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventReverseTakedown';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventReverseTakedown';
 	}
 	defs$1.isModEventReverseTakedown = isModEventReverseTakedown;
 	function validateModEventReverseTakedown(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventReverseTakedown', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#modEventReverseTakedown', v);
 	}
 	defs$1.validateModEventReverseTakedown = validateModEventReverseTakedown;
 	function isModEventResolveAppeal(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventResolveAppeal';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventResolveAppeal';
 	}
 	defs$1.isModEventResolveAppeal = isModEventResolveAppeal;
 	function validateModEventResolveAppeal(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventResolveAppeal', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#modEventResolveAppeal', v);
 	}
 	defs$1.validateModEventResolveAppeal = validateModEventResolveAppeal;
 	function isModEventComment(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventComment';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventComment';
 	}
 	defs$1.isModEventComment = isModEventComment;
 	function validateModEventComment(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventComment', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#modEventComment', v);
 	}
 	defs$1.validateModEventComment = validateModEventComment;
 	function isModEventReport(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventReport';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventReport';
 	}
 	defs$1.isModEventReport = isModEventReport;
 	function validateModEventReport(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventReport', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#modEventReport', v);
 	}
 	defs$1.validateModEventReport = validateModEventReport;
 	function isModEventLabel(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventLabel';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventLabel';
 	}
 	defs$1.isModEventLabel = isModEventLabel;
 	function validateModEventLabel(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventLabel', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#modEventLabel', v);
 	}
 	defs$1.validateModEventLabel = validateModEventLabel;
 	function isModEventAcknowledge(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventAcknowledge';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventAcknowledge';
 	}
 	defs$1.isModEventAcknowledge = isModEventAcknowledge;
 	function validateModEventAcknowledge(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventAcknowledge', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#modEventAcknowledge', v);
 	}
 	defs$1.validateModEventAcknowledge = validateModEventAcknowledge;
 	function isModEventEscalate(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventEscalate';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventEscalate';
 	}
 	defs$1.isModEventEscalate = isModEventEscalate;
 	function validateModEventEscalate(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventEscalate', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#modEventEscalate', v);
 	}
 	defs$1.validateModEventEscalate = validateModEventEscalate;
 	function isModEventMute(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventMute';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventMute';
 	}
 	defs$1.isModEventMute = isModEventMute;
 	function validateModEventMute(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventMute', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#modEventMute', v);
 	}
 	defs$1.validateModEventMute = validateModEventMute;
 	function isModEventUnmute(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventUnmute';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventUnmute';
 	}
 	defs$1.isModEventUnmute = isModEventUnmute;
 	function validateModEventUnmute(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventUnmute', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#modEventUnmute', v);
 	}
 	defs$1.validateModEventUnmute = validateModEventUnmute;
 	function isModEventMuteReporter(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventMuteReporter';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventMuteReporter';
 	}
 	defs$1.isModEventMuteReporter = isModEventMuteReporter;
 	function validateModEventMuteReporter(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventMuteReporter', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#modEventMuteReporter', v);
 	}
 	defs$1.validateModEventMuteReporter = validateModEventMuteReporter;
 	function isModEventUnmuteReporter(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventUnmuteReporter';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventUnmuteReporter';
 	}
 	defs$1.isModEventUnmuteReporter = isModEventUnmuteReporter;
 	function validateModEventUnmuteReporter(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventUnmuteReporter', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#modEventUnmuteReporter', v);
 	}
 	defs$1.validateModEventUnmuteReporter = validateModEventUnmuteReporter;
 	function isModEventEmail(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventEmail';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventEmail';
 	}
 	defs$1.isModEventEmail = isModEventEmail;
 	function validateModEventEmail(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventEmail', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#modEventEmail', v);
 	}
 	defs$1.validateModEventEmail = validateModEventEmail;
 	function isModEventDivert(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventDivert';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventDivert';
 	}
 	defs$1.isModEventDivert = isModEventDivert;
 	function validateModEventDivert(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventDivert', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#modEventDivert', v);
 	}
 	defs$1.validateModEventDivert = validateModEventDivert;
 	function isModEventTag(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventTag';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#modEventTag';
 	}
 	defs$1.isModEventTag = isModEventTag;
 	function validateModEventTag(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#modEventTag', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#modEventTag', v);
 	}
 	defs$1.validateModEventTag = validateModEventTag;
 	function isRepoView(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#repoView';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#repoView';
 	}
 	defs$1.isRepoView = isRepoView;
 	function validateRepoView(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#repoView', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#repoView', v);
 	}
 	defs$1.validateRepoView = validateRepoView;
 	function isRepoViewDetail(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#repoViewDetail';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#repoViewDetail';
 	}
 	defs$1.isRepoViewDetail = isRepoViewDetail;
 	function validateRepoViewDetail(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#repoViewDetail', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#repoViewDetail', v);
 	}
 	defs$1.validateRepoViewDetail = validateRepoViewDetail;
 	function isRepoViewNotFound(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#repoViewNotFound';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#repoViewNotFound';
 	}
 	defs$1.isRepoViewNotFound = isRepoViewNotFound;
 	function validateRepoViewNotFound(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#repoViewNotFound', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#repoViewNotFound', v);
 	}
 	defs$1.validateRepoViewNotFound = validateRepoViewNotFound;
 	function isRecordView(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#recordView';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#recordView';
 	}
 	defs$1.isRecordView = isRecordView;
 	function validateRecordView(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#recordView', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#recordView', v);
 	}
 	defs$1.validateRecordView = validateRecordView;
 	function isRecordViewDetail(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#recordViewDetail';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#recordViewDetail';
 	}
 	defs$1.isRecordViewDetail = isRecordViewDetail;
 	function validateRecordViewDetail(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#recordViewDetail', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#recordViewDetail', v);
 	}
 	defs$1.validateRecordViewDetail = validateRecordViewDetail;
 	function isRecordViewNotFound(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#recordViewNotFound';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#recordViewNotFound';
 	}
 	defs$1.isRecordViewNotFound = isRecordViewNotFound;
 	function validateRecordViewNotFound(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#recordViewNotFound', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#recordViewNotFound', v);
 	}
 	defs$1.validateRecordViewNotFound = validateRecordViewNotFound;
 	function isModeration(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#moderation';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#moderation';
 	}
 	defs$1.isModeration = isModeration;
 	function validateModeration(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#moderation', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#moderation', v);
 	}
 	defs$1.validateModeration = validateModeration;
 	function isModerationDetail(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#moderationDetail';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#moderationDetail';
 	}
 	defs$1.isModerationDetail = isModerationDetail;
 	function validateModerationDetail(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#moderationDetail', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#moderationDetail', v);
 	}
 	defs$1.validateModerationDetail = validateModerationDetail;
 	function isBlobView(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#blobView';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#blobView';
 	}
 	defs$1.isBlobView = isBlobView;
 	function validateBlobView(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#blobView', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#blobView', v);
 	}
 	defs$1.validateBlobView = validateBlobView;
 	function isImageDetails(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#imageDetails';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#imageDetails';
 	}
 	defs$1.isImageDetails = isImageDetails;
 	function validateImageDetails(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#imageDetails', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#imageDetails', v);
 	}
 	defs$1.validateImageDetails = validateImageDetails;
 	function isVideoDetails(v) {
-	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#videoDetails';
+	  return (0, util_1$4.isObj)(v) && (0, util_1$4.hasProp)(v, '$type') && v.$type === 'tools.ozone.moderation.defs#videoDetails';
 	}
 	defs$1.isVideoDetails = isVideoDetails;
 	function validateVideoDetails(v) {
-	  return lexicons_1$2.lexicons.validate('tools.ozone.moderation.defs#videoDetails', v);
+	  return lexicons_1$3.lexicons.validate('tools.ozone.moderation.defs#videoDetails', v);
 	}
 	defs$1.validateVideoDetails = validateVideoDetails;
+
+	var getEvent = {};
+
+	Object.defineProperty(getEvent, "__esModule", {
+	  value: true
+	});
+	getEvent.toKnownErr = void 0;
+	function toKnownErr$5(e) {
+	  return e;
+	}
+	getEvent.toKnownErr = toKnownErr$5;
+
+	var queryEvents = {};
+
+	Object.defineProperty(queryEvents, "__esModule", {
+	  value: true
+	});
+	queryEvents.toKnownErr = void 0;
+	function toKnownErr$4(e) {
+	  return e;
+	}
+	queryEvents.toKnownErr = toKnownErr$4;
+
+	var queryStatuses = {};
+
+	Object.defineProperty(queryStatuses, "__esModule", {
+	  value: true
+	});
+	queryStatuses.toKnownErr = void 0;
+	function toKnownErr$3(e) {
+	  return e;
+	}
+	queryStatuses.toKnownErr = toKnownErr$3;
+
+	var searchRepos = {};
+
+	Object.defineProperty(searchRepos, "__esModule", {
+	  value: true
+	});
+	searchRepos.toKnownErr = void 0;
+	function toKnownErr$2(e) {
+	  return e;
+	}
+	searchRepos.toKnownErr = toKnownErr$2;
+
+	var getConfig = {};
+
+	Object.defineProperty(getConfig, "__esModule", {
+	  value: true
+	});
+	getConfig.validateViewerConfig = getConfig.isViewerConfig = getConfig.validateServiceConfig = getConfig.isServiceConfig = getConfig.toKnownErr = void 0;
+	const util_1$3 = util$2;
+	const lexicons_1$2 = lexicons;
+	function toKnownErr$1(e) {
+	  return e;
+	}
+	getConfig.toKnownErr = toKnownErr$1;
+	function isServiceConfig(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.server.getConfig#serviceConfig';
+	}
+	getConfig.isServiceConfig = isServiceConfig;
+	function validateServiceConfig(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.server.getConfig#serviceConfig', v);
+	}
+	getConfig.validateServiceConfig = validateServiceConfig;
+	function isViewerConfig(v) {
+	  return (0, util_1$3.isObj)(v) && (0, util_1$3.hasProp)(v, '$type') && v.$type === 'tools.ozone.server.getConfig#viewerConfig';
+	}
+	getConfig.isViewerConfig = isViewerConfig;
+	function validateViewerConfig(v) {
+	  return lexicons_1$2.lexicons.validate('tools.ozone.server.getConfig#viewerConfig', v);
+	}
+	getConfig.validateViewerConfig = validateViewerConfig;
 
 	var defs = {};
 
@@ -29136,6 +27590,17 @@ if (cid) {
 	defs.ROLEMODERATOR = 'tools.ozone.team.defs#roleModerator';
 	/** Triage role. Mostly intended for monitoring and escalating issues. */
 	defs.ROLETRIAGE = 'tools.ozone.team.defs#roleTriage';
+
+	var listMembers = {};
+
+	Object.defineProperty(listMembers, "__esModule", {
+	  value: true
+	});
+	listMembers.toKnownErr = void 0;
+	function toKnownErr(e) {
+	  return e;
+	}
+	listMembers.toKnownErr = toKnownErr;
 
 	var __createBinding = commonjsGlobal && commonjsGlobal.__createBinding || (Object.create ? function (o, m, k, k2) {
 	  if (k2 === undefined) k2 = k;
@@ -29172,177 +27637,56 @@ if (cid) {
 	  value: true
 	});
 	client$1.ComAtprotoServerDescribeServer = client$1.ComAtprotoServerDeleteSession = client$1.ComAtprotoServerDeleteAccount = client$1.ComAtprotoServerDefs = client$1.ComAtprotoServerDeactivateAccount = client$1.ComAtprotoServerCreateSession = client$1.ComAtprotoServerCreateInviteCodes = client$1.ComAtprotoServerCreateInviteCode = client$1.ComAtprotoServerCreateAppPassword = client$1.ComAtprotoServerCreateAccount = client$1.ComAtprotoServerConfirmEmail = client$1.ComAtprotoServerCheckAccountStatus = client$1.ComAtprotoServerActivateAccount = client$1.ComAtprotoRepoUploadBlob = client$1.ComAtprotoRepoStrongRef = client$1.ComAtprotoRepoPutRecord = client$1.ComAtprotoRepoListRecords = client$1.ComAtprotoRepoListMissingBlobs = client$1.ComAtprotoRepoImportRepo = client$1.ComAtprotoRepoGetRecord = client$1.ComAtprotoRepoDescribeRepo = client$1.ComAtprotoRepoDeleteRecord = client$1.ComAtprotoRepoCreateRecord = client$1.ComAtprotoRepoApplyWrites = client$1.ComAtprotoModerationDefs = client$1.ComAtprotoModerationCreateReport = client$1.ComAtprotoLabelSubscribeLabels = client$1.ComAtprotoLabelQueryLabels = client$1.ComAtprotoLabelDefs = client$1.ComAtprotoIdentityUpdateHandle = client$1.ComAtprotoIdentitySubmitPlcOperation = client$1.ComAtprotoIdentitySignPlcOperation = client$1.ComAtprotoIdentityResolveHandle = client$1.ComAtprotoIdentityRequestPlcOperationSignature = client$1.ComAtprotoIdentityGetRecommendedDidCredentials = client$1.ComAtprotoAdminUpdateSubjectStatus = client$1.ComAtprotoAdminUpdateAccountPassword = client$1.ComAtprotoAdminUpdateAccountHandle = client$1.ComAtprotoAdminUpdateAccountEmail = client$1.ComAtprotoAdminSendEmail = client$1.ComAtprotoAdminSearchAccounts = client$1.ComAtprotoAdminGetSubjectStatus = client$1.ComAtprotoAdminGetInviteCodes = client$1.ComAtprotoAdminGetAccountInfos = client$1.ComAtprotoAdminGetAccountInfo = client$1.ComAtprotoAdminEnableAccountInvites = client$1.ComAtprotoAdminDisableInviteCodes = client$1.ComAtprotoAdminDisableAccountInvites = client$1.ComAtprotoAdminDeleteAccount = client$1.ComAtprotoAdminDefs = void 0;
-	client$1.AppBskyFeedGetFeed = client$1.AppBskyFeedGetAuthorFeed = client$1.AppBskyFeedGetActorLikes = client$1.AppBskyFeedGetActorFeeds = client$1.AppBskyFeedGenerator = client$1.AppBskyFeedDetach = client$1.AppBskyFeedDescribeFeedGenerator = client$1.AppBskyFeedDefs = client$1.AppBskyEmbedRecordWithMedia = client$1.AppBskyEmbedRecord = client$1.AppBskyEmbedImages = client$1.AppBskyEmbedExternal = client$1.AppBskyActorSearchActorsTypeahead = client$1.AppBskyActorSearchActors = client$1.AppBskyActorPutPreferences = client$1.AppBskyActorProfile = client$1.AppBskyActorGetSuggestions = client$1.AppBskyActorGetProfiles = client$1.AppBskyActorGetProfile = client$1.AppBskyActorGetPreferences = client$1.AppBskyActorDefs = client$1.ComAtprotoTempRequestPhoneVerification = client$1.ComAtprotoTempFetchLabels = client$1.ComAtprotoTempCheckSignupQueue = client$1.ComAtprotoSyncSubscribeRepos = client$1.ComAtprotoSyncRequestCrawl = client$1.ComAtprotoSyncNotifyOfUpdate = client$1.ComAtprotoSyncListRepos = client$1.ComAtprotoSyncListBlobs = client$1.ComAtprotoSyncGetRepoStatus = client$1.ComAtprotoSyncGetRepo = client$1.ComAtprotoSyncGetRecord = client$1.ComAtprotoSyncGetLatestCommit = client$1.ComAtprotoSyncGetHead = client$1.ComAtprotoSyncGetCheckout = client$1.ComAtprotoSyncGetBlocks = client$1.ComAtprotoSyncGetBlob = client$1.ComAtprotoServerUpdateEmail = client$1.ComAtprotoServerRevokeAppPassword = client$1.ComAtprotoServerResetPassword = client$1.ComAtprotoServerReserveSigningKey = client$1.ComAtprotoServerRequestPasswordReset = client$1.ComAtprotoServerRequestEmailUpdate = client$1.ComAtprotoServerRequestEmailConfirmation = client$1.ComAtprotoServerRequestAccountDelete = client$1.ComAtprotoServerRefreshSession = client$1.ComAtprotoServerListAppPasswords = client$1.ComAtprotoServerGetSession = client$1.ComAtprotoServerGetServiceAuth = client$1.ComAtprotoServerGetAccountInviteCodes = void 0;
-	client$1.AppBskyNotificationRegisterPush = client$1.AppBskyNotificationPutPreferences = client$1.AppBskyNotificationListNotifications = client$1.AppBskyNotificationGetUnreadCount = client$1.AppBskyLabelerService = client$1.AppBskyLabelerGetServices = client$1.AppBskyLabelerDefs = client$1.AppBskyGraphUnmuteThread = client$1.AppBskyGraphUnmuteActorList = client$1.AppBskyGraphUnmuteActor = client$1.AppBskyGraphStarterpack = client$1.AppBskyGraphMuteThread = client$1.AppBskyGraphMuteActorList = client$1.AppBskyGraphMuteActor = client$1.AppBskyGraphListitem = client$1.AppBskyGraphListblock = client$1.AppBskyGraphList = client$1.AppBskyGraphGetSuggestedFollowsByActor = client$1.AppBskyGraphGetStarterPacks = client$1.AppBskyGraphGetStarterPack = client$1.AppBskyGraphGetRelationships = client$1.AppBskyGraphGetMutes = client$1.AppBskyGraphGetLists = client$1.AppBskyGraphGetListMutes = client$1.AppBskyGraphGetListBlocks = client$1.AppBskyGraphGetList = client$1.AppBskyGraphGetKnownFollowers = client$1.AppBskyGraphGetFollows = client$1.AppBskyGraphGetFollowers = client$1.AppBskyGraphGetBlocks = client$1.AppBskyGraphGetActorStarterPacks = client$1.AppBskyGraphFollow = client$1.AppBskyGraphDefs = client$1.AppBskyGraphBlock = client$1.AppBskyFeedThreadgate = client$1.AppBskyFeedSendInteractions = client$1.AppBskyFeedSearchPosts = client$1.AppBskyFeedRepost = client$1.AppBskyFeedPost = client$1.AppBskyFeedLike = client$1.AppBskyFeedGetTimeline = client$1.AppBskyFeedGetSuggestedFeeds = client$1.AppBskyFeedGetRepostedBy = client$1.AppBskyFeedGetPosts = client$1.AppBskyFeedGetPostThread = client$1.AppBskyFeedGetListFeed = client$1.AppBskyFeedGetLikes = client$1.AppBskyFeedGetFeedSkeleton = client$1.AppBskyFeedGetFeedGenerators = client$1.AppBskyFeedGetFeedGenerator = void 0;
-	client$1.APP_BSKY_GRAPH = client$1.APP_BSKY_FEED = client$1.COM_ATPROTO_MODERATION = client$1.ToolsOzoneTeamUpdateMember = client$1.ToolsOzoneTeamListMembers = client$1.ToolsOzoneTeamDeleteMember = client$1.ToolsOzoneTeamDefs = client$1.ToolsOzoneTeamAddMember = client$1.ToolsOzoneServerGetConfig = client$1.ToolsOzoneModerationSearchRepos = client$1.ToolsOzoneModerationQueryStatuses = client$1.ToolsOzoneModerationQueryEvents = client$1.ToolsOzoneModerationGetRepo = client$1.ToolsOzoneModerationGetRecord = client$1.ToolsOzoneModerationGetEvent = client$1.ToolsOzoneModerationEmitEvent = client$1.ToolsOzoneModerationDefs = client$1.ToolsOzoneCommunicationUpdateTemplate = client$1.ToolsOzoneCommunicationListTemplates = client$1.ToolsOzoneCommunicationDeleteTemplate = client$1.ToolsOzoneCommunicationDefs = client$1.ToolsOzoneCommunicationCreateTemplate = client$1.ChatBskyModerationUpdateActorAccess = client$1.ChatBskyModerationGetMessageContext = client$1.ChatBskyModerationGetActorMetadata = client$1.ChatBskyConvoUpdateRead = client$1.ChatBskyConvoUnmuteConvo = client$1.ChatBskyConvoSendMessageBatch = client$1.ChatBskyConvoSendMessage = client$1.ChatBskyConvoMuteConvo = client$1.ChatBskyConvoListConvos = client$1.ChatBskyConvoLeaveConvo = client$1.ChatBskyConvoGetMessages = client$1.ChatBskyConvoGetLog = client$1.ChatBskyConvoGetConvoForMembers = client$1.ChatBskyConvoGetConvo = client$1.ChatBskyConvoDeleteMessageForSelf = client$1.ChatBskyConvoDefs = client$1.ChatBskyActorExportAccountData = client$1.ChatBskyActorDeleteAccount = client$1.ChatBskyActorDefs = client$1.ChatBskyActorDeclaration = client$1.AppBskyUnspeccedSearchPostsSkeleton = client$1.AppBskyUnspeccedSearchActorsSkeleton = client$1.AppBskyUnspeccedGetTaggedSuggestions = client$1.AppBskyUnspeccedGetSuggestionsSkeleton = client$1.AppBskyUnspeccedGetPopularFeedGenerators = client$1.AppBskyUnspeccedDefs = client$1.AppBskyRichtextFacet = client$1.AppBskyNotificationUpdateSeen = void 0;
-	client$1.ToolsOzoneTeamNS = client$1.ToolsOzoneServerNS = client$1.ToolsOzoneModerationNS = client$1.ToolsOzoneCommunicationNS = client$1.ToolsOzoneNS = client$1.ToolsNS = client$1.ChatBskyModerationNS = client$1.ChatBskyConvoNS = client$1.DeclarationRecord = client$1.ChatBskyActorNS = client$1.ChatBskyNS = client$1.ChatNS = client$1.AppBskyUnspeccedNS = client$1.AppBskyRichtextNS = client$1.AppBskyNotificationNS = client$1.ServiceRecord = client$1.AppBskyLabelerNS = client$1.StarterpackRecord = client$1.ListitemRecord = client$1.ListblockRecord = client$1.ListRecord = client$1.FollowRecord = client$1.BlockRecord = client$1.AppBskyGraphNS = client$1.ThreadgateRecord = client$1.RepostRecord = client$1.PostRecord = client$1.LikeRecord = client$1.GeneratorRecord = client$1.DetachRecord = client$1.AppBskyFeedNS = client$1.AppBskyEmbedNS = client$1.ProfileRecord = client$1.AppBskyActorNS = client$1.AppBskyNS = client$1.AppNS = client$1.ComAtprotoTempNS = client$1.ComAtprotoSyncNS = client$1.ComAtprotoServerNS = client$1.ComAtprotoRepoNS = client$1.ComAtprotoModerationNS = client$1.ComAtprotoLabelNS = client$1.ComAtprotoIdentityNS = client$1.ComAtprotoAdminNS = client$1.ComAtprotoNS = client$1.ComNS = client$1.AtpServiceClient = client$1.AtpBaseClient = client$1.TOOLS_OZONE_TEAM = client$1.TOOLS_OZONE_MODERATION = void 0;
+	client$1.AppBskyFeedGetFeedGenerator = client$1.AppBskyFeedGetFeed = client$1.AppBskyFeedGetAuthorFeed = client$1.AppBskyFeedGetActorLikes = client$1.AppBskyFeedGetActorFeeds = client$1.AppBskyFeedGenerator = client$1.AppBskyFeedDescribeFeedGenerator = client$1.AppBskyFeedDefs = client$1.AppBskyEmbedRecordWithMedia = client$1.AppBskyEmbedRecord = client$1.AppBskyEmbedImages = client$1.AppBskyEmbedExternal = client$1.AppBskyActorSearchActorsTypeahead = client$1.AppBskyActorSearchActors = client$1.AppBskyActorPutPreferences = client$1.AppBskyActorProfile = client$1.AppBskyActorGetSuggestions = client$1.AppBskyActorGetProfiles = client$1.AppBskyActorGetProfile = client$1.AppBskyActorGetPreferences = client$1.AppBskyActorDefs = client$1.ComAtprotoTempRequestPhoneVerification = client$1.ComAtprotoTempFetchLabels = client$1.ComAtprotoTempCheckSignupQueue = client$1.ComAtprotoSyncSubscribeRepos = client$1.ComAtprotoSyncRequestCrawl = client$1.ComAtprotoSyncNotifyOfUpdate = client$1.ComAtprotoSyncListRepos = client$1.ComAtprotoSyncListBlobs = client$1.ComAtprotoSyncGetRepoStatus = client$1.ComAtprotoSyncGetRepo = client$1.ComAtprotoSyncGetRecord = client$1.ComAtprotoSyncGetLatestCommit = client$1.ComAtprotoSyncGetHead = client$1.ComAtprotoSyncGetCheckout = client$1.ComAtprotoSyncGetBlocks = client$1.ComAtprotoSyncGetBlob = client$1.ComAtprotoServerUpdateEmail = client$1.ComAtprotoServerRevokeAppPassword = client$1.ComAtprotoServerResetPassword = client$1.ComAtprotoServerReserveSigningKey = client$1.ComAtprotoServerRequestPasswordReset = client$1.ComAtprotoServerRequestEmailUpdate = client$1.ComAtprotoServerRequestEmailConfirmation = client$1.ComAtprotoServerRequestAccountDelete = client$1.ComAtprotoServerRefreshSession = client$1.ComAtprotoServerListAppPasswords = client$1.ComAtprotoServerGetSession = client$1.ComAtprotoServerGetServiceAuth = client$1.ComAtprotoServerGetAccountInviteCodes = void 0;
+	client$1.AppBskyNotificationUpdateSeen = client$1.AppBskyNotificationRegisterPush = client$1.AppBskyNotificationPutPreferences = client$1.AppBskyNotificationListNotifications = client$1.AppBskyNotificationGetUnreadCount = client$1.AppBskyLabelerService = client$1.AppBskyLabelerGetServices = client$1.AppBskyLabelerDefs = client$1.AppBskyGraphUnmuteThread = client$1.AppBskyGraphUnmuteActorList = client$1.AppBskyGraphUnmuteActor = client$1.AppBskyGraphStarterpack = client$1.AppBskyGraphMuteThread = client$1.AppBskyGraphMuteActorList = client$1.AppBskyGraphMuteActor = client$1.AppBskyGraphListitem = client$1.AppBskyGraphListblock = client$1.AppBskyGraphList = client$1.AppBskyGraphGetSuggestedFollowsByActor = client$1.AppBskyGraphGetStarterPacks = client$1.AppBskyGraphGetStarterPack = client$1.AppBskyGraphGetRelationships = client$1.AppBskyGraphGetMutes = client$1.AppBskyGraphGetLists = client$1.AppBskyGraphGetListMutes = client$1.AppBskyGraphGetListBlocks = client$1.AppBskyGraphGetList = client$1.AppBskyGraphGetKnownFollowers = client$1.AppBskyGraphGetFollows = client$1.AppBskyGraphGetFollowers = client$1.AppBskyGraphGetBlocks = client$1.AppBskyGraphGetActorStarterPacks = client$1.AppBskyGraphFollow = client$1.AppBskyGraphDefs = client$1.AppBskyGraphBlock = client$1.AppBskyFeedThreadgate = client$1.AppBskyFeedSendInteractions = client$1.AppBskyFeedSearchPosts = client$1.AppBskyFeedRepost = client$1.AppBskyFeedPost = client$1.AppBskyFeedLike = client$1.AppBskyFeedGetTimeline = client$1.AppBskyFeedGetSuggestedFeeds = client$1.AppBskyFeedGetRepostedBy = client$1.AppBskyFeedGetPosts = client$1.AppBskyFeedGetPostThread = client$1.AppBskyFeedGetListFeed = client$1.AppBskyFeedGetLikes = client$1.AppBskyFeedGetFeedSkeleton = client$1.AppBskyFeedGetFeedGenerators = void 0;
+	client$1.TOOLS_OZONE_MODERATION = client$1.APP_BSKY_GRAPH = client$1.APP_BSKY_FEED = client$1.COM_ATPROTO_MODERATION = client$1.ToolsOzoneTeamUpdateMember = client$1.ToolsOzoneTeamListMembers = client$1.ToolsOzoneTeamDeleteMember = client$1.ToolsOzoneTeamDefs = client$1.ToolsOzoneTeamAddMember = client$1.ToolsOzoneServerGetConfig = client$1.ToolsOzoneModerationSearchRepos = client$1.ToolsOzoneModerationQueryStatuses = client$1.ToolsOzoneModerationQueryEvents = client$1.ToolsOzoneModerationGetRepo = client$1.ToolsOzoneModerationGetRecord = client$1.ToolsOzoneModerationGetEvent = client$1.ToolsOzoneModerationEmitEvent = client$1.ToolsOzoneModerationDefs = client$1.ToolsOzoneCommunicationUpdateTemplate = client$1.ToolsOzoneCommunicationListTemplates = client$1.ToolsOzoneCommunicationDeleteTemplate = client$1.ToolsOzoneCommunicationDefs = client$1.ToolsOzoneCommunicationCreateTemplate = client$1.ChatBskyModerationUpdateActorAccess = client$1.ChatBskyModerationGetMessageContext = client$1.ChatBskyModerationGetActorMetadata = client$1.ChatBskyConvoUpdateRead = client$1.ChatBskyConvoUnmuteConvo = client$1.ChatBskyConvoSendMessageBatch = client$1.ChatBskyConvoSendMessage = client$1.ChatBskyConvoMuteConvo = client$1.ChatBskyConvoListConvos = client$1.ChatBskyConvoLeaveConvo = client$1.ChatBskyConvoGetMessages = client$1.ChatBskyConvoGetLog = client$1.ChatBskyConvoGetConvoForMembers = client$1.ChatBskyConvoGetConvo = client$1.ChatBskyConvoDeleteMessageForSelf = client$1.ChatBskyConvoDefs = client$1.ChatBskyActorExportAccountData = client$1.ChatBskyActorDeleteAccount = client$1.ChatBskyActorDefs = client$1.ChatBskyActorDeclaration = client$1.AppBskyUnspeccedSearchPostsSkeleton = client$1.AppBskyUnspeccedSearchActorsSkeleton = client$1.AppBskyUnspeccedGetTaggedSuggestions = client$1.AppBskyUnspeccedGetSuggestionsSkeleton = client$1.AppBskyUnspeccedGetPopularFeedGenerators = client$1.AppBskyUnspeccedDefs = client$1.AppBskyRichtextFacet = void 0;
+	client$1.ToolsOzoneTeamNS = client$1.ToolsOzoneServerNS = client$1.ToolsOzoneModerationNS = client$1.ToolsOzoneCommunicationNS = client$1.ToolsOzoneNS = client$1.ToolsNS = client$1.ChatBskyModerationNS = client$1.ChatBskyConvoNS = client$1.DeclarationRecord = client$1.ChatBskyActorNS = client$1.ChatBskyNS = client$1.ChatNS = client$1.AppBskyUnspeccedNS = client$1.AppBskyRichtextNS = client$1.AppBskyNotificationNS = client$1.ServiceRecord = client$1.AppBskyLabelerNS = client$1.StarterpackRecord = client$1.ListitemRecord = client$1.ListblockRecord = client$1.ListRecord = client$1.FollowRecord = client$1.BlockRecord = client$1.AppBskyGraphNS = client$1.ThreadgateRecord = client$1.RepostRecord = client$1.PostRecord = client$1.LikeRecord = client$1.GeneratorRecord = client$1.AppBskyFeedNS = client$1.AppBskyEmbedNS = client$1.ProfileRecord = client$1.AppBskyActorNS = client$1.AppBskyNS = client$1.AppNS = client$1.ComAtprotoTempNS = client$1.ComAtprotoSyncNS = client$1.ComAtprotoServerNS = client$1.ComAtprotoRepoNS = client$1.ComAtprotoModerationNS = client$1.ComAtprotoLabelNS = client$1.ComAtprotoIdentityNS = client$1.ComAtprotoAdminNS = client$1.ComAtprotoNS = client$1.ComNS = client$1.AtpBaseClient = client$1.TOOLS_OZONE_TEAM = void 0;
 	/**
 	 * GENERATED CODE - DO NOT MODIFY
 	 */
-	const xrpc_1$1 = dist;
+	const xrpc_1$2 = dist;
 	const lexicons_1 = lexicons;
-	const ComAtprotoAdminDeleteAccount = __importStar(deleteAccount$2);
-	const ComAtprotoAdminDisableAccountInvites = __importStar(disableAccountInvites);
-	const ComAtprotoAdminDisableInviteCodes = __importStar(disableInviteCodes);
-	const ComAtprotoAdminEnableAccountInvites = __importStar(enableAccountInvites);
-	const ComAtprotoAdminGetAccountInfo = __importStar(getAccountInfo);
-	const ComAtprotoAdminGetAccountInfos = __importStar(getAccountInfos);
-	const ComAtprotoAdminGetInviteCodes = __importStar(getInviteCodes);
-	const ComAtprotoAdminGetSubjectStatus = __importStar(getSubjectStatus);
-	const ComAtprotoAdminSearchAccounts = __importStar(searchAccounts);
-	const ComAtprotoAdminSendEmail = __importStar(sendEmail);
-	const ComAtprotoAdminUpdateAccountEmail = __importStar(updateAccountEmail);
-	const ComAtprotoAdminUpdateAccountHandle = __importStar(updateAccountHandle);
-	const ComAtprotoAdminUpdateAccountPassword = __importStar(updateAccountPassword);
-	const ComAtprotoAdminUpdateSubjectStatus = __importStar(updateSubjectStatus);
-	const ComAtprotoIdentityGetRecommendedDidCredentials = __importStar(getRecommendedDidCredentials);
-	const ComAtprotoIdentityRequestPlcOperationSignature = __importStar(requestPlcOperationSignature);
-	const ComAtprotoIdentityResolveHandle = __importStar(resolveHandle);
-	const ComAtprotoIdentitySignPlcOperation = __importStar(signPlcOperation);
-	const ComAtprotoIdentitySubmitPlcOperation = __importStar(submitPlcOperation);
-	const ComAtprotoIdentityUpdateHandle = __importStar(updateHandle);
-	const ComAtprotoLabelQueryLabels = __importStar(queryLabels);
-	const ComAtprotoModerationCreateReport = __importStar(createReport);
 	const ComAtprotoRepoApplyWrites = __importStar(applyWrites);
 	const ComAtprotoRepoCreateRecord = __importStar(createRecord);
 	const ComAtprotoRepoDeleteRecord = __importStar(deleteRecord);
-	const ComAtprotoRepoDescribeRepo = __importStar(describeRepo);
-	const ComAtprotoRepoGetRecord = __importStar(getRecord$2);
-	const ComAtprotoRepoImportRepo = __importStar(importRepo);
-	const ComAtprotoRepoListMissingBlobs = __importStar(listMissingBlobs);
-	const ComAtprotoRepoListRecords = __importStar(listRecords);
 	const ComAtprotoRepoPutRecord = __importStar(putRecord);
-	const ComAtprotoRepoUploadBlob = __importStar(uploadBlob);
-	const ComAtprotoServerActivateAccount = __importStar(activateAccount);
-	const ComAtprotoServerCheckAccountStatus = __importStar(checkAccountStatus);
 	const ComAtprotoServerConfirmEmail = __importStar(confirmEmail);
 	const ComAtprotoServerCreateAccount = __importStar(createAccount);
 	const ComAtprotoServerCreateAppPassword = __importStar(createAppPassword);
-	const ComAtprotoServerCreateInviteCode = __importStar(createInviteCode);
-	const ComAtprotoServerCreateInviteCodes = __importStar(createInviteCodes);
 	const ComAtprotoServerCreateSession = __importStar(createSession);
-	const ComAtprotoServerDeactivateAccount = __importStar(deactivateAccount);
-	const ComAtprotoServerDeleteAccount = __importStar(deleteAccount$1);
-	const ComAtprotoServerDeleteSession = __importStar(deleteSession);
-	const ComAtprotoServerDescribeServer = __importStar(describeServer);
+	const ComAtprotoServerDeleteAccount = __importStar(deleteAccount$2);
 	const ComAtprotoServerGetAccountInviteCodes = __importStar(getAccountInviteCodes);
 	const ComAtprotoServerGetServiceAuth = __importStar(getServiceAuth);
-	const ComAtprotoServerGetSession = __importStar(getSession);
 	const ComAtprotoServerListAppPasswords = __importStar(listAppPasswords);
 	const ComAtprotoServerRefreshSession = __importStar(refreshSession);
-	const ComAtprotoServerRequestAccountDelete = __importStar(requestAccountDelete);
-	const ComAtprotoServerRequestEmailConfirmation = __importStar(requestEmailConfirmation);
-	const ComAtprotoServerRequestEmailUpdate = __importStar(requestEmailUpdate);
-	const ComAtprotoServerRequestPasswordReset = __importStar(requestPasswordReset);
-	const ComAtprotoServerReserveSigningKey = __importStar(reserveSigningKey);
 	const ComAtprotoServerResetPassword = __importStar(resetPassword);
-	const ComAtprotoServerRevokeAppPassword = __importStar(revokeAppPassword);
 	const ComAtprotoServerUpdateEmail = __importStar(updateEmail);
 	const ComAtprotoSyncGetBlob = __importStar(getBlob);
 	const ComAtprotoSyncGetBlocks = __importStar(getBlocks$1);
-	const ComAtprotoSyncGetCheckout = __importStar(getCheckout);
 	const ComAtprotoSyncGetHead = __importStar(getHead);
 	const ComAtprotoSyncGetLatestCommit = __importStar(getLatestCommit);
-	const ComAtprotoSyncGetRecord = __importStar(getRecord$1);
+	const ComAtprotoSyncGetRecord = __importStar(getRecord$2);
 	const ComAtprotoSyncGetRepo = __importStar(getRepo$1);
 	const ComAtprotoSyncGetRepoStatus = __importStar(getRepoStatus);
 	const ComAtprotoSyncListBlobs = __importStar(listBlobs);
-	const ComAtprotoSyncListRepos = __importStar(listRepos);
-	const ComAtprotoSyncNotifyOfUpdate = __importStar(notifyOfUpdate);
-	const ComAtprotoSyncRequestCrawl = __importStar(requestCrawl);
-	const ComAtprotoTempCheckSignupQueue = __importStar(checkSignupQueue);
-	const ComAtprotoTempFetchLabels = __importStar(fetchLabels);
-	const ComAtprotoTempRequestPhoneVerification = __importStar(requestPhoneVerification);
-	const AppBskyActorGetPreferences = __importStar(getPreferences);
-	const AppBskyActorGetProfile = __importStar(getProfile);
-	const AppBskyActorGetProfiles = __importStar(getProfiles);
-	const AppBskyActorGetSuggestions = __importStar(getSuggestions);
-	const AppBskyActorPutPreferences = __importStar(putPreferences$1);
-	const AppBskyActorSearchActors = __importStar(searchActors);
-	const AppBskyActorSearchActorsTypeahead = __importStar(searchActorsTypeahead);
-	const AppBskyFeedDescribeFeedGenerator = __importStar(describeFeedGenerator);
-	const AppBskyFeedGetActorFeeds = __importStar(getActorFeeds);
 	const AppBskyFeedGetActorLikes = __importStar(getActorLikes);
 	const AppBskyFeedGetAuthorFeed = __importStar(getAuthorFeed);
 	const AppBskyFeedGetFeed = __importStar(getFeed);
-	const AppBskyFeedGetFeedGenerator = __importStar(getFeedGenerator);
-	const AppBskyFeedGetFeedGenerators = __importStar(getFeedGenerators);
 	const AppBskyFeedGetFeedSkeleton = __importStar(getFeedSkeleton);
-	const AppBskyFeedGetLikes = __importStar(getLikes);
 	const AppBskyFeedGetListFeed = __importStar(getListFeed);
 	const AppBskyFeedGetPostThread = __importStar(getPostThread);
-	const AppBskyFeedGetPosts = __importStar(getPosts);
-	const AppBskyFeedGetRepostedBy = __importStar(getRepostedBy);
-	const AppBskyFeedGetSuggestedFeeds = __importStar(getSuggestedFeeds);
-	const AppBskyFeedGetTimeline = __importStar(getTimeline);
 	const AppBskyFeedSearchPosts = __importStar(searchPosts);
-	const AppBskyFeedSendInteractions = __importStar(sendInteractions);
-	const AppBskyGraphGetActorStarterPacks = __importStar(getActorStarterPacks);
-	const AppBskyGraphGetBlocks = __importStar(getBlocks);
-	const AppBskyGraphGetFollowers = __importStar(getFollowers);
-	const AppBskyGraphGetFollows = __importStar(getFollows);
-	const AppBskyGraphGetKnownFollowers = __importStar(getKnownFollowers);
-	const AppBskyGraphGetList = __importStar(getList);
-	const AppBskyGraphGetListBlocks = __importStar(getListBlocks);
-	const AppBskyGraphGetListMutes = __importStar(getListMutes);
-	const AppBskyGraphGetLists = __importStar(getLists);
-	const AppBskyGraphGetMutes = __importStar(getMutes);
 	const AppBskyGraphGetRelationships = __importStar(getRelationships);
-	const AppBskyGraphGetStarterPack = __importStar(getStarterPack);
-	const AppBskyGraphGetStarterPacks = __importStar(getStarterPacks);
-	const AppBskyGraphGetSuggestedFollowsByActor = __importStar(getSuggestedFollowsByActor);
-	const AppBskyGraphMuteActor = __importStar(muteActor);
-	const AppBskyGraphMuteActorList = __importStar(muteActorList);
-	const AppBskyGraphMuteThread = __importStar(muteThread);
-	const AppBskyGraphUnmuteActor = __importStar(unmuteActor);
-	const AppBskyGraphUnmuteActorList = __importStar(unmuteActorList);
-	const AppBskyGraphUnmuteThread = __importStar(unmuteThread);
-	const AppBskyLabelerGetServices = __importStar(getServices);
-	const AppBskyNotificationGetUnreadCount = __importStar(getUnreadCount);
-	const AppBskyNotificationListNotifications = __importStar(listNotifications);
-	const AppBskyNotificationPutPreferences = __importStar(putPreferences);
-	const AppBskyNotificationRegisterPush = __importStar(registerPush);
-	const AppBskyNotificationUpdateSeen = __importStar(updateSeen);
-	const AppBskyUnspeccedGetPopularFeedGenerators = __importStar(getPopularFeedGenerators);
-	const AppBskyUnspeccedGetSuggestionsSkeleton = __importStar(getSuggestionsSkeleton);
-	const AppBskyUnspeccedGetTaggedSuggestions = __importStar(getTaggedSuggestions);
 	const AppBskyUnspeccedSearchActorsSkeleton = __importStar(searchActorsSkeleton);
 	const AppBskyUnspeccedSearchPostsSkeleton = __importStar(searchPostsSkeleton);
-	const ChatBskyActorDeleteAccount = __importStar(deleteAccount);
-	const ChatBskyActorExportAccountData = __importStar(exportAccountData);
-	const ChatBskyConvoDeleteMessageForSelf = __importStar(deleteMessageForSelf);
-	const ChatBskyConvoGetConvo = __importStar(getConvo);
-	const ChatBskyConvoGetConvoForMembers = __importStar(getConvoForMembers);
-	const ChatBskyConvoGetLog = __importStar(getLog);
-	const ChatBskyConvoGetMessages = __importStar(getMessages);
-	const ChatBskyConvoLeaveConvo = __importStar(leaveConvo);
-	const ChatBskyConvoListConvos = __importStar(listConvos);
-	const ChatBskyConvoMuteConvo = __importStar(muteConvo);
-	const ChatBskyConvoSendMessage = __importStar(sendMessage);
-	const ChatBskyConvoSendMessageBatch = __importStar(sendMessageBatch);
-	const ChatBskyConvoUnmuteConvo = __importStar(unmuteConvo);
-	const ChatBskyConvoUpdateRead = __importStar(updateRead);
-	const ChatBskyModerationGetActorMetadata = __importStar(getActorMetadata);
-	const ChatBskyModerationGetMessageContext = __importStar(getMessageContext);
-	const ChatBskyModerationUpdateActorAccess = __importStar(updateActorAccess);
-	const ToolsOzoneCommunicationCreateTemplate = __importStar(createTemplate);
-	const ToolsOzoneCommunicationDeleteTemplate = __importStar(deleteTemplate);
-	const ToolsOzoneCommunicationListTemplates = __importStar(listTemplates);
-	const ToolsOzoneCommunicationUpdateTemplate = __importStar(updateTemplate);
 	const ToolsOzoneModerationEmitEvent = __importStar(emitEvent);
-	const ToolsOzoneModerationGetEvent = __importStar(getEvent);
-	const ToolsOzoneModerationGetRecord = __importStar(getRecord);
+	const ToolsOzoneModerationGetRecord = __importStar(getRecord$1);
 	const ToolsOzoneModerationGetRepo = __importStar(getRepo);
-	const ToolsOzoneModerationQueryEvents = __importStar(queryEvents);
-	const ToolsOzoneModerationQueryStatuses = __importStar(queryStatuses);
-	const ToolsOzoneModerationSearchRepos = __importStar(searchRepos);
-	const ToolsOzoneServerGetConfig = __importStar(getConfig);
 	const ToolsOzoneTeamAddMember = __importStar(addMember);
 	const ToolsOzoneTeamDeleteMember = __importStar(deleteMember);
-	const ToolsOzoneTeamListMembers = __importStar(listMembers);
 	const ToolsOzoneTeamUpdateMember = __importStar(updateMember);
 	client$1.ComAtprotoAdminDefs = __importStar(defs$d);
-	client$1.ComAtprotoAdminDeleteAccount = __importStar(deleteAccount$2);
+	client$1.ComAtprotoAdminDeleteAccount = __importStar(deleteAccount$1);
 	client$1.ComAtprotoAdminDisableAccountInvites = __importStar(disableAccountInvites);
 	client$1.ComAtprotoAdminDisableInviteCodes = __importStar(disableInviteCodes);
 	client$1.ComAtprotoAdminEnableAccountInvites = __importStar(enableAccountInvites);
@@ -29371,7 +27715,7 @@ if (cid) {
 	client$1.ComAtprotoRepoCreateRecord = __importStar(createRecord);
 	client$1.ComAtprotoRepoDeleteRecord = __importStar(deleteRecord);
 	client$1.ComAtprotoRepoDescribeRepo = __importStar(describeRepo);
-	client$1.ComAtprotoRepoGetRecord = __importStar(getRecord$2);
+	client$1.ComAtprotoRepoGetRecord = __importStar(getRecord);
 	client$1.ComAtprotoRepoImportRepo = __importStar(importRepo);
 	client$1.ComAtprotoRepoListMissingBlobs = __importStar(listMissingBlobs);
 	client$1.ComAtprotoRepoListRecords = __importStar(listRecords);
@@ -29388,7 +27732,7 @@ if (cid) {
 	client$1.ComAtprotoServerCreateSession = __importStar(createSession);
 	client$1.ComAtprotoServerDeactivateAccount = __importStar(deactivateAccount);
 	client$1.ComAtprotoServerDefs = __importStar(defs$a);
-	client$1.ComAtprotoServerDeleteAccount = __importStar(deleteAccount$1);
+	client$1.ComAtprotoServerDeleteAccount = __importStar(deleteAccount$2);
 	client$1.ComAtprotoServerDeleteSession = __importStar(deleteSession);
 	client$1.ComAtprotoServerDescribeServer = __importStar(describeServer);
 	client$1.ComAtprotoServerGetAccountInviteCodes = __importStar(getAccountInviteCodes);
@@ -29409,7 +27753,7 @@ if (cid) {
 	client$1.ComAtprotoSyncGetCheckout = __importStar(getCheckout);
 	client$1.ComAtprotoSyncGetHead = __importStar(getHead);
 	client$1.ComAtprotoSyncGetLatestCommit = __importStar(getLatestCommit);
-	client$1.ComAtprotoSyncGetRecord = __importStar(getRecord$1);
+	client$1.ComAtprotoSyncGetRecord = __importStar(getRecord$2);
 	client$1.ComAtprotoSyncGetRepo = __importStar(getRepo$1);
 	client$1.ComAtprotoSyncGetRepoStatus = __importStar(getRepoStatus);
 	client$1.ComAtprotoSyncListBlobs = __importStar(listBlobs);
@@ -29435,7 +27779,6 @@ if (cid) {
 	client$1.AppBskyEmbedRecordWithMedia = __importStar(recordWithMedia);
 	client$1.AppBskyFeedDefs = __importStar(defs$8);
 	client$1.AppBskyFeedDescribeFeedGenerator = __importStar(describeFeedGenerator);
-	client$1.AppBskyFeedDetach = __importStar(detach);
 	client$1.AppBskyFeedGenerator = __importStar(generator);
 	client$1.AppBskyFeedGetActorFeeds = __importStar(getActorFeeds);
 	client$1.AppBskyFeedGetActorLikes = __importStar(getActorLikes);
@@ -29527,7 +27870,7 @@ if (cid) {
 	client$1.ToolsOzoneModerationDefs = __importStar(defs$1);
 	client$1.ToolsOzoneModerationEmitEvent = __importStar(emitEvent);
 	client$1.ToolsOzoneModerationGetEvent = __importStar(getEvent);
-	client$1.ToolsOzoneModerationGetRecord = __importStar(getRecord);
+	client$1.ToolsOzoneModerationGetRecord = __importStar(getRecord$1);
 	client$1.ToolsOzoneModerationGetRepo = __importStar(getRepo);
 	client$1.ToolsOzoneModerationQueryEvents = __importStar(queryEvents);
 	client$1.ToolsOzoneModerationQueryStatuses = __importStar(queryStatuses);
@@ -29577,35 +27920,9 @@ if (cid) {
 	  DefsRoleModerator: 'tools.ozone.team.defs#roleModerator',
 	  DefsRoleTriage: 'tools.ozone.team.defs#roleTriage'
 	};
-	class AtpBaseClient {
-	  constructor() {
-	    Object.defineProperty(this, "xrpc", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: new xrpc_1$1.Client()
-	    });
-	    this.xrpc.addLexicons(lexicons_1.schemas);
-	  }
-	  service(serviceUri) {
-	    return new AtpServiceClient(this, this.xrpc.service(serviceUri));
-	  }
-	}
-	client$1.AtpBaseClient = AtpBaseClient;
-	class AtpServiceClient {
-	  constructor(baseClient, xrpcService) {
-	    Object.defineProperty(this, "_baseClient", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: void 0
-	    });
-	    Object.defineProperty(this, "xrpc", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: void 0
-	    });
+	class AtpBaseClient extends xrpc_1$2.XrpcClient {
+	  constructor(options) {
+	    super(options, lexicons_1.schemas);
 	    Object.defineProperty(this, "com", {
 	      enumerable: true,
 	      configurable: true,
@@ -29630,21 +27947,20 @@ if (cid) {
 	      writable: true,
 	      value: void 0
 	    });
-	    this._baseClient = baseClient;
-	    this.xrpc = xrpcService;
 	    this.com = new ComNS(this);
 	    this.app = new AppNS(this);
 	    this.chat = new ChatNS(this);
 	    this.tools = new ToolsNS(this);
 	  }
-	  setHeader(key, value) {
-	    this.xrpc.setHeader(key, value);
+	  /** @deprecated use `this` instead */
+	  get xrpc() {
+	    return this;
 	  }
 	}
-	client$1.AtpServiceClient = AtpServiceClient;
+	client$1.AtpBaseClient = AtpBaseClient;
 	class ComNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
@@ -29656,14 +27972,14 @@ if (cid) {
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
-	    this.atproto = new ComAtprotoNS(service);
+	    this._client = client;
+	    this.atproto = new ComAtprotoNS(client);
 	  }
 	}
 	client$1.ComNS = ComNS;
 	class ComAtprotoNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
@@ -29717,477 +28033,379 @@ if (cid) {
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
-	    this.admin = new ComAtprotoAdminNS(service);
-	    this.identity = new ComAtprotoIdentityNS(service);
-	    this.label = new ComAtprotoLabelNS(service);
-	    this.moderation = new ComAtprotoModerationNS(service);
-	    this.repo = new ComAtprotoRepoNS(service);
-	    this.server = new ComAtprotoServerNS(service);
-	    this.sync = new ComAtprotoSyncNS(service);
-	    this.temp = new ComAtprotoTempNS(service);
+	    this._client = client;
+	    this.admin = new ComAtprotoAdminNS(client);
+	    this.identity = new ComAtprotoIdentityNS(client);
+	    this.label = new ComAtprotoLabelNS(client);
+	    this.moderation = new ComAtprotoModerationNS(client);
+	    this.repo = new ComAtprotoRepoNS(client);
+	    this.server = new ComAtprotoServerNS(client);
+	    this.sync = new ComAtprotoSyncNS(client);
+	    this.temp = new ComAtprotoTempNS(client);
 	  }
 	}
 	client$1.ComAtprotoNS = ComAtprotoNS;
 	class ComAtprotoAdminNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  deleteAccount(data, opts) {
-	    return this._service.xrpc.call('com.atproto.admin.deleteAccount', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoAdminDeleteAccount.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.admin.deleteAccount', opts?.qp, data, opts);
 	  }
 	  disableAccountInvites(data, opts) {
-	    return this._service.xrpc.call('com.atproto.admin.disableAccountInvites', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoAdminDisableAccountInvites.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.admin.disableAccountInvites', opts?.qp, data, opts);
 	  }
 	  disableInviteCodes(data, opts) {
-	    return this._service.xrpc.call('com.atproto.admin.disableInviteCodes', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoAdminDisableInviteCodes.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.admin.disableInviteCodes', opts?.qp, data, opts);
 	  }
 	  enableAccountInvites(data, opts) {
-	    return this._service.xrpc.call('com.atproto.admin.enableAccountInvites', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoAdminEnableAccountInvites.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.admin.enableAccountInvites', opts?.qp, data, opts);
 	  }
 	  getAccountInfo(params, opts) {
-	    return this._service.xrpc.call('com.atproto.admin.getAccountInfo', params, undefined, opts).catch(e => {
-	      throw ComAtprotoAdminGetAccountInfo.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.admin.getAccountInfo', params, undefined, opts);
 	  }
 	  getAccountInfos(params, opts) {
-	    return this._service.xrpc.call('com.atproto.admin.getAccountInfos', params, undefined, opts).catch(e => {
-	      throw ComAtprotoAdminGetAccountInfos.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.admin.getAccountInfos', params, undefined, opts);
 	  }
 	  getInviteCodes(params, opts) {
-	    return this._service.xrpc.call('com.atproto.admin.getInviteCodes', params, undefined, opts).catch(e => {
-	      throw ComAtprotoAdminGetInviteCodes.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.admin.getInviteCodes', params, undefined, opts);
 	  }
 	  getSubjectStatus(params, opts) {
-	    return this._service.xrpc.call('com.atproto.admin.getSubjectStatus', params, undefined, opts).catch(e => {
-	      throw ComAtprotoAdminGetSubjectStatus.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.admin.getSubjectStatus', params, undefined, opts);
 	  }
 	  searchAccounts(params, opts) {
-	    return this._service.xrpc.call('com.atproto.admin.searchAccounts', params, undefined, opts).catch(e => {
-	      throw ComAtprotoAdminSearchAccounts.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.admin.searchAccounts', params, undefined, opts);
 	  }
 	  sendEmail(data, opts) {
-	    return this._service.xrpc.call('com.atproto.admin.sendEmail', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoAdminSendEmail.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.admin.sendEmail', opts?.qp, data, opts);
 	  }
 	  updateAccountEmail(data, opts) {
-	    return this._service.xrpc.call('com.atproto.admin.updateAccountEmail', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoAdminUpdateAccountEmail.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.admin.updateAccountEmail', opts?.qp, data, opts);
 	  }
 	  updateAccountHandle(data, opts) {
-	    return this._service.xrpc.call('com.atproto.admin.updateAccountHandle', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoAdminUpdateAccountHandle.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.admin.updateAccountHandle', opts?.qp, data, opts);
 	  }
 	  updateAccountPassword(data, opts) {
-	    return this._service.xrpc.call('com.atproto.admin.updateAccountPassword', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoAdminUpdateAccountPassword.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.admin.updateAccountPassword', opts?.qp, data, opts);
 	  }
 	  updateSubjectStatus(data, opts) {
-	    return this._service.xrpc.call('com.atproto.admin.updateSubjectStatus', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoAdminUpdateSubjectStatus.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.admin.updateSubjectStatus', opts?.qp, data, opts);
 	  }
 	}
 	client$1.ComAtprotoAdminNS = ComAtprotoAdminNS;
 	class ComAtprotoIdentityNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  getRecommendedDidCredentials(params, opts) {
-	    return this._service.xrpc.call('com.atproto.identity.getRecommendedDidCredentials', params, undefined, opts).catch(e => {
-	      throw ComAtprotoIdentityGetRecommendedDidCredentials.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.identity.getRecommendedDidCredentials', params, undefined, opts);
 	  }
 	  requestPlcOperationSignature(data, opts) {
-	    return this._service.xrpc.call('com.atproto.identity.requestPlcOperationSignature', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoIdentityRequestPlcOperationSignature.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.identity.requestPlcOperationSignature', opts?.qp, data, opts);
 	  }
 	  resolveHandle(params, opts) {
-	    return this._service.xrpc.call('com.atproto.identity.resolveHandle', params, undefined, opts).catch(e => {
-	      throw ComAtprotoIdentityResolveHandle.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.identity.resolveHandle', params, undefined, opts);
 	  }
 	  signPlcOperation(data, opts) {
-	    return this._service.xrpc.call('com.atproto.identity.signPlcOperation', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoIdentitySignPlcOperation.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.identity.signPlcOperation', opts?.qp, data, opts);
 	  }
 	  submitPlcOperation(data, opts) {
-	    return this._service.xrpc.call('com.atproto.identity.submitPlcOperation', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoIdentitySubmitPlcOperation.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.identity.submitPlcOperation', opts?.qp, data, opts);
 	  }
 	  updateHandle(data, opts) {
-	    return this._service.xrpc.call('com.atproto.identity.updateHandle', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoIdentityUpdateHandle.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.identity.updateHandle', opts?.qp, data, opts);
 	  }
 	}
 	client$1.ComAtprotoIdentityNS = ComAtprotoIdentityNS;
 	class ComAtprotoLabelNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  queryLabels(params, opts) {
-	    return this._service.xrpc.call('com.atproto.label.queryLabels', params, undefined, opts).catch(e => {
-	      throw ComAtprotoLabelQueryLabels.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.label.queryLabels', params, undefined, opts);
 	  }
 	}
 	client$1.ComAtprotoLabelNS = ComAtprotoLabelNS;
 	class ComAtprotoModerationNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  createReport(data, opts) {
-	    return this._service.xrpc.call('com.atproto.moderation.createReport', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoModerationCreateReport.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.moderation.createReport', opts?.qp, data, opts);
 	  }
 	}
 	client$1.ComAtprotoModerationNS = ComAtprotoModerationNS;
 	class ComAtprotoRepoNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  applyWrites(data, opts) {
-	    return this._service.xrpc.call('com.atproto.repo.applyWrites', opts?.qp, data, opts).catch(e => {
+	    return this._client.call('com.atproto.repo.applyWrites', opts?.qp, data, opts).catch(e => {
 	      throw ComAtprotoRepoApplyWrites.toKnownErr(e);
 	    });
 	  }
 	  createRecord(data, opts) {
-	    return this._service.xrpc.call('com.atproto.repo.createRecord', opts?.qp, data, opts).catch(e => {
+	    return this._client.call('com.atproto.repo.createRecord', opts?.qp, data, opts).catch(e => {
 	      throw ComAtprotoRepoCreateRecord.toKnownErr(e);
 	    });
 	  }
 	  deleteRecord(data, opts) {
-	    return this._service.xrpc.call('com.atproto.repo.deleteRecord', opts?.qp, data, opts).catch(e => {
+	    return this._client.call('com.atproto.repo.deleteRecord', opts?.qp, data, opts).catch(e => {
 	      throw ComAtprotoRepoDeleteRecord.toKnownErr(e);
 	    });
 	  }
 	  describeRepo(params, opts) {
-	    return this._service.xrpc.call('com.atproto.repo.describeRepo', params, undefined, opts).catch(e => {
-	      throw ComAtprotoRepoDescribeRepo.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.repo.describeRepo', params, undefined, opts);
 	  }
 	  getRecord(params, opts) {
-	    return this._service.xrpc.call('com.atproto.repo.getRecord', params, undefined, opts).catch(e => {
-	      throw ComAtprotoRepoGetRecord.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.repo.getRecord', params, undefined, opts);
 	  }
 	  importRepo(data, opts) {
-	    return this._service.xrpc.call('com.atproto.repo.importRepo', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoRepoImportRepo.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.repo.importRepo', opts?.qp, data, opts);
 	  }
 	  listMissingBlobs(params, opts) {
-	    return this._service.xrpc.call('com.atproto.repo.listMissingBlobs', params, undefined, opts).catch(e => {
-	      throw ComAtprotoRepoListMissingBlobs.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.repo.listMissingBlobs', params, undefined, opts);
 	  }
 	  listRecords(params, opts) {
-	    return this._service.xrpc.call('com.atproto.repo.listRecords', params, undefined, opts).catch(e => {
-	      throw ComAtprotoRepoListRecords.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.repo.listRecords', params, undefined, opts);
 	  }
 	  putRecord(data, opts) {
-	    return this._service.xrpc.call('com.atproto.repo.putRecord', opts?.qp, data, opts).catch(e => {
+	    return this._client.call('com.atproto.repo.putRecord', opts?.qp, data, opts).catch(e => {
 	      throw ComAtprotoRepoPutRecord.toKnownErr(e);
 	    });
 	  }
 	  uploadBlob(data, opts) {
-	    return this._service.xrpc.call('com.atproto.repo.uploadBlob', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoRepoUploadBlob.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.repo.uploadBlob', opts?.qp, data, opts);
 	  }
 	}
 	client$1.ComAtprotoRepoNS = ComAtprotoRepoNS;
 	class ComAtprotoServerNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  activateAccount(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.activateAccount', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoServerActivateAccount.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.server.activateAccount', opts?.qp, data, opts);
 	  }
 	  checkAccountStatus(params, opts) {
-	    return this._service.xrpc.call('com.atproto.server.checkAccountStatus', params, undefined, opts).catch(e => {
-	      throw ComAtprotoServerCheckAccountStatus.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.server.checkAccountStatus', params, undefined, opts);
 	  }
 	  confirmEmail(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.confirmEmail', opts?.qp, data, opts).catch(e => {
+	    return this._client.call('com.atproto.server.confirmEmail', opts?.qp, data, opts).catch(e => {
 	      throw ComAtprotoServerConfirmEmail.toKnownErr(e);
 	    });
 	  }
 	  createAccount(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.createAccount', opts?.qp, data, opts).catch(e => {
+	    return this._client.call('com.atproto.server.createAccount', opts?.qp, data, opts).catch(e => {
 	      throw ComAtprotoServerCreateAccount.toKnownErr(e);
 	    });
 	  }
 	  createAppPassword(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.createAppPassword', opts?.qp, data, opts).catch(e => {
+	    return this._client.call('com.atproto.server.createAppPassword', opts?.qp, data, opts).catch(e => {
 	      throw ComAtprotoServerCreateAppPassword.toKnownErr(e);
 	    });
 	  }
 	  createInviteCode(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.createInviteCode', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoServerCreateInviteCode.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.server.createInviteCode', opts?.qp, data, opts);
 	  }
 	  createInviteCodes(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.createInviteCodes', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoServerCreateInviteCodes.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.server.createInviteCodes', opts?.qp, data, opts);
 	  }
 	  createSession(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.createSession', opts?.qp, data, opts).catch(e => {
+	    return this._client.call('com.atproto.server.createSession', opts?.qp, data, opts).catch(e => {
 	      throw ComAtprotoServerCreateSession.toKnownErr(e);
 	    });
 	  }
 	  deactivateAccount(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.deactivateAccount', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoServerDeactivateAccount.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.server.deactivateAccount', opts?.qp, data, opts);
 	  }
 	  deleteAccount(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.deleteAccount', opts?.qp, data, opts).catch(e => {
+	    return this._client.call('com.atproto.server.deleteAccount', opts?.qp, data, opts).catch(e => {
 	      throw ComAtprotoServerDeleteAccount.toKnownErr(e);
 	    });
 	  }
 	  deleteSession(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.deleteSession', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoServerDeleteSession.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.server.deleteSession', opts?.qp, data, opts);
 	  }
 	  describeServer(params, opts) {
-	    return this._service.xrpc.call('com.atproto.server.describeServer', params, undefined, opts).catch(e => {
-	      throw ComAtprotoServerDescribeServer.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.server.describeServer', params, undefined, opts);
 	  }
 	  getAccountInviteCodes(params, opts) {
-	    return this._service.xrpc.call('com.atproto.server.getAccountInviteCodes', params, undefined, opts).catch(e => {
+	    return this._client.call('com.atproto.server.getAccountInviteCodes', params, undefined, opts).catch(e => {
 	      throw ComAtprotoServerGetAccountInviteCodes.toKnownErr(e);
 	    });
 	  }
 	  getServiceAuth(params, opts) {
-	    return this._service.xrpc.call('com.atproto.server.getServiceAuth', params, undefined, opts).catch(e => {
+	    return this._client.call('com.atproto.server.getServiceAuth', params, undefined, opts).catch(e => {
 	      throw ComAtprotoServerGetServiceAuth.toKnownErr(e);
 	    });
 	  }
 	  getSession(params, opts) {
-	    return this._service.xrpc.call('com.atproto.server.getSession', params, undefined, opts).catch(e => {
-	      throw ComAtprotoServerGetSession.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.server.getSession', params, undefined, opts);
 	  }
 	  listAppPasswords(params, opts) {
-	    return this._service.xrpc.call('com.atproto.server.listAppPasswords', params, undefined, opts).catch(e => {
+	    return this._client.call('com.atproto.server.listAppPasswords', params, undefined, opts).catch(e => {
 	      throw ComAtprotoServerListAppPasswords.toKnownErr(e);
 	    });
 	  }
 	  refreshSession(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.refreshSession', opts?.qp, data, opts).catch(e => {
+	    return this._client.call('com.atproto.server.refreshSession', opts?.qp, data, opts).catch(e => {
 	      throw ComAtprotoServerRefreshSession.toKnownErr(e);
 	    });
 	  }
 	  requestAccountDelete(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.requestAccountDelete', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoServerRequestAccountDelete.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.server.requestAccountDelete', opts?.qp, data, opts);
 	  }
 	  requestEmailConfirmation(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.requestEmailConfirmation', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoServerRequestEmailConfirmation.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.server.requestEmailConfirmation', opts?.qp, data, opts);
 	  }
 	  requestEmailUpdate(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.requestEmailUpdate', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoServerRequestEmailUpdate.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.server.requestEmailUpdate', opts?.qp, data, opts);
 	  }
 	  requestPasswordReset(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.requestPasswordReset', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoServerRequestPasswordReset.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.server.requestPasswordReset', opts?.qp, data, opts);
 	  }
 	  reserveSigningKey(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.reserveSigningKey', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoServerReserveSigningKey.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.server.reserveSigningKey', opts?.qp, data, opts);
 	  }
 	  resetPassword(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.resetPassword', opts?.qp, data, opts).catch(e => {
+	    return this._client.call('com.atproto.server.resetPassword', opts?.qp, data, opts).catch(e => {
 	      throw ComAtprotoServerResetPassword.toKnownErr(e);
 	    });
 	  }
 	  revokeAppPassword(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.revokeAppPassword', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoServerRevokeAppPassword.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.server.revokeAppPassword', opts?.qp, data, opts);
 	  }
 	  updateEmail(data, opts) {
-	    return this._service.xrpc.call('com.atproto.server.updateEmail', opts?.qp, data, opts).catch(e => {
+	    return this._client.call('com.atproto.server.updateEmail', opts?.qp, data, opts).catch(e => {
 	      throw ComAtprotoServerUpdateEmail.toKnownErr(e);
 	    });
 	  }
 	}
 	client$1.ComAtprotoServerNS = ComAtprotoServerNS;
 	class ComAtprotoSyncNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  getBlob(params, opts) {
-	    return this._service.xrpc.call('com.atproto.sync.getBlob', params, undefined, opts).catch(e => {
+	    return this._client.call('com.atproto.sync.getBlob', params, undefined, opts).catch(e => {
 	      throw ComAtprotoSyncGetBlob.toKnownErr(e);
 	    });
 	  }
 	  getBlocks(params, opts) {
-	    return this._service.xrpc.call('com.atproto.sync.getBlocks', params, undefined, opts).catch(e => {
+	    return this._client.call('com.atproto.sync.getBlocks', params, undefined, opts).catch(e => {
 	      throw ComAtprotoSyncGetBlocks.toKnownErr(e);
 	    });
 	  }
 	  getCheckout(params, opts) {
-	    return this._service.xrpc.call('com.atproto.sync.getCheckout', params, undefined, opts).catch(e => {
-	      throw ComAtprotoSyncGetCheckout.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.sync.getCheckout', params, undefined, opts);
 	  }
 	  getHead(params, opts) {
-	    return this._service.xrpc.call('com.atproto.sync.getHead', params, undefined, opts).catch(e => {
+	    return this._client.call('com.atproto.sync.getHead', params, undefined, opts).catch(e => {
 	      throw ComAtprotoSyncGetHead.toKnownErr(e);
 	    });
 	  }
 	  getLatestCommit(params, opts) {
-	    return this._service.xrpc.call('com.atproto.sync.getLatestCommit', params, undefined, opts).catch(e => {
+	    return this._client.call('com.atproto.sync.getLatestCommit', params, undefined, opts).catch(e => {
 	      throw ComAtprotoSyncGetLatestCommit.toKnownErr(e);
 	    });
 	  }
 	  getRecord(params, opts) {
-	    return this._service.xrpc.call('com.atproto.sync.getRecord', params, undefined, opts).catch(e => {
+	    return this._client.call('com.atproto.sync.getRecord', params, undefined, opts).catch(e => {
 	      throw ComAtprotoSyncGetRecord.toKnownErr(e);
 	    });
 	  }
 	  getRepo(params, opts) {
-	    return this._service.xrpc.call('com.atproto.sync.getRepo', params, undefined, opts).catch(e => {
+	    return this._client.call('com.atproto.sync.getRepo', params, undefined, opts).catch(e => {
 	      throw ComAtprotoSyncGetRepo.toKnownErr(e);
 	    });
 	  }
 	  getRepoStatus(params, opts) {
-	    return this._service.xrpc.call('com.atproto.sync.getRepoStatus', params, undefined, opts).catch(e => {
+	    return this._client.call('com.atproto.sync.getRepoStatus', params, undefined, opts).catch(e => {
 	      throw ComAtprotoSyncGetRepoStatus.toKnownErr(e);
 	    });
 	  }
 	  listBlobs(params, opts) {
-	    return this._service.xrpc.call('com.atproto.sync.listBlobs', params, undefined, opts).catch(e => {
+	    return this._client.call('com.atproto.sync.listBlobs', params, undefined, opts).catch(e => {
 	      throw ComAtprotoSyncListBlobs.toKnownErr(e);
 	    });
 	  }
 	  listRepos(params, opts) {
-	    return this._service.xrpc.call('com.atproto.sync.listRepos', params, undefined, opts).catch(e => {
-	      throw ComAtprotoSyncListRepos.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.sync.listRepos', params, undefined, opts);
 	  }
 	  notifyOfUpdate(data, opts) {
-	    return this._service.xrpc.call('com.atproto.sync.notifyOfUpdate', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoSyncNotifyOfUpdate.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.sync.notifyOfUpdate', opts?.qp, data, opts);
 	  }
 	  requestCrawl(data, opts) {
-	    return this._service.xrpc.call('com.atproto.sync.requestCrawl', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoSyncRequestCrawl.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.sync.requestCrawl', opts?.qp, data, opts);
 	  }
 	}
 	client$1.ComAtprotoSyncNS = ComAtprotoSyncNS;
 	class ComAtprotoTempNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  checkSignupQueue(params, opts) {
-	    return this._service.xrpc.call('com.atproto.temp.checkSignupQueue', params, undefined, opts).catch(e => {
-	      throw ComAtprotoTempCheckSignupQueue.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.temp.checkSignupQueue', params, undefined, opts);
 	  }
 	  fetchLabels(params, opts) {
-	    return this._service.xrpc.call('com.atproto.temp.fetchLabels', params, undefined, opts).catch(e => {
-	      throw ComAtprotoTempFetchLabels.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.temp.fetchLabels', params, undefined, opts);
 	  }
 	  requestPhoneVerification(data, opts) {
-	    return this._service.xrpc.call('com.atproto.temp.requestPhoneVerification', opts?.qp, data, opts).catch(e => {
-	      throw ComAtprotoTempRequestPhoneVerification.toKnownErr(e);
-	    });
+	    return this._client.call('com.atproto.temp.requestPhoneVerification', opts?.qp, data, opts);
 	  }
 	}
 	client$1.ComAtprotoTempNS = ComAtprotoTempNS;
 	class AppNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
@@ -30199,14 +28417,14 @@ if (cid) {
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
-	    this.bsky = new AppBskyNS(service);
+	    this._client = client;
+	    this.bsky = new AppBskyNS(client);
 	  }
 	}
 	client$1.AppNS = AppNS;
 	class AppBskyNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
@@ -30260,21 +28478,21 @@ if (cid) {
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
-	    this.actor = new AppBskyActorNS(service);
-	    this.embed = new AppBskyEmbedNS(service);
-	    this.feed = new AppBskyFeedNS(service);
-	    this.graph = new AppBskyGraphNS(service);
-	    this.labeler = new AppBskyLabelerNS(service);
-	    this.notification = new AppBskyNotificationNS(service);
-	    this.richtext = new AppBskyRichtextNS(service);
-	    this.unspecced = new AppBskyUnspeccedNS(service);
+	    this._client = client;
+	    this.actor = new AppBskyActorNS(client);
+	    this.embed = new AppBskyEmbedNS(client);
+	    this.feed = new AppBskyFeedNS(client);
+	    this.graph = new AppBskyGraphNS(client);
+	    this.labeler = new AppBskyLabelerNS(client);
+	    this.notification = new AppBskyNotificationNS(client);
+	    this.richtext = new AppBskyRichtextNS(client);
+	    this.unspecced = new AppBskyUnspeccedNS(client);
 	  }
 	}
 	client$1.AppBskyNS = AppBskyNS;
 	class AppBskyActorNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
@@ -30286,65 +28504,51 @@ if (cid) {
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
-	    this.profile = new ProfileRecord(service);
+	    this._client = client;
+	    this.profile = new ProfileRecord(client);
 	  }
 	  getPreferences(params, opts) {
-	    return this._service.xrpc.call('app.bsky.actor.getPreferences', params, undefined, opts).catch(e => {
-	      throw AppBskyActorGetPreferences.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.actor.getPreferences', params, undefined, opts);
 	  }
 	  getProfile(params, opts) {
-	    return this._service.xrpc.call('app.bsky.actor.getProfile', params, undefined, opts).catch(e => {
-	      throw AppBskyActorGetProfile.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.actor.getProfile', params, undefined, opts);
 	  }
 	  getProfiles(params, opts) {
-	    return this._service.xrpc.call('app.bsky.actor.getProfiles', params, undefined, opts).catch(e => {
-	      throw AppBskyActorGetProfiles.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.actor.getProfiles', params, undefined, opts);
 	  }
 	  getSuggestions(params, opts) {
-	    return this._service.xrpc.call('app.bsky.actor.getSuggestions', params, undefined, opts).catch(e => {
-	      throw AppBskyActorGetSuggestions.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.actor.getSuggestions', params, undefined, opts);
 	  }
 	  putPreferences(data, opts) {
-	    return this._service.xrpc.call('app.bsky.actor.putPreferences', opts?.qp, data, opts).catch(e => {
-	      throw AppBskyActorPutPreferences.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.actor.putPreferences', opts?.qp, data, opts);
 	  }
 	  searchActors(params, opts) {
-	    return this._service.xrpc.call('app.bsky.actor.searchActors', params, undefined, opts).catch(e => {
-	      throw AppBskyActorSearchActors.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.actor.searchActors', params, undefined, opts);
 	  }
 	  searchActorsTypeahead(params, opts) {
-	    return this._service.xrpc.call('app.bsky.actor.searchActorsTypeahead', params, undefined, opts).catch(e => {
-	      throw AppBskyActorSearchActorsTypeahead.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.actor.searchActorsTypeahead', params, undefined, opts);
 	  }
 	}
 	client$1.AppBskyActorNS = AppBskyActorNS;
 	class ProfileRecord {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  async list(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+	    const res = await this._client.call('com.atproto.repo.listRecords', {
 	      collection: 'app.bsky.actor.profile',
 	      ...params
 	    });
 	    return res.data;
 	  }
 	  async get(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+	    const res = await this._client.call('com.atproto.repo.getRecord', {
 	      collection: 'app.bsky.actor.profile',
 	      ...params
 	    });
@@ -30352,7 +28556,7 @@ if (cid) {
 	  }
 	  async create(params, record, headers) {
 	    record.$type = 'app.bsky.actor.profile';
-	    const res = await this._service.xrpc.call('com.atproto.repo.createRecord', undefined, {
+	    const res = await this._client.call('com.atproto.repo.createRecord', undefined, {
 	      collection: 'app.bsky.actor.profile',
 	      rkey: 'self',
 	      ...params,
@@ -30364,7 +28568,7 @@ if (cid) {
 	    return res.data;
 	  }
 	  async delete(params, headers) {
-	    await this._service.xrpc.call('com.atproto.repo.deleteRecord', undefined, {
+	    await this._client.call('com.atproto.repo.deleteRecord', undefined, {
 	      collection: 'app.bsky.actor.profile',
 	      ...params
 	    }, {
@@ -30374,26 +28578,20 @@ if (cid) {
 	}
 	client$1.ProfileRecord = ProfileRecord;
 	class AppBskyEmbedNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	}
 	client$1.AppBskyEmbedNS = AppBskyEmbedNS;
 	class AppBskyFeedNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: void 0
-	    });
-	    Object.defineProperty(this, "detach", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
@@ -30429,166 +28627,99 @@ if (cid) {
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
-	    this.detach = new DetachRecord(service);
-	    this.generator = new GeneratorRecord(service);
-	    this.like = new LikeRecord(service);
-	    this.post = new PostRecord(service);
-	    this.repost = new RepostRecord(service);
-	    this.threadgate = new ThreadgateRecord(service);
+	    this._client = client;
+	    this.generator = new GeneratorRecord(client);
+	    this.like = new LikeRecord(client);
+	    this.post = new PostRecord(client);
+	    this.repost = new RepostRecord(client);
+	    this.threadgate = new ThreadgateRecord(client);
 	  }
 	  describeFeedGenerator(params, opts) {
-	    return this._service.xrpc.call('app.bsky.feed.describeFeedGenerator', params, undefined, opts).catch(e => {
-	      throw AppBskyFeedDescribeFeedGenerator.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.feed.describeFeedGenerator', params, undefined, opts);
 	  }
 	  getActorFeeds(params, opts) {
-	    return this._service.xrpc.call('app.bsky.feed.getActorFeeds', params, undefined, opts).catch(e => {
-	      throw AppBskyFeedGetActorFeeds.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.feed.getActorFeeds', params, undefined, opts);
 	  }
 	  getActorLikes(params, opts) {
-	    return this._service.xrpc.call('app.bsky.feed.getActorLikes', params, undefined, opts).catch(e => {
+	    return this._client.call('app.bsky.feed.getActorLikes', params, undefined, opts).catch(e => {
 	      throw AppBskyFeedGetActorLikes.toKnownErr(e);
 	    });
 	  }
 	  getAuthorFeed(params, opts) {
-	    return this._service.xrpc.call('app.bsky.feed.getAuthorFeed', params, undefined, opts).catch(e => {
+	    return this._client.call('app.bsky.feed.getAuthorFeed', params, undefined, opts).catch(e => {
 	      throw AppBskyFeedGetAuthorFeed.toKnownErr(e);
 	    });
 	  }
 	  getFeed(params, opts) {
-	    return this._service.xrpc.call('app.bsky.feed.getFeed', params, undefined, opts).catch(e => {
+	    return this._client.call('app.bsky.feed.getFeed', params, undefined, opts).catch(e => {
 	      throw AppBskyFeedGetFeed.toKnownErr(e);
 	    });
 	  }
 	  getFeedGenerator(params, opts) {
-	    return this._service.xrpc.call('app.bsky.feed.getFeedGenerator', params, undefined, opts).catch(e => {
-	      throw AppBskyFeedGetFeedGenerator.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.feed.getFeedGenerator', params, undefined, opts);
 	  }
 	  getFeedGenerators(params, opts) {
-	    return this._service.xrpc.call('app.bsky.feed.getFeedGenerators', params, undefined, opts).catch(e => {
-	      throw AppBskyFeedGetFeedGenerators.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.feed.getFeedGenerators', params, undefined, opts);
 	  }
 	  getFeedSkeleton(params, opts) {
-	    return this._service.xrpc.call('app.bsky.feed.getFeedSkeleton', params, undefined, opts).catch(e => {
+	    return this._client.call('app.bsky.feed.getFeedSkeleton', params, undefined, opts).catch(e => {
 	      throw AppBskyFeedGetFeedSkeleton.toKnownErr(e);
 	    });
 	  }
 	  getLikes(params, opts) {
-	    return this._service.xrpc.call('app.bsky.feed.getLikes', params, undefined, opts).catch(e => {
-	      throw AppBskyFeedGetLikes.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.feed.getLikes', params, undefined, opts);
 	  }
 	  getListFeed(params, opts) {
-	    return this._service.xrpc.call('app.bsky.feed.getListFeed', params, undefined, opts).catch(e => {
+	    return this._client.call('app.bsky.feed.getListFeed', params, undefined, opts).catch(e => {
 	      throw AppBskyFeedGetListFeed.toKnownErr(e);
 	    });
 	  }
 	  getPostThread(params, opts) {
-	    return this._service.xrpc.call('app.bsky.feed.getPostThread', params, undefined, opts).catch(e => {
+	    return this._client.call('app.bsky.feed.getPostThread', params, undefined, opts).catch(e => {
 	      throw AppBskyFeedGetPostThread.toKnownErr(e);
 	    });
 	  }
 	  getPosts(params, opts) {
-	    return this._service.xrpc.call('app.bsky.feed.getPosts', params, undefined, opts).catch(e => {
-	      throw AppBskyFeedGetPosts.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.feed.getPosts', params, undefined, opts);
 	  }
 	  getRepostedBy(params, opts) {
-	    return this._service.xrpc.call('app.bsky.feed.getRepostedBy', params, undefined, opts).catch(e => {
-	      throw AppBskyFeedGetRepostedBy.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.feed.getRepostedBy', params, undefined, opts);
 	  }
 	  getSuggestedFeeds(params, opts) {
-	    return this._service.xrpc.call('app.bsky.feed.getSuggestedFeeds', params, undefined, opts).catch(e => {
-	      throw AppBskyFeedGetSuggestedFeeds.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.feed.getSuggestedFeeds', params, undefined, opts);
 	  }
 	  getTimeline(params, opts) {
-	    return this._service.xrpc.call('app.bsky.feed.getTimeline', params, undefined, opts).catch(e => {
-	      throw AppBskyFeedGetTimeline.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.feed.getTimeline', params, undefined, opts);
 	  }
 	  searchPosts(params, opts) {
-	    return this._service.xrpc.call('app.bsky.feed.searchPosts', params, undefined, opts).catch(e => {
+	    return this._client.call('app.bsky.feed.searchPosts', params, undefined, opts).catch(e => {
 	      throw AppBskyFeedSearchPosts.toKnownErr(e);
 	    });
 	  }
 	  sendInteractions(data, opts) {
-	    return this._service.xrpc.call('app.bsky.feed.sendInteractions', opts?.qp, data, opts).catch(e => {
-	      throw AppBskyFeedSendInteractions.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.feed.sendInteractions', opts?.qp, data, opts);
 	  }
 	}
 	client$1.AppBskyFeedNS = AppBskyFeedNS;
-	class DetachRecord {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: void 0
-	    });
-	    this._service = service;
-	  }
-	  async list(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
-	      collection: 'app.bsky.feed.detach',
-	      ...params
-	    });
-	    return res.data;
-	  }
-	  async get(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
-	      collection: 'app.bsky.feed.detach',
-	      ...params
-	    });
-	    return res.data;
-	  }
-	  async create(params, record, headers) {
-	    record.$type = 'app.bsky.feed.detach';
-	    const res = await this._service.xrpc.call('com.atproto.repo.createRecord', undefined, {
-	      collection: 'app.bsky.feed.detach',
-	      ...params,
-	      record
-	    }, {
-	      encoding: 'application/json',
-	      headers
-	    });
-	    return res.data;
-	  }
-	  async delete(params, headers) {
-	    await this._service.xrpc.call('com.atproto.repo.deleteRecord', undefined, {
-	      collection: 'app.bsky.feed.detach',
-	      ...params
-	    }, {
-	      headers
-	    });
-	  }
-	}
-	client$1.DetachRecord = DetachRecord;
 	class GeneratorRecord {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  async list(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+	    const res = await this._client.call('com.atproto.repo.listRecords', {
 	      collection: 'app.bsky.feed.generator',
 	      ...params
 	    });
 	    return res.data;
 	  }
 	  async get(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+	    const res = await this._client.call('com.atproto.repo.getRecord', {
 	      collection: 'app.bsky.feed.generator',
 	      ...params
 	    });
@@ -30596,7 +28727,7 @@ if (cid) {
 	  }
 	  async create(params, record, headers) {
 	    record.$type = 'app.bsky.feed.generator';
-	    const res = await this._service.xrpc.call('com.atproto.repo.createRecord', undefined, {
+	    const res = await this._client.call('com.atproto.repo.createRecord', undefined, {
 	      collection: 'app.bsky.feed.generator',
 	      ...params,
 	      record
@@ -30607,7 +28738,7 @@ if (cid) {
 	    return res.data;
 	  }
 	  async delete(params, headers) {
-	    await this._service.xrpc.call('com.atproto.repo.deleteRecord', undefined, {
+	    await this._client.call('com.atproto.repo.deleteRecord', undefined, {
 	      collection: 'app.bsky.feed.generator',
 	      ...params
 	    }, {
@@ -30617,24 +28748,24 @@ if (cid) {
 	}
 	client$1.GeneratorRecord = GeneratorRecord;
 	class LikeRecord {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  async list(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+	    const res = await this._client.call('com.atproto.repo.listRecords', {
 	      collection: 'app.bsky.feed.like',
 	      ...params
 	    });
 	    return res.data;
 	  }
 	  async get(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+	    const res = await this._client.call('com.atproto.repo.getRecord', {
 	      collection: 'app.bsky.feed.like',
 	      ...params
 	    });
@@ -30642,7 +28773,7 @@ if (cid) {
 	  }
 	  async create(params, record, headers) {
 	    record.$type = 'app.bsky.feed.like';
-	    const res = await this._service.xrpc.call('com.atproto.repo.createRecord', undefined, {
+	    const res = await this._client.call('com.atproto.repo.createRecord', undefined, {
 	      collection: 'app.bsky.feed.like',
 	      ...params,
 	      record
@@ -30653,7 +28784,7 @@ if (cid) {
 	    return res.data;
 	  }
 	  async delete(params, headers) {
-	    await this._service.xrpc.call('com.atproto.repo.deleteRecord', undefined, {
+	    await this._client.call('com.atproto.repo.deleteRecord', undefined, {
 	      collection: 'app.bsky.feed.like',
 	      ...params
 	    }, {
@@ -30663,24 +28794,24 @@ if (cid) {
 	}
 	client$1.LikeRecord = LikeRecord;
 	class PostRecord {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  async list(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+	    const res = await this._client.call('com.atproto.repo.listRecords', {
 	      collection: 'app.bsky.feed.post',
 	      ...params
 	    });
 	    return res.data;
 	  }
 	  async get(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+	    const res = await this._client.call('com.atproto.repo.getRecord', {
 	      collection: 'app.bsky.feed.post',
 	      ...params
 	    });
@@ -30688,7 +28819,7 @@ if (cid) {
 	  }
 	  async create(params, record, headers) {
 	    record.$type = 'app.bsky.feed.post';
-	    const res = await this._service.xrpc.call('com.atproto.repo.createRecord', undefined, {
+	    const res = await this._client.call('com.atproto.repo.createRecord', undefined, {
 	      collection: 'app.bsky.feed.post',
 	      ...params,
 	      record
@@ -30699,7 +28830,7 @@ if (cid) {
 	    return res.data;
 	  }
 	  async delete(params, headers) {
-	    await this._service.xrpc.call('com.atproto.repo.deleteRecord', undefined, {
+	    await this._client.call('com.atproto.repo.deleteRecord', undefined, {
 	      collection: 'app.bsky.feed.post',
 	      ...params
 	    }, {
@@ -30709,24 +28840,24 @@ if (cid) {
 	}
 	client$1.PostRecord = PostRecord;
 	class RepostRecord {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  async list(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+	    const res = await this._client.call('com.atproto.repo.listRecords', {
 	      collection: 'app.bsky.feed.repost',
 	      ...params
 	    });
 	    return res.data;
 	  }
 	  async get(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+	    const res = await this._client.call('com.atproto.repo.getRecord', {
 	      collection: 'app.bsky.feed.repost',
 	      ...params
 	    });
@@ -30734,7 +28865,7 @@ if (cid) {
 	  }
 	  async create(params, record, headers) {
 	    record.$type = 'app.bsky.feed.repost';
-	    const res = await this._service.xrpc.call('com.atproto.repo.createRecord', undefined, {
+	    const res = await this._client.call('com.atproto.repo.createRecord', undefined, {
 	      collection: 'app.bsky.feed.repost',
 	      ...params,
 	      record
@@ -30745,7 +28876,7 @@ if (cid) {
 	    return res.data;
 	  }
 	  async delete(params, headers) {
-	    await this._service.xrpc.call('com.atproto.repo.deleteRecord', undefined, {
+	    await this._client.call('com.atproto.repo.deleteRecord', undefined, {
 	      collection: 'app.bsky.feed.repost',
 	      ...params
 	    }, {
@@ -30755,24 +28886,24 @@ if (cid) {
 	}
 	client$1.RepostRecord = RepostRecord;
 	class ThreadgateRecord {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  async list(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+	    const res = await this._client.call('com.atproto.repo.listRecords', {
 	      collection: 'app.bsky.feed.threadgate',
 	      ...params
 	    });
 	    return res.data;
 	  }
 	  async get(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+	    const res = await this._client.call('com.atproto.repo.getRecord', {
 	      collection: 'app.bsky.feed.threadgate',
 	      ...params
 	    });
@@ -30780,7 +28911,7 @@ if (cid) {
 	  }
 	  async create(params, record, headers) {
 	    record.$type = 'app.bsky.feed.threadgate';
-	    const res = await this._service.xrpc.call('com.atproto.repo.createRecord', undefined, {
+	    const res = await this._client.call('com.atproto.repo.createRecord', undefined, {
 	      collection: 'app.bsky.feed.threadgate',
 	      ...params,
 	      record
@@ -30791,7 +28922,7 @@ if (cid) {
 	    return res.data;
 	  }
 	  async delete(params, headers) {
-	    await this._service.xrpc.call('com.atproto.repo.deleteRecord', undefined, {
+	    await this._client.call('com.atproto.repo.deleteRecord', undefined, {
 	      collection: 'app.bsky.feed.threadgate',
 	      ...params
 	    }, {
@@ -30801,8 +28932,8 @@ if (cid) {
 	}
 	client$1.ThreadgateRecord = ThreadgateRecord;
 	class AppBskyGraphNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
@@ -30844,135 +28975,97 @@ if (cid) {
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
-	    this.block = new BlockRecord(service);
-	    this.follow = new FollowRecord(service);
-	    this.list = new ListRecord(service);
-	    this.listblock = new ListblockRecord(service);
-	    this.listitem = new ListitemRecord(service);
-	    this.starterpack = new StarterpackRecord(service);
+	    this._client = client;
+	    this.block = new BlockRecord(client);
+	    this.follow = new FollowRecord(client);
+	    this.list = new ListRecord(client);
+	    this.listblock = new ListblockRecord(client);
+	    this.listitem = new ListitemRecord(client);
+	    this.starterpack = new StarterpackRecord(client);
 	  }
 	  getActorStarterPacks(params, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.getActorStarterPacks', params, undefined, opts).catch(e => {
-	      throw AppBskyGraphGetActorStarterPacks.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.getActorStarterPacks', params, undefined, opts);
 	  }
 	  getBlocks(params, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.getBlocks', params, undefined, opts).catch(e => {
-	      throw AppBskyGraphGetBlocks.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.getBlocks', params, undefined, opts);
 	  }
 	  getFollowers(params, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.getFollowers', params, undefined, opts).catch(e => {
-	      throw AppBskyGraphGetFollowers.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.getFollowers', params, undefined, opts);
 	  }
 	  getFollows(params, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.getFollows', params, undefined, opts).catch(e => {
-	      throw AppBskyGraphGetFollows.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.getFollows', params, undefined, opts);
 	  }
 	  getKnownFollowers(params, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.getKnownFollowers', params, undefined, opts).catch(e => {
-	      throw AppBskyGraphGetKnownFollowers.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.getKnownFollowers', params, undefined, opts);
 	  }
 	  getList(params, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.getList', params, undefined, opts).catch(e => {
-	      throw AppBskyGraphGetList.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.getList', params, undefined, opts);
 	  }
 	  getListBlocks(params, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.getListBlocks', params, undefined, opts).catch(e => {
-	      throw AppBskyGraphGetListBlocks.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.getListBlocks', params, undefined, opts);
 	  }
 	  getListMutes(params, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.getListMutes', params, undefined, opts).catch(e => {
-	      throw AppBskyGraphGetListMutes.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.getListMutes', params, undefined, opts);
 	  }
 	  getLists(params, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.getLists', params, undefined, opts).catch(e => {
-	      throw AppBskyGraphGetLists.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.getLists', params, undefined, opts);
 	  }
 	  getMutes(params, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.getMutes', params, undefined, opts).catch(e => {
-	      throw AppBskyGraphGetMutes.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.getMutes', params, undefined, opts);
 	  }
 	  getRelationships(params, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.getRelationships', params, undefined, opts).catch(e => {
+	    return this._client.call('app.bsky.graph.getRelationships', params, undefined, opts).catch(e => {
 	      throw AppBskyGraphGetRelationships.toKnownErr(e);
 	    });
 	  }
 	  getStarterPack(params, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.getStarterPack', params, undefined, opts).catch(e => {
-	      throw AppBskyGraphGetStarterPack.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.getStarterPack', params, undefined, opts);
 	  }
 	  getStarterPacks(params, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.getStarterPacks', params, undefined, opts).catch(e => {
-	      throw AppBskyGraphGetStarterPacks.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.getStarterPacks', params, undefined, opts);
 	  }
 	  getSuggestedFollowsByActor(params, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.getSuggestedFollowsByActor', params, undefined, opts).catch(e => {
-	      throw AppBskyGraphGetSuggestedFollowsByActor.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.getSuggestedFollowsByActor', params, undefined, opts);
 	  }
 	  muteActor(data, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.muteActor', opts?.qp, data, opts).catch(e => {
-	      throw AppBskyGraphMuteActor.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.muteActor', opts?.qp, data, opts);
 	  }
 	  muteActorList(data, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.muteActorList', opts?.qp, data, opts).catch(e => {
-	      throw AppBskyGraphMuteActorList.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.muteActorList', opts?.qp, data, opts);
 	  }
 	  muteThread(data, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.muteThread', opts?.qp, data, opts).catch(e => {
-	      throw AppBskyGraphMuteThread.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.muteThread', opts?.qp, data, opts);
 	  }
 	  unmuteActor(data, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.unmuteActor', opts?.qp, data, opts).catch(e => {
-	      throw AppBskyGraphUnmuteActor.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.unmuteActor', opts?.qp, data, opts);
 	  }
 	  unmuteActorList(data, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.unmuteActorList', opts?.qp, data, opts).catch(e => {
-	      throw AppBskyGraphUnmuteActorList.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.unmuteActorList', opts?.qp, data, opts);
 	  }
 	  unmuteThread(data, opts) {
-	    return this._service.xrpc.call('app.bsky.graph.unmuteThread', opts?.qp, data, opts).catch(e => {
-	      throw AppBskyGraphUnmuteThread.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.graph.unmuteThread', opts?.qp, data, opts);
 	  }
 	}
 	client$1.AppBskyGraphNS = AppBskyGraphNS;
 	class BlockRecord {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  async list(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+	    const res = await this._client.call('com.atproto.repo.listRecords', {
 	      collection: 'app.bsky.graph.block',
 	      ...params
 	    });
 	    return res.data;
 	  }
 	  async get(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+	    const res = await this._client.call('com.atproto.repo.getRecord', {
 	      collection: 'app.bsky.graph.block',
 	      ...params
 	    });
@@ -30980,7 +29073,7 @@ if (cid) {
 	  }
 	  async create(params, record, headers) {
 	    record.$type = 'app.bsky.graph.block';
-	    const res = await this._service.xrpc.call('com.atproto.repo.createRecord', undefined, {
+	    const res = await this._client.call('com.atproto.repo.createRecord', undefined, {
 	      collection: 'app.bsky.graph.block',
 	      ...params,
 	      record
@@ -30991,7 +29084,7 @@ if (cid) {
 	    return res.data;
 	  }
 	  async delete(params, headers) {
-	    await this._service.xrpc.call('com.atproto.repo.deleteRecord', undefined, {
+	    await this._client.call('com.atproto.repo.deleteRecord', undefined, {
 	      collection: 'app.bsky.graph.block',
 	      ...params
 	    }, {
@@ -31001,24 +29094,24 @@ if (cid) {
 	}
 	client$1.BlockRecord = BlockRecord;
 	class FollowRecord {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  async list(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+	    const res = await this._client.call('com.atproto.repo.listRecords', {
 	      collection: 'app.bsky.graph.follow',
 	      ...params
 	    });
 	    return res.data;
 	  }
 	  async get(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+	    const res = await this._client.call('com.atproto.repo.getRecord', {
 	      collection: 'app.bsky.graph.follow',
 	      ...params
 	    });
@@ -31026,7 +29119,7 @@ if (cid) {
 	  }
 	  async create(params, record, headers) {
 	    record.$type = 'app.bsky.graph.follow';
-	    const res = await this._service.xrpc.call('com.atproto.repo.createRecord', undefined, {
+	    const res = await this._client.call('com.atproto.repo.createRecord', undefined, {
 	      collection: 'app.bsky.graph.follow',
 	      ...params,
 	      record
@@ -31037,7 +29130,7 @@ if (cid) {
 	    return res.data;
 	  }
 	  async delete(params, headers) {
-	    await this._service.xrpc.call('com.atproto.repo.deleteRecord', undefined, {
+	    await this._client.call('com.atproto.repo.deleteRecord', undefined, {
 	      collection: 'app.bsky.graph.follow',
 	      ...params
 	    }, {
@@ -31047,24 +29140,24 @@ if (cid) {
 	}
 	client$1.FollowRecord = FollowRecord;
 	class ListRecord {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  async list(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+	    const res = await this._client.call('com.atproto.repo.listRecords', {
 	      collection: 'app.bsky.graph.list',
 	      ...params
 	    });
 	    return res.data;
 	  }
 	  async get(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+	    const res = await this._client.call('com.atproto.repo.getRecord', {
 	      collection: 'app.bsky.graph.list',
 	      ...params
 	    });
@@ -31072,7 +29165,7 @@ if (cid) {
 	  }
 	  async create(params, record, headers) {
 	    record.$type = 'app.bsky.graph.list';
-	    const res = await this._service.xrpc.call('com.atproto.repo.createRecord', undefined, {
+	    const res = await this._client.call('com.atproto.repo.createRecord', undefined, {
 	      collection: 'app.bsky.graph.list',
 	      ...params,
 	      record
@@ -31083,7 +29176,7 @@ if (cid) {
 	    return res.data;
 	  }
 	  async delete(params, headers) {
-	    await this._service.xrpc.call('com.atproto.repo.deleteRecord', undefined, {
+	    await this._client.call('com.atproto.repo.deleteRecord', undefined, {
 	      collection: 'app.bsky.graph.list',
 	      ...params
 	    }, {
@@ -31093,24 +29186,24 @@ if (cid) {
 	}
 	client$1.ListRecord = ListRecord;
 	class ListblockRecord {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  async list(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+	    const res = await this._client.call('com.atproto.repo.listRecords', {
 	      collection: 'app.bsky.graph.listblock',
 	      ...params
 	    });
 	    return res.data;
 	  }
 	  async get(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+	    const res = await this._client.call('com.atproto.repo.getRecord', {
 	      collection: 'app.bsky.graph.listblock',
 	      ...params
 	    });
@@ -31118,7 +29211,7 @@ if (cid) {
 	  }
 	  async create(params, record, headers) {
 	    record.$type = 'app.bsky.graph.listblock';
-	    const res = await this._service.xrpc.call('com.atproto.repo.createRecord', undefined, {
+	    const res = await this._client.call('com.atproto.repo.createRecord', undefined, {
 	      collection: 'app.bsky.graph.listblock',
 	      ...params,
 	      record
@@ -31129,7 +29222,7 @@ if (cid) {
 	    return res.data;
 	  }
 	  async delete(params, headers) {
-	    await this._service.xrpc.call('com.atproto.repo.deleteRecord', undefined, {
+	    await this._client.call('com.atproto.repo.deleteRecord', undefined, {
 	      collection: 'app.bsky.graph.listblock',
 	      ...params
 	    }, {
@@ -31139,24 +29232,24 @@ if (cid) {
 	}
 	client$1.ListblockRecord = ListblockRecord;
 	class ListitemRecord {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  async list(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+	    const res = await this._client.call('com.atproto.repo.listRecords', {
 	      collection: 'app.bsky.graph.listitem',
 	      ...params
 	    });
 	    return res.data;
 	  }
 	  async get(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+	    const res = await this._client.call('com.atproto.repo.getRecord', {
 	      collection: 'app.bsky.graph.listitem',
 	      ...params
 	    });
@@ -31164,7 +29257,7 @@ if (cid) {
 	  }
 	  async create(params, record, headers) {
 	    record.$type = 'app.bsky.graph.listitem';
-	    const res = await this._service.xrpc.call('com.atproto.repo.createRecord', undefined, {
+	    const res = await this._client.call('com.atproto.repo.createRecord', undefined, {
 	      collection: 'app.bsky.graph.listitem',
 	      ...params,
 	      record
@@ -31175,7 +29268,7 @@ if (cid) {
 	    return res.data;
 	  }
 	  async delete(params, headers) {
-	    await this._service.xrpc.call('com.atproto.repo.deleteRecord', undefined, {
+	    await this._client.call('com.atproto.repo.deleteRecord', undefined, {
 	      collection: 'app.bsky.graph.listitem',
 	      ...params
 	    }, {
@@ -31185,24 +29278,24 @@ if (cid) {
 	}
 	client$1.ListitemRecord = ListitemRecord;
 	class StarterpackRecord {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  async list(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+	    const res = await this._client.call('com.atproto.repo.listRecords', {
 	      collection: 'app.bsky.graph.starterpack',
 	      ...params
 	    });
 	    return res.data;
 	  }
 	  async get(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+	    const res = await this._client.call('com.atproto.repo.getRecord', {
 	      collection: 'app.bsky.graph.starterpack',
 	      ...params
 	    });
@@ -31210,7 +29303,7 @@ if (cid) {
 	  }
 	  async create(params, record, headers) {
 	    record.$type = 'app.bsky.graph.starterpack';
-	    const res = await this._service.xrpc.call('com.atproto.repo.createRecord', undefined, {
+	    const res = await this._client.call('com.atproto.repo.createRecord', undefined, {
 	      collection: 'app.bsky.graph.starterpack',
 	      ...params,
 	      record
@@ -31221,7 +29314,7 @@ if (cid) {
 	    return res.data;
 	  }
 	  async delete(params, headers) {
-	    await this._service.xrpc.call('com.atproto.repo.deleteRecord', undefined, {
+	    await this._client.call('com.atproto.repo.deleteRecord', undefined, {
 	      collection: 'app.bsky.graph.starterpack',
 	      ...params
 	    }, {
@@ -31231,8 +29324,8 @@ if (cid) {
 	}
 	client$1.StarterpackRecord = StarterpackRecord;
 	class AppBskyLabelerNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
@@ -31244,35 +29337,33 @@ if (cid) {
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
-	    this.service = new ServiceRecord(service);
+	    this._client = client;
+	    this.service = new ServiceRecord(client);
 	  }
 	  getServices(params, opts) {
-	    return this._service.xrpc.call('app.bsky.labeler.getServices', params, undefined, opts).catch(e => {
-	      throw AppBskyLabelerGetServices.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.labeler.getServices', params, undefined, opts);
 	  }
 	}
 	client$1.AppBskyLabelerNS = AppBskyLabelerNS;
 	class ServiceRecord {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  async list(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+	    const res = await this._client.call('com.atproto.repo.listRecords', {
 	      collection: 'app.bsky.labeler.service',
 	      ...params
 	    });
 	    return res.data;
 	  }
 	  async get(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+	    const res = await this._client.call('com.atproto.repo.getRecord', {
 	      collection: 'app.bsky.labeler.service',
 	      ...params
 	    });
@@ -31280,7 +29371,7 @@ if (cid) {
 	  }
 	  async create(params, record, headers) {
 	    record.$type = 'app.bsky.labeler.service';
-	    const res = await this._service.xrpc.call('com.atproto.repo.createRecord', undefined, {
+	    const res = await this._client.call('com.atproto.repo.createRecord', undefined, {
 	      collection: 'app.bsky.labeler.service',
 	      rkey: 'self',
 	      ...params,
@@ -31292,7 +29383,7 @@ if (cid) {
 	    return res.data;
 	  }
 	  async delete(params, headers) {
-	    await this._service.xrpc.call('com.atproto.repo.deleteRecord', undefined, {
+	    await this._client.call('com.atproto.repo.deleteRecord', undefined, {
 	      collection: 'app.bsky.labeler.service',
 	      ...params
 	    }, {
@@ -31302,94 +29393,78 @@ if (cid) {
 	}
 	client$1.ServiceRecord = ServiceRecord;
 	class AppBskyNotificationNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  getUnreadCount(params, opts) {
-	    return this._service.xrpc.call('app.bsky.notification.getUnreadCount', params, undefined, opts).catch(e => {
-	      throw AppBskyNotificationGetUnreadCount.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.notification.getUnreadCount', params, undefined, opts);
 	  }
 	  listNotifications(params, opts) {
-	    return this._service.xrpc.call('app.bsky.notification.listNotifications', params, undefined, opts).catch(e => {
-	      throw AppBskyNotificationListNotifications.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.notification.listNotifications', params, undefined, opts);
 	  }
 	  putPreferences(data, opts) {
-	    return this._service.xrpc.call('app.bsky.notification.putPreferences', opts?.qp, data, opts).catch(e => {
-	      throw AppBskyNotificationPutPreferences.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.notification.putPreferences', opts?.qp, data, opts);
 	  }
 	  registerPush(data, opts) {
-	    return this._service.xrpc.call('app.bsky.notification.registerPush', opts?.qp, data, opts).catch(e => {
-	      throw AppBskyNotificationRegisterPush.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.notification.registerPush', opts?.qp, data, opts);
 	  }
 	  updateSeen(data, opts) {
-	    return this._service.xrpc.call('app.bsky.notification.updateSeen', opts?.qp, data, opts).catch(e => {
-	      throw AppBskyNotificationUpdateSeen.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.notification.updateSeen', opts?.qp, data, opts);
 	  }
 	}
 	client$1.AppBskyNotificationNS = AppBskyNotificationNS;
 	class AppBskyRichtextNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	}
 	client$1.AppBskyRichtextNS = AppBskyRichtextNS;
 	class AppBskyUnspeccedNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  getPopularFeedGenerators(params, opts) {
-	    return this._service.xrpc.call('app.bsky.unspecced.getPopularFeedGenerators', params, undefined, opts).catch(e => {
-	      throw AppBskyUnspeccedGetPopularFeedGenerators.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.unspecced.getPopularFeedGenerators', params, undefined, opts);
 	  }
 	  getSuggestionsSkeleton(params, opts) {
-	    return this._service.xrpc.call('app.bsky.unspecced.getSuggestionsSkeleton', params, undefined, opts).catch(e => {
-	      throw AppBskyUnspeccedGetSuggestionsSkeleton.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.unspecced.getSuggestionsSkeleton', params, undefined, opts);
 	  }
 	  getTaggedSuggestions(params, opts) {
-	    return this._service.xrpc.call('app.bsky.unspecced.getTaggedSuggestions', params, undefined, opts).catch(e => {
-	      throw AppBskyUnspeccedGetTaggedSuggestions.toKnownErr(e);
-	    });
+	    return this._client.call('app.bsky.unspecced.getTaggedSuggestions', params, undefined, opts);
 	  }
 	  searchActorsSkeleton(params, opts) {
-	    return this._service.xrpc.call('app.bsky.unspecced.searchActorsSkeleton', params, undefined, opts).catch(e => {
+	    return this._client.call('app.bsky.unspecced.searchActorsSkeleton', params, undefined, opts).catch(e => {
 	      throw AppBskyUnspeccedSearchActorsSkeleton.toKnownErr(e);
 	    });
 	  }
 	  searchPostsSkeleton(params, opts) {
-	    return this._service.xrpc.call('app.bsky.unspecced.searchPostsSkeleton', params, undefined, opts).catch(e => {
+	    return this._client.call('app.bsky.unspecced.searchPostsSkeleton', params, undefined, opts).catch(e => {
 	      throw AppBskyUnspeccedSearchPostsSkeleton.toKnownErr(e);
 	    });
 	  }
 	}
 	client$1.AppBskyUnspeccedNS = AppBskyUnspeccedNS;
 	class ChatNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
@@ -31401,14 +29476,14 @@ if (cid) {
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
-	    this.bsky = new ChatBskyNS(service);
+	    this._client = client;
+	    this.bsky = new ChatBskyNS(client);
 	  }
 	}
 	client$1.ChatNS = ChatNS;
 	class ChatBskyNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
@@ -31432,16 +29507,16 @@ if (cid) {
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
-	    this.actor = new ChatBskyActorNS(service);
-	    this.convo = new ChatBskyConvoNS(service);
-	    this.moderation = new ChatBskyModerationNS(service);
+	    this._client = client;
+	    this.actor = new ChatBskyActorNS(client);
+	    this.convo = new ChatBskyConvoNS(client);
+	    this.moderation = new ChatBskyModerationNS(client);
 	  }
 	}
 	client$1.ChatBskyNS = ChatBskyNS;
 	class ChatBskyActorNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
@@ -31453,40 +29528,36 @@ if (cid) {
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
-	    this.declaration = new DeclarationRecord(service);
+	    this._client = client;
+	    this.declaration = new DeclarationRecord(client);
 	  }
 	  deleteAccount(data, opts) {
-	    return this._service.xrpc.call('chat.bsky.actor.deleteAccount', opts?.qp, data, opts).catch(e => {
-	      throw ChatBskyActorDeleteAccount.toKnownErr(e);
-	    });
+	    return this._client.call('chat.bsky.actor.deleteAccount', opts?.qp, data, opts);
 	  }
 	  exportAccountData(params, opts) {
-	    return this._service.xrpc.call('chat.bsky.actor.exportAccountData', params, undefined, opts).catch(e => {
-	      throw ChatBskyActorExportAccountData.toKnownErr(e);
-	    });
+	    return this._client.call('chat.bsky.actor.exportAccountData', params, undefined, opts);
 	  }
 	}
 	client$1.ChatBskyActorNS = ChatBskyActorNS;
 	class DeclarationRecord {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  async list(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.listRecords', {
+	    const res = await this._client.call('com.atproto.repo.listRecords', {
 	      collection: 'chat.bsky.actor.declaration',
 	      ...params
 	    });
 	    return res.data;
 	  }
 	  async get(params) {
-	    const res = await this._service.xrpc.call('com.atproto.repo.getRecord', {
+	    const res = await this._client.call('com.atproto.repo.getRecord', {
 	      collection: 'chat.bsky.actor.declaration',
 	      ...params
 	    });
@@ -31494,7 +29565,7 @@ if (cid) {
 	  }
 	  async create(params, record, headers) {
 	    record.$type = 'chat.bsky.actor.declaration';
-	    const res = await this._service.xrpc.call('com.atproto.repo.createRecord', undefined, {
+	    const res = await this._client.call('com.atproto.repo.createRecord', undefined, {
 	      collection: 'chat.bsky.actor.declaration',
 	      rkey: 'self',
 	      ...params,
@@ -31506,7 +29577,7 @@ if (cid) {
 	    return res.data;
 	  }
 	  async delete(params, headers) {
-	    await this._service.xrpc.call('com.atproto.repo.deleteRecord', undefined, {
+	    await this._client.call('com.atproto.repo.deleteRecord', undefined, {
 	      collection: 'chat.bsky.actor.declaration',
 	      ...params
 	    }, {
@@ -31516,107 +29587,77 @@ if (cid) {
 	}
 	client$1.DeclarationRecord = DeclarationRecord;
 	class ChatBskyConvoNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  deleteMessageForSelf(data, opts) {
-	    return this._service.xrpc.call('chat.bsky.convo.deleteMessageForSelf', opts?.qp, data, opts).catch(e => {
-	      throw ChatBskyConvoDeleteMessageForSelf.toKnownErr(e);
-	    });
+	    return this._client.call('chat.bsky.convo.deleteMessageForSelf', opts?.qp, data, opts);
 	  }
 	  getConvo(params, opts) {
-	    return this._service.xrpc.call('chat.bsky.convo.getConvo', params, undefined, opts).catch(e => {
-	      throw ChatBskyConvoGetConvo.toKnownErr(e);
-	    });
+	    return this._client.call('chat.bsky.convo.getConvo', params, undefined, opts);
 	  }
 	  getConvoForMembers(params, opts) {
-	    return this._service.xrpc.call('chat.bsky.convo.getConvoForMembers', params, undefined, opts).catch(e => {
-	      throw ChatBskyConvoGetConvoForMembers.toKnownErr(e);
-	    });
+	    return this._client.call('chat.bsky.convo.getConvoForMembers', params, undefined, opts);
 	  }
 	  getLog(params, opts) {
-	    return this._service.xrpc.call('chat.bsky.convo.getLog', params, undefined, opts).catch(e => {
-	      throw ChatBskyConvoGetLog.toKnownErr(e);
-	    });
+	    return this._client.call('chat.bsky.convo.getLog', params, undefined, opts);
 	  }
 	  getMessages(params, opts) {
-	    return this._service.xrpc.call('chat.bsky.convo.getMessages', params, undefined, opts).catch(e => {
-	      throw ChatBskyConvoGetMessages.toKnownErr(e);
-	    });
+	    return this._client.call('chat.bsky.convo.getMessages', params, undefined, opts);
 	  }
 	  leaveConvo(data, opts) {
-	    return this._service.xrpc.call('chat.bsky.convo.leaveConvo', opts?.qp, data, opts).catch(e => {
-	      throw ChatBskyConvoLeaveConvo.toKnownErr(e);
-	    });
+	    return this._client.call('chat.bsky.convo.leaveConvo', opts?.qp, data, opts);
 	  }
 	  listConvos(params, opts) {
-	    return this._service.xrpc.call('chat.bsky.convo.listConvos', params, undefined, opts).catch(e => {
-	      throw ChatBskyConvoListConvos.toKnownErr(e);
-	    });
+	    return this._client.call('chat.bsky.convo.listConvos', params, undefined, opts);
 	  }
 	  muteConvo(data, opts) {
-	    return this._service.xrpc.call('chat.bsky.convo.muteConvo', opts?.qp, data, opts).catch(e => {
-	      throw ChatBskyConvoMuteConvo.toKnownErr(e);
-	    });
+	    return this._client.call('chat.bsky.convo.muteConvo', opts?.qp, data, opts);
 	  }
 	  sendMessage(data, opts) {
-	    return this._service.xrpc.call('chat.bsky.convo.sendMessage', opts?.qp, data, opts).catch(e => {
-	      throw ChatBskyConvoSendMessage.toKnownErr(e);
-	    });
+	    return this._client.call('chat.bsky.convo.sendMessage', opts?.qp, data, opts);
 	  }
 	  sendMessageBatch(data, opts) {
-	    return this._service.xrpc.call('chat.bsky.convo.sendMessageBatch', opts?.qp, data, opts).catch(e => {
-	      throw ChatBskyConvoSendMessageBatch.toKnownErr(e);
-	    });
+	    return this._client.call('chat.bsky.convo.sendMessageBatch', opts?.qp, data, opts);
 	  }
 	  unmuteConvo(data, opts) {
-	    return this._service.xrpc.call('chat.bsky.convo.unmuteConvo', opts?.qp, data, opts).catch(e => {
-	      throw ChatBskyConvoUnmuteConvo.toKnownErr(e);
-	    });
+	    return this._client.call('chat.bsky.convo.unmuteConvo', opts?.qp, data, opts);
 	  }
 	  updateRead(data, opts) {
-	    return this._service.xrpc.call('chat.bsky.convo.updateRead', opts?.qp, data, opts).catch(e => {
-	      throw ChatBskyConvoUpdateRead.toKnownErr(e);
-	    });
+	    return this._client.call('chat.bsky.convo.updateRead', opts?.qp, data, opts);
 	  }
 	}
 	client$1.ChatBskyConvoNS = ChatBskyConvoNS;
 	class ChatBskyModerationNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  getActorMetadata(params, opts) {
-	    return this._service.xrpc.call('chat.bsky.moderation.getActorMetadata', params, undefined, opts).catch(e => {
-	      throw ChatBskyModerationGetActorMetadata.toKnownErr(e);
-	    });
+	    return this._client.call('chat.bsky.moderation.getActorMetadata', params, undefined, opts);
 	  }
 	  getMessageContext(params, opts) {
-	    return this._service.xrpc.call('chat.bsky.moderation.getMessageContext', params, undefined, opts).catch(e => {
-	      throw ChatBskyModerationGetMessageContext.toKnownErr(e);
-	    });
+	    return this._client.call('chat.bsky.moderation.getMessageContext', params, undefined, opts);
 	  }
 	  updateActorAccess(data, opts) {
-	    return this._service.xrpc.call('chat.bsky.moderation.updateActorAccess', opts?.qp, data, opts).catch(e => {
-	      throw ChatBskyModerationUpdateActorAccess.toKnownErr(e);
-	    });
+	    return this._client.call('chat.bsky.moderation.updateActorAccess', opts?.qp, data, opts);
 	  }
 	}
 	client$1.ChatBskyModerationNS = ChatBskyModerationNS;
 	class ToolsNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
@@ -31628,14 +29669,14 @@ if (cid) {
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
-	    this.ozone = new ToolsOzoneNS(service);
+	    this._client = client;
+	    this.ozone = new ToolsOzoneNS(client);
 	  }
 	}
 	client$1.ToolsNS = ToolsNS;
 	class ToolsOzoneNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
@@ -31665,582 +29706,122 @@ if (cid) {
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
-	    this.communication = new ToolsOzoneCommunicationNS(service);
-	    this.moderation = new ToolsOzoneModerationNS(service);
-	    this.server = new ToolsOzoneServerNS(service);
-	    this.team = new ToolsOzoneTeamNS(service);
+	    this._client = client;
+	    this.communication = new ToolsOzoneCommunicationNS(client);
+	    this.moderation = new ToolsOzoneModerationNS(client);
+	    this.server = new ToolsOzoneServerNS(client);
+	    this.team = new ToolsOzoneTeamNS(client);
 	  }
 	}
 	client$1.ToolsOzoneNS = ToolsOzoneNS;
 	class ToolsOzoneCommunicationNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  createTemplate(data, opts) {
-	    return this._service.xrpc.call('tools.ozone.communication.createTemplate', opts?.qp, data, opts).catch(e => {
-	      throw ToolsOzoneCommunicationCreateTemplate.toKnownErr(e);
-	    });
+	    return this._client.call('tools.ozone.communication.createTemplate', opts?.qp, data, opts);
 	  }
 	  deleteTemplate(data, opts) {
-	    return this._service.xrpc.call('tools.ozone.communication.deleteTemplate', opts?.qp, data, opts).catch(e => {
-	      throw ToolsOzoneCommunicationDeleteTemplate.toKnownErr(e);
-	    });
+	    return this._client.call('tools.ozone.communication.deleteTemplate', opts?.qp, data, opts);
 	  }
 	  listTemplates(params, opts) {
-	    return this._service.xrpc.call('tools.ozone.communication.listTemplates', params, undefined, opts).catch(e => {
-	      throw ToolsOzoneCommunicationListTemplates.toKnownErr(e);
-	    });
+	    return this._client.call('tools.ozone.communication.listTemplates', params, undefined, opts);
 	  }
 	  updateTemplate(data, opts) {
-	    return this._service.xrpc.call('tools.ozone.communication.updateTemplate', opts?.qp, data, opts).catch(e => {
-	      throw ToolsOzoneCommunicationUpdateTemplate.toKnownErr(e);
-	    });
+	    return this._client.call('tools.ozone.communication.updateTemplate', opts?.qp, data, opts);
 	  }
 	}
 	client$1.ToolsOzoneCommunicationNS = ToolsOzoneCommunicationNS;
 	class ToolsOzoneModerationNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  emitEvent(data, opts) {
-	    return this._service.xrpc.call('tools.ozone.moderation.emitEvent', opts?.qp, data, opts).catch(e => {
+	    return this._client.call('tools.ozone.moderation.emitEvent', opts?.qp, data, opts).catch(e => {
 	      throw ToolsOzoneModerationEmitEvent.toKnownErr(e);
 	    });
 	  }
 	  getEvent(params, opts) {
-	    return this._service.xrpc.call('tools.ozone.moderation.getEvent', params, undefined, opts).catch(e => {
-	      throw ToolsOzoneModerationGetEvent.toKnownErr(e);
-	    });
+	    return this._client.call('tools.ozone.moderation.getEvent', params, undefined, opts);
 	  }
 	  getRecord(params, opts) {
-	    return this._service.xrpc.call('tools.ozone.moderation.getRecord', params, undefined, opts).catch(e => {
+	    return this._client.call('tools.ozone.moderation.getRecord', params, undefined, opts).catch(e => {
 	      throw ToolsOzoneModerationGetRecord.toKnownErr(e);
 	    });
 	  }
 	  getRepo(params, opts) {
-	    return this._service.xrpc.call('tools.ozone.moderation.getRepo', params, undefined, opts).catch(e => {
+	    return this._client.call('tools.ozone.moderation.getRepo', params, undefined, opts).catch(e => {
 	      throw ToolsOzoneModerationGetRepo.toKnownErr(e);
 	    });
 	  }
 	  queryEvents(params, opts) {
-	    return this._service.xrpc.call('tools.ozone.moderation.queryEvents', params, undefined, opts).catch(e => {
-	      throw ToolsOzoneModerationQueryEvents.toKnownErr(e);
-	    });
+	    return this._client.call('tools.ozone.moderation.queryEvents', params, undefined, opts);
 	  }
 	  queryStatuses(params, opts) {
-	    return this._service.xrpc.call('tools.ozone.moderation.queryStatuses', params, undefined, opts).catch(e => {
-	      throw ToolsOzoneModerationQueryStatuses.toKnownErr(e);
-	    });
+	    return this._client.call('tools.ozone.moderation.queryStatuses', params, undefined, opts);
 	  }
 	  searchRepos(params, opts) {
-	    return this._service.xrpc.call('tools.ozone.moderation.searchRepos', params, undefined, opts).catch(e => {
-	      throw ToolsOzoneModerationSearchRepos.toKnownErr(e);
-	    });
+	    return this._client.call('tools.ozone.moderation.searchRepos', params, undefined, opts);
 	  }
 	}
 	client$1.ToolsOzoneModerationNS = ToolsOzoneModerationNS;
 	class ToolsOzoneServerNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  getConfig(params, opts) {
-	    return this._service.xrpc.call('tools.ozone.server.getConfig', params, undefined, opts).catch(e => {
-	      throw ToolsOzoneServerGetConfig.toKnownErr(e);
-	    });
+	    return this._client.call('tools.ozone.server.getConfig', params, undefined, opts);
 	  }
 	}
 	client$1.ToolsOzoneServerNS = ToolsOzoneServerNS;
 	class ToolsOzoneTeamNS {
-	  constructor(service) {
-	    Object.defineProperty(this, "_service", {
+	  constructor(client) {
+	    Object.defineProperty(this, "_client", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
 	      value: void 0
 	    });
-	    this._service = service;
+	    this._client = client;
 	  }
 	  addMember(data, opts) {
-	    return this._service.xrpc.call('tools.ozone.team.addMember', opts?.qp, data, opts).catch(e => {
+	    return this._client.call('tools.ozone.team.addMember', opts?.qp, data, opts).catch(e => {
 	      throw ToolsOzoneTeamAddMember.toKnownErr(e);
 	    });
 	  }
 	  deleteMember(data, opts) {
-	    return this._service.xrpc.call('tools.ozone.team.deleteMember', opts?.qp, data, opts).catch(e => {
+	    return this._client.call('tools.ozone.team.deleteMember', opts?.qp, data, opts).catch(e => {
 	      throw ToolsOzoneTeamDeleteMember.toKnownErr(e);
 	    });
 	  }
 	  listMembers(params, opts) {
-	    return this._service.xrpc.call('tools.ozone.team.listMembers', params, undefined, opts).catch(e => {
-	      throw ToolsOzoneTeamListMembers.toKnownErr(e);
-	    });
+	    return this._client.call('tools.ozone.team.listMembers', params, undefined, opts);
 	  }
 	  updateMember(data, opts) {
-	    return this._service.xrpc.call('tools.ozone.team.updateMember', opts?.qp, data, opts).catch(e => {
+	    return this._client.call('tools.ozone.team.updateMember', opts?.qp, data, opts).catch(e => {
 	      throw ToolsOzoneTeamUpdateMember.toKnownErr(e);
 	    });
 	  }
 	}
 	client$1.ToolsOzoneTeamNS = ToolsOzoneTeamNS;
-
-	var agent = {};
-
-	Object.defineProperty(agent, "__esModule", {
-	  value: true
-	});
-	agent.AtpAgent = void 0;
-	const xrpc_1 = dist;
-	const xrpc_2 = dist;
-	const common_web_1$2 = dist$2;
-	const client_1$5 = client$1;
-	const const_1 = _const;
-	const REFRESH_SESSION = 'com.atproto.server.refreshSession';
-	/**
-	 * An ATP "Agent"
-	 * Manages session token lifecycles and provides convenience methods.
-	 */
-	class AtpAgent {
-	  get com() {
-	    return this.api.com;
-	  }
-	  /**
-	   * Configures the API globally.
-	   */
-	  static configure(opts) {
-	    if (opts.fetch) {
-	      AtpAgent.fetch = opts.fetch;
-	    }
-	    if (opts.appLabelers) {
-	      AtpAgent.appLabelers = opts.appLabelers;
-	    }
-	  }
-	  constructor(opts) {
-	    Object.defineProperty(this, "service", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: void 0
-	    });
-	    Object.defineProperty(this, "api", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: void 0
-	    });
-	    Object.defineProperty(this, "session", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: void 0
-	    });
-	    Object.defineProperty(this, "labelersHeader", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: []
-	    });
-	    Object.defineProperty(this, "proxyHeader", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: void 0
-	    });
-	    Object.defineProperty(this, "pdsUrl", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: void 0
-	    }); // The PDS URL, driven by the did doc. May be undefined.
-	    Object.defineProperty(this, "_baseClient", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: void 0
-	    });
-	    Object.defineProperty(this, "_persistSession", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: void 0
-	    });
-	    Object.defineProperty(this, "_refreshSessionPromise", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: void 0
-	    });
-	    /**
-	     * Upload a binary blob to the server
-	     */
-	    Object.defineProperty(this, "uploadBlob", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: (data, opts) => this.api.com.atproto.repo.uploadBlob(data, opts)
-	    });
-	    /**
-	     * Resolve a handle to a DID
-	     */
-	    Object.defineProperty(this, "resolveHandle", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: (params, opts) => this.api.com.atproto.identity.resolveHandle(params, opts)
-	    });
-	    /**
-	     * Change the user's handle
-	     */
-	    Object.defineProperty(this, "updateHandle", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: (data, opts) => this.api.com.atproto.identity.updateHandle(data, opts)
-	    });
-	    /**
-	     * Create a moderation report
-	     */
-	    Object.defineProperty(this, "createModerationReport", {
-	      enumerable: true,
-	      configurable: true,
-	      writable: true,
-	      value: (data, opts) => this.api.com.atproto.moderation.createReport(data, opts)
-	    });
-	    this.service = opts.service instanceof URL ? opts.service : new URL(opts.service);
-	    this._persistSession = opts.persistSession;
-	    // create an ATP client instance for this agent
-	    this._baseClient = new client_1$5.AtpBaseClient();
-	    this._baseClient.xrpc.fetch = this._fetch.bind(this); // patch its fetch implementation
-	    this.api = this._baseClient.service(opts.service);
-	  }
-	  clone() {
-	    const inst = new AtpAgent({
-	      service: this.service
-	    });
-	    this.copyInto(inst);
-	    return inst;
-	  }
-	  copyInto(inst) {
-	    inst.session = this.session;
-	    inst.labelersHeader = this.labelersHeader;
-	    inst.proxyHeader = this.proxyHeader;
-	    inst.pdsUrl = this.pdsUrl;
-	    inst.api.xrpc.uri = this.pdsUrl || this.service;
-	  }
-	  withProxy(serviceType, did) {
-	    const inst = this.clone();
-	    inst.configureProxyHeader(serviceType, did);
-	    return inst;
-	  }
-	  /**
-	   * Is there any active session?
-	   */
-	  get hasSession() {
-	    return !!this.session;
-	  }
-	  /**
-	   * Sets the "Persist Session" method which can be used to store access tokens
-	   * as they change.
-	   */
-	  setPersistSessionHandler(handler) {
-	    this._persistSession = handler;
-	  }
-	  /**
-	   * Configures the moderation services to be applied on requests.
-	   * NOTE: this is called automatically by getPreferences() and the relevant moderation config
-	   * methods in BskyAgent instances.
-	   */
-	  configureLabelersHeader(labelerDids) {
-	    this.labelersHeader = labelerDids;
-	  }
-	  /**
-	   * Configures the atproto-proxy header to be applied on requests
-	   */
-	  configureProxyHeader(serviceType, did) {
-	    if (did.startsWith('did:')) {
-	      this.proxyHeader = `${did}#${serviceType}`;
-	    }
-	  }
-	  /**
-	   * Create a new account and hydrate its session in this agent.
-	   */
-	  async createAccount(opts) {
-	    try {
-	      const res = await this.api.com.atproto.server.createAccount(opts);
-	      this.session = {
-	        accessJwt: res.data.accessJwt,
-	        refreshJwt: res.data.refreshJwt,
-	        handle: res.data.handle,
-	        did: res.data.did,
-	        email: opts.email,
-	        emailConfirmed: false,
-	        emailAuthFactor: false,
-	        active: true
-	      };
-	      this._updateApiEndpoint(res.data.didDoc);
-	      return res;
-	    } catch (e) {
-	      this.session = undefined;
-	      throw e;
-	    } finally {
-	      if (this.session) {
-	        this._persistSession?.('create', this.session);
-	      } else {
-	        this._persistSession?.('create-failed', undefined);
-	      }
-	    }
-	  }
-	  /**
-	   * Start a new session with this agent.
-	   */
-	  async login(opts) {
-	    try {
-	      const res = await this.api.com.atproto.server.createSession({
-	        identifier: opts.identifier,
-	        password: opts.password,
-	        authFactorToken: opts.authFactorToken
-	      });
-	      this.session = {
-	        accessJwt: res.data.accessJwt,
-	        refreshJwt: res.data.refreshJwt,
-	        handle: res.data.handle,
-	        did: res.data.did,
-	        email: res.data.email,
-	        emailConfirmed: res.data.emailConfirmed,
-	        emailAuthFactor: res.data.emailAuthFactor,
-	        active: res.data.active ?? true,
-	        status: res.data.status
-	      };
-	      this._updateApiEndpoint(res.data.didDoc);
-	      return res;
-	    } catch (e) {
-	      this.session = undefined;
-	      throw e;
-	    } finally {
-	      if (this.session) {
-	        this._persistSession?.('create', this.session);
-	      } else {
-	        this._persistSession?.('create-failed', undefined);
-	      }
-	    }
-	  }
-	  /**
-	   * Resume a pre-existing session with this agent.
-	   */
-	  async resumeSession(session) {
-	    try {
-	      this.session = session;
-	      const res = await this.api.com.atproto.server.getSession();
-	      if (res.data.did !== this.session.did) {
-	        throw new xrpc_2.XRPCError(xrpc_2.ResponseType.InvalidRequest, 'Invalid session', 'InvalidDID');
-	      }
-	      this.session.email = res.data.email;
-	      this.session.handle = res.data.handle;
-	      this.session.emailConfirmed = res.data.emailConfirmed;
-	      this.session.emailAuthFactor = res.data.emailAuthFactor;
-	      this.session.active = res.data.active ?? true;
-	      this.session.status = res.data.status;
-	      this._updateApiEndpoint(res.data.didDoc);
-	      this._persistSession?.('update', this.session);
-	      return res;
-	    } catch (e) {
-	      this.session = undefined;
-	      if (e instanceof xrpc_2.XRPCError) {
-	        /*
-	         * `ExpiredToken` and `InvalidToken` are handled in
-	         * `this_refreshSession`, and emit an `expired` event there.
-	         *
-	         * Everything else is handled here.
-	         */
-	        if ([1, 408, 425, 429, 500, 502, 503, 504, 522, 524].includes(e.status)) {
-	          this._persistSession?.('network-error', undefined);
-	        } else {
-	          this._persistSession?.('expired', undefined);
-	        }
-	      } else {
-	        this._persistSession?.('network-error', undefined);
-	      }
-	      throw e;
-	    }
-	  }
-	  /**
-	   * Internal helper to add authorization headers to requests.
-	   */
-	  _addHeaders(reqHeaders) {
-	    if (!reqHeaders.authorization && this.session?.accessJwt) {
-	      reqHeaders = {
-	        ...reqHeaders,
-	        authorization: `Bearer ${this.session.accessJwt}`
-	      };
-	    }
-	    if (this.proxyHeader) {
-	      reqHeaders = {
-	        ...reqHeaders,
-	        'atproto-proxy': this.proxyHeader
-	      };
-	    }
-	    const labelerHeaderName = 'atproto-accept-labelers';
-	    const labelerHeaders = AtpAgent.appLabelers.map(str => `${str};redact`).concat(this.labelersHeader.filter(str => str.startsWith('did:')));
-	    // Besides labelers configured via appLabelers and labelersHeader
-	    // respect any additional labelers configured via the request headers
-	    if (reqHeaders[labelerHeaderName]) {
-	      labelerHeaders.push(
-	      // Allow for headers to be comma-separated with or without spaces in between by trimming after split
-	      ...reqHeaders[labelerHeaderName].split(',').map(str => str.trim()));
-	    }
-	    reqHeaders = {
-	      ...reqHeaders,
-	      [labelerHeaderName]: labelerHeaders.join(', ')
-	    };
-	    return reqHeaders;
-	  }
-	  /**
-	   * Internal fetch handler which adds access-token management
-	   */
-	  async _fetch(reqUri, reqMethod, reqHeaders, reqBody) {
-	    if (!AtpAgent.fetch) {
-	      throw new Error('AtpAgent fetch() method not configured');
-	    }
-	    // wait for any active session-refreshes to finish
-	    await this._refreshSessionPromise;
-	    // send the request
-	    let res = await AtpAgent.fetch(reqUri, reqMethod, this._addHeaders(reqHeaders), reqBody);
-	    // handle session-refreshes as needed
-	    if (isErrorResponse(res, ['ExpiredToken']) && this.session?.refreshJwt) {
-	      // attempt refresh
-	      await this.refreshSession();
-	      // resend the request with the new access token
-	      res = await AtpAgent.fetch(reqUri, reqMethod, this._addHeaders(reqHeaders), reqBody);
-	    }
-	    return res;
-	  }
-	  /**
-	   * Internal helper to refresh sessions
-	   * - Wraps the actual implementation in a promise-guard to ensure only
-	   *   one refresh is attempted at a time.
-	   */
-	  async refreshSession() {
-	    if (this._refreshSessionPromise) {
-	      return this._refreshSessionPromise;
-	    }
-	    this._refreshSessionPromise = this._refreshSessionInner();
-	    try {
-	      await this._refreshSessionPromise;
-	    } finally {
-	      this._refreshSessionPromise = undefined;
-	    }
-	  }
-	  /**
-	   * Internal helper to refresh sessions (actual behavior)
-	   */
-	  async _refreshSessionInner() {
-	    if (!AtpAgent.fetch) {
-	      throw new Error('AtpAgent fetch() method not configured');
-	    }
-	    if (!this.session?.refreshJwt) {
-	      return;
-	    }
-	    // send the refresh request
-	    const url = new URL((this.pdsUrl || this.service).origin);
-	    url.pathname = `/xrpc/${REFRESH_SESSION}`;
-	    const res = await AtpAgent.fetch(url.toString(), 'POST', {
-	      authorization: `Bearer ${this.session.refreshJwt}`
-	    }, undefined);
-	    if (isErrorResponse(res, ['ExpiredToken', 'InvalidToken'])) {
-	      // failed due to a bad refresh token
-	      this.session = undefined;
-	      this._persistSession?.('expired', undefined);
-	    } else if (isNewSessionObject(this._baseClient, res.body)) {
-	      // succeeded, update the session
-	      this.session = {
-	        ...(this.session || {}),
-	        accessJwt: res.body.accessJwt,
-	        refreshJwt: res.body.refreshJwt,
-	        handle: res.body.handle,
-	        did: res.body.did
-	      };
-	      this._updateApiEndpoint(res.body.didDoc);
-	      this._persistSession?.('update', this.session);
-	    }
-	    // else: other failures should be ignored - the issue will
-	    // propagate in the _fetch() handler's second attempt to run
-	    // the request
-	  }
-	  /**
-	   * Helper to update the pds endpoint dynamically.
-	   *
-	   * The session methods (create, resume, refresh) may respond with the user's
-	   * did document which contains the user's canonical PDS endpoint. That endpoint
-	   * may differ from the endpoint used to contact the server. We capture that
-	   * PDS endpoint and update the client to use that given endpoint for future
-	   * requests. (This helps ensure smooth migrations between PDSes, especially
-	   * when the PDSes are operated by a single org.)
-	   */
-	  _updateApiEndpoint(didDoc) {
-	    if ((0, common_web_1$2.isValidDidDoc)(didDoc)) {
-	      const endpoint = (0, common_web_1$2.getPdsEndpoint)(didDoc);
-	      this.pdsUrl = endpoint ? new URL(endpoint) : undefined;
-	    }
-	    this.api.xrpc.uri = this.pdsUrl || this.service;
-	  }
-	}
-	agent.AtpAgent = AtpAgent;
-	/**
-	 * The `fetch` implementation; must be implemented for your platform.
-	 */
-	Object.defineProperty(AtpAgent, "fetch", {
-	  enumerable: true,
-	  configurable: true,
-	  writable: true,
-	  value: xrpc_2.defaultFetchHandler
-	});
-	/**
-	 * The labelers to be used across all requests with the takedown capability
-	 */
-	Object.defineProperty(AtpAgent, "appLabelers", {
-	  enumerable: true,
-	  configurable: true,
-	  writable: true,
-	  value: [const_1.BSKY_LABELER_DID]
-	});
-	function isErrorObject(v) {
-	  return xrpc_1.errorResponseBody.safeParse(v).success;
-	}
-	function isErrorResponse(res, errorNames) {
-	  if (res.status !== 400) {
-	    return false;
-	  }
-	  if (!isErrorObject(res.body)) {
-	    return false;
-	  }
-	  return typeof res.body.error === 'string' && errorNames.includes(res.body.error);
-	}
-	function isNewSessionObject(client, v) {
-	  try {
-	    client.xrpc.lex.assertValidXrpcOutput('com.atproto.server.refreshSession', v);
-	    return true;
-	  } catch {
-	    return false;
-	  }
-	}
 
 	var richText = {};
 
@@ -32258,7 +29839,7 @@ if (cid) {
 	  value: true
 	});
 	unicode.UnicodeString = void 0;
-	const common_web_1$1 = dist$2;
+	const common_web_1$2 = dist$2;
 	const encoder$1 = new TextEncoder();
 	const decoder$1 = new TextDecoder();
 	class UnicodeString {
@@ -32289,7 +29870,7 @@ if (cid) {
 	  }
 	  get graphemeLength() {
 	    if (!this._graphemeLen) {
-	      this._graphemeLen = (0, common_web_1$1.graphemeLen)(this.utf16);
+	      this._graphemeLen = (0, common_web_1$2.graphemeLen)(this.utf16);
 	    }
 	    return this._graphemeLen;
 	  }
@@ -34219,7 +31800,7 @@ if (cid) {
 	      for (const facet of this.facets) {
 	        for (const feature of facet.features) {
 	          if (client_1$4.AppBskyRichtextFacet.isMention(feature)) {
-	            const did = await agent.resolveHandle({
+	            const did = await agent.com.atproto.identity.resolveHandle({
 	              handle: feature.did
 	            }).catch(_ => undefined).then(res => res?.data.did);
 	            feature.did = did || '';
@@ -34808,7 +32389,7 @@ if (cid) {
 	      return; // skip labelers not configured by the user
 	    }
 	    if (isSelf && labelDef.flags.includes('no-self')) {
-	      return; // skip self-labels that arent supported
+	      return; // skip self-labels that aren't supported
 	    }
 	    // establish the label preference for interpretation
 	    let labelPref = labelDef.defaultSetting || 'ignore';
@@ -35352,7 +32933,7 @@ if (cid) {
 	  value: true
 	});
 	userList.decideUserList = void 0;
-	const syntax_1$1 = dist$4;
+	const syntax_1$1 = dist$3;
 	const decision_1 = decision;
 	const account_1 = account;
 	const profile_1 = profile;
@@ -35701,11 +33282,11 @@ if (cid) {
 	  }
 	};
 
-	var bskyAgent = {};
+	var agent = {};
 
 	var AwaitLock$1 = {};
 
-	var __classPrivateFieldGet = commonjsGlobal && commonjsGlobal.__classPrivateFieldGet || function (receiver, state, kind, f) {
+	var __classPrivateFieldGet$1 = commonjsGlobal && commonjsGlobal.__classPrivateFieldGet || function (receiver, state, kind, f) {
 	  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
 	  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
 	  return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
@@ -35733,7 +33314,7 @@ if (cid) {
 	   * status of the lock.
 	   */
 	  get acquired() {
-	    return __classPrivateFieldGet(this, _AwaitLock_acquired, "f");
+	    return __classPrivateFieldGet$1(this, _AwaitLock_acquired, "f");
 	  }
 	  /**
 	   * Acquires the lock, waiting if necessary for it to become free if it is already locked. The
@@ -35748,13 +33329,13 @@ if (cid) {
 	  acquireAsync({
 	    timeout
 	  } = {}) {
-	    if (!__classPrivateFieldGet(this, _AwaitLock_acquired, "f")) {
+	    if (!__classPrivateFieldGet$1(this, _AwaitLock_acquired, "f")) {
 	      __classPrivateFieldSet(this, _AwaitLock_acquired, true, "f");
 	      return Promise.resolve();
 	    }
 	    if (timeout == null) {
 	      return new Promise(resolve => {
-	        __classPrivateFieldGet(this, _AwaitLock_waitingResolvers, "f").add(resolve);
+	        __classPrivateFieldGet$1(this, _AwaitLock_waitingResolvers, "f").add(resolve);
 	      });
 	    }
 	    let resolver;
@@ -35764,10 +33345,10 @@ if (cid) {
 	        clearTimeout(timer);
 	        resolve();
 	      };
-	      __classPrivateFieldGet(this, _AwaitLock_waitingResolvers, "f").add(resolver);
+	      __classPrivateFieldGet$1(this, _AwaitLock_waitingResolvers, "f").add(resolver);
 	    }), new Promise((_, reject) => {
 	      timer = setTimeout(() => {
-	        __classPrivateFieldGet(this, _AwaitLock_waitingResolvers, "f").delete(resolver);
+	        __classPrivateFieldGet$1(this, _AwaitLock_waitingResolvers, "f").delete(resolver);
 	        reject(new Error(`Timed out waiting for lock`));
 	      }, timeout);
 	    })]);
@@ -35780,7 +33361,7 @@ if (cid) {
 	   * synchronously without waiting for the JavaScript task queue.
 	   */
 	  tryAcquire() {
-	    if (!__classPrivateFieldGet(this, _AwaitLock_acquired, "f")) {
+	    if (!__classPrivateFieldGet$1(this, _AwaitLock_acquired, "f")) {
 	      __classPrivateFieldSet(this, _AwaitLock_acquired, true, "f");
 	      return true;
 	    }
@@ -35791,13 +33372,13 @@ if (cid) {
 	   * must release the lock exactly once.
 	   */
 	  release() {
-	    if (!__classPrivateFieldGet(this, _AwaitLock_acquired, "f")) {
+	    if (!__classPrivateFieldGet$1(this, _AwaitLock_acquired, "f")) {
 	      throw new Error(`Cannot release an unacquired lock`);
 	    }
-	    if (__classPrivateFieldGet(this, _AwaitLock_waitingResolvers, "f").size > 0) {
+	    if (__classPrivateFieldGet$1(this, _AwaitLock_waitingResolvers, "f").size > 0) {
 	      // Sets preserve insertion order like a queue
-	      const [resolve] = __classPrivateFieldGet(this, _AwaitLock_waitingResolvers, "f");
-	      __classPrivateFieldGet(this, _AwaitLock_waitingResolvers, "f").delete(resolve);
+	      const [resolve] = __classPrivateFieldGet$1(this, _AwaitLock_waitingResolvers, "f");
+	      __classPrivateFieldGet$1(this, _AwaitLock_waitingResolvers, "f").delete(resolve);
 	      resolve();
 	    } else {
 	      __classPrivateFieldSet(this, _AwaitLock_acquired, false, "f");
@@ -35807,23 +33388,30 @@ if (cid) {
 	AwaitLock$1.default = AwaitLock;
 	_AwaitLock_acquired = new WeakMap(), _AwaitLock_waitingResolvers = new WeakMap();
 
+	var __classPrivateFieldGet = commonjsGlobal && commonjsGlobal.__classPrivateFieldGet || function (receiver, state, kind, f) {
+	  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+	  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+	  return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+	};
 	var __importDefault = commonjsGlobal && commonjsGlobal.__importDefault || function (mod) {
 	  return mod && mod.__esModule ? mod : {
 	    "default": mod
 	  };
 	};
-	Object.defineProperty(bskyAgent, "__esModule", {
+	var _Agent_prefsLock;
+	Object.defineProperty(agent, "__esModule", {
 	  value: true
 	});
-	bskyAgent.BskyAgent = void 0;
-	const syntax_1 = dist$4;
-	const common_web_1 = dist$2;
+	agent.Agent = void 0;
+	const common_web_1$1 = dist$2;
+	const syntax_1 = dist$3;
+	const xrpc_1$1 = dist;
 	const await_lock_1 = __importDefault(AwaitLock$1);
-	const agent_1 = agent;
-	const client_1 = client$1;
+	const index_1 = client$1;
+	const const_1 = _const;
+	const moderation_1 = moderation;
 	const labels_1 = labels;
 	const util_1 = util$4;
-	const moderation_1 = moderation;
 	const FEED_VIEW_PREF_DEFAULTS = {
 	  hideReplies: false,
 	  hideRepliesByUnfollowed: true,
@@ -35835,150 +33423,281 @@ if (cid) {
 	  sort: 'oldest',
 	  prioritizeFollowedUsers: true
 	};
-	class BskyAgent extends agent_1.AtpAgent {
-	  constructor() {
-	    super(...arguments);
-	    Object.defineProperty(this, "_prefsLock", {
+	/**
+	 * An {@link Agent} is an {@link AtpBaseClient} with the following
+	 * additional features:
+	 * - Abstract session management utilities
+	 * - AT Protocol labelers configuration utilities
+	 * - AT Protocol proxy configuration utilities
+	 * - Cloning utilities
+	 * - `app.bsky` syntactic sugar
+	 * - `com.atproto` syntactic sugar
+	 */
+	class Agent extends index_1.AtpBaseClient {
+	  /**
+	   * Configures the Agent (or its sub classes) globally.
+	   */
+	  static configure(opts) {
+	    if (opts.appLabelers) {
+	      this.appLabelers = opts.appLabelers.map(util_1.asDid); // Validate & copy
+	    }
+	  }
+	  //#endregion
+	  constructor(fetchHandlerOpts) {
+	    const fetchHandler = (0, xrpc_1$1.buildFetchHandler)(fetchHandlerOpts);
+	    super((url, init) => {
+	      const headers = new Headers(init?.headers);
+	      if (this.proxy && !headers.has('atproto-proxy')) {
+	        headers.set('atproto-proxy', this.proxy);
+	      }
+	      // Merge the labelers header of this particular request with the app &
+	      // instance labelers.
+	      headers.set('atproto-accept-labelers', [...this.appLabelers.map(l => `${l};redact`), ...this.labelers, headers.get('atproto-accept-labelers')?.trim()].filter(Boolean).join(', '));
+	      return fetchHandler(url, {
+	        ...init,
+	        headers
+	      });
+	    });
+	    Object.defineProperty(this, "labelers", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: new await_lock_1.default()
+	      value: []
 	    });
+	    //#endregion
+	    //#region ATPROTO proxy configuration utilities
+	    Object.defineProperty(this, "proxy", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: void 0
+	    });
+	    //#region "com.atproto" lexicon short hand methods
+	    /**
+	     * Upload a binary blob to the server
+	     */
+	    Object.defineProperty(this, "uploadBlob", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: (data, opts) => this.com.atproto.repo.uploadBlob(data, opts)
+	    });
+	    /**
+	     * Resolve a handle to a DID
+	     */
+	    Object.defineProperty(this, "resolveHandle", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: (params, opts) => this.com.atproto.identity.resolveHandle(params, opts)
+	    });
+	    /**
+	     * Change the user's handle
+	     */
+	    Object.defineProperty(this, "updateHandle", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: (data, opts) => this.com.atproto.identity.updateHandle(data, opts)
+	    });
+	    /**
+	     * Create a moderation report
+	     */
+	    Object.defineProperty(this, "createModerationReport", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: (data, opts) => this.com.atproto.moderation.createReport(data, opts)
+	    });
+	    //#endregion
+	    //#region "app.bsky" lexicon short hand methods
 	    Object.defineProperty(this, "getTimeline", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: (params, opts) => this.api.app.bsky.feed.getTimeline(params, opts)
+	      value: (params, opts) => this.app.bsky.feed.getTimeline(params, opts)
 	    });
 	    Object.defineProperty(this, "getAuthorFeed", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: (params, opts) => this.api.app.bsky.feed.getAuthorFeed(params, opts)
+	      value: (params, opts) => this.app.bsky.feed.getAuthorFeed(params, opts)
 	    });
 	    Object.defineProperty(this, "getActorLikes", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: (params, opts) => this.api.app.bsky.feed.getActorLikes(params, opts)
+	      value: (params, opts) => this.app.bsky.feed.getActorLikes(params, opts)
 	    });
 	    Object.defineProperty(this, "getPostThread", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: (params, opts) => this.api.app.bsky.feed.getPostThread(params, opts)
+	      value: (params, opts) => this.app.bsky.feed.getPostThread(params, opts)
 	    });
 	    Object.defineProperty(this, "getPost", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: params => this.api.app.bsky.feed.post.get(params)
+	      value: params => this.app.bsky.feed.post.get(params)
 	    });
 	    Object.defineProperty(this, "getPosts", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: (params, opts) => this.api.app.bsky.feed.getPosts(params, opts)
+	      value: (params, opts) => this.app.bsky.feed.getPosts(params, opts)
 	    });
 	    Object.defineProperty(this, "getLikes", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: (params, opts) => this.api.app.bsky.feed.getLikes(params, opts)
+	      value: (params, opts) => this.app.bsky.feed.getLikes(params, opts)
 	    });
 	    Object.defineProperty(this, "getRepostedBy", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: (params, opts) => this.api.app.bsky.feed.getRepostedBy(params, opts)
+	      value: (params, opts) => this.app.bsky.feed.getRepostedBy(params, opts)
 	    });
 	    Object.defineProperty(this, "getFollows", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: (params, opts) => this.api.app.bsky.graph.getFollows(params, opts)
+	      value: (params, opts) => this.app.bsky.graph.getFollows(params, opts)
 	    });
 	    Object.defineProperty(this, "getFollowers", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: (params, opts) => this.api.app.bsky.graph.getFollowers(params, opts)
+	      value: (params, opts) => this.app.bsky.graph.getFollowers(params, opts)
 	    });
 	    Object.defineProperty(this, "getProfile", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: (params, opts) => this.api.app.bsky.actor.getProfile(params, opts)
+	      value: (params, opts) => this.app.bsky.actor.getProfile(params, opts)
 	    });
 	    Object.defineProperty(this, "getProfiles", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: (params, opts) => this.api.app.bsky.actor.getProfiles(params, opts)
+	      value: (params, opts) => this.app.bsky.actor.getProfiles(params, opts)
 	    });
 	    Object.defineProperty(this, "getSuggestions", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: (params, opts) => this.api.app.bsky.actor.getSuggestions(params, opts)
+	      value: (params, opts) => this.app.bsky.actor.getSuggestions(params, opts)
 	    });
 	    Object.defineProperty(this, "searchActors", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: (params, opts) => this.api.app.bsky.actor.searchActors(params, opts)
+	      value: (params, opts) => this.app.bsky.actor.searchActors(params, opts)
 	    });
 	    Object.defineProperty(this, "searchActorsTypeahead", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: (params, opts) => this.api.app.bsky.actor.searchActorsTypeahead(params, opts)
+	      value: (params, opts) => this.app.bsky.actor.searchActorsTypeahead(params, opts)
 	    });
 	    Object.defineProperty(this, "listNotifications", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: (params, opts) => this.api.app.bsky.notification.listNotifications(params, opts)
+	      value: (params, opts) => this.app.bsky.notification.listNotifications(params, opts)
 	    });
 	    Object.defineProperty(this, "countUnreadNotifications", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: (params, opts) => this.api.app.bsky.notification.getUnreadCount(params, opts)
+	      value: (params, opts) => this.app.bsky.notification.getUnreadCount(params, opts)
 	    });
 	    Object.defineProperty(this, "getLabelers", {
 	      enumerable: true,
 	      configurable: true,
 	      writable: true,
-	      value: (params, opts) => this.api.app.bsky.labeler.getServices(params, opts)
+	      value: (params, opts) => this.app.bsky.labeler.getServices(params, opts)
 	    });
+	    //- Private methods
+	    _Agent_prefsLock.set(this, new await_lock_1.default()
+	    /**
+	     * This function updates the preferences of a user and allows for a callback function to be executed
+	     * before the update.
+	     * @param cb - cb is a callback function that takes in a single parameter of type
+	     * AppBskyActorDefs.Preferences and returns either a boolean or void. This callback function is used to
+	     * update the preferences of the user. The function is called with the current preferences as an
+	     * argument and if the callback returns false, the preferences are not updated.
+	     */);
 	  }
-	  clone() {
-	    const inst = new BskyAgent({
-	      service: this.service
-	    });
-	    this.copyInto(inst);
+	  copyInto(inst) {
+	    inst.configureLabelers(this.labelers);
+	    inst.configureProxy(this.proxy ?? null);
 	    return inst;
 	  }
-	  get app() {
-	    return this.api.app;
+	  withProxy(serviceType, did) {
+	    const inst = this.clone();
+	    inst.configureProxy(`${(0, util_1.asDid)(did)}#${serviceType}`);
+	    return inst;
+	  }
+	  //#endregion
+	  //#region ATPROTO labelers configuration utilities
+	  /**
+	   * The labelers statically configured on the class of the current instance.
+	   */
+	  get appLabelers() {
+	    return this.constructor.appLabelers;
+	  }
+	  configureLabelers(labelerDids) {
+	    this.labelers = labelerDids.map(util_1.asDid); // Validate & copy
+	  }
+	  /** @deprecated use {@link configureLabelers} instead */
+	  configureLabelersHeader(labelerDids) {
+	    // Filtering non-did values for backwards compatibility
+	    this.configureLabelers(labelerDids.filter(util_1.isDid));
+	  }
+	  configureProxy(value) {
+	    if (value === null) this.proxy = undefined;else if ((0, util_1.isDid)(value)) this.proxy = value;else throw new TypeError('Invalid proxy DID');
+	  }
+	  /** @deprecated use {@link configureProxy} instead */
+	  configureProxyHeader(serviceType, did) {
+	    // Ignoring non-did values for backwards compatibility
+	    if ((0, util_1.isDid)(did)) this.configureProxy(`${did}#${serviceType}`);
+	  }
+	  /**
+	   * Get the authenticated user's DID, or throw an error if not authenticated.
+	   */
+	  get accountDid() {
+	    this.assertAuthenticated();
+	    return this.did;
+	  }
+	  /**
+	   * Assert that the user is authenticated.
+	   */
+	  assertAuthenticated() {
+	    if (!this.did) throw new Error('Not logged in');
+	  }
+	  //#endregion
+	  /** @deprecated use "this" instead */
+	  get api() {
+	    return this;
 	  }
 	  async getLabelDefinitions(prefs) {
 	    // collect the labeler dids
-	    let dids = BskyAgent.appLabelers;
+	    const dids = [...this.appLabelers];
 	    if (isBskyPrefs(prefs)) {
-	      dids = dids.concat(prefs.moderationPrefs.labelers.map(l => l.did));
+	      dids.push(...prefs.moderationPrefs.labelers.map(l => l.did));
 	    } else if (isModPrefs(prefs)) {
-	      dids = dids.concat(prefs.labelers.map(l => l.did));
+	      dids.push(...prefs.labelers.map(l => l.did));
 	    } else {
-	      dids = dids.concat(prefs);
+	      dids.push(...prefs);
 	    }
 	    // fetch their definitions
 	    const labelers = await this.getLabelers({
 	      dids,
 	      detailed: true
 	    });
-	    // assemble a map of labeler dids to the interpretted label value definitions
+	    // assemble a map of labeler dids to the interpreted label value definitions
 	    const labelDefs = {};
 	    if (labelers.data) {
 	      for (const labeler of labelers.data.views) {
@@ -35988,30 +33707,22 @@ if (cid) {
 	    return labelDefs;
 	  }
 	  async post(record) {
-	    if (!this.session) {
-	      throw new Error('Not logged in');
-	    }
-	    record.createdAt = record.createdAt || new Date().toISOString();
-	    return this.api.app.bsky.feed.post.create({
-	      repo: this.session.did
+	    record.createdAt || (record.createdAt = new Date().toISOString());
+	    return this.app.bsky.feed.post.create({
+	      repo: this.accountDid
 	    }, record);
 	  }
 	  async deletePost(postUri) {
-	    if (!this.session) {
-	      throw new Error('Not logged in');
-	    }
+	    this.assertAuthenticated();
 	    const postUrip = new syntax_1.AtUri(postUri);
-	    return await this.api.app.bsky.feed.post.delete({
+	    return this.app.bsky.feed.post.delete({
 	      repo: postUrip.hostname,
 	      rkey: postUrip.rkey
 	    });
 	  }
 	  async like(uri, cid) {
-	    if (!this.session) {
-	      throw new Error('Not logged in');
-	    }
-	    return await this.api.app.bsky.feed.like.create({
-	      repo: this.session.did
+	    return this.app.bsky.feed.like.create({
+	      repo: this.accountDid
 	    }, {
 	      subject: {
 	        uri,
@@ -36021,21 +33732,16 @@ if (cid) {
 	    });
 	  }
 	  async deleteLike(likeUri) {
-	    if (!this.session) {
-	      throw new Error('Not logged in');
-	    }
+	    this.assertAuthenticated();
 	    const likeUrip = new syntax_1.AtUri(likeUri);
-	    return await this.api.app.bsky.feed.like.delete({
+	    return this.app.bsky.feed.like.delete({
 	      repo: likeUrip.hostname,
 	      rkey: likeUrip.rkey
 	    });
 	  }
 	  async repost(uri, cid) {
-	    if (!this.session) {
-	      throw new Error('Not logged in');
-	    }
-	    return await this.api.app.bsky.feed.repost.create({
-	      repo: this.session.did
+	    return this.app.bsky.feed.repost.create({
+	      repo: this.accountDid
 	    }, {
 	      subject: {
 	        uri,
@@ -36045,45 +33751,36 @@ if (cid) {
 	    });
 	  }
 	  async deleteRepost(repostUri) {
-	    if (!this.session) {
-	      throw new Error('Not logged in');
-	    }
+	    this.assertAuthenticated();
 	    const repostUrip = new syntax_1.AtUri(repostUri);
-	    return await this.api.app.bsky.feed.repost.delete({
+	    return this.app.bsky.feed.repost.delete({
 	      repo: repostUrip.hostname,
 	      rkey: repostUrip.rkey
 	    });
 	  }
 	  async follow(subjectDid) {
-	    if (!this.session) {
-	      throw new Error('Not logged in');
-	    }
-	    return await this.api.app.bsky.graph.follow.create({
-	      repo: this.session.did
+	    return this.app.bsky.graph.follow.create({
+	      repo: this.accountDid
 	    }, {
 	      subject: subjectDid,
 	      createdAt: new Date().toISOString()
 	    });
 	  }
 	  async deleteFollow(followUri) {
-	    if (!this.session) {
-	      throw new Error('Not logged in');
-	    }
+	    this.assertAuthenticated();
 	    const followUrip = new syntax_1.AtUri(followUri);
-	    return await this.api.app.bsky.graph.follow.delete({
+	    return this.app.bsky.graph.follow.delete({
 	      repo: followUrip.hostname,
 	      rkey: followUrip.rkey
 	    });
 	  }
 	  async upsertProfile(updateFn) {
-	    if (!this.session) {
-	      throw new Error('Not logged in');
-	    }
+	    const repo = this.accountDid;
 	    let retriesRemaining = 5;
 	    while (retriesRemaining >= 0) {
 	      // fetch existing
 	      const existing = await this.com.atproto.repo.getRecord({
-	        repo: this.session.did,
+	        repo,
 	        collection: 'app.bsky.actor.profile',
 	        rkey: 'self'
 	      }).catch(_ => undefined);
@@ -36093,21 +33790,21 @@ if (cid) {
 	        updated.$type = 'app.bsky.actor.profile';
 	      }
 	      // validate the record
-	      const validation = client_1.AppBskyActorProfile.validateRecord(updated);
+	      const validation = index_1.AppBskyActorProfile.validateRecord(updated);
 	      if (!validation.success) {
 	        throw validation.error;
 	      }
 	      try {
 	        // attempt the put
 	        await this.com.atproto.repo.putRecord({
-	          repo: this.session.did,
+	          repo,
 	          collection: 'app.bsky.actor.profile',
 	          rkey: 'self',
 	          record: updated,
 	          swapRecord: existing?.data.cid || null
 	        });
 	      } catch (e) {
-	        if (retriesRemaining > 0 && e instanceof client_1.ComAtprotoRepoPutRecord.InvalidSwapError) {
+	        if (retriesRemaining > 0 && e instanceof index_1.ComAtprotoRepoPutRecord.InvalidSwapError) {
 	          // try again
 	          retriesRemaining--;
 	          continue;
@@ -36119,58 +33816,52 @@ if (cid) {
 	    }
 	  }
 	  async mute(actor) {
-	    return this.api.app.bsky.graph.muteActor({
+	    return this.app.bsky.graph.muteActor({
 	      actor
 	    });
 	  }
 	  async unmute(actor) {
-	    return this.api.app.bsky.graph.unmuteActor({
+	    return this.app.bsky.graph.unmuteActor({
 	      actor
 	    });
 	  }
 	  async muteModList(uri) {
-	    return this.api.app.bsky.graph.muteActorList({
+	    return this.app.bsky.graph.muteActorList({
 	      list: uri
 	    });
 	  }
 	  async unmuteModList(uri) {
-	    return this.api.app.bsky.graph.unmuteActorList({
+	    return this.app.bsky.graph.unmuteActorList({
 	      list: uri
 	    });
 	  }
 	  async blockModList(uri) {
-	    if (!this.session) {
-	      throw new Error('Not logged in');
-	    }
-	    return await this.api.app.bsky.graph.listblock.create({
-	      repo: this.session.did
+	    return this.app.bsky.graph.listblock.create({
+	      repo: this.accountDid
 	    }, {
 	      subject: uri,
 	      createdAt: new Date().toISOString()
 	    });
 	  }
 	  async unblockModList(uri) {
-	    if (!this.session) {
-	      throw new Error('Not logged in');
-	    }
-	    const listInfo = await this.api.app.bsky.graph.getList({
+	    const repo = this.accountDid;
+	    const listInfo = await this.app.bsky.graph.getList({
 	      list: uri,
 	      limit: 1
 	    });
-	    if (!listInfo.data.list.viewer?.blocked) {
-	      return;
+	    const blocked = listInfo.data.list.viewer?.blocked;
+	    if (blocked) {
+	      const {
+	        rkey
+	      } = new syntax_1.AtUri(blocked);
+	      return this.app.bsky.graph.listblock.delete({
+	        repo,
+	        rkey
+	      });
 	    }
-	    const {
-	      rkey
-	    } = new syntax_1.AtUri(listInfo.data.list.viewer.blocked);
-	    return await this.api.app.bsky.graph.listblock.delete({
-	      repo: this.session.did,
-	      rkey
-	    });
 	  }
-	  async updateSeenNotifications(seenAt) {
-	    seenAt = seenAt || new Date().toISOString();
-	    return this.api.app.bsky.notification.updateSeen({
+	  async updateSeenNotifications(seenAt = new Date().toISOString()) {
+	    return this.app.bsky.notification.updateSeen({
 	      seenAt
 	    });
 	  }
@@ -36195,7 +33886,7 @@ if (cid) {
 	        labels: {
 	          ...labels_1.DEFAULT_LABEL_SETTINGS
 	        },
-	        labelers: BskyAgent.appLabelers.map(did => ({
+	        labelers: this.appLabelers.map(did => ({
 	          did,
 	          labels: {}
 	        })),
@@ -36214,34 +33905,34 @@ if (cid) {
 	    const res = await this.app.bsky.actor.getPreferences({});
 	    const labelPrefs = [];
 	    for (const pref of res.data.preferences) {
-	      if (client_1.AppBskyActorDefs.isAdultContentPref(pref) && client_1.AppBskyActorDefs.validateAdultContentPref(pref).success) {
+	      if (index_1.AppBskyActorDefs.isAdultContentPref(pref) && index_1.AppBskyActorDefs.validateAdultContentPref(pref).success) {
 	        // adult content preferences
 	        prefs.moderationPrefs.adultContentEnabled = pref.enabled;
-	      } else if (client_1.AppBskyActorDefs.isContentLabelPref(pref) && client_1.AppBskyActorDefs.validateContentLabelPref(pref).success) {
+	      } else if (index_1.AppBskyActorDefs.isContentLabelPref(pref) && index_1.AppBskyActorDefs.validateContentLabelPref(pref).success) {
 	        // content label preference
 	        const adjustedPref = adjustLegacyContentLabelPref(pref);
 	        labelPrefs.push(adjustedPref);
-	      } else if (client_1.AppBskyActorDefs.isLabelersPref(pref) && client_1.AppBskyActorDefs.validateLabelersPref(pref).success) {
+	      } else if (index_1.AppBskyActorDefs.isLabelersPref(pref) && index_1.AppBskyActorDefs.validateLabelersPref(pref).success) {
 	        // labelers preferences
-	        prefs.moderationPrefs.labelers = BskyAgent.appLabelers.map(did => ({
+	        prefs.moderationPrefs.labelers = this.appLabelers.map(did => ({
 	          did,
 	          labels: {}
 	        })).concat(pref.labelers.map(labeler => ({
 	          ...labeler,
 	          labels: {}
 	        })));
-	      } else if (client_1.AppBskyActorDefs.isSavedFeedsPrefV2(pref) && client_1.AppBskyActorDefs.validateSavedFeedsPrefV2(pref).success) {
+	      } else if (index_1.AppBskyActorDefs.isSavedFeedsPrefV2(pref) && index_1.AppBskyActorDefs.validateSavedFeedsPrefV2(pref).success) {
 	        prefs.savedFeeds = pref.items;
-	      } else if (client_1.AppBskyActorDefs.isSavedFeedsPref(pref) && client_1.AppBskyActorDefs.validateSavedFeedsPref(pref).success) {
+	      } else if (index_1.AppBskyActorDefs.isSavedFeedsPref(pref) && index_1.AppBskyActorDefs.validateSavedFeedsPref(pref).success) {
 	        // saved and pinned feeds
 	        prefs.feeds.saved = pref.saved;
 	        prefs.feeds.pinned = pref.pinned;
-	      } else if (client_1.AppBskyActorDefs.isPersonalDetailsPref(pref) && client_1.AppBskyActorDefs.validatePersonalDetailsPref(pref).success) {
+	      } else if (index_1.AppBskyActorDefs.isPersonalDetailsPref(pref) && index_1.AppBskyActorDefs.validatePersonalDetailsPref(pref).success) {
 	        // birth date (irl)
 	        if (pref.birthDate) {
 	          prefs.birthDate = new Date(pref.birthDate);
 	        }
-	      } else if (client_1.AppBskyActorDefs.isFeedViewPref(pref) && client_1.AppBskyActorDefs.validateFeedViewPref(pref).success) {
+	      } else if (index_1.AppBskyActorDefs.isFeedViewPref(pref) && index_1.AppBskyActorDefs.validateFeedViewPref(pref).success) {
 	        // feed view preferences
 	        // eslint-disable-next-line @typescript-eslint/no-unused-vars
 	        const {
@@ -36253,7 +33944,7 @@ if (cid) {
 	          ...FEED_VIEW_PREF_DEFAULTS,
 	          ...v
 	        };
-	      } else if (client_1.AppBskyActorDefs.isThreadViewPref(pref) && client_1.AppBskyActorDefs.validateThreadViewPref(pref).success) {
+	      } else if (index_1.AppBskyActorDefs.isThreadViewPref(pref) && index_1.AppBskyActorDefs.validateThreadViewPref(pref).success) {
 	        // thread view preferences
 	        // eslint-disable-next-line @typescript-eslint/no-unused-vars
 	        const {
@@ -36264,7 +33955,7 @@ if (cid) {
 	          ...prefs.threadViewPrefs,
 	          ...v
 	        };
-	      } else if (client_1.AppBskyActorDefs.isInterestsPref(pref) && client_1.AppBskyActorDefs.validateInterestsPref(pref).success) {
+	      } else if (index_1.AppBskyActorDefs.isInterestsPref(pref) && index_1.AppBskyActorDefs.validateInterestsPref(pref).success) {
 	        // eslint-disable-next-line @typescript-eslint/no-unused-vars
 	        const {
 	          $type,
@@ -36274,7 +33965,7 @@ if (cid) {
 	          ...prefs.interests,
 	          ...v
 	        };
-	      } else if (client_1.AppBskyActorDefs.isMutedWordsPref(pref) && client_1.AppBskyActorDefs.validateMutedWordsPref(pref).success) {
+	      } else if (index_1.AppBskyActorDefs.isMutedWordsPref(pref) && index_1.AppBskyActorDefs.validateMutedWordsPref(pref).success) {
 	        // eslint-disable-next-line @typescript-eslint/no-unused-vars
 	        const {
 	          $type,
@@ -36287,14 +33978,14 @@ if (cid) {
 	            return word;
 	          });
 	        }
-	      } else if (client_1.AppBskyActorDefs.isHiddenPostsPref(pref) && client_1.AppBskyActorDefs.validateHiddenPostsPref(pref).success) {
+	      } else if (index_1.AppBskyActorDefs.isHiddenPostsPref(pref) && index_1.AppBskyActorDefs.validateHiddenPostsPref(pref).success) {
 	        // eslint-disable-next-line @typescript-eslint/no-unused-vars
 	        const {
 	          $type,
 	          ...v
 	        } = pref;
 	        prefs.moderationPrefs.hiddenPosts = v.items;
-	      } else if (client_1.AppBskyActorDefs.isBskyAppStatePref(pref) && client_1.AppBskyActorDefs.validateBskyAppStatePref(pref).success) {
+	      } else if (index_1.AppBskyActorDefs.isBskyAppStatePref(pref) && index_1.AppBskyActorDefs.validateBskyAppStatePref(pref).success) {
 	        // eslint-disable-next-line @typescript-eslint/no-unused-vars
 	        const {
 	          $type,
@@ -36313,7 +34004,7 @@ if (cid) {
 	     * If no v1 prefs exist, the user is either new, or could be old and has
 	     * never edited their feeds.
 	     */
-	    if (prefs.savedFeeds === undefined) {
+	    if (prefs.savedFeeds == null) {
 	      const {
 	        saved,
 	        pinned
@@ -36322,7 +34013,7 @@ if (cid) {
 	        const uniqueMigratedSavedFeeds = new Map();
 	        // insert Following feed first
 	        uniqueMigratedSavedFeeds.set('timeline', {
-	          id: common_web_1.TID.nextStr(),
+	          id: common_web_1$1.TID.nextStr(),
 	          type: 'timeline',
 	          value: 'following',
 	          pinned: true
@@ -36333,7 +34024,7 @@ if (cid) {
 	          // only want supported types
 	          if (type === 'unknown') continue;
 	          uniqueMigratedSavedFeeds.set(uri, {
-	            id: common_web_1.TID.nextStr(),
+	            id: common_web_1$1.TID.nextStr(),
 	            type,
 	            value: uri,
 	            pinned: true
@@ -36345,7 +34036,7 @@ if (cid) {
 	            // only want supported types
 	            if (type === 'unknown') continue;
 	            uniqueMigratedSavedFeeds.set(uri, {
-	              id: common_web_1.TID.nextStr(),
+	              id: common_web_1$1.TID.nextStr(),
 	              type,
 	              value: uri,
 	              pinned: false
@@ -36355,7 +34046,7 @@ if (cid) {
 	        prefs.savedFeeds = Array.from(uniqueMigratedSavedFeeds.values());
 	      } else {
 	        prefs.savedFeeds = [{
-	          id: common_web_1.TID.nextStr(),
+	          id: common_web_1$1.TID.nextStr(),
 	          type: 'timeline',
 	          value: 'following',
 	          pinned: true
@@ -36376,7 +34067,7 @@ if (cid) {
 	    }
 	    prefs.moderationPrefs.labels = remapLegacyLabels(prefs.moderationPrefs.labels);
 	    // automatically configure the client
-	    this.configureLabelersHeader(prefsArrayToLabelerDids(res.data.preferences));
+	    this.configureLabelers(prefsArrayToLabelerDids(res.data.preferences));
 	    return prefs;
 	  }
 	  async overwriteSavedFeeds(savedFeeds) {
@@ -36389,11 +34080,11 @@ if (cid) {
 	      }
 	      uniqueSavedFeeds.set(feed.id, feed);
 	    });
-	    return updateSavedFeedsV2Preferences(this, () => Array.from(uniqueSavedFeeds.values()));
+	    return this.updateSavedFeedsV2Preferences(() => Array.from(uniqueSavedFeeds.values()));
 	  }
 	  async updateSavedFeeds(savedFeedsToUpdate) {
 	    savedFeedsToUpdate.map(util_1.validateSavedFeed);
-	    return updateSavedFeedsV2Preferences(this, savedFeeds => {
+	    return this.updateSavedFeedsV2Preferences(savedFeeds => {
 	      return savedFeeds.map(savedFeed => {
 	        const updatedVersion = savedFeedsToUpdate.find(updated => savedFeed.id === updated.id);
 	        if (updatedVersion) {
@@ -36410,19 +34101,19 @@ if (cid) {
 	  async addSavedFeeds(savedFeeds) {
 	    const toSave = savedFeeds.map(f => ({
 	      ...f,
-	      id: common_web_1.TID.nextStr()
+	      id: common_web_1$1.TID.nextStr()
 	    }));
 	    toSave.forEach(util_1.validateSavedFeed);
-	    return updateSavedFeedsV2Preferences(this, savedFeeds => [...savedFeeds, ...toSave]);
+	    return this.updateSavedFeedsV2Preferences(savedFeeds => [...savedFeeds, ...toSave]);
 	  }
 	  async removeSavedFeeds(ids) {
-	    return updateSavedFeedsV2Preferences(this, savedFeeds => [...savedFeeds.filter(feed => !ids.find(id => feed.id === id))]);
+	    return this.updateSavedFeedsV2Preferences(savedFeeds => [...savedFeeds.filter(feed => !ids.find(id => feed.id === id))]);
 	  }
 	  /**
 	   * @deprecated use `overwriteSavedFeeds`
 	   */
 	  async setSavedFeeds(saved, pinned) {
-	    return updateFeedPreferences(this, () => ({
+	    return this.updateFeedPreferences(() => ({
 	      saved,
 	      pinned
 	    }));
@@ -36431,7 +34122,7 @@ if (cid) {
 	   * @deprecated use `addSavedFeeds`
 	   */
 	  async addSavedFeed(v) {
-	    return updateFeedPreferences(this, (saved, pinned) => ({
+	    return this.updateFeedPreferences((saved, pinned) => ({
 	      saved: [...saved.filter(uri => uri !== v), v],
 	      pinned
 	    }));
@@ -36440,7 +34131,7 @@ if (cid) {
 	   * @deprecated use `removeSavedFeeds`
 	   */
 	  async removeSavedFeed(v) {
-	    return updateFeedPreferences(this, (saved, pinned) => ({
+	    return this.updateFeedPreferences((saved, pinned) => ({
 	      saved: saved.filter(uri => uri !== v),
 	      pinned: pinned.filter(uri => uri !== v)
 	    }));
@@ -36449,7 +34140,7 @@ if (cid) {
 	   * @deprecated use `addSavedFeeds` or `updateSavedFeeds`
 	   */
 	  async addPinnedFeed(v) {
-	    return updateFeedPreferences(this, (saved, pinned) => ({
+	    return this.updateFeedPreferences((saved, pinned) => ({
 	      saved: [...saved.filter(uri => uri !== v), v],
 	      pinned: [...pinned.filter(uri => uri !== v), v]
 	    }));
@@ -36458,14 +34149,14 @@ if (cid) {
 	   * @deprecated use `updateSavedFeeds` or `removeSavedFeeds`
 	   */
 	  async removePinnedFeed(v) {
-	    return updateFeedPreferences(this, (saved, pinned) => ({
+	    return this.updateFeedPreferences((saved, pinned) => ({
 	      saved,
 	      pinned: pinned.filter(uri => uri !== v)
 	    }));
 	  }
 	  async setAdultContentEnabled(v) {
-	    await updatePreferences(this, prefs => {
-	      let adultContentPref = prefs.findLast(pref => client_1.AppBskyActorDefs.isAdultContentPref(pref) && client_1.AppBskyActorDefs.validateAdultContentPref(pref).success);
+	    await this.updatePreferences(prefs => {
+	      let adultContentPref = prefs.findLast(pref => index_1.AppBskyActorDefs.isAdultContentPref(pref) && index_1.AppBskyActorDefs.validateAdultContentPref(pref).success);
 	      if (adultContentPref) {
 	        adultContentPref.enabled = v;
 	      } else {
@@ -36474,15 +34165,15 @@ if (cid) {
 	          enabled: v
 	        };
 	      }
-	      return prefs.filter(pref => !client_1.AppBskyActorDefs.isAdultContentPref(pref)).concat([adultContentPref]);
+	      return prefs.filter(pref => !index_1.AppBskyActorDefs.isAdultContentPref(pref)).concat([adultContentPref]);
 	    });
 	  }
 	  async setContentLabelPref(key, value, labelerDid) {
 	    if (labelerDid) {
 	      (0, syntax_1.ensureValidDid)(labelerDid);
 	    }
-	    await updatePreferences(this, prefs => {
-	      let labelPref = prefs.findLast(pref => client_1.AppBskyActorDefs.isContentLabelPref(pref) && client_1.AppBskyActorDefs.validateContentLabelPref(pref).success && pref.label === key && pref.labelerDid === labelerDid);
+	    await this.updatePreferences(prefs => {
+	      let labelPref = prefs.findLast(pref => index_1.AppBskyActorDefs.isContentLabelPref(pref) && index_1.AppBskyActorDefs.validateContentLabelPref(pref).success && pref.label === key && pref.labelerDid === labelerDid);
 	      let legacyLabelPref;
 	      if (labelPref) {
 	        labelPref.visibility = value;
@@ -36494,7 +34185,7 @@ if (cid) {
 	          visibility: value
 	        };
 	      }
-	      if (client_1.AppBskyActorDefs.isContentLabelPref(labelPref)) {
+	      if (index_1.AppBskyActorDefs.isContentLabelPref(labelPref)) {
 	        // is global
 	        if (!labelPref.labelerDid) {
 	          const legacyLabelValue = {
@@ -36504,7 +34195,7 @@ if (cid) {
 	          }[labelPref.label];
 	          // if it's a legacy label, double-write the legacy label
 	          if (legacyLabelValue) {
-	            legacyLabelPref = prefs.findLast(pref => client_1.AppBskyActorDefs.isContentLabelPref(pref) && client_1.AppBskyActorDefs.validateContentLabelPref(pref).success && pref.label === legacyLabelValue && pref.labelerDid === undefined);
+	            legacyLabelPref = prefs.findLast(pref => index_1.AppBskyActorDefs.isContentLabelPref(pref) && index_1.AppBskyActorDefs.validateContentLabelPref(pref).success && pref.label === legacyLabelValue && pref.labelerDid === undefined);
 	            if (legacyLabelPref) {
 	              legacyLabelPref.visibility = value;
 	            } else {
@@ -36518,22 +34209,22 @@ if (cid) {
 	          }
 	        }
 	      }
-	      return prefs.filter(pref => !client_1.AppBskyActorDefs.isContentLabelPref(pref) || !(pref.label === key && pref.labelerDid === labelerDid)).concat([labelPref]).filter(pref => {
+	      return prefs.filter(pref => !index_1.AppBskyActorDefs.isContentLabelPref(pref) || !(pref.label === key && pref.labelerDid === labelerDid)).concat([labelPref]).filter(pref => {
 	        if (!legacyLabelPref) return true;
-	        return !client_1.AppBskyActorDefs.isContentLabelPref(pref) || !(pref.label === legacyLabelPref.label && pref.labelerDid === undefined);
+	        return !index_1.AppBskyActorDefs.isContentLabelPref(pref) || !(pref.label === legacyLabelPref.label && pref.labelerDid === undefined);
 	      }).concat(legacyLabelPref ? [legacyLabelPref] : []);
 	    });
 	  }
 	  async addLabeler(did) {
-	    const prefs = await updatePreferences(this, prefs => {
-	      let labelersPref = prefs.findLast(pref => client_1.AppBskyActorDefs.isLabelersPref(pref) && client_1.AppBskyActorDefs.validateLabelersPref(pref).success);
+	    const prefs = await this.updatePreferences(prefs => {
+	      let labelersPref = prefs.findLast(pref => index_1.AppBskyActorDefs.isLabelersPref(pref) && index_1.AppBskyActorDefs.validateLabelersPref(pref).success);
 	      if (!labelersPref) {
 	        labelersPref = {
 	          $type: 'app.bsky.actor.defs#labelersPref',
 	          labelers: []
 	        };
 	      }
-	      if (client_1.AppBskyActorDefs.isLabelersPref(labelersPref)) {
+	      if (index_1.AppBskyActorDefs.isLabelersPref(labelersPref)) {
 	        let labelerPrefItem = labelersPref.labelers.find(labeler => labeler.did === did);
 	        if (!labelerPrefItem) {
 	          labelerPrefItem = {
@@ -36542,34 +34233,34 @@ if (cid) {
 	          labelersPref.labelers.push(labelerPrefItem);
 	        }
 	      }
-	      return prefs.filter(pref => !client_1.AppBskyActorDefs.isLabelersPref(pref)).concat([labelersPref]);
+	      return prefs.filter(pref => !index_1.AppBskyActorDefs.isLabelersPref(pref)).concat([labelersPref]);
 	    });
 	    // automatically configure the client
-	    this.configureLabelersHeader(prefsArrayToLabelerDids(prefs));
+	    this.configureLabelers(prefsArrayToLabelerDids(prefs));
 	  }
 	  async removeLabeler(did) {
-	    const prefs = await updatePreferences(this, prefs => {
-	      let labelersPref = prefs.findLast(pref => client_1.AppBskyActorDefs.isLabelersPref(pref) && client_1.AppBskyActorDefs.validateLabelersPref(pref).success);
+	    const prefs = await this.updatePreferences(prefs => {
+	      let labelersPref = prefs.findLast(pref => index_1.AppBskyActorDefs.isLabelersPref(pref) && index_1.AppBskyActorDefs.validateLabelersPref(pref).success);
 	      if (!labelersPref) {
 	        labelersPref = {
 	          $type: 'app.bsky.actor.defs#labelersPref',
 	          labelers: []
 	        };
 	      }
-	      if (client_1.AppBskyActorDefs.isLabelersPref(labelersPref)) {
+	      if (index_1.AppBskyActorDefs.isLabelersPref(labelersPref)) {
 	        labelersPref.labelers = labelersPref.labelers.filter(labeler => labeler.did !== did);
 	      }
-	      return prefs.filter(pref => !client_1.AppBskyActorDefs.isLabelersPref(pref)).concat([labelersPref]);
+	      return prefs.filter(pref => !index_1.AppBskyActorDefs.isLabelersPref(pref)).concat([labelersPref]);
 	    });
 	    // automatically configure the client
-	    this.configureLabelersHeader(prefsArrayToLabelerDids(prefs));
+	    this.configureLabelers(prefsArrayToLabelerDids(prefs));
 	  }
 	  async setPersonalDetails({
 	    birthDate
 	  }) {
 	    birthDate = birthDate instanceof Date ? birthDate.toISOString() : birthDate;
-	    await updatePreferences(this, prefs => {
-	      let personalDetailsPref = prefs.findLast(pref => client_1.AppBskyActorDefs.isPersonalDetailsPref(pref) && client_1.AppBskyActorDefs.validatePersonalDetailsPref(pref).success);
+	    await this.updatePreferences(prefs => {
+	      let personalDetailsPref = prefs.findLast(pref => index_1.AppBskyActorDefs.isPersonalDetailsPref(pref) && index_1.AppBskyActorDefs.validatePersonalDetailsPref(pref).success);
 	      if (personalDetailsPref) {
 	        personalDetailsPref.birthDate = birthDate;
 	      } else {
@@ -36578,19 +34269,19 @@ if (cid) {
 	          birthDate
 	        };
 	      }
-	      return prefs.filter(pref => !client_1.AppBskyActorDefs.isPersonalDetailsPref(pref)).concat([personalDetailsPref]);
+	      return prefs.filter(pref => !index_1.AppBskyActorDefs.isPersonalDetailsPref(pref)).concat([personalDetailsPref]);
 	    });
 	  }
 	  async setFeedViewPrefs(feed, pref) {
-	    await updatePreferences(this, prefs => {
-	      const existing = prefs.findLast(pref => client_1.AppBskyActorDefs.isFeedViewPref(pref) && client_1.AppBskyActorDefs.validateFeedViewPref(pref).success && pref.feed === feed);
+	    await this.updatePreferences(prefs => {
+	      const existing = prefs.findLast(pref => index_1.AppBskyActorDefs.isFeedViewPref(pref) && index_1.AppBskyActorDefs.validateFeedViewPref(pref).success && pref.feed === feed);
 	      if (existing) {
 	        pref = {
 	          ...existing,
 	          ...pref
 	        };
 	      }
-	      return prefs.filter(p => !client_1.AppBskyActorDefs.isFeedViewPref(pref) || p.feed !== feed).concat([{
+	      return prefs.filter(p => !index_1.AppBskyActorDefs.isFeedViewPref(pref) || p.feed !== feed).concat([{
 	        ...pref,
 	        $type: 'app.bsky.actor.defs#feedViewPref',
 	        feed
@@ -36598,30 +34289,30 @@ if (cid) {
 	    });
 	  }
 	  async setThreadViewPrefs(pref) {
-	    await updatePreferences(this, prefs => {
-	      const existing = prefs.findLast(pref => client_1.AppBskyActorDefs.isThreadViewPref(pref) && client_1.AppBskyActorDefs.validateThreadViewPref(pref).success);
+	    await this.updatePreferences(prefs => {
+	      const existing = prefs.findLast(pref => index_1.AppBskyActorDefs.isThreadViewPref(pref) && index_1.AppBskyActorDefs.validateThreadViewPref(pref).success);
 	      if (existing) {
 	        pref = {
 	          ...existing,
 	          ...pref
 	        };
 	      }
-	      return prefs.filter(p => !client_1.AppBskyActorDefs.isThreadViewPref(p)).concat([{
+	      return prefs.filter(p => !index_1.AppBskyActorDefs.isThreadViewPref(p)).concat([{
 	        ...pref,
 	        $type: 'app.bsky.actor.defs#threadViewPref'
 	      }]);
 	    });
 	  }
 	  async setInterestsPref(pref) {
-	    await updatePreferences(this, prefs => {
-	      const existing = prefs.findLast(pref => client_1.AppBskyActorDefs.isInterestsPref(pref) && client_1.AppBskyActorDefs.validateInterestsPref(pref).success);
+	    await this.updatePreferences(prefs => {
+	      const existing = prefs.findLast(pref => index_1.AppBskyActorDefs.isInterestsPref(pref) && index_1.AppBskyActorDefs.validateInterestsPref(pref).success);
 	      if (existing) {
 	        pref = {
 	          ...existing,
 	          ...pref
 	        };
 	      }
-	      return prefs.filter(p => !client_1.AppBskyActorDefs.isInterestsPref(p)).concat([{
+	      return prefs.filter(p => !index_1.AppBskyActorDefs.isInterestsPref(p)).concat([{
 	        ...pref,
 	        $type: 'app.bsky.actor.defs#interestsPref'
 	      }]);
@@ -36633,16 +34324,16 @@ if (cid) {
 	  async addMutedWord(mutedWord) {
 	    const sanitizedValue = (0, util_1.sanitizeMutedWordValue)(mutedWord.value);
 	    if (!sanitizedValue) return;
-	    await updatePreferences(this, prefs => {
-	      let mutedWordsPref = prefs.findLast(pref => client_1.AppBskyActorDefs.isMutedWordsPref(pref) && client_1.AppBskyActorDefs.validateMutedWordsPref(pref).success);
+	    await this.updatePreferences(prefs => {
+	      let mutedWordsPref = prefs.findLast(pref => index_1.AppBskyActorDefs.isMutedWordsPref(pref) && index_1.AppBskyActorDefs.validateMutedWordsPref(pref).success);
 	      const newMutedWord = {
-	        id: common_web_1.TID.nextStr(),
+	        id: common_web_1$1.TID.nextStr(),
 	        value: sanitizedValue,
 	        targets: mutedWord.targets || [],
 	        actorTarget: mutedWord.actorTarget || 'all',
 	        expiresAt: mutedWord.expiresAt || undefined
 	      };
-	      if (mutedWordsPref && client_1.AppBskyActorDefs.isMutedWordsPref(mutedWordsPref)) {
+	      if (mutedWordsPref && index_1.AppBskyActorDefs.isMutedWordsPref(mutedWordsPref)) {
 	        mutedWordsPref.items.push(newMutedWord);
 	        /**
 	         * Migrate any old muted words that don't have an id
@@ -36654,7 +34345,7 @@ if (cid) {
 	          items: [newMutedWord]
 	        };
 	      }
-	      return prefs.filter(p => !client_1.AppBskyActorDefs.isMutedWordsPref(p)).concat([{
+	      return prefs.filter(p => !index_1.AppBskyActorDefs.isMutedWordsPref(p)).concat([{
 	        ...mutedWordsPref,
 	        $type: 'app.bsky.actor.defs#mutedWordsPref'
 	      }]);
@@ -36676,9 +34367,9 @@ if (cid) {
 	   * Update a muted word in user preferences.
 	   */
 	  async updateMutedWord(mutedWord) {
-	    await updatePreferences(this, prefs => {
-	      const mutedWordsPref = prefs.findLast(pref => client_1.AppBskyActorDefs.isMutedWordsPref(pref) && client_1.AppBskyActorDefs.validateMutedWordsPref(pref).success);
-	      if (mutedWordsPref && client_1.AppBskyActorDefs.isMutedWordsPref(mutedWordsPref)) {
+	    await this.updatePreferences(prefs => {
+	      const mutedWordsPref = prefs.findLast(pref => index_1.AppBskyActorDefs.isMutedWordsPref(pref) && index_1.AppBskyActorDefs.validateMutedWordsPref(pref).success);
+	      if (mutedWordsPref && index_1.AppBskyActorDefs.isMutedWordsPref(mutedWordsPref)) {
 	        mutedWordsPref.items = mutedWordsPref.items.map(existingItem => {
 	          const match = matchMutedWord(existingItem, mutedWord);
 	          if (match) {
@@ -36687,7 +34378,7 @@ if (cid) {
 	              ...mutedWord
 	            };
 	            return {
-	              id: existingItem.id || common_web_1.TID.nextStr(),
+	              id: existingItem.id || common_web_1$1.TID.nextStr(),
 	              value: (0, util_1.sanitizeMutedWordValue)(updated.value) || existingItem.value,
 	              targets: updated.targets || [],
 	              actorTarget: updated.actorTarget || 'all',
@@ -36701,7 +34392,7 @@ if (cid) {
 	         * Migrate any old muted words that don't have an id
 	         */
 	        mutedWordsPref.items = migrateLegacyMutedWordsItems(mutedWordsPref.items);
-	        return prefs.filter(p => !client_1.AppBskyActorDefs.isMutedWordsPref(p)).concat([{
+	        return prefs.filter(p => !index_1.AppBskyActorDefs.isMutedWordsPref(p)).concat([{
 	          ...mutedWordsPref,
 	          $type: 'app.bsky.actor.defs#mutedWordsPref'
 	        }]);
@@ -36713,9 +34404,9 @@ if (cid) {
 	   * Remove a muted word from user preferences.
 	   */
 	  async removeMutedWord(mutedWord) {
-	    await updatePreferences(this, prefs => {
-	      const mutedWordsPref = prefs.findLast(pref => client_1.AppBskyActorDefs.isMutedWordsPref(pref) && client_1.AppBskyActorDefs.validateMutedWordsPref(pref).success);
-	      if (mutedWordsPref && client_1.AppBskyActorDefs.isMutedWordsPref(mutedWordsPref)) {
+	    await this.updatePreferences(prefs => {
+	      const mutedWordsPref = prefs.findLast(pref => index_1.AppBskyActorDefs.isMutedWordsPref(pref) && index_1.AppBskyActorDefs.validateMutedWordsPref(pref).success);
+	      if (mutedWordsPref && index_1.AppBskyActorDefs.isMutedWordsPref(mutedWordsPref)) {
 	        for (let i = 0; i < mutedWordsPref.items.length; i++) {
 	          const match = matchMutedWord(mutedWordsPref.items[i], mutedWord);
 	          if (match) {
@@ -36727,7 +34418,7 @@ if (cid) {
 	         * Migrate any old muted words that don't have an id
 	         */
 	        mutedWordsPref.items = migrateLegacyMutedWordsItems(mutedWordsPref.items);
-	        return prefs.filter(p => !client_1.AppBskyActorDefs.isMutedWordsPref(p)).concat([{
+	        return prefs.filter(p => !index_1.AppBskyActorDefs.isMutedWordsPref(p)).concat([{
 	          ...mutedWordsPref,
 	          $type: 'app.bsky.actor.defs#mutedWordsPref'
 	        }]);
@@ -36742,145 +34433,175 @@ if (cid) {
 	    await Promise.all(mutedWords.map(word => this.removeMutedWord(word)));
 	  }
 	  async hidePost(postUri) {
-	    await updateHiddenPost(this, postUri, 'hide');
+	    await this.updateHiddenPost(postUri, 'hide');
 	  }
 	  async unhidePost(postUri) {
-	    await updateHiddenPost(this, postUri, 'unhide');
+	    await this.updateHiddenPost(postUri, 'unhide');
 	  }
 	  async bskyAppQueueNudges(nudges) {
-	    await updatePreferences(this, prefs => {
-	      let bskyAppStatePref = prefs.findLast(pref => client_1.AppBskyActorDefs.isBskyAppStatePref(pref) && client_1.AppBskyActorDefs.validateBskyAppStatePref(pref).success);
+	    await this.updatePreferences(prefs => {
+	      let bskyAppStatePref = prefs.findLast(pref => index_1.AppBskyActorDefs.isBskyAppStatePref(pref) && index_1.AppBskyActorDefs.validateBskyAppStatePref(pref).success);
 	      bskyAppStatePref = bskyAppStatePref || {};
 	      nudges = Array.isArray(nudges) ? nudges : [nudges];
 	      bskyAppStatePref.queuedNudges = (bskyAppStatePref.queuedNudges || []).concat(nudges);
-	      return prefs.filter(p => !client_1.AppBskyActorDefs.isBskyAppStatePref(p)).concat([{
+	      return prefs.filter(p => !index_1.AppBskyActorDefs.isBskyAppStatePref(p)).concat([{
 	        ...bskyAppStatePref,
 	        $type: 'app.bsky.actor.defs#bskyAppStatePref'
 	      }]);
 	    });
 	  }
 	  async bskyAppDismissNudges(nudges) {
-	    await updatePreferences(this, prefs => {
-	      let bskyAppStatePref = prefs.findLast(pref => client_1.AppBskyActorDefs.isBskyAppStatePref(pref) && client_1.AppBskyActorDefs.validateBskyAppStatePref(pref).success);
+	    await this.updatePreferences(prefs => {
+	      let bskyAppStatePref = prefs.findLast(pref => index_1.AppBskyActorDefs.isBskyAppStatePref(pref) && index_1.AppBskyActorDefs.validateBskyAppStatePref(pref).success);
 	      bskyAppStatePref = bskyAppStatePref || {};
 	      nudges = Array.isArray(nudges) ? nudges : [nudges];
 	      bskyAppStatePref.queuedNudges = (bskyAppStatePref.queuedNudges || []).filter(nudge => !nudges.includes(nudge));
-	      return prefs.filter(p => !client_1.AppBskyActorDefs.isBskyAppStatePref(p)).concat([{
+	      return prefs.filter(p => !index_1.AppBskyActorDefs.isBskyAppStatePref(p)).concat([{
 	        ...bskyAppStatePref,
 	        $type: 'app.bsky.actor.defs#bskyAppStatePref'
 	      }]);
 	    });
 	  }
 	  async bskyAppSetActiveProgressGuide(guide) {
-	    if (guide && !client_1.AppBskyActorDefs.validateBskyAppProgressGuide(guide).success) {
+	    if (guide && !index_1.AppBskyActorDefs.validateBskyAppProgressGuide(guide).success) {
 	      throw new Error('Invalid progress guide');
 	    }
-	    await updatePreferences(this, prefs => {
-	      let bskyAppStatePref = prefs.findLast(pref => client_1.AppBskyActorDefs.isBskyAppStatePref(pref) && client_1.AppBskyActorDefs.validateBskyAppStatePref(pref).success);
+	    await this.updatePreferences(prefs => {
+	      let bskyAppStatePref = prefs.findLast(pref => index_1.AppBskyActorDefs.isBskyAppStatePref(pref) && index_1.AppBskyActorDefs.validateBskyAppStatePref(pref).success);
 	      bskyAppStatePref = bskyAppStatePref || {};
 	      bskyAppStatePref.activeProgressGuide = guide;
-	      return prefs.filter(p => !client_1.AppBskyActorDefs.isBskyAppStatePref(p)).concat([{
+	      return prefs.filter(p => !index_1.AppBskyActorDefs.isBskyAppStatePref(p)).concat([{
 	        ...bskyAppStatePref,
 	        $type: 'app.bsky.actor.defs#bskyAppStatePref'
 	      }]);
 	    });
 	  }
-	}
-	bskyAgent.BskyAgent = BskyAgent;
-	/**
-	 * This function updates the preferences of a user and allows for a callback function to be executed
-	 * before the update.
-	 * @param cb - cb is a callback function that takes in a single parameter of type
-	 * AppBskyActorDefs.Preferences and returns either a boolean or void. This callback function is used to
-	 * update the preferences of the user. The function is called with the current preferences as an
-	 * argument and if the callback returns false, the preferences are not updated.
-	 */
-	async function updatePreferences(agent, cb) {
-	  try {
-	    await agent._prefsLock.acquireAsync();
-	    const res = await agent.app.bsky.actor.getPreferences({});
-	    const newPrefs = cb(res.data.preferences);
-	    if (newPrefs === false) {
-	      return res.data.preferences;
+	  /**
+	   * This function updates the preferences of a user and allows for a callback function to be executed
+	   * before the update.
+	   * @param cb - cb is a callback function that takes in a single parameter of type
+	   * AppBskyActorDefs.Preferences and returns either a boolean or void. This callback function is used to
+	   * update the preferences of the user. The function is called with the current preferences as an
+	   * argument and if the callback returns false, the preferences are not updated.
+	   */
+	  async updatePreferences(cb) {
+	    try {
+	      await __classPrivateFieldGet(this, _Agent_prefsLock, "f").acquireAsync();
+	      const res = await this.app.bsky.actor.getPreferences({});
+	      const newPrefs = cb(res.data.preferences);
+	      if (newPrefs === false) {
+	        return res.data.preferences;
+	      }
+	      await this.app.bsky.actor.putPreferences({
+	        preferences: newPrefs
+	      });
+	      return newPrefs;
+	    } finally {
+	      __classPrivateFieldGet(this, _Agent_prefsLock, "f").release();
 	    }
-	    await agent.app.bsky.actor.putPreferences({
-	      preferences: newPrefs
+	  }
+	  async updateHiddenPost(postUri, action) {
+	    await this.updatePreferences(prefs => {
+	      let pref = prefs.findLast(pref => index_1.AppBskyActorDefs.isHiddenPostsPref(pref) && index_1.AppBskyActorDefs.validateHiddenPostsPref(pref).success);
+	      if (pref && index_1.AppBskyActorDefs.isHiddenPostsPref(pref)) {
+	        pref.items = action === 'hide' ? Array.from(new Set([...pref.items, postUri])) : pref.items.filter(uri => uri !== postUri);
+	      } else {
+	        if (action === 'hide') {
+	          pref = {
+	            $type: 'app.bsky.actor.defs#hiddenPostsPref',
+	            items: [postUri]
+	          };
+	        }
+	      }
+	      return prefs.filter(p => !index_1.AppBskyActorDefs.isInterestsPref(p)).concat([{
+	        ...pref,
+	        $type: 'app.bsky.actor.defs#hiddenPostsPref'
+	      }]);
 	    });
-	    return newPrefs;
-	  } finally {
-	    agent._prefsLock.release();
+	  }
+	  /**
+	   * A helper specifically for updating feed preferences
+	   */
+	  async updateFeedPreferences(cb) {
+	    let res;
+	    await this.updatePreferences(prefs => {
+	      let feedsPref = prefs.findLast(pref => index_1.AppBskyActorDefs.isSavedFeedsPref(pref) && index_1.AppBskyActorDefs.validateSavedFeedsPref(pref).success);
+	      if (feedsPref) {
+	        res = cb(feedsPref.saved, feedsPref.pinned);
+	        feedsPref.saved = res.saved;
+	        feedsPref.pinned = res.pinned;
+	      } else {
+	        res = cb([], []);
+	        feedsPref = {
+	          $type: 'app.bsky.actor.defs#savedFeedsPref',
+	          saved: res.saved,
+	          pinned: res.pinned
+	        };
+	      }
+	      return prefs.filter(pref => !index_1.AppBskyActorDefs.isSavedFeedsPref(pref)).concat([feedsPref]);
+	    });
+	    return res;
+	  }
+	  async updateSavedFeedsV2Preferences(cb) {
+	    let maybeMutatedSavedFeeds = [];
+	    await this.updatePreferences(prefs => {
+	      let existingV2Pref = prefs.findLast(pref => index_1.AppBskyActorDefs.isSavedFeedsPrefV2(pref) && index_1.AppBskyActorDefs.validateSavedFeedsPrefV2(pref).success);
+	      let existingV1Pref = prefs.findLast(pref => index_1.AppBskyActorDefs.isSavedFeedsPref(pref) && index_1.AppBskyActorDefs.validateSavedFeedsPref(pref).success);
+	      if (existingV2Pref) {
+	        maybeMutatedSavedFeeds = cb(existingV2Pref.items);
+	        existingV2Pref = {
+	          ...existingV2Pref,
+	          items: maybeMutatedSavedFeeds
+	        };
+	      } else {
+	        maybeMutatedSavedFeeds = cb([]);
+	        existingV2Pref = {
+	          $type: 'app.bsky.actor.defs#savedFeedsPrefV2',
+	          items: maybeMutatedSavedFeeds
+	        };
+	      }
+	      // enforce ordering, pinned then saved
+	      const pinned = existingV2Pref.items.filter(i => i.pinned);
+	      const saved = existingV2Pref.items.filter(i => !i.pinned);
+	      existingV2Pref.items = pinned.concat(saved);
+	      let updatedPrefs = prefs.filter(pref => !index_1.AppBskyActorDefs.isSavedFeedsPrefV2(pref)).concat(existingV2Pref);
+	      /*
+	       * If there's a v2 pref present, it means this account was migrated from v1
+	       * to v2. During the transition period, we double write v2 prefs back to
+	       * v1, but NOT the other way around.
+	       */
+	      if (existingV1Pref) {
+	        const {
+	          saved,
+	          pinned
+	        } = existingV1Pref;
+	        const v2Compat = (0, util_1.savedFeedsToUriArrays)(
+	        // v1 only supports feeds and lists
+	        existingV2Pref.items.filter(i => ['feed', 'list'].includes(i.type)));
+	        existingV1Pref = {
+	          ...existingV1Pref,
+	          saved: Array.from(new Set([...saved, ...v2Compat.saved])),
+	          pinned: Array.from(new Set([...pinned, ...v2Compat.pinned]))
+	        };
+	        updatedPrefs = updatedPrefs.filter(pref => !index_1.AppBskyActorDefs.isSavedFeedsPref(pref)).concat(existingV1Pref);
+	      }
+	      return updatedPrefs;
+	    });
+	    return maybeMutatedSavedFeeds;
 	  }
 	}
+	agent.Agent = Agent;
+	_Agent_prefsLock = new WeakMap();
+	//#region Static configuration
 	/**
-	 * A helper specifically for updating feed preferences
+	 * The labelers to be used across all requests with the takedown capability
 	 */
-	async function updateFeedPreferences(agent, cb) {
-	  let res;
-	  await updatePreferences(agent, prefs => {
-	    let feedsPref = prefs.findLast(pref => client_1.AppBskyActorDefs.isSavedFeedsPref(pref) && client_1.AppBskyActorDefs.validateSavedFeedsPref(pref).success);
-	    if (feedsPref) {
-	      res = cb(feedsPref.saved, feedsPref.pinned);
-	      feedsPref.saved = res.saved;
-	      feedsPref.pinned = res.pinned;
-	    } else {
-	      res = cb([], []);
-	      feedsPref = {
-	        $type: 'app.bsky.actor.defs#savedFeedsPref',
-	        saved: res.saved,
-	        pinned: res.pinned
-	      };
-	    }
-	    return prefs.filter(pref => !client_1.AppBskyActorDefs.isSavedFeedsPref(pref)).concat([feedsPref]);
-	  });
-	  return res;
-	}
-	async function updateSavedFeedsV2Preferences(agent, cb) {
-	  let maybeMutatedSavedFeeds = [];
-	  await updatePreferences(agent, prefs => {
-	    let existingV2Pref = prefs.findLast(pref => client_1.AppBskyActorDefs.isSavedFeedsPrefV2(pref) && client_1.AppBskyActorDefs.validateSavedFeedsPrefV2(pref).success);
-	    let existingV1Pref = prefs.findLast(pref => client_1.AppBskyActorDefs.isSavedFeedsPref(pref) && client_1.AppBskyActorDefs.validateSavedFeedsPref(pref).success);
-	    if (existingV2Pref) {
-	      maybeMutatedSavedFeeds = cb(existingV2Pref.items);
-	      existingV2Pref = {
-	        ...existingV2Pref,
-	        items: maybeMutatedSavedFeeds
-	      };
-	    } else {
-	      maybeMutatedSavedFeeds = cb([]);
-	      existingV2Pref = {
-	        $type: 'app.bsky.actor.defs#savedFeedsPrefV2',
-	        items: maybeMutatedSavedFeeds
-	      };
-	    }
-	    // enforce ordering, pinned then saved
-	    const pinned = existingV2Pref.items.filter(i => i.pinned);
-	    const saved = existingV2Pref.items.filter(i => !i.pinned);
-	    existingV2Pref.items = pinned.concat(saved);
-	    let updatedPrefs = prefs.filter(pref => !client_1.AppBskyActorDefs.isSavedFeedsPrefV2(pref)).concat(existingV2Pref);
-	    /*
-	     * If there's a v2 pref present, it means this account was migrated from v1
-	     * to v2. During the transition period, we double write v2 prefs back to
-	     * v1, but NOT the other way around.
-	     */
-	    if (existingV1Pref) {
-	      const {
-	        saved,
-	        pinned
-	      } = existingV1Pref;
-	      const v2Compat = (0, util_1.savedFeedsToUriArrays)(
-	      // v1 only supports feeds and lists
-	      existingV2Pref.items.filter(i => ['feed', 'list'].includes(i.type)));
-	      existingV1Pref = {
-	        ...existingV1Pref,
-	        saved: Array.from(new Set([...saved, ...v2Compat.saved])),
-	        pinned: Array.from(new Set([...pinned, ...v2Compat.pinned]))
-	      };
-	      updatedPrefs = updatedPrefs.filter(pref => !client_1.AppBskyActorDefs.isSavedFeedsPref(pref)).concat(existingV1Pref);
-	    }
-	    return updatedPrefs;
-	  });
-	  return maybeMutatedSavedFeeds;
-	}
+	Object.defineProperty(Agent, "appLabelers", {
+	  enumerable: true,
+	  configurable: true,
+	  writable: true,
+	  value: [const_1.BSKY_LABELER_DID]
+	});
 	/**
 	 * Helper to transform the legacy content preferences.
 	 */
@@ -36920,31 +34641,12 @@ if (cid) {
 	 * A helper to get the currently enabled labelers from the full preferences array
 	 */
 	function prefsArrayToLabelerDids(prefs) {
-	  const labelersPref = prefs.findLast(pref => client_1.AppBskyActorDefs.isLabelersPref(pref) && client_1.AppBskyActorDefs.validateLabelersPref(pref).success);
+	  const labelersPref = prefs.findLast(pref => index_1.AppBskyActorDefs.isLabelersPref(pref) && index_1.AppBskyActorDefs.validateLabelersPref(pref).success);
 	  let dids = [];
 	  if (labelersPref) {
 	    dids = labelersPref.labelers.map(labeler => labeler.did);
 	  }
 	  return dids;
-	}
-	async function updateHiddenPost(agent, postUri, action) {
-	  await updatePreferences(agent, prefs => {
-	    let pref = prefs.findLast(pref => client_1.AppBskyActorDefs.isHiddenPostsPref(pref) && client_1.AppBskyActorDefs.validateHiddenPostsPref(pref).success);
-	    if (pref && client_1.AppBskyActorDefs.isHiddenPostsPref(pref)) {
-	      pref.items = action === 'hide' ? Array.from(new Set([...pref.items, postUri])) : pref.items.filter(uri => uri !== postUri);
-	    } else {
-	      if (action === 'hide') {
-	        pref = {
-	          $type: 'app.bsky.actor.defs#hiddenPostsPref',
-	          items: [postUri]
-	        };
-	      }
-	    }
-	    return prefs.filter(p => !client_1.AppBskyActorDefs.isInterestsPref(p)).concat([{
-	      ...pref,
-	      $type: 'app.bsky.actor.defs#hiddenPostsPref'
-	    }]);
-	  });
 	}
 	function isBskyPrefs(v) {
 	  return v && typeof v === 'object' && 'moderationPrefs' in v && isModPrefs(v.moderationPrefs);
@@ -36955,7 +34657,7 @@ if (cid) {
 	function migrateLegacyMutedWordsItems(items) {
 	  return items.map(item => ({
 	    ...item,
-	    id: item.id || common_web_1.TID.nextStr()
+	    id: item.id || common_web_1$1.TID.nextStr()
 	  }));
 	}
 	function matchMutedWord(existingWord, newWord) {
@@ -36967,6 +34669,464 @@ if (cid) {
 	  const legacyMatchByValue = !existingId && existingWord.value === newWord.value;
 	  return matchById || legacyMatchByValue;
 	}
+
+	var atpAgent = {};
+
+	Object.defineProperty(atpAgent, "__esModule", {
+	  value: true
+	});
+	atpAgent.AtpAgent = void 0;
+	const common_web_1 = dist$2;
+	const xrpc_1 = dist;
+	const agent_1 = agent;
+	const client_1 = client$1;
+	const ReadableStream = globalThis.ReadableStream;
+	/**
+	 * An {@link AtpAgent} extends the {@link Agent} abstract class by
+	 * implementing password based session management.
+	 */
+	class AtpAgent extends agent_1.Agent {
+	  constructor(options) {
+	    super(async (url, init) => {
+	      // wait for any active session-refreshes to finish
+	      await this.sessionManager.refreshSessionPromise;
+	      const initialHeaders = (0, xrpc_1.combineHeaders)(init?.headers, this.headers);
+	      const reqInit = {
+	        ...init,
+	        headers: initialHeaders
+	      };
+	      const initialUri = new URL(url, this.dispatchUrl);
+	      const initialReq = new Request(initialUri, reqInit);
+	      const initialToken = this.session?.accessJwt;
+	      if (!initialToken || initialReq.headers.has('authorization')) {
+	        return (0, this.sessionManager.fetch)(initialReq);
+	      }
+	      initialReq.headers.set('authorization', `Bearer ${initialToken}`);
+	      const initialRes = await (0, this.sessionManager.fetch)(initialReq);
+	      if (!this.session?.refreshJwt) {
+	        return initialRes;
+	      }
+	      const isExpiredToken = await isErrorResponse(initialRes, [400], ['ExpiredToken']);
+	      if (!isExpiredToken) {
+	        return initialRes;
+	      }
+	      try {
+	        await this.sessionManager.refreshSession();
+	      } catch {
+	        return initialRes;
+	      }
+	      if (reqInit?.signal?.aborted) {
+	        return initialRes;
+	      }
+	      // The stream was already consumed. We cannot retry the request. A solution
+	      // would be to tee() the input stream but that would bufferize the entire
+	      // stream in memory which can lead to memory starvation. Instead, we will
+	      // return the original response and let the calling code handle retries.
+	      if (ReadableStream && reqInit.body instanceof ReadableStream) {
+	        return initialRes;
+	      }
+	      // Return initial "ExpiredToken" response if the session was not refreshed.
+	      const updatedToken = this.session?.accessJwt;
+	      if (!updatedToken || updatedToken === initialToken) {
+	        return initialRes;
+	      }
+	      // Make sure the initial request is cancelled to avoid leaking resources
+	      // (NodeJS 👀): https://undici.nodejs.org/#/?id=garbage-collection
+	      await initialRes.body?.cancel();
+	      // We need to re-compute the URI in case the PDS endpoint has changed
+	      const updatedUri = new URL(url, this.dispatchUrl);
+	      const updatedReq = new Request(updatedUri, reqInit);
+	      updatedReq.headers.set('authorization', `Bearer ${updatedToken}`);
+	      return await (0, this.sessionManager.fetch)(updatedReq);
+	    });
+	    Object.defineProperty(this, "headers", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: void 0
+	    });
+	    Object.defineProperty(this, "sessionManager", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: void 0
+	    });
+	    if (options instanceof SessionManager) {
+	      this.headers = new Map();
+	      this.sessionManager = options;
+	    } else {
+	      this.headers = new Map(options.headers);
+	      this.sessionManager = new SessionManager(new URL(options.service), options.fetch, options.persistSession);
+	    }
+	  }
+	  clone() {
+	    return this.copyInto(new AtpAgent(this.sessionManager));
+	  }
+	  copyInto(inst) {
+	    if (inst instanceof AtpAgent) {
+	      for (const [key] of inst.headers) {
+	        inst.unsetHeader(key);
+	      }
+	      for (const [key, value] of this.headers) {
+	        inst.setHeader(key, value);
+	      }
+	    }
+	    return super.copyInto(inst);
+	  }
+	  setHeader(key, value) {
+	    this.headers.set(key.toLowerCase(), value);
+	  }
+	  unsetHeader(key) {
+	    this.headers.delete(key.toLowerCase());
+	  }
+	  get session() {
+	    return this.sessionManager.session;
+	  }
+	  get hasSession() {
+	    return !!this.session;
+	  }
+	  get did() {
+	    return this.session?.did;
+	  }
+	  get serviceUrl() {
+	    return this.sessionManager.serviceUrl;
+	  }
+	  get pdsUrl() {
+	    return this.sessionManager.pdsUrl;
+	  }
+	  get dispatchUrl() {
+	    return this.pdsUrl || this.serviceUrl;
+	  }
+	  /** @deprecated use {@link serviceUrl} instead */
+	  get service() {
+	    return this.serviceUrl;
+	  }
+	  get persistSession() {
+	    throw new Error('Cannot set persistSession directly. "persistSession" is defined through the constructor and will be invoked automatically when session data changes.');
+	  }
+	  set persistSession(v) {
+	    throw new Error('Cannot set persistSession directly. "persistSession" must be defined in the constructor and can no longer be changed.');
+	  }
+	  /** @deprecated This will be removed in OAuthAtpAgent */
+	  getServiceUrl() {
+	    return this.serviceUrl;
+	  }
+	  async resumeSession(session) {
+	    return this.sessionManager.resumeSession(session);
+	  }
+	  async createAccount(data, opts) {
+	    return this.sessionManager.createAccount(data, opts);
+	  }
+	  async login(opts) {
+	    return this.sessionManager.login(opts);
+	  }
+	  async logout() {
+	    return this.sessionManager.logout();
+	  }
+	}
+	atpAgent.AtpAgent = AtpAgent;
+	/**
+	 * Private class meant to be used by clones of {@link AtpAgent} so they can
+	 * share the same session across multiple instances (with different
+	 * proxying/labelers/headers options).
+	 */
+	class SessionManager {
+	  constructor(serviceUrl, fetch = globalThis.fetch, persistSession) {
+	    Object.defineProperty(this, "serviceUrl", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: serviceUrl
+	    });
+	    Object.defineProperty(this, "fetch", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: fetch
+	    });
+	    Object.defineProperty(this, "persistSession", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: persistSession
+	    });
+	    Object.defineProperty(this, "pdsUrl", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: void 0
+	    }); // The PDS URL, driven by the did doc
+	    Object.defineProperty(this, "session", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: void 0
+	    });
+	    Object.defineProperty(this, "refreshSessionPromise", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: void 0
+	    });
+	    /**
+	     * Private {@link AtpBaseClient} used to perform session management API
+	     * calls on the service endpoint. Calls performed by this agent will not be
+	     * authenticated using the user's session.
+	     */
+	    Object.defineProperty(this, "api", {
+	      enumerable: true,
+	      configurable: true,
+	      writable: true,
+	      value: new client_1.AtpBaseClient((url, init) => {
+	        return (0, this.fetch)(new URL(url, this.serviceUrl), init);
+	      })
+	    });
+	  }
+	  /**
+	   * Sets a WhatWG "fetch()" function to be used for making HTTP requests.
+	   */
+	  setFetch(fetch = globalThis.fetch) {
+	    this.fetch = fetch;
+	  }
+	  /**
+	   * Create a new account and hydrate its session in this agent.
+	   */
+	  async createAccount(data, opts) {
+	    try {
+	      const res = await this.api.com.atproto.server.createAccount(data, opts);
+	      this.session = {
+	        accessJwt: res.data.accessJwt,
+	        refreshJwt: res.data.refreshJwt,
+	        handle: res.data.handle,
+	        did: res.data.did,
+	        email: data.email,
+	        emailConfirmed: false,
+	        emailAuthFactor: false,
+	        active: true
+	      };
+	      this.persistSession?.('create', this.session);
+	      this._updateApiEndpoint(res.data.didDoc);
+	      return res;
+	    } catch (e) {
+	      this.session = undefined;
+	      this.persistSession?.('create-failed', undefined);
+	      throw e;
+	    }
+	  }
+	  /**
+	   * Start a new session with this agent.
+	   */
+	  async login(opts) {
+	    try {
+	      const res = await this.api.com.atproto.server.createSession({
+	        identifier: opts.identifier,
+	        password: opts.password,
+	        authFactorToken: opts.authFactorToken
+	      });
+	      this.session = {
+	        accessJwt: res.data.accessJwt,
+	        refreshJwt: res.data.refreshJwt,
+	        handle: res.data.handle,
+	        did: res.data.did,
+	        email: res.data.email,
+	        emailConfirmed: res.data.emailConfirmed,
+	        emailAuthFactor: res.data.emailAuthFactor,
+	        active: res.data.active ?? true,
+	        status: res.data.status
+	      };
+	      this._updateApiEndpoint(res.data.didDoc);
+	      this.persistSession?.('create', this.session);
+	      return res;
+	    } catch (e) {
+	      this.session = undefined;
+	      this.persistSession?.('create-failed', undefined);
+	      throw e;
+	    }
+	  }
+	  async logout() {
+	    if (this.session) {
+	      try {
+	        await this.api.com.atproto.server.deleteSession(undefined, {
+	          headers: {
+	            authorization: `Bearer ${this.session.accessJwt}`
+	          }
+	        });
+	      } catch {
+	        // Ignore errors
+	      } finally {
+	        this.session = undefined;
+	        this.persistSession?.('expired', undefined);
+	      }
+	    }
+	  }
+	  /**
+	   * Resume a pre-existing session with this agent.
+	   */
+	  async resumeSession(session) {
+	    this.session = session;
+	    try {
+	      const res = await this.api.com.atproto.server.getSession(undefined, {
+	        headers: {
+	          authorization: `Bearer ${session.accessJwt}`
+	        }
+	      }).catch(async err => {
+	        if (err instanceof xrpc_1.XRPCError && ['ExpiredToken', 'InvalidToken'].includes(err.error) && session.refreshJwt) {
+	          try {
+	            const res = await this.api.com.atproto.server.refreshSession(undefined, {
+	              headers: {
+	                authorization: `Bearer ${session.refreshJwt}`
+	              }
+	            });
+	            session.accessJwt = res.data.accessJwt;
+	            session.refreshJwt = res.data.refreshJwt;
+	            return this.api.com.atproto.server.getSession(undefined, {
+	              headers: {
+	                authorization: `Bearer ${session.accessJwt}`
+	              }
+	            });
+	          } catch {
+	            // Noop, we'll throw the original error
+	          }
+	        }
+	        throw err;
+	      });
+	      if (res.data.did !== session.did) {
+	        throw new xrpc_1.XRPCError(xrpc_1.ResponseType.InvalidRequest, 'Invalid session', 'InvalidDID');
+	      }
+	      session.email = res.data.email;
+	      session.handle = res.data.handle;
+	      session.emailConfirmed = res.data.emailConfirmed;
+	      session.emailAuthFactor = res.data.emailAuthFactor;
+	      session.active = res.data.active ?? true;
+	      session.status = res.data.status;
+	      // protect against concurrent session updates
+	      if (this.session === session) {
+	        this._updateApiEndpoint(res.data.didDoc);
+	        this.persistSession?.('update', session);
+	      }
+	      return res;
+	    } catch (err) {
+	      // protect against concurrent session updates
+	      if (this.session === session) {
+	        this.session = undefined;
+	        this.persistSession?.(err instanceof xrpc_1.XRPCError && ['ExpiredToken', 'InvalidToken'].includes(err.error) ? 'expired' : 'network-error', undefined);
+	      }
+	      throw err;
+	    }
+	  }
+	  /**
+	   * Internal helper to refresh sessions
+	   * - Wraps the actual implementation in a promise-guard to ensure only
+	   *   one refresh is attempted at a time.
+	   */
+	  async refreshSession() {
+	    return this.refreshSessionPromise || (this.refreshSessionPromise = this._refreshSessionInner().finally(() => {
+	      this.refreshSessionPromise = undefined;
+	    }));
+	  }
+	  /**
+	   * Internal helper to refresh sessions (actual behavior)
+	   */
+	  async _refreshSessionInner() {
+	    if (!this.session?.refreshJwt) {
+	      return;
+	    }
+	    try {
+	      const res = await this.api.com.atproto.server.refreshSession(undefined, {
+	        headers: {
+	          authorization: `Bearer ${this.session.refreshJwt}`
+	        }
+	      });
+	      // succeeded, update the session
+	      this.session = {
+	        ...this.session,
+	        accessJwt: res.data.accessJwt,
+	        refreshJwt: res.data.refreshJwt,
+	        handle: res.data.handle,
+	        did: res.data.did
+	      };
+	      this._updateApiEndpoint(res.data.didDoc);
+	      this.persistSession?.('update', this.session);
+	    } catch (err) {
+	      if (err instanceof xrpc_1.XRPCError && err.error && ['ExpiredToken', 'InvalidToken'].includes(err.error)) {
+	        // failed due to a bad refresh token
+	        this.session = undefined;
+	        this.persistSession?.('expired', undefined);
+	      }
+	      // else: other failures should be ignored - the issue will
+	      // propagate in the _dispatch() second attempt to run
+	      // the request
+	    }
+	  }
+	  /**
+	   * Helper to update the pds endpoint dynamically.
+	   *
+	   * The session methods (create, resume, refresh) may respond with the user's
+	   * did document which contains the user's canonical PDS endpoint. That endpoint
+	   * may differ from the endpoint used to contact the server. We capture that
+	   * PDS endpoint and update the client to use that given endpoint for future
+	   * requests. (This helps ensure smooth migrations between PDSes, especially
+	   * when the PDSes are operated by a single org.)
+	   */
+	  _updateApiEndpoint(didDoc) {
+	    if ((0, common_web_1.isValidDidDoc)(didDoc)) {
+	      const endpoint = (0, common_web_1.getPdsEndpoint)(didDoc);
+	      this.pdsUrl = endpoint ? new URL(endpoint) : undefined;
+	    } else {
+	      // If the did doc is invalid, we clear the pdsUrl (should never happen)
+	      this.pdsUrl = undefined;
+	    }
+	  }
+	}
+	function isErrorObject(v) {
+	  return xrpc_1.errorResponseBody.safeParse(v).success;
+	}
+	async function isErrorResponse(response, status, errorNames) {
+	  if (!status.includes(response.status)) return false;
+	  // Some engines (react-native 👀) don't expose a response.body property...
+	  // if (!response.body) return false
+	  try {
+	    const json = await peekJson(response, 10 * 1024);
+	    return isErrorObject(json) && errorNames.includes(json.error);
+	  } catch (err) {
+	    return false;
+	  }
+	}
+	async function peekJson(response, maxSize = Infinity) {
+	  if (extractType(response) !== 'application/json') throw new Error('Not JSON');
+	  if (extractLength(response) > maxSize) throw new Error('Response too large');
+	  return response.clone().json();
+	}
+	function extractLength({
+	  headers
+	}) {
+	  return headers.get('Content-Length') ? Number(headers.get('Content-Length')) : NaN;
+	}
+	function extractType({
+	  headers
+	}) {
+	  return headers.get('Content-Type')?.split(';')[0]?.trim();
+	}
+
+	var bskyAgent = {};
+
+	Object.defineProperty(bskyAgent, "__esModule", {
+	  value: true
+	});
+	bskyAgent.BskyAgent = void 0;
+	const atp_agent_1 = atpAgent;
+	/** @deprecated use {@link AtpAgent} instead */
+	class BskyAgent extends atp_agent_1.AtpAgent {
+	  clone() {
+	    if (this.constructor === BskyAgent) {
+	      const agent = new BskyAgent(this.sessionManager);
+	      return this.copyInto(agent);
+	    }
+	    // sub-classes should override this method
+	    throw new TypeError('Cannot clone a subclass of BskyAgent');
+	  }
+	}
+	bskyAgent.BskyAgent = BskyAgent;
 
 	(function (exports) {
 
@@ -36992,43 +35152,45 @@ if (cid) {
 	  Object.defineProperty(exports, "__esModule", {
 	    value: true
 	  });
-	  exports.default = exports.BskyAgent = exports.DEFAULT_LABEL_SETTINGS = exports.LABELS = exports.parseLanguage = exports.jsonStringToLex = exports.jsonToLex = exports.stringifyLex = exports.lexToJson = exports.BlobRef = exports.AtUri = void 0;
-	  var syntax_1 = dist$4;
+	  exports.lexicons = exports.default = exports.BskyAgent = exports.AtpAgent = exports.Agent = exports.DEFAULT_LABEL_SETTINGS = exports.LABELS = exports.parseLanguage = exports.jsonStringToLex = exports.jsonToLex = exports.stringifyLex = exports.lexToJson = exports.BlobRef = exports.AtUri = void 0;
+	  const lexicon_1 = dist$4;
+	  const lexicons_1 = lexicons;
+	  var syntax_1 = dist$3;
 	  Object.defineProperty(exports, "AtUri", {
 	    enumerable: true,
 	    get: function () {
 	      return syntax_1.AtUri;
 	    }
 	  });
-	  var lexicon_1 = dist$3;
+	  var lexicon_2 = dist$4;
 	  Object.defineProperty(exports, "BlobRef", {
 	    enumerable: true,
 	    get: function () {
-	      return lexicon_1.BlobRef;
+	      return lexicon_2.BlobRef;
 	    }
 	  });
 	  Object.defineProperty(exports, "lexToJson", {
 	    enumerable: true,
 	    get: function () {
-	      return lexicon_1.lexToJson;
+	      return lexicon_2.lexToJson;
 	    }
 	  });
 	  Object.defineProperty(exports, "stringifyLex", {
 	    enumerable: true,
 	    get: function () {
-	      return lexicon_1.stringifyLex;
+	      return lexicon_2.stringifyLex;
 	    }
 	  });
 	  Object.defineProperty(exports, "jsonToLex", {
 	    enumerable: true,
 	    get: function () {
-	      return lexicon_1.jsonToLex;
+	      return lexicon_2.jsonToLex;
 	    }
 	  });
 	  Object.defineProperty(exports, "jsonStringToLex", {
 	    enumerable: true,
 	    get: function () {
-	      return lexicon_1.jsonStringToLex;
+	      return lexicon_2.jsonStringToLex;
 	    }
 	  });
 	  var common_web_1 = dist$2;
@@ -37042,7 +35204,6 @@ if (cid) {
 	  __exportStar(_const, exports);
 	  __exportStar(util$4, exports);
 	  __exportStar(client$1, exports);
-	  __exportStar(agent, exports);
 	  __exportStar(richText, exports);
 	  __exportStar(sanitization, exports);
 	  __exportStar(unicode, exports);
@@ -37063,6 +35224,20 @@ if (cid) {
 	      return labels_1.DEFAULT_LABEL_SETTINGS;
 	    }
 	  });
+	  var agent_1 = agent;
+	  Object.defineProperty(exports, "Agent", {
+	    enumerable: true,
+	    get: function () {
+	      return agent_1.Agent;
+	    }
+	  });
+	  var atp_agent_1 = atpAgent;
+	  Object.defineProperty(exports, "AtpAgent", {
+	    enumerable: true,
+	    get: function () {
+	      return atp_agent_1.AtpAgent;
+	    }
+	  });
 	  var bsky_agent_1 = bskyAgent;
 	  Object.defineProperty(exports, "BskyAgent", {
 	    enumerable: true,
@@ -37070,13 +35245,17 @@ if (cid) {
 	      return bsky_agent_1.BskyAgent;
 	    }
 	  });
-	  var agent_1 = agent;
+	  /** @deprecated */
+	  var atp_agent_2 = atpAgent;
 	  Object.defineProperty(exports, "default", {
 	    enumerable: true,
 	    get: function () {
-	      return agent_1.AtpAgent;
+	      return atp_agent_2.AtpAgent;
 	    }
 	  });
+	  // Expose a copy to prevent alteration of the internal Lexicon instance used by
+	  // the AtpBaseClient class.
+	  exports.lexicons = new lexicon_1.Lexicons(lexicons_1.lexicons);
 	})(dist$5);
 	var index = /*@__PURE__*/getDefaultExportFromCjs(dist$5);
 
@@ -37512,7 +35691,7 @@ if (cid) {
 	try {
 	  decoder = new TextDecoder();
 	} catch (error) {}
-	let src$1;
+	let src;
 	let srcEnd;
 	let position$1 = 0;
 	const LEGACY_RECORD_INLINE_ID = 105;
@@ -37549,7 +35728,7 @@ if (cid) {
 	  // if eval variants are not supported, do not create inline object readers ever
 	  inlineObjectReadThreshold = Infinity;
 	}
-	let Decoder$1 = class Decoder {
+	class Decoder {
 	  constructor(options) {
 	    if (options) {
 	      if ((options.keyMap || options._keyMap) && !options.useRecords) {
@@ -37609,7 +35788,7 @@ if (cid) {
 	    return res;
 	  }
 	  decode(source, end) {
-	    if (src$1) {
+	    if (src) {
 	      // re-entrant execution, save the state and restore it after we do this decode
 	      return saveState(() => {
 	        clearSource();
@@ -37621,7 +35800,7 @@ if (cid) {
 	    srcStringEnd = 0;
 	    srcString = null;
 	    bundledStrings$1 = null;
-	    src$1 = source;
+	    src = source;
 	    // this provides cached access to the data view for a buffer if it is getting reused, which is a recommend
 	    // technique for getting data from a database where it can be copied into an existing buffer instead of creating
 	    // new ones
@@ -37629,7 +35808,7 @@ if (cid) {
 	      dataView$1 = source.dataView || (source.dataView = new DataView(source.buffer, source.byteOffset, source.byteLength));
 	    } catch (error) {
 	      // if it doesn't have a buffer, maybe it is the wrong type of object
-	      src$1 = null;
+	      src = null;
 	      if (source instanceof Uint8Array) throw error;
 	      throw new Error('Source must be a Uint8Array or Buffer but was a ' + (source && typeof source == 'object' ? source.constructor.name : typeof source));
 	    }
@@ -37683,10 +35862,10 @@ if (cid) {
 	      clearSource();
 	    }
 	  }
-	};
+	}
 	function checkedRead() {
 	  try {
-	    let result = read$2();
+	    let result = read$1();
 	    if (bundledStrings$1) {
 	      if (position$1 >= bundledStrings$1.postBundlePosition) {
 	        let error = new Error('Unexpected bundle position');
@@ -37700,7 +35879,7 @@ if (cid) {
 	    if (position$1 == srcEnd) {
 	      // finished reading this source, cleanup references
 	      currentStructures = null;
-	      src$1 = null;
+	      src = null;
 	      if (referenceMap) referenceMap = null;
 	    } else if (position$1 > srcEnd) {
 	      // over read
@@ -37720,14 +35899,14 @@ if (cid) {
 	    throw error;
 	  }
 	}
-	function read$2() {
-	  let token = src$1[position$1++];
+	function read$1() {
+	  let token = src[position$1++];
 	  let majorType = token >> 5;
 	  token = token & 0x1f;
 	  if (token > 0x17) {
 	    switch (token) {
 	      case 0x18:
-	        token = src$1[position$1++];
+	        token = src[position$1++];
 	        break;
 	      case 0x19:
 	        if (majorType == 7) {
@@ -37741,7 +35920,7 @@ if (cid) {
 	          let value = dataView$1.getFloat32(position$1);
 	          if (currentDecoder.useFloat32 > 2) {
 	            // this does rounding of numbers that were encoded in 32-bit float to nearest significant decimal digit that could be preserved
-	            let multiplier = mult10[(src$1[position$1] & 0x7f) << 1 | src$1[position$1 + 1] >> 7];
+	            let multiplier = mult10[(src[position$1] & 0x7f) << 1 | src[position$1 + 1] >> 7];
 	            position$1 += 4;
 	            return (multiplier * value + (value > 0 ? 0.5 : -0.5) >> 0) / multiplier;
 	          }
@@ -37778,7 +35957,7 @@ if (cid) {
 	            let array = [];
 	            let value,
 	              i = 0;
-	            while ((value = read$2()) != STOP_CODE) {
+	            while ((value = read$1()) != STOP_CODE) {
 	              if (i >= maxArraySize) throw new Error(`Array length exceeds ${maxArraySize}`);
 	              array[i++] = value;
 	            }
@@ -37790,14 +35969,14 @@ if (cid) {
 	              let object = {};
 	              let i = 0;
 	              if (currentDecoder.keyMap) {
-	                while ((key = read$2()) != STOP_CODE) {
+	                while ((key = read$1()) != STOP_CODE) {
 	                  if (i++ >= maxMapSize) throw new Error(`Property count exceeds ${maxMapSize}`);
-	                  object[safeKey(currentDecoder.decodeKey(key))] = read$2();
+	                  object[safeKey(currentDecoder.decodeKey(key))] = read$1();
 	                }
 	              } else {
-	                while ((key = read$2()) != STOP_CODE) {
+	                while ((key = read$1()) != STOP_CODE) {
 	                  if (i++ >= maxMapSize) throw new Error(`Property count exceeds ${maxMapSize}`);
-	                  object[safeKey(key)] = read$2();
+	                  object[safeKey(key)] = read$1();
 	                }
 	              }
 	              return object;
@@ -37809,19 +35988,19 @@ if (cid) {
 	              let map = new Map();
 	              if (currentDecoder.keyMap) {
 	                let i = 0;
-	                while ((key = read$2()) != STOP_CODE) {
+	                while ((key = read$1()) != STOP_CODE) {
 	                  if (i++ >= maxMapSize) {
 	                    throw new Error(`Map size exceeds ${maxMapSize}`);
 	                  }
-	                  map.set(currentDecoder.decodeKey(key), read$2());
+	                  map.set(currentDecoder.decodeKey(key), read$1());
 	                }
 	              } else {
 	                let i = 0;
-	                while ((key = read$2()) != STOP_CODE) {
+	                while ((key = read$1()) != STOP_CODE) {
 	                  if (i++ >= maxMapSize) {
 	                    throw new Error(`Map size exceeds ${maxMapSize}`);
 	                  }
-	                  map.set(key, read$2());
+	                  map.set(key, read$1());
 	                }
 	              }
 	              return map;
@@ -37862,14 +36041,14 @@ if (cid) {
 	      let array = new Array(token);
 	      //if (currentDecoder.keyMap) for (let i = 0; i < token; i++) array[i] = currentDecoder.decodeKey(read())	
 	      //else 
-	      for (let i = 0; i < token; i++) array[i] = read$2();
+	      for (let i = 0; i < token; i++) array[i] = read$1();
 	      return array;
 	    case 5:
 	      // map
 	      if (token >= maxMapSize) throw new Error(`Map size exceeds ${maxArraySize}`);
 	      if (currentDecoder.mapsAsObjects) {
 	        let object = {};
-	        if (currentDecoder.keyMap) for (let i = 0; i < token; i++) object[safeKey(currentDecoder.decodeKey(read$2()))] = read$2();else for (let i = 0; i < token; i++) object[safeKey(read$2())] = read$2();
+	        if (currentDecoder.keyMap) for (let i = 0; i < token; i++) object[safeKey(currentDecoder.decodeKey(read$1()))] = read$1();else for (let i = 0; i < token; i++) object[safeKey(read$1())] = read$1();
 	        return object;
 	      } else {
 	        if (restoreMapsAsObject) {
@@ -37877,7 +36056,7 @@ if (cid) {
 	          restoreMapsAsObject = false;
 	        }
 	        let map = new Map();
-	        if (currentDecoder.keyMap) for (let i = 0; i < token; i++) map.set(currentDecoder.decodeKey(read$2()), read$2());else for (let i = 0; i < token; i++) map.set(read$2(), read$2());
+	        if (currentDecoder.keyMap) for (let i = 0; i < token; i++) map.set(currentDecoder.decodeKey(read$1()), read$1());else for (let i = 0; i < token; i++) map.set(read$1(), read$1());
 	        return map;
 	      }
 	    case 6:
@@ -37894,25 +36073,25 @@ if (cid) {
 	            // we do a special check for this so that we can keep the
 	            // currentExtensions as densely stored array (v8 stores arrays densely under about 3000 elements)
 	            let length = readJustLength();
-	            let id = read$2();
-	            let structure = read$2();
+	            let id = read$1();
+	            let structure = read$1();
 	            recordDefinition(id, structure);
 	            let object = {};
 	            if (currentDecoder.keyMap) for (let i = 2; i < length; i++) {
 	              let key = currentDecoder.decodeKey(structure[i - 2]);
-	              object[safeKey(key)] = read$2();
+	              object[safeKey(key)] = read$1();
 	            } else for (let i = 2; i < length; i++) {
 	              let key = structure[i - 2];
-	              object[safeKey(key)] = read$2();
+	              object[safeKey(key)] = read$1();
 	            }
 	            return object;
 	          } else if (token == RECORD_DEFINITIONS_ID) {
 	            let length = readJustLength();
-	            let id = read$2();
+	            let id = read$1();
 	            for (let i = 2; i < length; i++) {
-	              recordDefinition(id++, read$2());
+	              recordDefinition(id++, read$1());
 	            }
-	            return read$2();
+	            return read$1();
 	          } else if (token == BUNDLED_STRINGS_ID) {
 	            return readBundleExt();
 	          }
@@ -37928,9 +36107,9 @@ if (cid) {
 	      }
 	      let extension = currentExtensions[token];
 	      if (extension) {
-	        if (extension.handlesRead) return extension(read$2);else return extension(read$2());
+	        if (extension.handlesRead) return extension(read$1);else return extension(read$1());
 	      } else {
-	        let input = read$2();
+	        let input = read$1();
 	        for (let i = 0; i < currentExtensionRanges.length; i++) {
 	          let value = currentExtensionRanges[i](token, input);
 	          if (value !== undefined) return value;
@@ -37970,13 +36149,13 @@ if (cid) {
 	  if (!structure) throw new Error('Structure is required in record definition');
 	  function readObject() {
 	    // get the array size from the header
-	    let length = src$1[position$1++];
+	    let length = src[position$1++];
 	    //let majorType = token >> 5
 	    length = length & 0x1f;
 	    if (length > 0x17) {
 	      switch (length) {
 	        case 0x18:
-	          length = src$1[position$1++];
+	          length = src[position$1++];
 	          break;
 	        case 0x19:
 	          length = dataView$1.getUint16(position$1);
@@ -37987,14 +36166,14 @@ if (cid) {
 	          position$1 += 4;
 	          break;
 	        default:
-	          throw new Error('Expected array header, but got ' + src$1[position$1 - 1]);
+	          throw new Error('Expected array header, but got ' + src[position$1 - 1]);
 	      }
 	    }
 	    // This initial function is quick to instantiate, but runs slower. After several iterations pay the cost to build the faster function
 	    let compiledReader = this.compiledReader; // first look to see if we have the fast compiled function
 	    while (compiledReader) {
 	      // we have a fast compiled object literal reader
-	      if (compiledReader.propertyCount === length) return compiledReader(read$2); // with the right length, so we use it
+	      if (compiledReader.propertyCount === length) return compiledReader(read$1); // with the right length, so we use it
 	      compiledReader = compiledReader.next; // see if there is another reader with the right length
 	    }
 	    if (this.slowReads++ >= inlineObjectReadThreshold) {
@@ -38004,11 +36183,11 @@ if (cid) {
 	      if (this.compiledReader) compiledReader.next = this.compiledReader; // if there is an existing one, we store multiple readers as a linked list because it is usually pretty rare to have multiple readers (of different length) for the same structure
 	      compiledReader.propertyCount = length;
 	      this.compiledReader = compiledReader;
-	      return compiledReader(read$2);
+	      return compiledReader(read$1);
 	    }
 	    let object = {};
-	    if (currentDecoder.keyMap) for (let i = 0; i < length; i++) object[safeKey(currentDecoder.decodeKey(this[i]))] = read$2();else for (let i = 0; i < length; i++) {
-	      object[safeKey(this[i])] = read$2();
+	    if (currentDecoder.keyMap) for (let i = 0; i < length; i++) object[safeKey(currentDecoder.decodeKey(this[i]))] = read$1();else for (let i = 0; i < length; i++) {
+	      object[safeKey(this[i])] = read$1();
 	    }
 	    return object;
 	  }
@@ -38029,29 +36208,29 @@ if (cid) {
 	  if (length < 16) {
 	    if (result = shortStringInJS(length)) return result;
 	  }
-	  if (length > 64 && decoder) return decoder.decode(src$1.subarray(position$1, position$1 += length));
+	  if (length > 64 && decoder) return decoder.decode(src.subarray(position$1, position$1 += length));
 	  const end = position$1 + length;
 	  const units = [];
 	  result = '';
 	  while (position$1 < end) {
-	    const byte1 = src$1[position$1++];
+	    const byte1 = src[position$1++];
 	    if ((byte1 & 0x80) === 0) {
 	      // 1 byte
 	      units.push(byte1);
 	    } else if ((byte1 & 0xe0) === 0xc0) {
 	      // 2 bytes
-	      const byte2 = src$1[position$1++] & 0x3f;
+	      const byte2 = src[position$1++] & 0x3f;
 	      units.push((byte1 & 0x1f) << 6 | byte2);
 	    } else if ((byte1 & 0xf0) === 0xe0) {
 	      // 3 bytes
-	      const byte2 = src$1[position$1++] & 0x3f;
-	      const byte3 = src$1[position$1++] & 0x3f;
+	      const byte2 = src[position$1++] & 0x3f;
+	      const byte3 = src[position$1++] & 0x3f;
 	      units.push((byte1 & 0x1f) << 12 | byte2 << 6 | byte3);
 	    } else if ((byte1 & 0xf8) === 0xf0) {
 	      // 4 bytes
-	      const byte2 = src$1[position$1++] & 0x3f;
-	      const byte3 = src$1[position$1++] & 0x3f;
-	      const byte4 = src$1[position$1++] & 0x3f;
+	      const byte2 = src[position$1++] & 0x3f;
+	      const byte3 = src[position$1++] & 0x3f;
+	      const byte4 = src[position$1++] & 0x3f;
 	      let unit = (byte1 & 0x07) << 0x12 | byte2 << 0x0c | byte3 << 0x06 | byte4;
 	      if (unit > 0xffff) {
 	        unit -= 0x10000;
@@ -38077,7 +36256,7 @@ if (cid) {
 	  let start = position$1;
 	  let bytes = new Array(length);
 	  for (let i = 0; i < length; i++) {
-	    const byte = src$1[position$1++];
+	    const byte = src[position$1++];
 	    if ((byte & 0x80) > 0) {
 	      position$1 = start;
 	      return;
@@ -38090,7 +36269,7 @@ if (cid) {
 	  if (length < 4) {
 	    if (length < 2) {
 	      if (length === 0) return '';else {
-	        let a = src$1[position$1++];
+	        let a = src[position$1++];
 	        if ((a & 0x80) > 1) {
 	          position$1 -= 1;
 	          return;
@@ -38098,14 +36277,14 @@ if (cid) {
 	        return fromCharCode(a);
 	      }
 	    } else {
-	      let a = src$1[position$1++];
-	      let b = src$1[position$1++];
+	      let a = src[position$1++];
+	      let b = src[position$1++];
 	      if ((a & 0x80) > 0 || (b & 0x80) > 0) {
 	        position$1 -= 2;
 	        return;
 	      }
 	      if (length < 3) return fromCharCode(a, b);
-	      let c = src$1[position$1++];
+	      let c = src[position$1++];
 	      if ((c & 0x80) > 0) {
 	        position$1 -= 3;
 	        return;
@@ -38113,17 +36292,17 @@ if (cid) {
 	      return fromCharCode(a, b, c);
 	    }
 	  } else {
-	    let a = src$1[position$1++];
-	    let b = src$1[position$1++];
-	    let c = src$1[position$1++];
-	    let d = src$1[position$1++];
+	    let a = src[position$1++];
+	    let b = src[position$1++];
+	    let c = src[position$1++];
+	    let d = src[position$1++];
 	    if ((a & 0x80) > 0 || (b & 0x80) > 0 || (c & 0x80) > 0 || (d & 0x80) > 0) {
 	      position$1 -= 4;
 	      return;
 	    }
 	    if (length < 6) {
 	      if (length === 4) return fromCharCode(a, b, c, d);else {
-	        let e = src$1[position$1++];
+	        let e = src[position$1++];
 	        if ((e & 0x80) > 0) {
 	          position$1 -= 5;
 	          return;
@@ -38131,31 +36310,31 @@ if (cid) {
 	        return fromCharCode(a, b, c, d, e);
 	      }
 	    } else if (length < 8) {
-	      let e = src$1[position$1++];
-	      let f = src$1[position$1++];
+	      let e = src[position$1++];
+	      let f = src[position$1++];
 	      if ((e & 0x80) > 0 || (f & 0x80) > 0) {
 	        position$1 -= 6;
 	        return;
 	      }
 	      if (length < 7) return fromCharCode(a, b, c, d, e, f);
-	      let g = src$1[position$1++];
+	      let g = src[position$1++];
 	      if ((g & 0x80) > 0) {
 	        position$1 -= 7;
 	        return;
 	      }
 	      return fromCharCode(a, b, c, d, e, f, g);
 	    } else {
-	      let e = src$1[position$1++];
-	      let f = src$1[position$1++];
-	      let g = src$1[position$1++];
-	      let h = src$1[position$1++];
+	      let e = src[position$1++];
+	      let f = src[position$1++];
+	      let g = src[position$1++];
+	      let h = src[position$1++];
 	      if ((e & 0x80) > 0 || (f & 0x80) > 0 || (g & 0x80) > 0 || (h & 0x80) > 0) {
 	        position$1 -= 8;
 	        return;
 	      }
 	      if (length < 10) {
 	        if (length === 8) return fromCharCode(a, b, c, d, e, f, g, h);else {
-	          let i = src$1[position$1++];
+	          let i = src[position$1++];
 	          if ((i & 0x80) > 0) {
 	            position$1 -= 9;
 	            return;
@@ -38163,31 +36342,31 @@ if (cid) {
 	          return fromCharCode(a, b, c, d, e, f, g, h, i);
 	        }
 	      } else if (length < 12) {
-	        let i = src$1[position$1++];
-	        let j = src$1[position$1++];
+	        let i = src[position$1++];
+	        let j = src[position$1++];
 	        if ((i & 0x80) > 0 || (j & 0x80) > 0) {
 	          position$1 -= 10;
 	          return;
 	        }
 	        if (length < 11) return fromCharCode(a, b, c, d, e, f, g, h, i, j);
-	        let k = src$1[position$1++];
+	        let k = src[position$1++];
 	        if ((k & 0x80) > 0) {
 	          position$1 -= 11;
 	          return;
 	        }
 	        return fromCharCode(a, b, c, d, e, f, g, h, i, j, k);
 	      } else {
-	        let i = src$1[position$1++];
-	        let j = src$1[position$1++];
-	        let k = src$1[position$1++];
-	        let l = src$1[position$1++];
+	        let i = src[position$1++];
+	        let j = src[position$1++];
+	        let k = src[position$1++];
+	        let l = src[position$1++];
 	        if ((i & 0x80) > 0 || (j & 0x80) > 0 || (k & 0x80) > 0 || (l & 0x80) > 0) {
 	          position$1 -= 12;
 	          return;
 	        }
 	        if (length < 14) {
 	          if (length === 12) return fromCharCode(a, b, c, d, e, f, g, h, i, j, k, l);else {
-	            let m = src$1[position$1++];
+	            let m = src[position$1++];
 	            if ((m & 0x80) > 0) {
 	              position$1 -= 13;
 	              return;
@@ -38195,14 +36374,14 @@ if (cid) {
 	            return fromCharCode(a, b, c, d, e, f, g, h, i, j, k, l, m);
 	          }
 	        } else {
-	          let m = src$1[position$1++];
-	          let n = src$1[position$1++];
+	          let m = src[position$1++];
+	          let n = src[position$1++];
 	          if ((m & 0x80) > 0 || (n & 0x80) > 0) {
 	            position$1 -= 14;
 	            return;
 	          }
 	          if (length < 15) return fromCharCode(a, b, c, d, e, f, g, h, i, j, k, l, m, n);
-	          let o = src$1[position$1++];
+	          let o = src[position$1++];
 	          if ((o & 0x80) > 0) {
 	            position$1 -= 15;
 	            return;
@@ -38216,13 +36395,13 @@ if (cid) {
 	function readBin(length) {
 	  return currentDecoder.copyBuffers ?
 	  // specifically use the copying slice (not the node one)
-	  Uint8Array.prototype.slice.call(src$1, position$1, position$1 += length) : src$1.subarray(position$1, position$1 += length);
+	  Uint8Array.prototype.slice.call(src, position$1, position$1 += length) : src.subarray(position$1, position$1 += length);
 	}
 	let f32Array = new Float32Array(1);
 	let u8Array = new Uint8Array(f32Array.buffer, 0, 4);
 	function getFloat16() {
-	  let byte0 = src$1[position$1++];
-	  let byte1 = src$1[position$1++];
+	  let byte0 = src[position$1++];
+	  let byte1 = src[position$1++];
 	  let exponent = (byte0 & 0x7f) >> 2;
 	  if (exponent === 0x1f) {
 	    // specials
@@ -38319,9 +36498,9 @@ if (cid) {
 	  return (glbl[data[0]] || Error)(data[1], data[2]);
 	};
 	const packedTable = read => {
-	  if (src$1[position$1++] != 0x84) {
+	  if (src[position$1++] != 0x84) {
 	    let error = new Error('Packed values structure must be followed by a 4 element array');
-	    if (src$1.length < position$1) error.incomplete = true;
+	    if (src.length < position$1) error.incomplete = true;
 	    throw error;
 	  }
 	  let newPackedValues = read(); // packed values
@@ -38373,7 +36552,7 @@ if (cid) {
 	  }
 	  let id = referenceMap.id++;
 	  let startingPosition = position$1;
-	  let token = src$1[position$1];
+	  let token = src[position$1];
 	  let target;
 	  // TODO: handle Maps, Sets, and other types that can cycle; this is complicated, because you potentially need to read
 	  // ahead past references to record structure definitions
@@ -38491,7 +36670,7 @@ if (cid) {
 	}
 	function readBundleExt() {
 	  let length = readJustLength();
-	  let bundlePosition = position$1 + read$2();
+	  let bundlePosition = position$1 + read$1();
 	  for (let i = 2; i < length; i++) {
 	    // skip past bundles that were already read
 	    let bundleLength = readJustLength(); // this will increment position, so must add to position afterwards
@@ -38504,14 +36683,14 @@ if (cid) {
 	  bundledStrings$1.position1 = 0;
 	  bundledStrings$1.postBundlePosition = position$1;
 	  position$1 = dataPosition;
-	  return read$2();
+	  return read$1();
 	}
 	function readJustLength() {
-	  let token = src$1[position$1++] & 0x1f;
+	  let token = src[position$1++] & 0x1f;
 	  if (token > 0x17) {
 	    switch (token) {
 	      case 0x18:
-	        token = src$1[position$1++];
+	        token = src[position$1++];
 	        break;
 	      case 0x19:
 	        token = dataView$1.getUint16(position$1);
@@ -38529,7 +36708,7 @@ if (cid) {
 	  if (currentDecoder.getShared) {
 	    let sharedData = saveState(() => {
 	      // save the state in case getShared modifies our buffer
-	      src$1 = null;
+	      src = null;
 	      return currentDecoder.getShared();
 	    }) || {};
 	    let updatedStructures = sharedData.structures || [];
@@ -38548,7 +36727,7 @@ if (cid) {
 	  let savedBundledStrings = bundledStrings$1;
 
 	  // TODO: We may need to revisit this if we do more external calls to user code (since it could be slow)
-	  let savedSrc = new Uint8Array(src$1.slice(0, srcEnd)); // we copy the data in case it changes while external data is processed
+	  let savedSrc = new Uint8Array(src.slice(0, srcEnd)); // we copy the data in case it changes while external data is processed
 	  let savedStructures = currentStructures;
 	  let savedDecoder = currentDecoder;
 	  let savedSequentialMode = sequentialMode;
@@ -38560,15 +36739,15 @@ if (cid) {
 	  srcString = savedSrcString;
 	  referenceMap = savedReferenceMap;
 	  bundledStrings$1 = savedBundledStrings;
-	  src$1 = savedSrc;
+	  src = savedSrc;
 	  sequentialMode = savedSequentialMode;
 	  currentStructures = savedStructures;
 	  currentDecoder = savedDecoder;
-	  dataView$1 = new DataView(src$1.buffer, src$1.byteOffset, src$1.byteLength);
+	  dataView$1 = new DataView(src.buffer, src.byteOffset, src.byteLength);
 	  return value;
 	}
 	function clearSource() {
-	  src$1 = null;
+	  src = null;
 	  referenceMap = null;
 	  currentStructures = null;
 	}
@@ -38579,10 +36758,10 @@ if (cid) {
 	for (let i = 0; i < 256; i++) {
 	  mult10[i] = +('1e' + Math.floor(45.15 - i * 0.30103));
 	}
-	let defaultDecoder = new Decoder$1({
+	let defaultDecoder = new Decoder({
 	  useRecords: false
 	});
-	const decode$7 = defaultDecoder.decode;
+	const decode$3 = defaultDecoder.decode;
 	const decodeMultiple = defaultDecoder.decodeMultiple;
 
 	let textEncoder$1;
@@ -38605,7 +36784,7 @@ if (cid) {
 	const MAX_BUNDLE_SIZE = 0xf000;
 	const hasNonLatin = /[\u0080-\uFFFF]/;
 	const RECORD_SYMBOL = Symbol('record-id');
-	let Encoder$1 = class Encoder extends Decoder$1 {
+	class Encoder extends Decoder {
 	  constructor(options) {
 	    super(options);
 	    this.offset = 0;
@@ -39451,7 +37630,7 @@ if (cid) {
 	    // saveShared may fail to write and reload, or may have reloaded to check compatibility and overwrite saved data, either way load the correct shared data
 	    return saveResults;
 	  }
-	};
+	}
 	function writeEntityLength(length, majorValue) {
 	  if (length < 0x18) target[position++] = majorValue | length;else if (length < 0x100) {
 	    target[position++] = majorValue | 0x18;
@@ -39707,7 +37886,7 @@ if (cid) {
 	  }
 	  addExtension$1(extension);
 	}
-	let defaultEncoder = new Encoder$1({
+	let defaultEncoder = new Encoder({
 	  useRecords: false
 	});
 	defaultEncoder.encode;
@@ -39716,3338 +37895,6 @@ if (cid) {
 	const REUSE_BUFFER_MODE = 512;
 	const RESET_BUFFER_MODE = 1024;
 	const THROW_ON_ITERABLE = 2048;
-
-	function equals$1(aa, bb) {
-	  if (aa === bb) return true;
-	  if (aa.byteLength !== bb.byteLength) {
-	    return false;
-	  }
-	  for (let ii = 0; ii < aa.byteLength; ii++) {
-	    if (aa[ii] !== bb[ii]) {
-	      return false;
-	    }
-	  }
-	  return true;
-	}
-	function coerce(o) {
-	  if (o instanceof Uint8Array && o.constructor.name === 'Uint8Array') return o;
-	  if (o instanceof ArrayBuffer) return new Uint8Array(o);
-	  if (ArrayBuffer.isView(o)) {
-	    return new Uint8Array(o.buffer, o.byteOffset, o.byteLength);
-	  }
-	  throw new Error('Unknown type, must be binary type');
-	}
-
-	/* eslint-disable */
-	// base-x encoding / decoding
-	// Copyright (c) 2018 base-x contributors
-	// Copyright (c) 2014-2018 The Bitcoin Core developers (base58.cpp)
-	// Distributed under the MIT software license, see the accompanying
-	// file LICENSE or http://www.opensource.org/licenses/mit-license.php.
-	/**
-	 * @param {string} ALPHABET
-	 * @param {any} name
-	 */
-	function base(ALPHABET, name) {
-	  if (ALPHABET.length >= 255) {
-	    throw new TypeError('Alphabet too long');
-	  }
-	  var BASE_MAP = new Uint8Array(256);
-	  for (var j = 0; j < BASE_MAP.length; j++) {
-	    BASE_MAP[j] = 255;
-	  }
-	  for (var i = 0; i < ALPHABET.length; i++) {
-	    var x = ALPHABET.charAt(i);
-	    var xc = x.charCodeAt(0);
-	    if (BASE_MAP[xc] !== 255) {
-	      throw new TypeError(x + ' is ambiguous');
-	    }
-	    BASE_MAP[xc] = i;
-	  }
-	  var BASE = ALPHABET.length;
-	  var LEADER = ALPHABET.charAt(0);
-	  var FACTOR = Math.log(BASE) / Math.log(256); // log(BASE) / log(256), rounded up
-	  var iFACTOR = Math.log(256) / Math.log(BASE); // log(256) / log(BASE), rounded up
-	  /**
-	   * @param {any[] | Iterable<number>} source
-	   */
-	  function encode(source) {
-	    // @ts-ignore
-	    if (source instanceof Uint8Array) ;else if (ArrayBuffer.isView(source)) {
-	      source = new Uint8Array(source.buffer, source.byteOffset, source.byteLength);
-	    } else if (Array.isArray(source)) {
-	      source = Uint8Array.from(source);
-	    }
-	    if (!(source instanceof Uint8Array)) {
-	      throw new TypeError('Expected Uint8Array');
-	    }
-	    if (source.length === 0) {
-	      return '';
-	    }
-	    // Skip & count leading zeroes.
-	    var zeroes = 0;
-	    var length = 0;
-	    var pbegin = 0;
-	    var pend = source.length;
-	    while (pbegin !== pend && source[pbegin] === 0) {
-	      pbegin++;
-	      zeroes++;
-	    }
-	    // Allocate enough space in big-endian base58 representation.
-	    var size = (pend - pbegin) * iFACTOR + 1 >>> 0;
-	    var b58 = new Uint8Array(size);
-	    // Process the bytes.
-	    while (pbegin !== pend) {
-	      var carry = source[pbegin];
-	      // Apply "b58 = b58 * 256 + ch".
-	      var i = 0;
-	      for (var it1 = size - 1; (carry !== 0 || i < length) && it1 !== -1; it1--, i++) {
-	        carry += 256 * b58[it1] >>> 0;
-	        b58[it1] = carry % BASE >>> 0;
-	        carry = carry / BASE >>> 0;
-	      }
-	      if (carry !== 0) {
-	        throw new Error('Non-zero carry');
-	      }
-	      length = i;
-	      pbegin++;
-	    }
-	    // Skip leading zeroes in base58 result.
-	    var it2 = size - length;
-	    while (it2 !== size && b58[it2] === 0) {
-	      it2++;
-	    }
-	    // Translate the result into a string.
-	    var str = LEADER.repeat(zeroes);
-	    for (; it2 < size; ++it2) {
-	      str += ALPHABET.charAt(b58[it2]);
-	    }
-	    return str;
-	  }
-	  /**
-	   * @param {string | string[]} source
-	   */
-	  function decodeUnsafe(source) {
-	    if (typeof source !== 'string') {
-	      throw new TypeError('Expected String');
-	    }
-	    if (source.length === 0) {
-	      return new Uint8Array();
-	    }
-	    var psz = 0;
-	    // Skip leading spaces.
-	    if (source[psz] === ' ') {
-	      return;
-	    }
-	    // Skip and count leading '1's.
-	    var zeroes = 0;
-	    var length = 0;
-	    while (source[psz] === LEADER) {
-	      zeroes++;
-	      psz++;
-	    }
-	    // Allocate enough space in big-endian base256 representation.
-	    var size = (source.length - psz) * FACTOR + 1 >>> 0; // log(58) / log(256), rounded up.
-	    var b256 = new Uint8Array(size);
-	    // Process the characters.
-	    while (source[psz]) {
-	      // Decode character
-	      var carry = BASE_MAP[source.charCodeAt(psz)];
-	      // Invalid character
-	      if (carry === 255) {
-	        return;
-	      }
-	      var i = 0;
-	      for (var it3 = size - 1; (carry !== 0 || i < length) && it3 !== -1; it3--, i++) {
-	        carry += BASE * b256[it3] >>> 0;
-	        b256[it3] = carry % 256 >>> 0;
-	        carry = carry / 256 >>> 0;
-	      }
-	      if (carry !== 0) {
-	        throw new Error('Non-zero carry');
-	      }
-	      length = i;
-	      psz++;
-	    }
-	    // Skip trailing spaces.
-	    if (source[psz] === ' ') {
-	      return;
-	    }
-	    // Skip leading zeroes in b256.
-	    var it4 = size - length;
-	    while (it4 !== size && b256[it4] === 0) {
-	      it4++;
-	    }
-	    var vch = new Uint8Array(zeroes + (size - it4));
-	    var j = zeroes;
-	    while (it4 !== size) {
-	      vch[j++] = b256[it4++];
-	    }
-	    return vch;
-	  }
-	  /**
-	   * @param {string | string[]} string
-	   */
-	  function decode(string) {
-	    var buffer = decodeUnsafe(string);
-	    if (buffer) {
-	      return buffer;
-	    }
-	    throw new Error(`Non-${name} character`);
-	  }
-	  return {
-	    encode: encode,
-	    decodeUnsafe: decodeUnsafe,
-	    decode: decode
-	  };
-	}
-	var src = base;
-	var _brrp__multiformats_scope_baseX = src;
-
-	/**
-	 * Class represents both BaseEncoder and MultibaseEncoder meaning it
-	 * can be used to encode to multibase or base encode without multibase
-	 * prefix.
-	 */
-	class Encoder {
-	  name;
-	  prefix;
-	  baseEncode;
-	  constructor(name, prefix, baseEncode) {
-	    this.name = name;
-	    this.prefix = prefix;
-	    this.baseEncode = baseEncode;
-	  }
-	  encode(bytes) {
-	    if (bytes instanceof Uint8Array) {
-	      return `${this.prefix}${this.baseEncode(bytes)}`;
-	    } else {
-	      throw Error('Unknown type, must be binary type');
-	    }
-	  }
-	}
-	/**
-	 * Class represents both BaseDecoder and MultibaseDecoder so it could be used
-	 * to decode multibases (with matching prefix) or just base decode strings
-	 * with corresponding base encoding.
-	 */
-	class Decoder {
-	  name;
-	  prefix;
-	  baseDecode;
-	  prefixCodePoint;
-	  constructor(name, prefix, baseDecode) {
-	    this.name = name;
-	    this.prefix = prefix;
-	    /* c8 ignore next 3 */
-	    if (prefix.codePointAt(0) === undefined) {
-	      throw new Error('Invalid prefix character');
-	    }
-	    this.prefixCodePoint = prefix.codePointAt(0);
-	    this.baseDecode = baseDecode;
-	  }
-	  decode(text) {
-	    if (typeof text === 'string') {
-	      if (text.codePointAt(0) !== this.prefixCodePoint) {
-	        throw Error(`Unable to decode multibase string ${JSON.stringify(text)}, ${this.name} decoder only supports inputs prefixed with ${this.prefix}`);
-	      }
-	      return this.baseDecode(text.slice(this.prefix.length));
-	    } else {
-	      throw Error('Can only multibase decode strings');
-	    }
-	  }
-	  or(decoder) {
-	    return or(this, decoder);
-	  }
-	}
-	class ComposedDecoder {
-	  decoders;
-	  constructor(decoders) {
-	    this.decoders = decoders;
-	  }
-	  or(decoder) {
-	    return or(this, decoder);
-	  }
-	  decode(input) {
-	    const prefix = input[0];
-	    const decoder = this.decoders[prefix];
-	    if (decoder != null) {
-	      return decoder.decode(input);
-	    } else {
-	      throw RangeError(`Unable to decode multibase string ${JSON.stringify(input)}, only inputs prefixed with ${Object.keys(this.decoders)} are supported`);
-	    }
-	  }
-	}
-	function or(left, right) {
-	  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-	  return new ComposedDecoder({
-	    ...(left.decoders ?? {
-	      [left.prefix]: left
-	    }),
-	    ...(right.decoders ?? {
-	      [right.prefix]: right
-	    })
-	  });
-	}
-	class Codec {
-	  name;
-	  prefix;
-	  baseEncode;
-	  baseDecode;
-	  encoder;
-	  decoder;
-	  constructor(name, prefix, baseEncode, baseDecode) {
-	    this.name = name;
-	    this.prefix = prefix;
-	    this.baseEncode = baseEncode;
-	    this.baseDecode = baseDecode;
-	    this.encoder = new Encoder(name, prefix, baseEncode);
-	    this.decoder = new Decoder(name, prefix, baseDecode);
-	  }
-	  encode(input) {
-	    return this.encoder.encode(input);
-	  }
-	  decode(input) {
-	    return this.decoder.decode(input);
-	  }
-	}
-	function from({
-	  name,
-	  prefix,
-	  encode,
-	  decode
-	}) {
-	  return new Codec(name, prefix, encode, decode);
-	}
-	function baseX({
-	  name,
-	  prefix,
-	  alphabet
-	}) {
-	  const {
-	    encode,
-	    decode
-	  } = _brrp__multiformats_scope_baseX(alphabet, name);
-	  return from({
-	    prefix,
-	    name,
-	    encode,
-	    decode: text => coerce(decode(text))
-	  });
-	}
-	function decode$6(string, alphabet, bitsPerChar, name) {
-	  // Build the character lookup table:
-	  const codes = {};
-	  for (let i = 0; i < alphabet.length; ++i) {
-	    codes[alphabet[i]] = i;
-	  }
-	  // Count the padding bytes:
-	  let end = string.length;
-	  while (string[end - 1] === '=') {
-	    --end;
-	  }
-	  // Allocate the output:
-	  const out = new Uint8Array(end * bitsPerChar / 8 | 0);
-	  // Parse the data:
-	  let bits = 0; // Number of bits currently in the buffer
-	  let buffer = 0; // Bits waiting to be written out, MSB first
-	  let written = 0; // Next byte to write
-	  for (let i = 0; i < end; ++i) {
-	    // Read one character from the string:
-	    const value = codes[string[i]];
-	    if (value === undefined) {
-	      throw new SyntaxError(`Non-${name} character`);
-	    }
-	    // Append the bits to the buffer:
-	    buffer = buffer << bitsPerChar | value;
-	    bits += bitsPerChar;
-	    // Write out some bits if the buffer has a byte's worth:
-	    if (bits >= 8) {
-	      bits -= 8;
-	      out[written++] = 0xff & buffer >> bits;
-	    }
-	  }
-	  // Verify that we have received just enough bits:
-	  if (bits >= bitsPerChar || (0xff & buffer << 8 - bits) !== 0) {
-	    throw new SyntaxError('Unexpected end of data');
-	  }
-	  return out;
-	}
-	function encode$2(data, alphabet, bitsPerChar) {
-	  const pad = alphabet[alphabet.length - 1] === '=';
-	  const mask = (1 << bitsPerChar) - 1;
-	  let out = '';
-	  let bits = 0; // Number of bits currently in the buffer
-	  let buffer = 0; // Bits waiting to be written out, MSB first
-	  for (let i = 0; i < data.length; ++i) {
-	    // Slurp data into the buffer:
-	    buffer = buffer << 8 | data[i];
-	    bits += 8;
-	    // Write out as much as we can:
-	    while (bits > bitsPerChar) {
-	      bits -= bitsPerChar;
-	      out += alphabet[mask & buffer >> bits];
-	    }
-	  }
-	  // Partial character:
-	  if (bits !== 0) {
-	    out += alphabet[mask & buffer << bitsPerChar - bits];
-	  }
-	  // Add padding characters until we hit a byte boundary:
-	  if (pad) {
-	    while ((out.length * bitsPerChar & 7) !== 0) {
-	      out += '=';
-	    }
-	  }
-	  return out;
-	}
-	/**
-	 * RFC4648 Factory
-	 */
-	function rfc4648({
-	  name,
-	  prefix,
-	  bitsPerChar,
-	  alphabet
-	}) {
-	  return from({
-	    prefix,
-	    name,
-	    encode(input) {
-	      return encode$2(input, alphabet, bitsPerChar);
-	    },
-	    decode(input) {
-	      return decode$6(input, alphabet, bitsPerChar, name);
-	    }
-	  });
-	}
-
-	const base32 = rfc4648({
-	  prefix: 'b',
-	  name: 'base32',
-	  alphabet: 'abcdefghijklmnopqrstuvwxyz234567',
-	  bitsPerChar: 5
-	});
-	rfc4648({
-	  prefix: 'B',
-	  name: 'base32upper',
-	  alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567',
-	  bitsPerChar: 5
-	});
-	rfc4648({
-	  prefix: 'c',
-	  name: 'base32pad',
-	  alphabet: 'abcdefghijklmnopqrstuvwxyz234567=',
-	  bitsPerChar: 5
-	});
-	rfc4648({
-	  prefix: 'C',
-	  name: 'base32padupper',
-	  alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567=',
-	  bitsPerChar: 5
-	});
-	rfc4648({
-	  prefix: 'v',
-	  name: 'base32hex',
-	  alphabet: '0123456789abcdefghijklmnopqrstuv',
-	  bitsPerChar: 5
-	});
-	rfc4648({
-	  prefix: 'V',
-	  name: 'base32hexupper',
-	  alphabet: '0123456789ABCDEFGHIJKLMNOPQRSTUV',
-	  bitsPerChar: 5
-	});
-	rfc4648({
-	  prefix: 't',
-	  name: 'base32hexpad',
-	  alphabet: '0123456789abcdefghijklmnopqrstuv=',
-	  bitsPerChar: 5
-	});
-	rfc4648({
-	  prefix: 'T',
-	  name: 'base32hexpadupper',
-	  alphabet: '0123456789ABCDEFGHIJKLMNOPQRSTUV=',
-	  bitsPerChar: 5
-	});
-	rfc4648({
-	  prefix: 'h',
-	  name: 'base32z',
-	  alphabet: 'ybndrfg8ejkmcpqxot1uwisza345h769',
-	  bitsPerChar: 5
-	});
-
-	const base58btc = baseX({
-	  name: 'base58btc',
-	  prefix: 'z',
-	  alphabet: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
-	});
-	baseX({
-	  name: 'base58flickr',
-	  prefix: 'Z',
-	  alphabet: '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
-	});
-
-	/* eslint-disable */
-	var encode_1$1 = encode$1;
-	var MSB$2 = 0x80,
-	  REST$2 = 0x7F,
-	  MSBALL$1 = ~REST$2,
-	  INT$1 = Math.pow(2, 31);
-	/**
-	 * @param {number} num
-	 * @param {number[]} out
-	 * @param {number} offset
-	 */
-	function encode$1(num, out, offset) {
-	  out = out || [];
-	  offset = offset || 0;
-	  var oldOffset = offset;
-	  while (num >= INT$1) {
-	    out[offset++] = num & 0xFF | MSB$2;
-	    num /= 128;
-	  }
-	  while (num & MSBALL$1) {
-	    out[offset++] = num & 0xFF | MSB$2;
-	    num >>>= 7;
-	  }
-	  out[offset] = num | 0;
-	  // @ts-ignore
-	  encode$1.bytes = offset - oldOffset + 1;
-	  return out;
-	}
-	var decode$5 = read$1;
-	var MSB$1$1 = 0x80,
-	  REST$1$1 = 0x7F;
-	/**
-	 * @param {string | any[]} buf
-	 * @param {number} offset
-	 */
-	function read$1(buf, offset) {
-	  var res = 0,
-	    offset = offset || 0,
-	    shift = 0,
-	    counter = offset,
-	    b,
-	    l = buf.length;
-	  do {
-	    if (counter >= l) {
-	      // @ts-ignore
-	      read$1.bytes = 0;
-	      throw new RangeError('Could not decode varint');
-	    }
-	    b = buf[counter++];
-	    res += shift < 28 ? (b & REST$1$1) << shift : (b & REST$1$1) * Math.pow(2, shift);
-	    shift += 7;
-	  } while (b >= MSB$1$1);
-	  // @ts-ignore
-	  read$1.bytes = counter - offset;
-	  return res;
-	}
-	var N1$1 = Math.pow(2, 7);
-	var N2$1 = Math.pow(2, 14);
-	var N3$1 = Math.pow(2, 21);
-	var N4$1 = Math.pow(2, 28);
-	var N5$1 = Math.pow(2, 35);
-	var N6$1 = Math.pow(2, 42);
-	var N7$1 = Math.pow(2, 49);
-	var N8$1 = Math.pow(2, 56);
-	var N9$1 = Math.pow(2, 63);
-	var length$1 = function ( /** @type {number} */value) {
-	  return value < N1$1 ? 1 : value < N2$1 ? 2 : value < N3$1 ? 3 : value < N4$1 ? 4 : value < N5$1 ? 5 : value < N6$1 ? 6 : value < N7$1 ? 7 : value < N8$1 ? 8 : value < N9$1 ? 9 : 10;
-	};
-	var varint$2 = {
-	  encode: encode_1$1,
-	  decode: decode$5,
-	  encodingLength: length$1
-	};
-	var _brrp_varint = varint$2;
-
-	function decode$4(data, offset = 0) {
-	  const code = _brrp_varint.decode(data, offset);
-	  return [code, _brrp_varint.decode.bytes];
-	}
-	function encodeTo(int, target, offset = 0) {
-	  _brrp_varint.encode(int, target, offset);
-	  return target;
-	}
-	function encodingLength(int) {
-	  return _brrp_varint.encodingLength(int);
-	}
-
-	/**
-	 * Creates a multihash digest.
-	 */
-	function create(code, digest) {
-	  const size = digest.byteLength;
-	  const sizeOffset = encodingLength(code);
-	  const digestOffset = sizeOffset + encodingLength(size);
-	  const bytes = new Uint8Array(digestOffset + size);
-	  encodeTo(code, bytes, 0);
-	  encodeTo(size, bytes, sizeOffset);
-	  bytes.set(digest, digestOffset);
-	  return new Digest(code, size, digest, bytes);
-	}
-	/**
-	 * Turns bytes representation of multihash digest into an instance.
-	 */
-	function decode$3(multihash) {
-	  const bytes = coerce(multihash);
-	  const [code, sizeOffset] = decode$4(bytes);
-	  const [size, digestOffset] = decode$4(bytes.subarray(sizeOffset));
-	  const digest = bytes.subarray(sizeOffset + digestOffset);
-	  if (digest.byteLength !== size) {
-	    throw new Error('Incorrect length');
-	  }
-	  return new Digest(code, size, digest, bytes);
-	}
-	function equals(a, b) {
-	  if (a === b) {
-	    return true;
-	  } else {
-	    const data = b;
-	    return a.code === data.code && a.size === data.size && data.bytes instanceof Uint8Array && equals$1(a.bytes, data.bytes);
-	  }
-	}
-	/**
-	 * Represents a multihash digest which carries information about the
-	 * hashing algorithm and an actual hash digest.
-	 */
-	class Digest {
-	  code;
-	  size;
-	  digest;
-	  bytes;
-	  /**
-	   * Creates a multihash digest.
-	   */
-	  constructor(code, size, digest, bytes) {
-	    this.code = code;
-	    this.size = size;
-	    this.digest = digest;
-	    this.bytes = bytes;
-	  }
-	}
-
-	function format$1(link, base) {
-	  const {
-	    bytes,
-	    version
-	  } = link;
-	  switch (version) {
-	    case 0:
-	      return toStringV0(bytes, baseCache(link), base ?? base58btc.encoder);
-	    default:
-	      return toStringV1(bytes, baseCache(link), base ?? base32.encoder);
-	  }
-	}
-	const cache = new WeakMap();
-	function baseCache(cid) {
-	  const baseCache = cache.get(cid);
-	  if (baseCache == null) {
-	    const baseCache = new Map();
-	    cache.set(cid, baseCache);
-	    return baseCache;
-	  }
-	  return baseCache;
-	}
-	class CID {
-	  code;
-	  version;
-	  multihash;
-	  bytes;
-	  '/';
-	  /**
-	   * @param version - Version of the CID
-	   * @param code - Code of the codec content is encoded in, see https://github.com/multiformats/multicodec/blob/master/table.csv
-	   * @param multihash - (Multi)hash of the of the content.
-	   */
-	  constructor(version, code, multihash, bytes) {
-	    this.code = code;
-	    this.version = version;
-	    this.multihash = multihash;
-	    this.bytes = bytes;
-	    // flag to serializers that this is a CID and
-	    // should be treated specially
-	    this['/'] = bytes;
-	  }
-	  /**
-	   * Signalling `cid.asCID === cid` has been replaced with `cid['/'] === cid.bytes`
-	   * please either use `CID.asCID(cid)` or switch to new signalling mechanism
-	   *
-	   * @deprecated
-	   */
-	  get asCID() {
-	    return this;
-	  }
-	  // ArrayBufferView
-	  get byteOffset() {
-	    return this.bytes.byteOffset;
-	  }
-	  // ArrayBufferView
-	  get byteLength() {
-	    return this.bytes.byteLength;
-	  }
-	  toV0() {
-	    switch (this.version) {
-	      case 0:
-	        {
-	          return this;
-	        }
-	      case 1:
-	        {
-	          const {
-	            code,
-	            multihash
-	          } = this;
-	          if (code !== DAG_PB_CODE) {
-	            throw new Error('Cannot convert a non dag-pb CID to CIDv0');
-	          }
-	          // sha2-256
-	          if (multihash.code !== SHA_256_CODE) {
-	            throw new Error('Cannot convert non sha2-256 multihash CID to CIDv0');
-	          }
-	          return CID.createV0(multihash);
-	        }
-	      default:
-	        {
-	          throw Error(`Can not convert CID version ${this.version} to version 0. This is a bug please report`);
-	        }
-	    }
-	  }
-	  toV1() {
-	    switch (this.version) {
-	      case 0:
-	        {
-	          const {
-	            code,
-	            digest
-	          } = this.multihash;
-	          const multihash = create(code, digest);
-	          return CID.createV1(this.code, multihash);
-	        }
-	      case 1:
-	        {
-	          return this;
-	        }
-	      default:
-	        {
-	          throw Error(`Can not convert CID version ${this.version} to version 1. This is a bug please report`);
-	        }
-	    }
-	  }
-	  equals(other) {
-	    return CID.equals(this, other);
-	  }
-	  static equals(self, other) {
-	    const unknown = other;
-	    return unknown != null && self.code === unknown.code && self.version === unknown.version && equals(self.multihash, unknown.multihash);
-	  }
-	  toString(base) {
-	    return format$1(this, base);
-	  }
-	  toJSON() {
-	    return {
-	      '/': format$1(this)
-	    };
-	  }
-	  link() {
-	    return this;
-	  }
-	  [Symbol.toStringTag] = 'CID';
-	  // Legacy
-	  [Symbol.for('nodejs.util.inspect.custom')]() {
-	    return `CID(${this.toString()})`;
-	  }
-	  /**
-	   * Takes any input `value` and returns a `CID` instance if it was
-	   * a `CID` otherwise returns `null`. If `value` is instanceof `CID`
-	   * it will return value back. If `value` is not instance of this CID
-	   * class, but is compatible CID it will return new instance of this
-	   * `CID` class. Otherwise returns null.
-	   *
-	   * This allows two different incompatible versions of CID library to
-	   * co-exist and interop as long as binary interface is compatible.
-	   */
-	  static asCID(input) {
-	    if (input == null) {
-	      return null;
-	    }
-	    const value = input;
-	    if (value instanceof CID) {
-	      // If value is instance of CID then we're all set.
-	      return value;
-	    } else if (value['/'] != null && value['/'] === value.bytes || value.asCID === value) {
-	      // If value isn't instance of this CID class but `this.asCID === this` or
-	      // `value['/'] === value.bytes` is true it is CID instance coming from a
-	      // different implementation (diff version or duplicate). In that case we
-	      // rebase it to this `CID` implementation so caller is guaranteed to get
-	      // instance with expected API.
-	      const {
-	        version,
-	        code,
-	        multihash,
-	        bytes
-	      } = value;
-	      return new CID(version, code, multihash, bytes ?? encodeCID(version, code, multihash.bytes));
-	    } else if (value[cidSymbol] === true) {
-	      // If value is a CID from older implementation that used to be tagged via
-	      // symbol we still rebase it to the this `CID` implementation by
-	      // delegating that to a constructor.
-	      const {
-	        version,
-	        multihash,
-	        code
-	      } = value;
-	      const digest = decode$3(multihash);
-	      return CID.create(version, code, digest);
-	    } else {
-	      // Otherwise value is not a CID (or an incompatible version of it) in
-	      // which case we return `null`.
-	      return null;
-	    }
-	  }
-	  /**
-	   * @param version - Version of the CID
-	   * @param code - Code of the codec content is encoded in, see https://github.com/multiformats/multicodec/blob/master/table.csv
-	   * @param digest - (Multi)hash of the of the content.
-	   */
-	  static create(version, code, digest) {
-	    if (typeof code !== 'number') {
-	      throw new Error('String codecs are no longer supported');
-	    }
-	    if (!(digest.bytes instanceof Uint8Array)) {
-	      throw new Error('Invalid digest');
-	    }
-	    switch (version) {
-	      case 0:
-	        {
-	          if (code !== DAG_PB_CODE) {
-	            throw new Error(`Version 0 CID must use dag-pb (code: ${DAG_PB_CODE}) block encoding`);
-	          } else {
-	            return new CID(version, code, digest, digest.bytes);
-	          }
-	        }
-	      case 1:
-	        {
-	          const bytes = encodeCID(version, code, digest.bytes);
-	          return new CID(version, code, digest, bytes);
-	        }
-	      default:
-	        {
-	          throw new Error('Invalid version');
-	        }
-	    }
-	  }
-	  /**
-	   * Simplified version of `create` for CIDv0.
-	   */
-	  static createV0(digest) {
-	    return CID.create(0, DAG_PB_CODE, digest);
-	  }
-	  /**
-	   * Simplified version of `create` for CIDv1.
-	   *
-	   * @param code - Content encoding format code.
-	   * @param digest - Multihash of the content.
-	   */
-	  static createV1(code, digest) {
-	    return CID.create(1, code, digest);
-	  }
-	  /**
-	   * Decoded a CID from its binary representation. The byte array must contain
-	   * only the CID with no additional bytes.
-	   *
-	   * An error will be thrown if the bytes provided do not contain a valid
-	   * binary representation of a CID.
-	   */
-	  static decode(bytes) {
-	    const [cid, remainder] = CID.decodeFirst(bytes);
-	    if (remainder.length !== 0) {
-	      throw new Error('Incorrect length');
-	    }
-	    return cid;
-	  }
-	  /**
-	   * Decoded a CID from its binary representation at the beginning of a byte
-	   * array.
-	   *
-	   * Returns an array with the first element containing the CID and the second
-	   * element containing the remainder of the original byte array. The remainder
-	   * will be a zero-length byte array if the provided bytes only contained a
-	   * binary CID representation.
-	   */
-	  static decodeFirst(bytes) {
-	    const specs = CID.inspectBytes(bytes);
-	    const prefixSize = specs.size - specs.multihashSize;
-	    const multihashBytes = coerce(bytes.subarray(prefixSize, prefixSize + specs.multihashSize));
-	    if (multihashBytes.byteLength !== specs.multihashSize) {
-	      throw new Error('Incorrect length');
-	    }
-	    const digestBytes = multihashBytes.subarray(specs.multihashSize - specs.digestSize);
-	    const digest = new Digest(specs.multihashCode, specs.digestSize, digestBytes, multihashBytes);
-	    const cid = specs.version === 0 ? CID.createV0(digest) : CID.createV1(specs.codec, digest);
-	    return [cid, bytes.subarray(specs.size)];
-	  }
-	  /**
-	   * Inspect the initial bytes of a CID to determine its properties.
-	   *
-	   * Involves decoding up to 4 varints. Typically this will require only 4 to 6
-	   * bytes but for larger multicodec code values and larger multihash digest
-	   * lengths these varints can be quite large. It is recommended that at least
-	   * 10 bytes be made available in the `initialBytes` argument for a complete
-	   * inspection.
-	   */
-	  static inspectBytes(initialBytes) {
-	    let offset = 0;
-	    const next = () => {
-	      const [i, length] = decode$4(initialBytes.subarray(offset));
-	      offset += length;
-	      return i;
-	    };
-	    let version = next();
-	    let codec = DAG_PB_CODE;
-	    if (version === 18) {
-	      // CIDv0
-	      version = 0;
-	      offset = 0;
-	    } else {
-	      codec = next();
-	    }
-	    if (version !== 0 && version !== 1) {
-	      throw new RangeError(`Invalid CID version ${version}`);
-	    }
-	    const prefixSize = offset;
-	    const multihashCode = next(); // multihash code
-	    const digestSize = next(); // multihash length
-	    const size = offset + digestSize;
-	    const multihashSize = size - prefixSize;
-	    return {
-	      version,
-	      codec,
-	      multihashCode,
-	      digestSize,
-	      multihashSize,
-	      size
-	    };
-	  }
-	  /**
-	   * Takes cid in a string representation and creates an instance. If `base`
-	   * decoder is not provided will use a default from the configuration. It will
-	   * throw an error if encoding of the CID is not compatible with supplied (or
-	   * a default decoder).
-	   */
-	  static parse(source, base) {
-	    const [prefix, bytes] = parseCIDtoBytes(source, base);
-	    const cid = CID.decode(bytes);
-	    if (cid.version === 0 && source[0] !== 'Q') {
-	      throw Error('Version 0 CID string must not include multibase prefix');
-	    }
-	    // Cache string representation to avoid computing it on `this.toString()`
-	    baseCache(cid).set(prefix, source);
-	    return cid;
-	  }
-	}
-	function parseCIDtoBytes(source, base) {
-	  switch (source[0]) {
-	    // CIDv0 is parsed differently
-	    case 'Q':
-	      {
-	        const decoder = base ?? base58btc;
-	        return [base58btc.prefix, decoder.decode(`${base58btc.prefix}${source}`)];
-	      }
-	    case base58btc.prefix:
-	      {
-	        const decoder = base ?? base58btc;
-	        return [base58btc.prefix, decoder.decode(source)];
-	      }
-	    case base32.prefix:
-	      {
-	        const decoder = base ?? base32;
-	        return [base32.prefix, decoder.decode(source)];
-	      }
-	    default:
-	      {
-	        if (base == null) {
-	          throw Error('To parse non base32 or base58btc encoded CID multibase decoder must be provided');
-	        }
-	        return [source[0], base.decode(source)];
-	      }
-	  }
-	}
-	function toStringV0(bytes, cache, base) {
-	  const {
-	    prefix
-	  } = base;
-	  if (prefix !== base58btc.prefix) {
-	    throw Error(`Cannot string encode V0 in ${base.name} encoding`);
-	  }
-	  const cid = cache.get(prefix);
-	  if (cid == null) {
-	    const cid = base.encode(bytes).slice(1);
-	    cache.set(prefix, cid);
-	    return cid;
-	  } else {
-	    return cid;
-	  }
-	}
-	function toStringV1(bytes, cache, base) {
-	  const {
-	    prefix
-	  } = base;
-	  const cid = cache.get(prefix);
-	  if (cid == null) {
-	    const cid = base.encode(bytes);
-	    cache.set(prefix, cid);
-	    return cid;
-	  } else {
-	    return cid;
-	  }
-	}
-	const DAG_PB_CODE = 0x70;
-	const SHA_256_CODE = 0x12;
-	function encodeCID(version, code, multihash) {
-	  const codeOffset = encodingLength(version);
-	  const hashOffset = codeOffset + encodingLength(code);
-	  const bytes = new Uint8Array(hashOffset + multihash.byteLength);
-	  encodeTo(version, bytes, 0);
-	  encodeTo(code, bytes, codeOffset);
-	  bytes.set(multihash, hashOffset);
-	  return bytes;
-	}
-	const cidSymbol = Symbol.for('@ipld/js-cid/CID');
-
-	// This is an unfortunate replacement for @sindresorhus/is that we need to
-	// re-implement for performance purposes. In particular the is.observable()
-	// check is expensive, and unnecessary for our purposes. The values returned
-	// are compatible with @sindresorhus/is, however.
-
-	const typeofs = ['string', 'number', 'bigint', 'symbol'];
-	const objectTypeNames = ['Function', 'Generator', 'AsyncGenerator', 'GeneratorFunction', 'AsyncGeneratorFunction', 'AsyncFunction', 'Observable', 'Array', 'Buffer', 'Object', 'RegExp', 'Date', 'Error', 'Map', 'Set', 'WeakMap', 'WeakSet', 'ArrayBuffer', 'SharedArrayBuffer', 'DataView', 'Promise', 'URL', 'HTMLElement', 'Int8Array', 'Uint8Array', 'Uint8ClampedArray', 'Int16Array', 'Uint16Array', 'Int32Array', 'Uint32Array', 'Float32Array', 'Float64Array', 'BigInt64Array', 'BigUint64Array'];
-
-	/**
-	 * @param {any} value
-	 * @returns {string}
-	 */
-	function is(value) {
-	  if (value === null) {
-	    return 'null';
-	  }
-	  if (value === undefined) {
-	    return 'undefined';
-	  }
-	  if (value === true || value === false) {
-	    return 'boolean';
-	  }
-	  const typeOf = typeof value;
-	  if (typeofs.includes(typeOf)) {
-	    return typeOf;
-	  }
-	  /* c8 ignore next 4 */
-	  // not going to bother testing this, it's not going to be valid anyway
-	  if (typeOf === 'function') {
-	    return 'Function';
-	  }
-	  if (Array.isArray(value)) {
-	    return 'Array';
-	  }
-	  if (isBuffer$1(value)) {
-	    return 'Buffer';
-	  }
-	  const objectType = getObjectType(value);
-	  if (objectType) {
-	    return objectType;
-	  }
-	  /* c8 ignore next */
-	  return 'Object';
-	}
-
-	/**
-	 * @param {any} value
-	 * @returns {boolean}
-	 */
-	function isBuffer$1(value) {
-	  return value && value.constructor && value.constructor.isBuffer && value.constructor.isBuffer.call(null, value);
-	}
-
-	/**
-	 * @param {any} value
-	 * @returns {string|undefined}
-	 */
-	function getObjectType(value) {
-	  const objectTypeName = Object.prototype.toString.call(value).slice(8, -1);
-	  if (objectTypeNames.includes(objectTypeName)) {
-	    return objectTypeName;
-	  }
-	  /* c8 ignore next */
-	  return undefined;
-	}
-
-	class Type {
-	  /**
-	   * @param {number} major
-	   * @param {string} name
-	   * @param {boolean} terminal
-	   */
-	  constructor(major, name, terminal) {
-	    this.major = major;
-	    this.majorEncoded = major << 5;
-	    this.name = name;
-	    this.terminal = terminal;
-	  }
-
-	  /* c8 ignore next 3 */
-	  toString() {
-	    return `Type[${this.major}].${this.name}`;
-	  }
-
-	  /**
-	   * @param {Type} typ
-	   * @returns {number}
-	   */
-	  compare(typ) {
-	    /* c8 ignore next 1 */
-	    return this.major < typ.major ? -1 : this.major > typ.major ? 1 : 0;
-	  }
-	}
-
-	// convert to static fields when better supported
-	Type.uint = new Type(0, 'uint', true);
-	Type.negint = new Type(1, 'negint', true);
-	Type.bytes = new Type(2, 'bytes', true);
-	Type.string = new Type(3, 'string', true);
-	Type.array = new Type(4, 'array', false);
-	Type.map = new Type(5, 'map', false);
-	Type.tag = new Type(6, 'tag', false); // terminal?
-	Type.float = new Type(7, 'float', true);
-	Type.false = new Type(7, 'false', true);
-	Type.true = new Type(7, 'true', true);
-	Type.null = new Type(7, 'null', true);
-	Type.undefined = new Type(7, 'undefined', true);
-	Type.break = new Type(7, 'break', true);
-	// Type.indefiniteLength = new Type(0, 'indefiniteLength', true)
-
-	class Token {
-	  /**
-	   * @param {Type} type
-	   * @param {any} [value]
-	   * @param {number} [encodedLength]
-	   */
-	  constructor(type, value, encodedLength) {
-	    this.type = type;
-	    this.value = value;
-	    this.encodedLength = encodedLength;
-	    /** @type {Uint8Array|undefined} */
-	    this.encodedBytes = undefined;
-	    /** @type {Uint8Array|undefined} */
-	    this.byteValue = undefined;
-	  }
-
-	  /* c8 ignore next 3 */
-	  toString() {
-	    return `Token[${this.type}].${this.value}`;
-	  }
-	}
-
-	// Use Uint8Array directly in the browser, use Buffer in Node.js but don't
-	// speak its name directly to avoid bundlers pulling in the `Buffer` polyfill
-
-	// @ts-ignore
-	const useBuffer = globalThis.process &&
-	// @ts-ignore
-	!globalThis.process.browser &&
-	// @ts-ignore
-	globalThis.Buffer &&
-	// @ts-ignore
-	typeof globalThis.Buffer.isBuffer === 'function';
-	const textDecoder = new TextDecoder();
-	const textEncoder = new TextEncoder();
-
-	/**
-	 * @param {Uint8Array} buf
-	 * @returns {boolean}
-	 */
-	function isBuffer(buf) {
-	  // @ts-ignore
-	  return useBuffer && globalThis.Buffer.isBuffer(buf);
-	}
-	const toString$1 = useBuffer ?
-	// eslint-disable-line operator-linebreak
-	/**
-	 * @param {Uint8Array} bytes
-	 * @param {number} start
-	 * @param {number} end
-	 */
-	(bytes, start, end) => {
-	  return end - start > 64 ?
-	  // eslint-disable-line operator-linebreak
-	  // @ts-ignore
-	  globalThis.Buffer.from(bytes.subarray(start, end)).toString('utf8') : utf8Slice(bytes, start, end);
-	}
-	/* c8 ignore next 11 */ :
-	// eslint-disable-line operator-linebreak
-	/**
-	 * @param {Uint8Array} bytes
-	 * @param {number} start
-	 * @param {number} end
-	 */
-	(bytes, start, end) => {
-	  return end - start > 64 ? textDecoder.decode(bytes.subarray(start, end)) : utf8Slice(bytes, start, end);
-	};
-	const fromString = useBuffer ?
-	// eslint-disable-line operator-linebreak
-	/**
-	 * @param {string} string
-	 */
-	string => {
-	  return string.length > 64 ?
-	  // eslint-disable-line operator-linebreak
-	  // @ts-ignore
-	  globalThis.Buffer.from(string) : utf8ToBytes(string);
-	}
-	/* c8 ignore next 7 */ :
-	// eslint-disable-line operator-linebreak
-	/**
-	 * @param {string} string
-	 */
-	string => {
-	  return string.length > 64 ? textEncoder.encode(string) : utf8ToBytes(string);
-	};
-	const slice = useBuffer ?
-	// eslint-disable-line operator-linebreak
-	/**
-	 * @param {Uint8Array} bytes
-	 * @param {number} start
-	 * @param {number} end
-	 */
-	(bytes, start, end) => {
-	  if (isBuffer(bytes)) {
-	    return new Uint8Array(bytes.subarray(start, end));
-	  }
-	  return bytes.slice(start, end);
-	}
-	/* c8 ignore next 9 */ :
-	// eslint-disable-line operator-linebreak
-	/**
-	 * @param {Uint8Array} bytes
-	 * @param {number} start
-	 * @param {number} end
-	 */
-	(bytes, start, end) => {
-	  return bytes.slice(start, end);
-	};
-
-	/**
-	 * @param {Uint8Array} b1
-	 * @param {Uint8Array} b2
-	 * @returns {number}
-	 */
-	function compare(b1, b2) {
-	  /* c8 ignore next 5 */
-	  if (isBuffer(b1) && isBuffer(b2)) {
-	    // probably not possible to get here in the current API
-	    // @ts-ignore Buffer
-	    return b1.compare(b2);
-	  }
-	  for (let i = 0; i < b1.length; i++) {
-	    if (b1[i] === b2[i]) {
-	      continue;
-	    }
-	    return b1[i] < b2[i] ? -1 : 1;
-	  } /* c8 ignore next 3 */
-	  return 0;
-	}
-
-	// The below code is taken from https://github.com/google/closure-library/blob/8598d87242af59aac233270742c8984e2b2bdbe0/closure/goog/crypt/crypt.js#L117-L143
-	// Licensed Apache-2.0.
-
-	/**
-	 * @param {string} str
-	 * @returns {number[]}
-	 */
-	function utf8ToBytes(str) {
-	  const out = [];
-	  let p = 0;
-	  for (let i = 0; i < str.length; i++) {
-	    let c = str.charCodeAt(i);
-	    if (c < 128) {
-	      out[p++] = c;
-	    } else if (c < 2048) {
-	      out[p++] = c >> 6 | 192;
-	      out[p++] = c & 63 | 128;
-	    } else if ((c & 0xFC00) === 0xD800 && i + 1 < str.length && (str.charCodeAt(i + 1) & 0xFC00) === 0xDC00) {
-	      // Surrogate Pair
-	      c = 0x10000 + ((c & 0x03FF) << 10) + (str.charCodeAt(++i) & 0x03FF);
-	      out[p++] = c >> 18 | 240;
-	      out[p++] = c >> 12 & 63 | 128;
-	      out[p++] = c >> 6 & 63 | 128;
-	      out[p++] = c & 63 | 128;
-	    } else {
-	      out[p++] = c >> 12 | 224;
-	      out[p++] = c >> 6 & 63 | 128;
-	      out[p++] = c & 63 | 128;
-	    }
-	  }
-	  return out;
-	}
-
-	// The below code is mostly taken from https://github.com/feross/buffer
-	// Licensed MIT. Copyright (c) Feross Aboukhadijeh
-
-	/**
-	 * @param {Uint8Array} buf
-	 * @param {number} offset
-	 * @param {number} end
-	 * @returns {string}
-	 */
-	function utf8Slice(buf, offset, end) {
-	  const res = [];
-	  while (offset < end) {
-	    const firstByte = buf[offset];
-	    let codePoint = null;
-	    let bytesPerSequence = firstByte > 0xef ? 4 : firstByte > 0xdf ? 3 : firstByte > 0xbf ? 2 : 1;
-	    if (offset + bytesPerSequence <= end) {
-	      let secondByte, thirdByte, fourthByte, tempCodePoint;
-	      switch (bytesPerSequence) {
-	        case 1:
-	          if (firstByte < 0x80) {
-	            codePoint = firstByte;
-	          }
-	          break;
-	        case 2:
-	          secondByte = buf[offset + 1];
-	          if ((secondByte & 0xc0) === 0x80) {
-	            tempCodePoint = (firstByte & 0x1f) << 0x6 | secondByte & 0x3f;
-	            if (tempCodePoint > 0x7f) {
-	              codePoint = tempCodePoint;
-	            }
-	          }
-	          break;
-	        case 3:
-	          secondByte = buf[offset + 1];
-	          thirdByte = buf[offset + 2];
-	          if ((secondByte & 0xc0) === 0x80 && (thirdByte & 0xc0) === 0x80) {
-	            tempCodePoint = (firstByte & 0xf) << 0xc | (secondByte & 0x3f) << 0x6 | thirdByte & 0x3f;
-	            /* c8 ignore next 3 */
-	            if (tempCodePoint > 0x7ff && (tempCodePoint < 0xd800 || tempCodePoint > 0xdfff)) {
-	              codePoint = tempCodePoint;
-	            }
-	          }
-	          break;
-	        case 4:
-	          secondByte = buf[offset + 1];
-	          thirdByte = buf[offset + 2];
-	          fourthByte = buf[offset + 3];
-	          if ((secondByte & 0xc0) === 0x80 && (thirdByte & 0xc0) === 0x80 && (fourthByte & 0xc0) === 0x80) {
-	            tempCodePoint = (firstByte & 0xf) << 0x12 | (secondByte & 0x3f) << 0xc | (thirdByte & 0x3f) << 0x6 | fourthByte & 0x3f;
-	            if (tempCodePoint > 0xffff && tempCodePoint < 0x110000) {
-	              codePoint = tempCodePoint;
-	            }
-	          }
-	      }
-	    }
-
-	    /* c8 ignore next 5 */
-	    if (codePoint === null) {
-	      // we did not generate a valid codePoint so insert a
-	      // replacement char (U+FFFD) and advance only 1 byte
-	      codePoint = 0xfffd;
-	      bytesPerSequence = 1;
-	    } else if (codePoint > 0xffff) {
-	      // encode to utf16 (surrogate pair dance)
-	      codePoint -= 0x10000;
-	      res.push(codePoint >>> 10 & 0x3ff | 0xd800);
-	      codePoint = 0xdc00 | codePoint & 0x3ff;
-	    }
-	    res.push(codePoint);
-	    offset += bytesPerSequence;
-	  }
-	  return decodeCodePointsArray(res);
-	}
-
-	// Based on http://stackoverflow.com/a/22747272/680742, the browser with
-	// the lowest limit is Chrome, with 0x10000 args.
-	// We go 1 magnitude less, for safety
-	const MAX_ARGUMENTS_LENGTH = 0x1000;
-
-	/**
-	 * @param {number[]} codePoints
-	 * @returns {string}
-	 */
-	function decodeCodePointsArray(codePoints) {
-	  const len = codePoints.length;
-	  if (len <= MAX_ARGUMENTS_LENGTH) {
-	    return String.fromCharCode.apply(String, codePoints); // avoid extra slice()
-	  }
-	  /* c8 ignore next 10 */
-	  // Decode in chunks to avoid "call stack size exceeded".
-	  let res = '';
-	  let i = 0;
-	  while (i < len) {
-	    res += String.fromCharCode.apply(String, codePoints.slice(i, i += MAX_ARGUMENTS_LENGTH));
-	  }
-	  return res;
-	}
-
-	const decodeErrPrefix = 'CBOR decode error:';
-	const encodeErrPrefix = 'CBOR encode error:';
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} need
-	 */
-	function assertEnoughData(data, pos, need) {
-	  if (data.length - pos < need) {
-	    throw new Error(`${decodeErrPrefix} not enough data for type`);
-	  }
-	}
-
-	/* globals BigInt */
-
-	const uintBoundaries = [24, 256, 65536, 4294967296, BigInt('18446744073709551616')];
-
-	/**
-	 * @typedef {import('./bl.js').Bl} Bl
-	 * @typedef {import('../interface').DecodeOptions} DecodeOptions
-	 */
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} offset
-	 * @param {DecodeOptions} options
-	 * @returns {number}
-	 */
-	function readUint8(data, offset, options) {
-	  assertEnoughData(data, offset, 1);
-	  const value = data[offset];
-	  if (options.strict === true && value < uintBoundaries[0]) {
-	    throw new Error(`${decodeErrPrefix} integer encoded in more bytes than necessary (strict decode)`);
-	  }
-	  return value;
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} offset
-	 * @param {DecodeOptions} options
-	 * @returns {number}
-	 */
-	function readUint16(data, offset, options) {
-	  assertEnoughData(data, offset, 2);
-	  const value = data[offset] << 8 | data[offset + 1];
-	  if (options.strict === true && value < uintBoundaries[1]) {
-	    throw new Error(`${decodeErrPrefix} integer encoded in more bytes than necessary (strict decode)`);
-	  }
-	  return value;
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} offset
-	 * @param {DecodeOptions} options
-	 * @returns {number}
-	 */
-	function readUint32(data, offset, options) {
-	  assertEnoughData(data, offset, 4);
-	  const value = data[offset] * 16777216 /* 2 ** 24 */ + (data[offset + 1] << 16) + (data[offset + 2] << 8) + data[offset + 3];
-	  if (options.strict === true && value < uintBoundaries[2]) {
-	    throw new Error(`${decodeErrPrefix} integer encoded in more bytes than necessary (strict decode)`);
-	  }
-	  return value;
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} offset
-	 * @param {DecodeOptions} options
-	 * @returns {number|bigint}
-	 */
-	function readUint64(data, offset, options) {
-	  // assume BigInt, convert back to Number if within safe range
-	  assertEnoughData(data, offset, 8);
-	  const hi = data[offset] * 16777216 /* 2 ** 24 */ + (data[offset + 1] << 16) + (data[offset + 2] << 8) + data[offset + 3];
-	  const lo = data[offset + 4] * 16777216 /* 2 ** 24 */ + (data[offset + 5] << 16) + (data[offset + 6] << 8) + data[offset + 7];
-	  const value = (BigInt(hi) << BigInt(32)) + BigInt(lo);
-	  if (options.strict === true && value < uintBoundaries[3]) {
-	    throw new Error(`${decodeErrPrefix} integer encoded in more bytes than necessary (strict decode)`);
-	  }
-	  if (value <= Number.MAX_SAFE_INTEGER) {
-	    return Number(value);
-	  }
-	  if (options.allowBigInt === true) {
-	    return value;
-	  }
-	  throw new Error(`${decodeErrPrefix} integers outside of the safe integer range are not supported`);
-	}
-
-	/* not required thanks to quick[] list
-	const oneByteTokens = new Array(24).fill(0).map((v, i) => new Token(Type.uint, i, 1))
-	export function decodeUintCompact (data, pos, minor, options) {
-	  return oneByteTokens[minor]
-	}
-	*/
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeUint8(data, pos, _minor, options) {
-	  return new Token(Type.uint, readUint8(data, pos + 1, options), 2);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeUint16(data, pos, _minor, options) {
-	  return new Token(Type.uint, readUint16(data, pos + 1, options), 3);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeUint32(data, pos, _minor, options) {
-	  return new Token(Type.uint, readUint32(data, pos + 1, options), 5);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeUint64(data, pos, _minor, options) {
-	  return new Token(Type.uint, readUint64(data, pos + 1, options), 9);
-	}
-
-	/**
-	 * @param {Bl} buf
-	 * @param {Token} token
-	 */
-	function encodeUint(buf, token) {
-	  return encodeUintValue(buf, 0, token.value);
-	}
-
-	/**
-	 * @param {Bl} buf
-	 * @param {number} major
-	 * @param {number|bigint} uint
-	 */
-	function encodeUintValue(buf, major, uint) {
-	  if (uint < uintBoundaries[0]) {
-	    const nuint = Number(uint);
-	    // pack into one byte, minor=0, additional=value
-	    buf.push([major | nuint]);
-	  } else if (uint < uintBoundaries[1]) {
-	    const nuint = Number(uint);
-	    // pack into two byte, minor=0, additional=24
-	    buf.push([major | 24, nuint]);
-	  } else if (uint < uintBoundaries[2]) {
-	    const nuint = Number(uint);
-	    // pack into three byte, minor=0, additional=25
-	    buf.push([major | 25, nuint >>> 8, nuint & 0xff]);
-	  } else if (uint < uintBoundaries[3]) {
-	    const nuint = Number(uint);
-	    // pack into five byte, minor=0, additional=26
-	    buf.push([major | 26, nuint >>> 24 & 0xff, nuint >>> 16 & 0xff, nuint >>> 8 & 0xff, nuint & 0xff]);
-	  } else {
-	    const buint = BigInt(uint);
-	    if (buint < uintBoundaries[4]) {
-	      // pack into nine byte, minor=0, additional=27
-	      const set = [major | 27, 0, 0, 0, 0, 0, 0, 0];
-	      // simulate bitwise above 32 bits
-	      let lo = Number(buint & BigInt(0xffffffff));
-	      let hi = Number(buint >> BigInt(32) & BigInt(0xffffffff));
-	      set[8] = lo & 0xff;
-	      lo = lo >> 8;
-	      set[7] = lo & 0xff;
-	      lo = lo >> 8;
-	      set[6] = lo & 0xff;
-	      lo = lo >> 8;
-	      set[5] = lo & 0xff;
-	      set[4] = hi & 0xff;
-	      hi = hi >> 8;
-	      set[3] = hi & 0xff;
-	      hi = hi >> 8;
-	      set[2] = hi & 0xff;
-	      hi = hi >> 8;
-	      set[1] = hi & 0xff;
-	      buf.push(set);
-	    } else {
-	      throw new Error(`${decodeErrPrefix} encountered BigInt larger than allowable range`);
-	    }
-	  }
-	}
-
-	/**
-	 * @param {Token} token
-	 * @returns {number}
-	 */
-	encodeUint.encodedSize = function encodedSize(token) {
-	  return encodeUintValue.encodedSize(token.value);
-	};
-
-	/**
-	 * @param {number} uint
-	 * @returns {number}
-	 */
-	encodeUintValue.encodedSize = function encodedSize(uint) {
-	  if (uint < uintBoundaries[0]) {
-	    return 1;
-	  }
-	  if (uint < uintBoundaries[1]) {
-	    return 2;
-	  }
-	  if (uint < uintBoundaries[2]) {
-	    return 3;
-	  }
-	  if (uint < uintBoundaries[3]) {
-	    return 5;
-	  }
-	  return 9;
-	};
-
-	/**
-	 * @param {Token} tok1
-	 * @param {Token} tok2
-	 * @returns {number}
-	 */
-	encodeUint.compareTokens = function compareTokens(tok1, tok2) {
-	  return tok1.value < tok2.value ? -1 : tok1.value > tok2.value ? 1 : /* c8 ignore next */0;
-	};
-
-	/* eslint-env es2020 */
-
-
-	/**
-	 * @typedef {import('./bl.js').Bl} Bl
-	 * @typedef {import('../interface').DecodeOptions} DecodeOptions
-	 */
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeNegint8(data, pos, _minor, options) {
-	  return new Token(Type.negint, -1 - readUint8(data, pos + 1, options), 2);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeNegint16(data, pos, _minor, options) {
-	  return new Token(Type.negint, -1 - readUint16(data, pos + 1, options), 3);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeNegint32(data, pos, _minor, options) {
-	  return new Token(Type.negint, -1 - readUint32(data, pos + 1, options), 5);
-	}
-	const neg1b = BigInt(-1);
-	const pos1b = BigInt(1);
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeNegint64(data, pos, _minor, options) {
-	  const int = readUint64(data, pos + 1, options);
-	  if (typeof int !== 'bigint') {
-	    const value = -1 - int;
-	    if (value >= Number.MIN_SAFE_INTEGER) {
-	      return new Token(Type.negint, value, 9);
-	    }
-	  }
-	  if (options.allowBigInt !== true) {
-	    throw new Error(`${decodeErrPrefix} integers outside of the safe integer range are not supported`);
-	  }
-	  return new Token(Type.negint, neg1b - BigInt(int), 9);
-	}
-
-	/**
-	 * @param {Bl} buf
-	 * @param {Token} token
-	 */
-	function encodeNegint(buf, token) {
-	  const negint = token.value;
-	  const unsigned = typeof negint === 'bigint' ? negint * neg1b - pos1b : negint * -1 - 1;
-	  encodeUintValue(buf, token.type.majorEncoded, unsigned);
-	}
-
-	/**
-	 * @param {Token} token
-	 * @returns {number}
-	 */
-	encodeNegint.encodedSize = function encodedSize(token) {
-	  const negint = token.value;
-	  const unsigned = typeof negint === 'bigint' ? negint * neg1b - pos1b : negint * -1 - 1;
-	  /* c8 ignore next 4 */
-	  // handled by quickEncode, we shouldn't get here but it's included for completeness
-	  if (unsigned < uintBoundaries[0]) {
-	    return 1;
-	  }
-	  if (unsigned < uintBoundaries[1]) {
-	    return 2;
-	  }
-	  if (unsigned < uintBoundaries[2]) {
-	    return 3;
-	  }
-	  if (unsigned < uintBoundaries[3]) {
-	    return 5;
-	  }
-	  return 9;
-	};
-
-	/**
-	 * @param {Token} tok1
-	 * @param {Token} tok2
-	 * @returns {number}
-	 */
-	encodeNegint.compareTokens = function compareTokens(tok1, tok2) {
-	  // opposite of the uint comparison since we store the uint version in bytes
-	  return tok1.value < tok2.value ? 1 : tok1.value > tok2.value ? -1 : /* c8 ignore next */0;
-	};
-
-	/**
-	 * @typedef {import('./bl.js').Bl} Bl
-	 * @typedef {import('../interface').DecodeOptions} DecodeOptions
-	 */
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} prefix
-	 * @param {number} length
-	 * @returns {Token}
-	 */
-	function toToken$3(data, pos, prefix, length) {
-	  assertEnoughData(data, pos, prefix + length);
-	  const buf = slice(data, pos + prefix, pos + prefix + length);
-	  return new Token(Type.bytes, buf, prefix + length);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} minor
-	 * @param {DecodeOptions} _options
-	 * @returns {Token}
-	 */
-	function decodeBytesCompact(data, pos, minor, _options) {
-	  return toToken$3(data, pos, 1, minor);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeBytes8(data, pos, _minor, options) {
-	  return toToken$3(data, pos, 2, readUint8(data, pos + 1, options));
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeBytes16(data, pos, _minor, options) {
-	  return toToken$3(data, pos, 3, readUint16(data, pos + 1, options));
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeBytes32(data, pos, _minor, options) {
-	  return toToken$3(data, pos, 5, readUint32(data, pos + 1, options));
-	}
-
-	// TODO: maybe we shouldn't support this ..
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeBytes64(data, pos, _minor, options) {
-	  const l = readUint64(data, pos + 1, options);
-	  if (typeof l === 'bigint') {
-	    throw new Error(`${decodeErrPrefix} 64-bit integer bytes lengths not supported`);
-	  }
-	  return toToken$3(data, pos, 9, l);
-	}
-
-	/**
-	 * `encodedBytes` allows for caching when we do a byte version of a string
-	 * for key sorting purposes
-	 * @param {Token} token
-	 * @returns {Uint8Array}
-	 */
-	function tokenBytes(token) {
-	  if (token.encodedBytes === undefined) {
-	    token.encodedBytes = token.type === Type.string ? fromString(token.value) : token.value;
-	  }
-	  // @ts-ignore c'mon
-	  return token.encodedBytes;
-	}
-
-	/**
-	 * @param {Bl} buf
-	 * @param {Token} token
-	 */
-	function encodeBytes(buf, token) {
-	  const bytes = tokenBytes(token);
-	  encodeUintValue(buf, token.type.majorEncoded, bytes.length);
-	  buf.push(bytes);
-	}
-
-	/**
-	 * @param {Token} token
-	 * @returns {number}
-	 */
-	encodeBytes.encodedSize = function encodedSize(token) {
-	  const bytes = tokenBytes(token);
-	  return encodeUintValue.encodedSize(bytes.length) + bytes.length;
-	};
-
-	/**
-	 * @param {Token} tok1
-	 * @param {Token} tok2
-	 * @returns {number}
-	 */
-	encodeBytes.compareTokens = function compareTokens(tok1, tok2) {
-	  return compareBytes(tokenBytes(tok1), tokenBytes(tok2));
-	};
-
-	/**
-	 * @param {Uint8Array} b1
-	 * @param {Uint8Array} b2
-	 * @returns {number}
-	 */
-	function compareBytes(b1, b2) {
-	  return b1.length < b2.length ? -1 : b1.length > b2.length ? 1 : compare(b1, b2);
-	}
-
-	/**
-	 * @typedef {import('./bl.js').Bl} Bl
-	 * @typedef {import('../interface').DecodeOptions} DecodeOptions
-	 */
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} prefix
-	 * @param {number} length
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function toToken$2(data, pos, prefix, length, options) {
-	  const totLength = prefix + length;
-	  assertEnoughData(data, pos, totLength);
-	  const tok = new Token(Type.string, toString$1(data, pos + prefix, pos + totLength), totLength);
-	  if (options.retainStringBytes === true) {
-	    tok.byteValue = slice(data, pos + prefix, pos + totLength);
-	  }
-	  return tok;
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeStringCompact(data, pos, minor, options) {
-	  return toToken$2(data, pos, 1, minor, options);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeString8(data, pos, _minor, options) {
-	  return toToken$2(data, pos, 2, readUint8(data, pos + 1, options), options);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeString16(data, pos, _minor, options) {
-	  return toToken$2(data, pos, 3, readUint16(data, pos + 1, options), options);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeString32(data, pos, _minor, options) {
-	  return toToken$2(data, pos, 5, readUint32(data, pos + 1, options), options);
-	}
-
-	// TODO: maybe we shouldn't support this ..
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeString64(data, pos, _minor, options) {
-	  const l = readUint64(data, pos + 1, options);
-	  if (typeof l === 'bigint') {
-	    throw new Error(`${decodeErrPrefix} 64-bit integer string lengths not supported`);
-	  }
-	  return toToken$2(data, pos, 9, l, options);
-	}
-	const encodeString = encodeBytes;
-
-	/**
-	 * @typedef {import('./bl.js').Bl} Bl
-	 * @typedef {import('../interface').DecodeOptions} DecodeOptions
-	 */
-
-	/**
-	 * @param {Uint8Array} _data
-	 * @param {number} _pos
-	 * @param {number} prefix
-	 * @param {number} length
-	 * @returns {Token}
-	 */
-	function toToken$1(_data, _pos, prefix, length) {
-	  return new Token(Type.array, length, prefix);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} minor
-	 * @param {DecodeOptions} _options
-	 * @returns {Token}
-	 */
-	function decodeArrayCompact(data, pos, minor, _options) {
-	  return toToken$1(data, pos, 1, minor);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeArray8(data, pos, _minor, options) {
-	  return toToken$1(data, pos, 2, readUint8(data, pos + 1, options));
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeArray16(data, pos, _minor, options) {
-	  return toToken$1(data, pos, 3, readUint16(data, pos + 1, options));
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeArray32(data, pos, _minor, options) {
-	  return toToken$1(data, pos, 5, readUint32(data, pos + 1, options));
-	}
-
-	// TODO: maybe we shouldn't support this ..
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeArray64(data, pos, _minor, options) {
-	  const l = readUint64(data, pos + 1, options);
-	  if (typeof l === 'bigint') {
-	    throw new Error(`${decodeErrPrefix} 64-bit integer array lengths not supported`);
-	  }
-	  return toToken$1(data, pos, 9, l);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeArrayIndefinite(data, pos, _minor, options) {
-	  if (options.allowIndefinite === false) {
-	    throw new Error(`${decodeErrPrefix} indefinite length items not allowed`);
-	  }
-	  return toToken$1(data, pos, 1, Infinity);
-	}
-
-	/**
-	 * @param {Bl} buf
-	 * @param {Token} token
-	 */
-	function encodeArray(buf, token) {
-	  encodeUintValue(buf, Type.array.majorEncoded, token.value);
-	}
-
-	// using an array as a map key, are you sure about this? we can only sort
-	// by map length here, it's up to the encoder to decide to look deeper
-	encodeArray.compareTokens = encodeUint.compareTokens;
-
-	/**
-	 * @param {Token} token
-	 * @returns {number}
-	 */
-	encodeArray.encodedSize = function encodedSize(token) {
-	  return encodeUintValue.encodedSize(token.value);
-	};
-
-	/**
-	 * @typedef {import('./bl.js').Bl} Bl
-	 * @typedef {import('../interface').DecodeOptions} DecodeOptions
-	 */
-
-	/**
-	 * @param {Uint8Array} _data
-	 * @param {number} _pos
-	 * @param {number} prefix
-	 * @param {number} length
-	 * @returns {Token}
-	 */
-	function toToken(_data, _pos, prefix, length) {
-	  return new Token(Type.map, length, prefix);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} minor
-	 * @param {DecodeOptions} _options
-	 * @returns {Token}
-	 */
-	function decodeMapCompact(data, pos, minor, _options) {
-	  return toToken(data, pos, 1, minor);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeMap8(data, pos, _minor, options) {
-	  return toToken(data, pos, 2, readUint8(data, pos + 1, options));
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeMap16(data, pos, _minor, options) {
-	  return toToken(data, pos, 3, readUint16(data, pos + 1, options));
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeMap32(data, pos, _minor, options) {
-	  return toToken(data, pos, 5, readUint32(data, pos + 1, options));
-	}
-
-	// TODO: maybe we shouldn't support this ..
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeMap64(data, pos, _minor, options) {
-	  const l = readUint64(data, pos + 1, options);
-	  if (typeof l === 'bigint') {
-	    throw new Error(`${decodeErrPrefix} 64-bit integer map lengths not supported`);
-	  }
-	  return toToken(data, pos, 9, l);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeMapIndefinite(data, pos, _minor, options) {
-	  if (options.allowIndefinite === false) {
-	    throw new Error(`${decodeErrPrefix} indefinite length items not allowed`);
-	  }
-	  return toToken(data, pos, 1, Infinity);
-	}
-
-	/**
-	 * @param {Bl} buf
-	 * @param {Token} token
-	 */
-	function encodeMap(buf, token) {
-	  encodeUintValue(buf, Type.map.majorEncoded, token.value);
-	}
-
-	// using a map as a map key, are you sure about this? we can only sort
-	// by map length here, it's up to the encoder to decide to look deeper
-	encodeMap.compareTokens = encodeUint.compareTokens;
-
-	/**
-	 * @param {Token} token
-	 * @returns {number}
-	 */
-	encodeMap.encodedSize = function encodedSize(token) {
-	  return encodeUintValue.encodedSize(token.value);
-	};
-
-	/**
-	 * @typedef {import('./bl.js').Bl} Bl
-	 * @typedef {import('../interface').DecodeOptions} DecodeOptions
-	 */
-
-	/**
-	 * @param {Uint8Array} _data
-	 * @param {number} _pos
-	 * @param {number} minor
-	 * @param {DecodeOptions} _options
-	 * @returns {Token}
-	 */
-	function decodeTagCompact(_data, _pos, minor, _options) {
-	  return new Token(Type.tag, minor, 1);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeTag8(data, pos, _minor, options) {
-	  return new Token(Type.tag, readUint8(data, pos + 1, options), 2);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeTag16(data, pos, _minor, options) {
-	  return new Token(Type.tag, readUint16(data, pos + 1, options), 3);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeTag32(data, pos, _minor, options) {
-	  return new Token(Type.tag, readUint32(data, pos + 1, options), 5);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeTag64(data, pos, _minor, options) {
-	  return new Token(Type.tag, readUint64(data, pos + 1, options), 9);
-	}
-
-	/**
-	 * @param {Bl} buf
-	 * @param {Token} token
-	 */
-	function encodeTag(buf, token) {
-	  encodeUintValue(buf, Type.tag.majorEncoded, token.value);
-	}
-	encodeTag.compareTokens = encodeUint.compareTokens;
-
-	/**
-	 * @param {Token} token
-	 * @returns {number}
-	 */
-	encodeTag.encodedSize = function encodedSize(token) {
-	  return encodeUintValue.encodedSize(token.value);
-	};
-
-	// TODO: shift some of the bytes logic to bytes-utils so we can use Buffer
-	// where possible
-
-
-	/**
-	 * @typedef {import('./bl.js').Bl} Bl
-	 * @typedef {import('../interface').DecodeOptions} DecodeOptions
-	 * @typedef {import('../interface').EncodeOptions} EncodeOptions
-	 */
-
-	const MINOR_FALSE = 20;
-	const MINOR_TRUE = 21;
-	const MINOR_NULL = 22;
-	const MINOR_UNDEFINED = 23;
-
-	/**
-	 * @param {Uint8Array} _data
-	 * @param {number} _pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeUndefined(_data, _pos, _minor, options) {
-	  if (options.allowUndefined === false) {
-	    throw new Error(`${decodeErrPrefix} undefined values are not supported`);
-	  } else if (options.coerceUndefinedToNull === true) {
-	    return new Token(Type.null, null, 1);
-	  }
-	  return new Token(Type.undefined, undefined, 1);
-	}
-
-	/**
-	 * @param {Uint8Array} _data
-	 * @param {number} _pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeBreak(_data, _pos, _minor, options) {
-	  if (options.allowIndefinite === false) {
-	    throw new Error(`${decodeErrPrefix} indefinite length items not allowed`);
-	  }
-	  return new Token(Type.break, undefined, 1);
-	}
-
-	/**
-	 * @param {number} value
-	 * @param {number} bytes
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function createToken(value, bytes, options) {
-	  if (options) {
-	    if (options.allowNaN === false && Number.isNaN(value)) {
-	      throw new Error(`${decodeErrPrefix} NaN values are not supported`);
-	    }
-	    if (options.allowInfinity === false && (value === Infinity || value === -Infinity)) {
-	      throw new Error(`${decodeErrPrefix} Infinity values are not supported`);
-	    }
-	  }
-	  return new Token(Type.float, value, bytes);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeFloat16(data, pos, _minor, options) {
-	  return createToken(readFloat16(data, pos + 1), 3, options);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeFloat32(data, pos, _minor, options) {
-	  return createToken(readFloat32(data, pos + 1), 5, options);
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} _minor
-	 * @param {DecodeOptions} options
-	 * @returns {Token}
-	 */
-	function decodeFloat64(data, pos, _minor, options) {
-	  return createToken(readFloat64(data, pos + 1), 9, options);
-	}
-
-	/**
-	 * @param {Bl} buf
-	 * @param {Token} token
-	 * @param {EncodeOptions} options
-	 */
-	function encodeFloat(buf, token, options) {
-	  const float = token.value;
-	  if (float === false) {
-	    buf.push([Type.float.majorEncoded | MINOR_FALSE]);
-	  } else if (float === true) {
-	    buf.push([Type.float.majorEncoded | MINOR_TRUE]);
-	  } else if (float === null) {
-	    buf.push([Type.float.majorEncoded | MINOR_NULL]);
-	  } else if (float === undefined) {
-	    buf.push([Type.float.majorEncoded | MINOR_UNDEFINED]);
-	  } else {
-	    let decoded;
-	    let success = false;
-	    if (!options || options.float64 !== true) {
-	      encodeFloat16(float);
-	      decoded = readFloat16(ui8a, 1);
-	      if (float === decoded || Number.isNaN(float)) {
-	        ui8a[0] = 0xf9;
-	        buf.push(ui8a.slice(0, 3));
-	        success = true;
-	      } else {
-	        encodeFloat32(float);
-	        decoded = readFloat32(ui8a, 1);
-	        if (float === decoded) {
-	          ui8a[0] = 0xfa;
-	          buf.push(ui8a.slice(0, 5));
-	          success = true;
-	        }
-	      }
-	    }
-	    if (!success) {
-	      encodeFloat64(float);
-	      decoded = readFloat64(ui8a, 1);
-	      ui8a[0] = 0xfb;
-	      buf.push(ui8a.slice(0, 9));
-	    }
-	  }
-	}
-
-	/**
-	 * @param {Token} token
-	 * @param {EncodeOptions} options
-	 * @returns {number}
-	 */
-	encodeFloat.encodedSize = function encodedSize(token, options) {
-	  const float = token.value;
-	  if (float === false || float === true || float === null || float === undefined) {
-	    return 1;
-	  }
-	  if (!options || options.float64 !== true) {
-	    encodeFloat16(float);
-	    let decoded = readFloat16(ui8a, 1);
-	    if (float === decoded || Number.isNaN(float)) {
-	      return 3;
-	    }
-	    encodeFloat32(float);
-	    decoded = readFloat32(ui8a, 1);
-	    if (float === decoded) {
-	      return 5;
-	    }
-	  }
-	  return 9;
-	};
-	const buffer = new ArrayBuffer(9);
-	const dataView = new DataView(buffer, 1);
-	const ui8a = new Uint8Array(buffer, 0);
-
-	/**
-	 * @param {number} inp
-	 */
-	function encodeFloat16(inp) {
-	  if (inp === Infinity) {
-	    dataView.setUint16(0, 0x7c00, false);
-	  } else if (inp === -Infinity) {
-	    dataView.setUint16(0, 0xfc00, false);
-	  } else if (Number.isNaN(inp)) {
-	    dataView.setUint16(0, 0x7e00, false);
-	  } else {
-	    dataView.setFloat32(0, inp);
-	    const valu32 = dataView.getUint32(0);
-	    const exponent = (valu32 & 0x7f800000) >> 23;
-	    const mantissa = valu32 & 0x7fffff;
-
-	    /* c8 ignore next 6 */
-	    if (exponent === 0xff) {
-	      // too big, Infinity, but this should be hard (impossible?) to trigger
-	      dataView.setUint16(0, 0x7c00, false);
-	    } else if (exponent === 0x00) {
-	      // 0.0, -0.0 and subnormals, shouldn't be possible to get here because 0.0 should be counted as an int
-	      dataView.setUint16(0, (inp & 0x80000000) >> 16 | mantissa >> 13, false);
-	    } else {
-	      // standard numbers
-	      // chunks of logic here borrowed from https://github.com/PJK/libcbor/blob/c78f437182533e3efa8d963ff4b945bb635c2284/src/cbor/encoding.c#L127
-	      const logicalExponent = exponent - 127;
-	      // Now we know that 2^exponent <= 0 logically
-	      /* c8 ignore next 6 */
-	      if (logicalExponent < -24) {
-	        /* No unambiguous representation exists, this float is not a half float
-	          and is too small to be represented using a half, round off to zero.
-	          Consistent with the reference implementation. */
-	        // should be difficult (impossible?) to get here in JS
-	        dataView.setUint16(0, 0);
-	      } else if (logicalExponent < -14) {
-	        /* Offset the remaining decimal places by shifting the significand, the
-	          value is lost. This is an implementation decision that works around the
-	          absence of standard half-float in the language. */
-	        dataView.setUint16(0, (valu32 & 0x80000000) >> 16 | ( /* sign bit */1 << 24 + logicalExponent), false);
-	      } else {
-	        dataView.setUint16(0, (valu32 & 0x80000000) >> 16 | logicalExponent + 15 << 10 | mantissa >> 13, false);
-	      }
-	    }
-	  }
-	}
-
-	/**
-	 * @param {Uint8Array} ui8a
-	 * @param {number} pos
-	 * @returns {number}
-	 */
-	function readFloat16(ui8a, pos) {
-	  if (ui8a.length - pos < 2) {
-	    throw new Error(`${decodeErrPrefix} not enough data for float16`);
-	  }
-	  const half = (ui8a[pos] << 8) + ui8a[pos + 1];
-	  if (half === 0x7c00) {
-	    return Infinity;
-	  }
-	  if (half === 0xfc00) {
-	    return -Infinity;
-	  }
-	  if (half === 0x7e00) {
-	    return NaN;
-	  }
-	  const exp = half >> 10 & 0x1f;
-	  const mant = half & 0x3ff;
-	  let val;
-	  if (exp === 0) {
-	    val = mant * 2 ** -24;
-	  } else if (exp !== 31) {
-	    val = (mant + 1024) * 2 ** (exp - 25);
-	    /* c8 ignore next 4 */
-	  } else {
-	    // may not be possible to get here
-	    val = mant === 0 ? Infinity : NaN;
-	  }
-	  return half & 0x8000 ? -val : val;
-	}
-
-	/**
-	 * @param {number} inp
-	 */
-	function encodeFloat32(inp) {
-	  dataView.setFloat32(0, inp, false);
-	}
-
-	/**
-	 * @param {Uint8Array} ui8a
-	 * @param {number} pos
-	 * @returns {number}
-	 */
-	function readFloat32(ui8a, pos) {
-	  if (ui8a.length - pos < 4) {
-	    throw new Error(`${decodeErrPrefix} not enough data for float32`);
-	  }
-	  const offset = (ui8a.byteOffset || 0) + pos;
-	  return new DataView(ui8a.buffer, offset, 4).getFloat32(0, false);
-	}
-
-	/**
-	 * @param {number} inp
-	 */
-	function encodeFloat64(inp) {
-	  dataView.setFloat64(0, inp, false);
-	}
-
-	/**
-	 * @param {Uint8Array} ui8a
-	 * @param {number} pos
-	 * @returns {number}
-	 */
-	function readFloat64(ui8a, pos) {
-	  if (ui8a.length - pos < 8) {
-	    throw new Error(`${decodeErrPrefix} not enough data for float64`);
-	  }
-	  const offset = (ui8a.byteOffset || 0) + pos;
-	  return new DataView(ui8a.buffer, offset, 8).getFloat64(0, false);
-	}
-
-	/**
-	 * @param {Token} _tok1
-	 * @param {Token} _tok2
-	 * @returns {number}
-	 */
-	encodeFloat.compareTokens = encodeUint.compareTokens;
-	/*
-	encodeFloat.compareTokens = function compareTokens (_tok1, _tok2) {
-	  return _tok1
-	  throw new Error(`${encodeErrPrefix} cannot use floats as map keys`)
-	}
-	*/
-
-	/**
-	 * @typedef {import('../interface').DecodeOptions} DecodeOptions
-	 */
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {number} pos
-	 * @param {number} minor
-	 */
-	function invalidMinor(data, pos, minor) {
-	  throw new Error(`${decodeErrPrefix} encountered invalid minor (${minor}) for major ${data[pos] >>> 5}`);
-	}
-
-	/**
-	 * @param {string} msg
-	 * @returns {()=>any}
-	 */
-	function errorer(msg) {
-	  return () => {
-	    throw new Error(`${decodeErrPrefix} ${msg}`);
-	  };
-	}
-
-	/** @type {((data:Uint8Array, pos:number, minor:number, options?:DecodeOptions) => any)[]} */
-	const jump = [];
-
-	// unsigned integer, 0x00..0x17 (0..23)
-	for (let i = 0; i <= 0x17; i++) {
-	  jump[i] = invalidMinor; // uint.decodeUintCompact, handled by quick[]
-	}
-	jump[0x18] = decodeUint8; // unsigned integer, one-byte uint8_t follows
-	jump[0x19] = decodeUint16; // unsigned integer, two-byte uint16_t follows
-	jump[0x1a] = decodeUint32; // unsigned integer, four-byte uint32_t follows
-	jump[0x1b] = decodeUint64; // unsigned integer, eight-byte uint64_t follows
-	jump[0x1c] = invalidMinor;
-	jump[0x1d] = invalidMinor;
-	jump[0x1e] = invalidMinor;
-	jump[0x1f] = invalidMinor;
-	// negative integer, -1-0x00..-1-0x17 (-1..-24)
-	for (let i = 0x20; i <= 0x37; i++) {
-	  jump[i] = invalidMinor; // negintDecode, handled by quick[]
-	}
-	jump[0x38] = decodeNegint8; // negative integer, -1-n one-byte uint8_t for n follows
-	jump[0x39] = decodeNegint16; // negative integer, -1-n two-byte uint16_t for n follows
-	jump[0x3a] = decodeNegint32; // negative integer, -1-n four-byte uint32_t for follows
-	jump[0x3b] = decodeNegint64; // negative integer, -1-n eight-byte uint64_t for follows
-	jump[0x3c] = invalidMinor;
-	jump[0x3d] = invalidMinor;
-	jump[0x3e] = invalidMinor;
-	jump[0x3f] = invalidMinor;
-	// byte string, 0x00..0x17 bytes follow
-	for (let i = 0x40; i <= 0x57; i++) {
-	  jump[i] = decodeBytesCompact;
-	}
-	jump[0x58] = decodeBytes8; // byte string, one-byte uint8_t for n, and then n bytes follow
-	jump[0x59] = decodeBytes16; // byte string, two-byte uint16_t for n, and then n bytes follow
-	jump[0x5a] = decodeBytes32; // byte string, four-byte uint32_t for n, and then n bytes follow
-	jump[0x5b] = decodeBytes64; // byte string, eight-byte uint64_t for n, and then n bytes follow
-	jump[0x5c] = invalidMinor;
-	jump[0x5d] = invalidMinor;
-	jump[0x5e] = invalidMinor;
-	jump[0x5f] = errorer('indefinite length bytes/strings are not supported'); // byte string, byte strings follow, terminated by "break"
-	// UTF-8 string 0x00..0x17 bytes follow
-	for (let i = 0x60; i <= 0x77; i++) {
-	  jump[i] = decodeStringCompact;
-	}
-	jump[0x78] = decodeString8; // UTF-8 string, one-byte uint8_t for n, and then n bytes follow
-	jump[0x79] = decodeString16; // UTF-8 string, two-byte uint16_t for n, and then n bytes follow
-	jump[0x7a] = decodeString32; // UTF-8 string, four-byte uint32_t for n, and then n bytes follow
-	jump[0x7b] = decodeString64; // UTF-8 string, eight-byte uint64_t for n, and then n bytes follow
-	jump[0x7c] = invalidMinor;
-	jump[0x7d] = invalidMinor;
-	jump[0x7e] = invalidMinor;
-	jump[0x7f] = errorer('indefinite length bytes/strings are not supported'); // UTF-8 strings follow, terminated by "break"
-	// array, 0x00..0x17 data items follow
-	for (let i = 0x80; i <= 0x97; i++) {
-	  jump[i] = decodeArrayCompact;
-	}
-	jump[0x98] = decodeArray8; // array, one-byte uint8_t for n, and then n data items follow
-	jump[0x99] = decodeArray16; // array, two-byte uint16_t for n, and then n data items follow
-	jump[0x9a] = decodeArray32; // array, four-byte uint32_t for n, and then n data items follow
-	jump[0x9b] = decodeArray64; // array, eight-byte uint64_t for n, and then n data items follow
-	jump[0x9c] = invalidMinor;
-	jump[0x9d] = invalidMinor;
-	jump[0x9e] = invalidMinor;
-	jump[0x9f] = decodeArrayIndefinite; // array, data items follow, terminated by "break"
-	// map, 0x00..0x17 pairs of data items follow
-	for (let i = 0xa0; i <= 0xb7; i++) {
-	  jump[i] = decodeMapCompact;
-	}
-	jump[0xb8] = decodeMap8; // map, one-byte uint8_t for n, and then n pairs of data items follow
-	jump[0xb9] = decodeMap16; // map, two-byte uint16_t for n, and then n pairs of data items follow
-	jump[0xba] = decodeMap32; // map, four-byte uint32_t for n, and then n pairs of data items follow
-	jump[0xbb] = decodeMap64; // map, eight-byte uint64_t for n, and then n pairs of data items follow
-	jump[0xbc] = invalidMinor;
-	jump[0xbd] = invalidMinor;
-	jump[0xbe] = invalidMinor;
-	jump[0xbf] = decodeMapIndefinite; // map, pairs of data items follow, terminated by "break"
-	// tags
-	for (let i = 0xc0; i <= 0xd7; i++) {
-	  jump[i] = decodeTagCompact;
-	}
-	jump[0xd8] = decodeTag8;
-	jump[0xd9] = decodeTag16;
-	jump[0xda] = decodeTag32;
-	jump[0xdb] = decodeTag64;
-	jump[0xdc] = invalidMinor;
-	jump[0xdd] = invalidMinor;
-	jump[0xde] = invalidMinor;
-	jump[0xdf] = invalidMinor;
-	// 0xe0..0xf3 simple values, unsupported
-	for (let i = 0xe0; i <= 0xf3; i++) {
-	  jump[i] = errorer('simple values are not supported');
-	}
-	jump[0xf4] = invalidMinor; // false, handled by quick[]
-	jump[0xf5] = invalidMinor; // true, handled by quick[]
-	jump[0xf6] = invalidMinor; // null, handled by quick[]
-	jump[0xf7] = decodeUndefined; // undefined
-	jump[0xf8] = errorer('simple values are not supported'); // simple value, one byte follows, unsupported
-	jump[0xf9] = decodeFloat16; // half-precision float (two-byte IEEE 754)
-	jump[0xfa] = decodeFloat32; // single-precision float (four-byte IEEE 754)
-	jump[0xfb] = decodeFloat64; // double-precision float (eight-byte IEEE 754)
-	jump[0xfc] = invalidMinor;
-	jump[0xfd] = invalidMinor;
-	jump[0xfe] = invalidMinor;
-	jump[0xff] = decodeBreak; // "break" stop code
-
-	/** @type {Token[]} */
-	const quick = [];
-	// ints <24
-	for (let i = 0; i < 24; i++) {
-	  quick[i] = new Token(Type.uint, i, 1);
-	}
-	// negints >= -24
-	for (let i = -1; i >= -24; i--) {
-	  quick[31 - i] = new Token(Type.negint, i, 1);
-	}
-	// empty bytes
-	quick[0x40] = new Token(Type.bytes, new Uint8Array(0), 1);
-	// empty string
-	quick[0x60] = new Token(Type.string, '', 1);
-	// empty list
-	quick[0x80] = new Token(Type.array, 0, 1);
-	// empty map
-	quick[0xa0] = new Token(Type.map, 0, 1);
-	// false
-	quick[0xf4] = new Token(Type.false, false, 1);
-	// true
-	quick[0xf5] = new Token(Type.true, true, 1);
-	// null
-	quick[0xf6] = new Token(Type.null, null, 1);
-
-	/** @returns {TokenTypeEncoder[]} */
-	function makeCborEncoders() {
-	  const encoders = [];
-	  encoders[Type.uint.major] = encodeUint;
-	  encoders[Type.negint.major] = encodeNegint;
-	  encoders[Type.bytes.major] = encodeBytes;
-	  encoders[Type.string.major] = encodeString;
-	  encoders[Type.array.major] = encodeArray;
-	  encoders[Type.map.major] = encodeMap;
-	  encoders[Type.tag.major] = encodeTag;
-	  encoders[Type.float.major] = encodeFloat;
-	  return encoders;
-	}
-	makeCborEncoders();
-
-	/** @implements {Reference} */
-	class Ref {
-	  /**
-	   * @param {object|any[]} obj
-	   * @param {Reference|undefined} parent
-	   */
-	  constructor(obj, parent) {
-	    this.obj = obj;
-	    this.parent = parent;
-	  }
-
-	  /**
-	   * @param {object|any[]} obj
-	   * @returns {boolean}
-	   */
-	  includes(obj) {
-	    /** @type {Reference|undefined} */
-	    let p = this;
-	    do {
-	      if (p.obj === obj) {
-	        return true;
-	      }
-	    } while (p = p.parent); // eslint-disable-line
-	    return false;
-	  }
-
-	  /**
-	   * @param {Reference|undefined} stack
-	   * @param {object|any[]} obj
-	   * @returns {Reference}
-	   */
-	  static createCheck(stack, obj) {
-	    if (stack && stack.includes(obj)) {
-	      throw new Error(`${encodeErrPrefix} object contains circular references`);
-	    }
-	    return new Ref(obj, stack);
-	  }
-	}
-	const simpleTokens = {
-	  null: new Token(Type.null, null),
-	  undefined: new Token(Type.undefined, undefined),
-	  true: new Token(Type.true, true),
-	  false: new Token(Type.false, false),
-	  emptyArray: new Token(Type.array, 0),
-	  emptyMap: new Token(Type.map, 0)
-	};
-
-	/** @type {{[typeName: string]: StrictTypeEncoder}} */
-	const typeEncoders = {
-	  /**
-	   * @param {any} obj
-	   * @param {string} _typ
-	   * @param {EncodeOptions} _options
-	   * @param {Reference} [_refStack]
-	   * @returns {TokenOrNestedTokens}
-	   */
-	  number(obj, _typ, _options, _refStack) {
-	    if (!Number.isInteger(obj) || !Number.isSafeInteger(obj)) {
-	      return new Token(Type.float, obj);
-	    } else if (obj >= 0) {
-	      return new Token(Type.uint, obj);
-	    } else {
-	      return new Token(Type.negint, obj);
-	    }
-	  },
-	  /**
-	   * @param {any} obj
-	   * @param {string} _typ
-	   * @param {EncodeOptions} _options
-	   * @param {Reference} [_refStack]
-	   * @returns {TokenOrNestedTokens}
-	   */
-	  bigint(obj, _typ, _options, _refStack) {
-	    if (obj >= BigInt(0)) {
-	      return new Token(Type.uint, obj);
-	    } else {
-	      return new Token(Type.negint, obj);
-	    }
-	  },
-	  /**
-	   * @param {any} obj
-	   * @param {string} _typ
-	   * @param {EncodeOptions} _options
-	   * @param {Reference} [_refStack]
-	   * @returns {TokenOrNestedTokens}
-	   */
-	  Uint8Array(obj, _typ, _options, _refStack) {
-	    return new Token(Type.bytes, obj);
-	  },
-	  /**
-	   * @param {any} obj
-	   * @param {string} _typ
-	   * @param {EncodeOptions} _options
-	   * @param {Reference} [_refStack]
-	   * @returns {TokenOrNestedTokens}
-	   */
-	  string(obj, _typ, _options, _refStack) {
-	    return new Token(Type.string, obj);
-	  },
-	  /**
-	   * @param {any} obj
-	   * @param {string} _typ
-	   * @param {EncodeOptions} _options
-	   * @param {Reference} [_refStack]
-	   * @returns {TokenOrNestedTokens}
-	   */
-	  boolean(obj, _typ, _options, _refStack) {
-	    return obj ? simpleTokens.true : simpleTokens.false;
-	  },
-	  /**
-	   * @param {any} _obj
-	   * @param {string} _typ
-	   * @param {EncodeOptions} _options
-	   * @param {Reference} [_refStack]
-	   * @returns {TokenOrNestedTokens}
-	   */
-	  null(_obj, _typ, _options, _refStack) {
-	    return simpleTokens.null;
-	  },
-	  /**
-	   * @param {any} _obj
-	   * @param {string} _typ
-	   * @param {EncodeOptions} _options
-	   * @param {Reference} [_refStack]
-	   * @returns {TokenOrNestedTokens}
-	   */
-	  undefined(_obj, _typ, _options, _refStack) {
-	    return simpleTokens.undefined;
-	  },
-	  /**
-	   * @param {any} obj
-	   * @param {string} _typ
-	   * @param {EncodeOptions} _options
-	   * @param {Reference} [_refStack]
-	   * @returns {TokenOrNestedTokens}
-	   */
-	  ArrayBuffer(obj, _typ, _options, _refStack) {
-	    return new Token(Type.bytes, new Uint8Array(obj));
-	  },
-	  /**
-	   * @param {any} obj
-	   * @param {string} _typ
-	   * @param {EncodeOptions} _options
-	   * @param {Reference} [_refStack]
-	   * @returns {TokenOrNestedTokens}
-	   */
-	  DataView(obj, _typ, _options, _refStack) {
-	    return new Token(Type.bytes, new Uint8Array(obj.buffer, obj.byteOffset, obj.byteLength));
-	  },
-	  /**
-	   * @param {any} obj
-	   * @param {string} _typ
-	   * @param {EncodeOptions} options
-	   * @param {Reference} [refStack]
-	   * @returns {TokenOrNestedTokens}
-	   */
-	  Array(obj, _typ, options, refStack) {
-	    if (!obj.length) {
-	      if (options.addBreakTokens === true) {
-	        return [simpleTokens.emptyArray, new Token(Type.break)];
-	      }
-	      return simpleTokens.emptyArray;
-	    }
-	    refStack = Ref.createCheck(refStack, obj);
-	    const entries = [];
-	    let i = 0;
-	    for (const e of obj) {
-	      entries[i++] = objectToTokens(e, options, refStack);
-	    }
-	    if (options.addBreakTokens) {
-	      return [new Token(Type.array, obj.length), entries, new Token(Type.break)];
-	    }
-	    return [new Token(Type.array, obj.length), entries];
-	  },
-	  /**
-	   * @param {any} obj
-	   * @param {string} typ
-	   * @param {EncodeOptions} options
-	   * @param {Reference} [refStack]
-	   * @returns {TokenOrNestedTokens}
-	   */
-	  Object(obj, typ, options, refStack) {
-	    // could be an Object or a Map
-	    const isMap = typ !== 'Object';
-	    // it's slightly quicker to use Object.keys() than Object.entries()
-	    const keys = isMap ? obj.keys() : Object.keys(obj);
-	    const length = isMap ? obj.size : keys.length;
-	    if (!length) {
-	      if (options.addBreakTokens === true) {
-	        return [simpleTokens.emptyMap, new Token(Type.break)];
-	      }
-	      return simpleTokens.emptyMap;
-	    }
-	    refStack = Ref.createCheck(refStack, obj);
-	    /** @type {TokenOrNestedTokens[]} */
-	    const entries = [];
-	    let i = 0;
-	    for (const key of keys) {
-	      entries[i++] = [objectToTokens(key, options, refStack), objectToTokens(isMap ? obj.get(key) : obj[key], options, refStack)];
-	    }
-	    sortMapEntries(entries, options);
-	    if (options.addBreakTokens) {
-	      return [new Token(Type.map, length), entries, new Token(Type.break)];
-	    }
-	    return [new Token(Type.map, length), entries];
-	  }
-	};
-	typeEncoders.Map = typeEncoders.Object;
-	typeEncoders.Buffer = typeEncoders.Uint8Array;
-	for (const typ of 'Uint8Clamped Uint16 Uint32 Int8 Int16 Int32 BigUint64 BigInt64 Float32 Float64'.split(' ')) {
-	  typeEncoders[`${typ}Array`] = typeEncoders.DataView;
-	}
-
-	/**
-	 * @param {any} obj
-	 * @param {EncodeOptions} [options]
-	 * @param {Reference} [refStack]
-	 * @returns {TokenOrNestedTokens}
-	 */
-	function objectToTokens(obj, options = {}, refStack) {
-	  const typ = is(obj);
-	  const customTypeEncoder = options && options.typeEncoders && /** @type {OptionalTypeEncoder} */options.typeEncoders[typ] || typeEncoders[typ];
-	  if (typeof customTypeEncoder === 'function') {
-	    const tokens = customTypeEncoder(obj, typ, options, refStack);
-	    if (tokens != null) {
-	      return tokens;
-	    }
-	  }
-	  const typeEncoder = typeEncoders[typ];
-	  if (!typeEncoder) {
-	    throw new Error(`${encodeErrPrefix} unsupported type: ${typ}`);
-	  }
-	  return typeEncoder(obj, typ, options, refStack);
-	}
-
-	/*
-	CBOR key sorting is a mess.
-
-	The canonicalisation recommendation from https://tools.ietf.org/html/rfc7049#section-3.9
-	includes the wording:
-
-	> The keys in every map must be sorted lowest value to highest.
-	> Sorting is performed on the bytes of the representation of the key
-	> data items without paying attention to the 3/5 bit splitting for
-	> major types.
-	> ...
-	>  *  If two keys have different lengths, the shorter one sorts
-	      earlier;
-	>  *  If two keys have the same length, the one with the lower value
-	      in (byte-wise) lexical order sorts earlier.
-
-	1. It is not clear what "bytes of the representation of the key" means: is it
-	   the CBOR representation, or the binary representation of the object itself?
-	   Consider the int and uint difference here.
-	2. It is not clear what "without paying attention to" means: do we include it
-	   and compare on that? Or do we omit the special prefix byte, (mostly) treating
-	   the key in its plain binary representation form.
-
-	The FIDO 2.0: Client To Authenticator Protocol spec takes the original CBOR
-	wording and clarifies it according to their understanding.
-	https://fidoalliance.org/specs/fido-v2.0-rd-20170927/fido-client-to-authenticator-protocol-v2.0-rd-20170927.html#message-encoding
-
-	> The keys in every map must be sorted lowest value to highest. Sorting is
-	> performed on the bytes of the representation of the key data items without
-	> paying attention to the 3/5 bit splitting for major types. The sorting rules
-	> are:
-	>  * If the major types are different, the one with the lower value in numerical
-	>    order sorts earlier.
-	>  * If two keys have different lengths, the shorter one sorts earlier;
-	>  * If two keys have the same length, the one with the lower value in
-	>    (byte-wise) lexical order sorts earlier.
-
-	Some other implementations, such as borc, do a full encode then do a
-	length-first, byte-wise-second comparison:
-	https://github.com/dignifiedquire/borc/blob/b6bae8b0bcde7c3976b0f0f0957208095c392a36/src/encoder.js#L358
-	https://github.com/dignifiedquire/borc/blob/b6bae8b0bcde7c3976b0f0f0957208095c392a36/src/utils.js#L143-L151
-
-	This has the benefit of being able to easily handle arbitrary keys, including
-	complex types (maps and arrays).
-
-	We'll opt for the FIDO approach, since it affords some efficies since we don't
-	need a full encode of each key to determine order and can defer to the types
-	to determine how to most efficiently order their values (i.e. int and uint
-	ordering can be done on the numbers, no need for byte-wise, for example).
-
-	Recommendation: stick to single key types or you'll get into trouble, and prefer
-	string keys because it's much simpler that way.
-	*/
-
-	/*
-	(UPDATE, Dec 2020)
-	https://tools.ietf.org/html/rfc8949 is the updated CBOR spec and clarifies some
-	of the questions above with a new recommendation for sorting order being much
-	closer to what would be expected in other environments (i.e. no length-first
-	weirdness).
-	This new sorting order is not yet implemented here but could be added as an
-	option. "Determinism" (canonicity) is system dependent and it's difficult to
-	change existing systems that are built with existing expectations. So if a new
-	ordering is introduced here, the old needs to be kept as well with the user
-	having the option.
-	*/
-
-	/**
-	 * @param {TokenOrNestedTokens[]} entries
-	 * @param {EncodeOptions} options
-	 */
-	function sortMapEntries(entries, options) {
-	  if (options.mapSorter) {
-	    entries.sort(options.mapSorter);
-	  }
-	}
-
-	/**
-	 * @typedef {import('./token.js').Token} Token
-	 * @typedef {import('../interface').DecodeOptions} DecodeOptions
-	 * @typedef {import('../interface').DecodeTokenizer} DecodeTokenizer
-	 */
-
-	const defaultDecodeOptions = {
-	  strict: false,
-	  allowIndefinite: true,
-	  allowUndefined: true,
-	  allowBigInt: true
-	};
-
-	/**
-	 * @implements {DecodeTokenizer}
-	 */
-	class Tokeniser {
-	  /**
-	   * @param {Uint8Array} data
-	   * @param {DecodeOptions} options
-	   */
-	  constructor(data, options = {}) {
-	    this._pos = 0;
-	    this.data = data;
-	    this.options = options;
-	  }
-	  pos() {
-	    return this._pos;
-	  }
-	  done() {
-	    return this._pos >= this.data.length;
-	  }
-	  next() {
-	    const byt = this.data[this._pos];
-	    let token = quick[byt];
-	    if (token === undefined) {
-	      const decoder = jump[byt];
-	      /* c8 ignore next 4 */
-	      // if we're here then there's something wrong with our jump or quick lists!
-	      if (!decoder) {
-	        throw new Error(`${decodeErrPrefix} no decoder for major type ${byt >>> 5} (byte 0x${byt.toString(16).padStart(2, '0')})`);
-	      }
-	      const minor = byt & 31;
-	      token = decoder(this.data, this._pos, minor, this.options);
-	    }
-	    // @ts-ignore we get to assume encodedLength is set (crossing fingers slightly)
-	    this._pos += token.encodedLength;
-	    return token;
-	  }
-	}
-	const DONE = Symbol.for('DONE');
-	const BREAK = Symbol.for('BREAK');
-
-	/**
-	 * @param {Token} token
-	 * @param {DecodeTokenizer} tokeniser
-	 * @param {DecodeOptions} options
-	 * @returns {any|BREAK|DONE}
-	 */
-	function tokenToArray(token, tokeniser, options) {
-	  const arr = [];
-	  for (let i = 0; i < token.value; i++) {
-	    const value = tokensToObject(tokeniser, options);
-	    if (value === BREAK) {
-	      if (token.value === Infinity) {
-	        // normal end to indefinite length array
-	        break;
-	      }
-	      throw new Error(`${decodeErrPrefix} got unexpected break to lengthed array`);
-	    }
-	    if (value === DONE) {
-	      throw new Error(`${decodeErrPrefix} found array but not enough entries (got ${i}, expected ${token.value})`);
-	    }
-	    arr[i] = value;
-	  }
-	  return arr;
-	}
-
-	/**
-	 * @param {Token} token
-	 * @param {DecodeTokenizer} tokeniser
-	 * @param {DecodeOptions} options
-	 * @returns {any|BREAK|DONE}
-	 */
-	function tokenToMap(token, tokeniser, options) {
-	  const useMaps = options.useMaps === true;
-	  const obj = useMaps ? undefined : {};
-	  const m = useMaps ? new Map() : undefined;
-	  for (let i = 0; i < token.value; i++) {
-	    const key = tokensToObject(tokeniser, options);
-	    if (key === BREAK) {
-	      if (token.value === Infinity) {
-	        // normal end to indefinite length map
-	        break;
-	      }
-	      throw new Error(`${decodeErrPrefix} got unexpected break to lengthed map`);
-	    }
-	    if (key === DONE) {
-	      throw new Error(`${decodeErrPrefix} found map but not enough entries (got ${i} [no key], expected ${token.value})`);
-	    }
-	    if (useMaps !== true && typeof key !== 'string') {
-	      throw new Error(`${decodeErrPrefix} non-string keys not supported (got ${typeof key})`);
-	    }
-	    if (options.rejectDuplicateMapKeys === true) {
-	      // @ts-ignore
-	      if (useMaps && m.has(key) || !useMaps && key in obj) {
-	        throw new Error(`${decodeErrPrefix} found repeat map key "${key}"`);
-	      }
-	    }
-	    const value = tokensToObject(tokeniser, options);
-	    if (value === DONE) {
-	      throw new Error(`${decodeErrPrefix} found map but not enough entries (got ${i} [no value], expected ${token.value})`);
-	    }
-	    if (useMaps) {
-	      // @ts-ignore TODO reconsider this .. maybe needs to be strict about key types
-	      m.set(key, value);
-	    } else {
-	      // @ts-ignore TODO reconsider this .. maybe needs to be strict about key types
-	      obj[key] = value;
-	    }
-	  }
-	  // @ts-ignore c'mon man
-	  return useMaps ? m : obj;
-	}
-
-	/**
-	 * @param {DecodeTokenizer} tokeniser
-	 * @param {DecodeOptions} options
-	 * @returns {any|BREAK|DONE}
-	 */
-	function tokensToObject(tokeniser, options) {
-	  // should we support array as an argument?
-	  // check for tokenIter[Symbol.iterator] and replace tokenIter with what that returns?
-	  if (tokeniser.done()) {
-	    return DONE;
-	  }
-	  const token = tokeniser.next();
-	  if (token.type === Type.break) {
-	    return BREAK;
-	  }
-	  if (token.type.terminal) {
-	    return token.value;
-	  }
-	  if (token.type === Type.array) {
-	    return tokenToArray(token, tokeniser, options);
-	  }
-	  if (token.type === Type.map) {
-	    return tokenToMap(token, tokeniser, options);
-	  }
-	  if (token.type === Type.tag) {
-	    if (options.tags && typeof options.tags[token.value] === 'function') {
-	      const tagged = tokensToObject(tokeniser, options);
-	      return options.tags[token.value](tagged);
-	    }
-	    throw new Error(`${decodeErrPrefix} tag not supported (${token.value})`);
-	  }
-	  /* c8 ignore next */
-	  throw new Error('unsupported');
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {DecodeOptions} [options]
-	 * @returns {[any, Uint8Array]}
-	 */
-	function decodeFirst(data, options) {
-	  if (!(data instanceof Uint8Array)) {
-	    throw new Error(`${decodeErrPrefix} data to decode must be a Uint8Array`);
-	  }
-	  options = Object.assign({}, defaultDecodeOptions, options);
-	  const tokeniser = options.tokenizer || new Tokeniser(data, options);
-	  const decoded = tokensToObject(tokeniser, options);
-	  if (decoded === DONE) {
-	    throw new Error(`${decodeErrPrefix} did not find any content to decode`);
-	  }
-	  if (decoded === BREAK) {
-	    throw new Error(`${decodeErrPrefix} got unexpected break`);
-	  }
-	  return [decoded, data.subarray(tokeniser.pos())];
-	}
-
-	/**
-	 * @param {Uint8Array} data
-	 * @param {DecodeOptions} [options]
-	 * @returns {any}
-	 */
-	function decode$2(data, options) {
-	  const [decoded, remainder] = decodeFirst(data, options);
-	  if (remainder.length > 0) {
-	    throw new Error(`${decodeErrPrefix} too many terminals, data makes no sense`);
-	  }
-	  return decoded;
-	}
-
-	// https://github.com/ipfs/go-ipfs/issues/3570#issuecomment-273931692
-	const CID_CBOR_TAG = 42;
-
-	/**
-	 * @template T
-	 * @typedef {import('multiformats/codecs/interface').ByteView<T>} ByteView
-	 */
-
-	/**
-	 * @template T
-	 * @typedef {import('multiformats/codecs/interface').ArrayBufferView<T>} ArrayBufferView
-	 */
-
-	/**
-	 * @template T
-	 * @param {ByteView<T> | ArrayBufferView<T>} buf
-	 * @returns {ByteView<T>}
-	 */
-	function toByteView(buf) {
-	  if (buf instanceof ArrayBuffer) {
-	    return new Uint8Array(buf, 0, buf.byteLength);
-	  }
-	  return buf;
-	}
-
-	/**
-	 * cidEncoder will receive all Objects during encode, it needs to filter out
-	 * anything that's not a CID and return `null` for that so it's encoded as
-	 * normal.
-	 *
-	 * @param {any} obj
-	 * @returns {cborg.Token[]|null}
-	 */
-	function cidEncoder(obj) {
-	  if (obj.asCID !== obj && obj['/'] !== obj.bytes) {
-	    return null; // any other kind of object
-	  }
-	  const cid = CID.asCID(obj);
-	  /* c8 ignore next 4 */
-	  // very unlikely case, and it'll probably throw a recursion error in cborg
-	  if (!cid) {
-	    return null;
-	  }
-	  const bytes = new Uint8Array(cid.bytes.byteLength + 1);
-	  bytes.set(cid.bytes, 1); // prefix is 0x00, for historical reasons
-	  return [new Token(Type.tag, CID_CBOR_TAG), new Token(Type.bytes, bytes)];
-	}
-
-	// eslint-disable-next-line jsdoc/require-returns-check
-	/**
-	 * Intercept all `undefined` values from an object walk and reject the entire
-	 * object if we find one.
-	 *
-	 * @returns {null}
-	 */
-	function undefinedEncoder() {
-	  throw new Error('`undefined` is not supported by the IPLD Data Model and cannot be encoded');
-	}
-
-	/**
-	 * Intercept all `number` values from an object walk and reject the entire
-	 * object if we find something that doesn't fit the IPLD data model (NaN &
-	 * Infinity).
-	 *
-	 * @param {number} num
-	 * @returns {null}
-	 */
-	function numberEncoder(num) {
-	  if (Number.isNaN(num)) {
-	    throw new Error('`NaN` is not supported by the IPLD Data Model and cannot be encoded');
-	  }
-	  if (num === Infinity || num === -Infinity) {
-	    throw new Error('`Infinity` and `-Infinity` is not supported by the IPLD Data Model and cannot be encoded');
-	  }
-	  return null;
-	}
-	const _encodeOptions = {
-	  float64: true,
-	  typeEncoders: {
-	    Object: cidEncoder,
-	    undefined: undefinedEncoder,
-	    number: numberEncoder
-	  }
-	};
-	({
-	  ..._encodeOptions,
-	  typeEncoders: {
-	    ..._encodeOptions.typeEncoders
-	  }
-	});
-
-	/**
-	 * @param {Uint8Array} bytes
-	 * @returns {CID}
-	 */
-	function cidDecoder(bytes) {
-	  if (bytes[0] !== 0) {
-	    throw new Error('Invalid CID for CBOR tag 42; expected leading 0x00');
-	  }
-	  return CID.decode(bytes.subarray(1)); // ignore leading 0x00
-	}
-	const _decodeOptions = {
-	  allowIndefinite: false,
-	  coerceUndefinedToNull: true,
-	  allowNaN: false,
-	  allowInfinity: false,
-	  allowBigInt: true,
-	  // this will lead to BigInt for ints outside of
-	  // safe-integer range, which may surprise users
-	  strict: true,
-	  useMaps: false,
-	  rejectDuplicateMapKeys: true,
-	  /** @type {import('cborg').TagDecoder[]} */
-	  tags: []
-	};
-	_decodeOptions.tags[CID_CBOR_TAG] = cidDecoder;
-	({
-	  ..._decodeOptions,
-	  tags: _decodeOptions.tags.slice()
-	});
-
-	/**
-	 * @template T
-	 * @param {ByteView<T> | ArrayBufferView<T>} data
-	 * @returns {T}
-	 */
-	const decode$1 = data => decode$2(toByteView(data), _decodeOptions);
 
 	var encode_1 = encode;
 	var MSB$1 = 0x80,
@@ -43075,7 +37922,7 @@ if (cid) {
 	  return out;
 	}
 
-	var decode = read;
+	var decode$2 = read;
 	var MSB = 0x80,
 	  REST = 0x7F;
 	function read(buf, offset) {
@@ -43113,348 +37960,1260 @@ if (cid) {
 
 	var varint = {
 	  encode: encode_1,
-	  decode: decode,
+	  decode: decode$2,
 	  encodingLength: length
 	};
 	var varint$1 = /*@__PURE__*/getDefaultExportFromCjs(varint);
+
+	const typeofs = ['string', 'number', 'bigint', 'symbol'];
+	const objectTypeNames = ['Function', 'Generator', 'AsyncGenerator', 'GeneratorFunction', 'AsyncGeneratorFunction', 'AsyncFunction', 'Observable', 'Array', 'Buffer', 'Object', 'RegExp', 'Date', 'Error', 'Map', 'Set', 'WeakMap', 'WeakSet', 'ArrayBuffer', 'SharedArrayBuffer', 'DataView', 'Promise', 'URL', 'HTMLElement', 'Int8Array', 'Uint8Array', 'Uint8ClampedArray', 'Int16Array', 'Uint16Array', 'Int32Array', 'Uint32Array', 'Float32Array', 'Float64Array', 'BigInt64Array', 'BigUint64Array'];
+	function is(value) {
+	  if (value === null) {
+	    return 'null';
+	  }
+	  if (value === undefined) {
+	    return 'undefined';
+	  }
+	  if (value === true || value === false) {
+	    return 'boolean';
+	  }
+	  const typeOf = typeof value;
+	  if (typeofs.includes(typeOf)) {
+	    return typeOf;
+	  }
+	  if (typeOf === 'function') {
+	    return 'Function';
+	  }
+	  if (Array.isArray(value)) {
+	    return 'Array';
+	  }
+	  if (isBuffer$1(value)) {
+	    return 'Buffer';
+	  }
+	  const objectType = getObjectType(value);
+	  if (objectType) {
+	    return objectType;
+	  }
+	  return 'Object';
+	}
+	function isBuffer$1(value) {
+	  return value && value.constructor && value.constructor.isBuffer && value.constructor.isBuffer.call(null, value);
+	}
+	function getObjectType(value) {
+	  const objectTypeName = Object.prototype.toString.call(value).slice(8, -1);
+	  if (objectTypeNames.includes(objectTypeName)) {
+	    return objectTypeName;
+	  }
+	  return undefined;
+	}
+
+	class Type {
+	  constructor(major, name, terminal) {
+	    this.major = major;
+	    this.majorEncoded = major << 5;
+	    this.name = name;
+	    this.terminal = terminal;
+	  }
+	  toString() {
+	    return `Type[${this.major}].${this.name}`;
+	  }
+	  compare(typ) {
+	    return this.major < typ.major ? -1 : this.major > typ.major ? 1 : 0;
+	  }
+	}
+	Type.uint = new Type(0, 'uint', true);
+	Type.negint = new Type(1, 'negint', true);
+	Type.bytes = new Type(2, 'bytes', true);
+	Type.string = new Type(3, 'string', true);
+	Type.array = new Type(4, 'array', false);
+	Type.map = new Type(5, 'map', false);
+	Type.tag = new Type(6, 'tag', false);
+	Type.float = new Type(7, 'float', true);
+	Type.false = new Type(7, 'false', true);
+	Type.true = new Type(7, 'true', true);
+	Type.null = new Type(7, 'null', true);
+	Type.undefined = new Type(7, 'undefined', true);
+	Type.break = new Type(7, 'break', true);
+	class Token {
+	  constructor(type, value, encodedLength) {
+	    this.type = type;
+	    this.value = value;
+	    this.encodedLength = encodedLength;
+	    this.encodedBytes = undefined;
+	    this.byteValue = undefined;
+	  }
+	  toString() {
+	    return `Token[${this.type}].${this.value}`;
+	  }
+	}
+
+	const useBuffer = globalThis.process && !globalThis.process.browser && globalThis.Buffer && typeof globalThis.Buffer.isBuffer === 'function';
+	const textDecoder = new TextDecoder();
+	const textEncoder = new TextEncoder();
+	function isBuffer(buf) {
+	  return useBuffer && globalThis.Buffer.isBuffer(buf);
+	}
+	const toString$1 = useBuffer ? (bytes, start, end) => {
+	  return end - start > 64 ? globalThis.Buffer.from(bytes.subarray(start, end)).toString('utf8') : utf8Slice(bytes, start, end);
+	} : (bytes, start, end) => {
+	  return end - start > 64 ? textDecoder.decode(bytes.subarray(start, end)) : utf8Slice(bytes, start, end);
+	};
+	const fromString = useBuffer ? string => {
+	  return string.length > 64 ? globalThis.Buffer.from(string) : utf8ToBytes(string);
+	} : string => {
+	  return string.length > 64 ? textEncoder.encode(string) : utf8ToBytes(string);
+	};
+	const slice = useBuffer ? (bytes, start, end) => {
+	  if (isBuffer(bytes)) {
+	    return new Uint8Array(bytes.subarray(start, end));
+	  }
+	  return bytes.slice(start, end);
+	} : (bytes, start, end) => {
+	  return bytes.slice(start, end);
+	};
+	function compare(b1, b2) {
+	  if (isBuffer(b1) && isBuffer(b2)) {
+	    return b1.compare(b2);
+	  }
+	  for (let i = 0; i < b1.length; i++) {
+	    if (b1[i] === b2[i]) {
+	      continue;
+	    }
+	    return b1[i] < b2[i] ? -1 : 1;
+	  }
+	  return 0;
+	}
+	function utf8ToBytes(string, units = Infinity) {
+	  let codePoint;
+	  const length = string.length;
+	  let leadSurrogate = null;
+	  const bytes = [];
+	  for (let i = 0; i < length; ++i) {
+	    codePoint = string.charCodeAt(i);
+	    if (codePoint > 55295 && codePoint < 57344) {
+	      if (!leadSurrogate) {
+	        if (codePoint > 56319) {
+	          if ((units -= 3) > -1) bytes.push(239, 191, 189);
+	          continue;
+	        } else if (i + 1 === length) {
+	          if ((units -= 3) > -1) bytes.push(239, 191, 189);
+	          continue;
+	        }
+	        leadSurrogate = codePoint;
+	        continue;
+	      }
+	      if (codePoint < 56320) {
+	        if ((units -= 3) > -1) bytes.push(239, 191, 189);
+	        leadSurrogate = codePoint;
+	        continue;
+	      }
+	      codePoint = (leadSurrogate - 55296 << 10 | codePoint - 56320) + 65536;
+	    } else if (leadSurrogate) {
+	      if ((units -= 3) > -1) bytes.push(239, 191, 189);
+	    }
+	    leadSurrogate = null;
+	    if (codePoint < 128) {
+	      if ((units -= 1) < 0) break;
+	      bytes.push(codePoint);
+	    } else if (codePoint < 2048) {
+	      if ((units -= 2) < 0) break;
+	      bytes.push(codePoint >> 6 | 192, codePoint & 63 | 128);
+	    } else if (codePoint < 65536) {
+	      if ((units -= 3) < 0) break;
+	      bytes.push(codePoint >> 12 | 224, codePoint >> 6 & 63 | 128, codePoint & 63 | 128);
+	    } else if (codePoint < 1114112) {
+	      if ((units -= 4) < 0) break;
+	      bytes.push(codePoint >> 18 | 240, codePoint >> 12 & 63 | 128, codePoint >> 6 & 63 | 128, codePoint & 63 | 128);
+	    } else {
+	      throw new Error('Invalid code point');
+	    }
+	  }
+	  return bytes;
+	}
+	function utf8Slice(buf, offset, end) {
+	  const res = [];
+	  while (offset < end) {
+	    const firstByte = buf[offset];
+	    let codePoint = null;
+	    let bytesPerSequence = firstByte > 239 ? 4 : firstByte > 223 ? 3 : firstByte > 191 ? 2 : 1;
+	    if (offset + bytesPerSequence <= end) {
+	      let secondByte, thirdByte, fourthByte, tempCodePoint;
+	      switch (bytesPerSequence) {
+	        case 1:
+	          if (firstByte < 128) {
+	            codePoint = firstByte;
+	          }
+	          break;
+	        case 2:
+	          secondByte = buf[offset + 1];
+	          if ((secondByte & 192) === 128) {
+	            tempCodePoint = (firstByte & 31) << 6 | secondByte & 63;
+	            if (tempCodePoint > 127) {
+	              codePoint = tempCodePoint;
+	            }
+	          }
+	          break;
+	        case 3:
+	          secondByte = buf[offset + 1];
+	          thirdByte = buf[offset + 2];
+	          if ((secondByte & 192) === 128 && (thirdByte & 192) === 128) {
+	            tempCodePoint = (firstByte & 15) << 12 | (secondByte & 63) << 6 | thirdByte & 63;
+	            if (tempCodePoint > 2047 && (tempCodePoint < 55296 || tempCodePoint > 57343)) {
+	              codePoint = tempCodePoint;
+	            }
+	          }
+	          break;
+	        case 4:
+	          secondByte = buf[offset + 1];
+	          thirdByte = buf[offset + 2];
+	          fourthByte = buf[offset + 3];
+	          if ((secondByte & 192) === 128 && (thirdByte & 192) === 128 && (fourthByte & 192) === 128) {
+	            tempCodePoint = (firstByte & 15) << 18 | (secondByte & 63) << 12 | (thirdByte & 63) << 6 | fourthByte & 63;
+	            if (tempCodePoint > 65535 && tempCodePoint < 1114112) {
+	              codePoint = tempCodePoint;
+	            }
+	          }
+	      }
+	    }
+	    if (codePoint === null) {
+	      codePoint = 65533;
+	      bytesPerSequence = 1;
+	    } else if (codePoint > 65535) {
+	      codePoint -= 65536;
+	      res.push(codePoint >>> 10 & 1023 | 55296);
+	      codePoint = 56320 | codePoint & 1023;
+	    }
+	    res.push(codePoint);
+	    offset += bytesPerSequence;
+	  }
+	  return decodeCodePointsArray(res);
+	}
+	const MAX_ARGUMENTS_LENGTH = 4096;
+	function decodeCodePointsArray(codePoints) {
+	  const len = codePoints.length;
+	  if (len <= MAX_ARGUMENTS_LENGTH) {
+	    return String.fromCharCode.apply(String, codePoints);
+	  }
+	  let res = '';
+	  let i = 0;
+	  while (i < len) {
+	    res += String.fromCharCode.apply(String, codePoints.slice(i, i += MAX_ARGUMENTS_LENGTH));
+	  }
+	  return res;
+	}
+
+	const decodeErrPrefix = 'CBOR decode error:';
+	const encodeErrPrefix = 'CBOR encode error:';
+	function assertEnoughData(data, pos, need) {
+	  if (data.length - pos < need) {
+	    throw new Error(`${decodeErrPrefix} not enough data for type`);
+	  }
+	}
+
+	const uintBoundaries = [24, 256, 65536, 4294967296, BigInt('18446744073709551616')];
+	function readUint8(data, offset, options) {
+	  assertEnoughData(data, offset, 1);
+	  const value = data[offset];
+	  if (options.strict === true && value < uintBoundaries[0]) {
+	    throw new Error(`${decodeErrPrefix} integer encoded in more bytes than necessary (strict decode)`);
+	  }
+	  return value;
+	}
+	function readUint16(data, offset, options) {
+	  assertEnoughData(data, offset, 2);
+	  const value = data[offset] << 8 | data[offset + 1];
+	  if (options.strict === true && value < uintBoundaries[1]) {
+	    throw new Error(`${decodeErrPrefix} integer encoded in more bytes than necessary (strict decode)`);
+	  }
+	  return value;
+	}
+	function readUint32(data, offset, options) {
+	  assertEnoughData(data, offset, 4);
+	  const value = data[offset] * 16777216 + (data[offset + 1] << 16) + (data[offset + 2] << 8) + data[offset + 3];
+	  if (options.strict === true && value < uintBoundaries[2]) {
+	    throw new Error(`${decodeErrPrefix} integer encoded in more bytes than necessary (strict decode)`);
+	  }
+	  return value;
+	}
+	function readUint64(data, offset, options) {
+	  assertEnoughData(data, offset, 8);
+	  const hi = data[offset] * 16777216 + (data[offset + 1] << 16) + (data[offset + 2] << 8) + data[offset + 3];
+	  const lo = data[offset + 4] * 16777216 + (data[offset + 5] << 16) + (data[offset + 6] << 8) + data[offset + 7];
+	  const value = (BigInt(hi) << BigInt(32)) + BigInt(lo);
+	  if (options.strict === true && value < uintBoundaries[3]) {
+	    throw new Error(`${decodeErrPrefix} integer encoded in more bytes than necessary (strict decode)`);
+	  }
+	  if (value <= Number.MAX_SAFE_INTEGER) {
+	    return Number(value);
+	  }
+	  if (options.allowBigInt === true) {
+	    return value;
+	  }
+	  throw new Error(`${decodeErrPrefix} integers outside of the safe integer range are not supported`);
+	}
+	function decodeUint8(data, pos, _minor, options) {
+	  return new Token(Type.uint, readUint8(data, pos + 1, options), 2);
+	}
+	function decodeUint16(data, pos, _minor, options) {
+	  return new Token(Type.uint, readUint16(data, pos + 1, options), 3);
+	}
+	function decodeUint32(data, pos, _minor, options) {
+	  return new Token(Type.uint, readUint32(data, pos + 1, options), 5);
+	}
+	function decodeUint64(data, pos, _minor, options) {
+	  return new Token(Type.uint, readUint64(data, pos + 1, options), 9);
+	}
+	function encodeUint(buf, token) {
+	  return encodeUintValue(buf, 0, token.value);
+	}
+	function encodeUintValue(buf, major, uint) {
+	  if (uint < uintBoundaries[0]) {
+	    const nuint = Number(uint);
+	    buf.push([major | nuint]);
+	  } else if (uint < uintBoundaries[1]) {
+	    const nuint = Number(uint);
+	    buf.push([major | 24, nuint]);
+	  } else if (uint < uintBoundaries[2]) {
+	    const nuint = Number(uint);
+	    buf.push([major | 25, nuint >>> 8, nuint & 255]);
+	  } else if (uint < uintBoundaries[3]) {
+	    const nuint = Number(uint);
+	    buf.push([major | 26, nuint >>> 24 & 255, nuint >>> 16 & 255, nuint >>> 8 & 255, nuint & 255]);
+	  } else {
+	    const buint = BigInt(uint);
+	    if (buint < uintBoundaries[4]) {
+	      const set = [major | 27, 0, 0, 0, 0, 0, 0, 0];
+	      let lo = Number(buint & BigInt(4294967295));
+	      let hi = Number(buint >> BigInt(32) & BigInt(4294967295));
+	      set[8] = lo & 255;
+	      lo = lo >> 8;
+	      set[7] = lo & 255;
+	      lo = lo >> 8;
+	      set[6] = lo & 255;
+	      lo = lo >> 8;
+	      set[5] = lo & 255;
+	      set[4] = hi & 255;
+	      hi = hi >> 8;
+	      set[3] = hi & 255;
+	      hi = hi >> 8;
+	      set[2] = hi & 255;
+	      hi = hi >> 8;
+	      set[1] = hi & 255;
+	      buf.push(set);
+	    } else {
+	      throw new Error(`${decodeErrPrefix} encountered BigInt larger than allowable range`);
+	    }
+	  }
+	}
+	encodeUint.encodedSize = function encodedSize(token) {
+	  return encodeUintValue.encodedSize(token.value);
+	};
+	encodeUintValue.encodedSize = function encodedSize(uint) {
+	  if (uint < uintBoundaries[0]) {
+	    return 1;
+	  }
+	  if (uint < uintBoundaries[1]) {
+	    return 2;
+	  }
+	  if (uint < uintBoundaries[2]) {
+	    return 3;
+	  }
+	  if (uint < uintBoundaries[3]) {
+	    return 5;
+	  }
+	  return 9;
+	};
+	encodeUint.compareTokens = function compareTokens(tok1, tok2) {
+	  return tok1.value < tok2.value ? -1 : tok1.value > tok2.value ? 1 : 0;
+	};
+
+	function decodeNegint8(data, pos, _minor, options) {
+	  return new Token(Type.negint, -1 - readUint8(data, pos + 1, options), 2);
+	}
+	function decodeNegint16(data, pos, _minor, options) {
+	  return new Token(Type.negint, -1 - readUint16(data, pos + 1, options), 3);
+	}
+	function decodeNegint32(data, pos, _minor, options) {
+	  return new Token(Type.negint, -1 - readUint32(data, pos + 1, options), 5);
+	}
+	const neg1b = BigInt(-1);
+	const pos1b = BigInt(1);
+	function decodeNegint64(data, pos, _minor, options) {
+	  const int = readUint64(data, pos + 1, options);
+	  if (typeof int !== 'bigint') {
+	    const value = -1 - int;
+	    if (value >= Number.MIN_SAFE_INTEGER) {
+	      return new Token(Type.negint, value, 9);
+	    }
+	  }
+	  if (options.allowBigInt !== true) {
+	    throw new Error(`${decodeErrPrefix} integers outside of the safe integer range are not supported`);
+	  }
+	  return new Token(Type.negint, neg1b - BigInt(int), 9);
+	}
+	function encodeNegint(buf, token) {
+	  const negint = token.value;
+	  const unsigned = typeof negint === 'bigint' ? negint * neg1b - pos1b : negint * -1 - 1;
+	  encodeUintValue(buf, token.type.majorEncoded, unsigned);
+	}
+	encodeNegint.encodedSize = function encodedSize(token) {
+	  const negint = token.value;
+	  const unsigned = typeof negint === 'bigint' ? negint * neg1b - pos1b : negint * -1 - 1;
+	  if (unsigned < uintBoundaries[0]) {
+	    return 1;
+	  }
+	  if (unsigned < uintBoundaries[1]) {
+	    return 2;
+	  }
+	  if (unsigned < uintBoundaries[2]) {
+	    return 3;
+	  }
+	  if (unsigned < uintBoundaries[3]) {
+	    return 5;
+	  }
+	  return 9;
+	};
+	encodeNegint.compareTokens = function compareTokens(tok1, tok2) {
+	  return tok1.value < tok2.value ? 1 : tok1.value > tok2.value ? -1 : 0;
+	};
+
+	function toToken$3(data, pos, prefix, length) {
+	  assertEnoughData(data, pos, prefix + length);
+	  const buf = slice(data, pos + prefix, pos + prefix + length);
+	  return new Token(Type.bytes, buf, prefix + length);
+	}
+	function decodeBytesCompact(data, pos, minor, _options) {
+	  return toToken$3(data, pos, 1, minor);
+	}
+	function decodeBytes8(data, pos, _minor, options) {
+	  return toToken$3(data, pos, 2, readUint8(data, pos + 1, options));
+	}
+	function decodeBytes16(data, pos, _minor, options) {
+	  return toToken$3(data, pos, 3, readUint16(data, pos + 1, options));
+	}
+	function decodeBytes32(data, pos, _minor, options) {
+	  return toToken$3(data, pos, 5, readUint32(data, pos + 1, options));
+	}
+	function decodeBytes64(data, pos, _minor, options) {
+	  const l = readUint64(data, pos + 1, options);
+	  if (typeof l === 'bigint') {
+	    throw new Error(`${decodeErrPrefix} 64-bit integer bytes lengths not supported`);
+	  }
+	  return toToken$3(data, pos, 9, l);
+	}
+	function tokenBytes(token) {
+	  if (token.encodedBytes === undefined) {
+	    token.encodedBytes = token.type === Type.string ? fromString(token.value) : token.value;
+	  }
+	  return token.encodedBytes;
+	}
+	function encodeBytes(buf, token) {
+	  const bytes = tokenBytes(token);
+	  encodeUintValue(buf, token.type.majorEncoded, bytes.length);
+	  buf.push(bytes);
+	}
+	encodeBytes.encodedSize = function encodedSize(token) {
+	  const bytes = tokenBytes(token);
+	  return encodeUintValue.encodedSize(bytes.length) + bytes.length;
+	};
+	encodeBytes.compareTokens = function compareTokens(tok1, tok2) {
+	  return compareBytes(tokenBytes(tok1), tokenBytes(tok2));
+	};
+	function compareBytes(b1, b2) {
+	  return b1.length < b2.length ? -1 : b1.length > b2.length ? 1 : compare(b1, b2);
+	}
+
+	function toToken$2(data, pos, prefix, length, options) {
+	  const totLength = prefix + length;
+	  assertEnoughData(data, pos, totLength);
+	  const tok = new Token(Type.string, toString$1(data, pos + prefix, pos + totLength), totLength);
+	  if (options.retainStringBytes === true) {
+	    tok.byteValue = slice(data, pos + prefix, pos + totLength);
+	  }
+	  return tok;
+	}
+	function decodeStringCompact(data, pos, minor, options) {
+	  return toToken$2(data, pos, 1, minor, options);
+	}
+	function decodeString8(data, pos, _minor, options) {
+	  return toToken$2(data, pos, 2, readUint8(data, pos + 1, options), options);
+	}
+	function decodeString16(data, pos, _minor, options) {
+	  return toToken$2(data, pos, 3, readUint16(data, pos + 1, options), options);
+	}
+	function decodeString32(data, pos, _minor, options) {
+	  return toToken$2(data, pos, 5, readUint32(data, pos + 1, options), options);
+	}
+	function decodeString64(data, pos, _minor, options) {
+	  const l = readUint64(data, pos + 1, options);
+	  if (typeof l === 'bigint') {
+	    throw new Error(`${decodeErrPrefix} 64-bit integer string lengths not supported`);
+	  }
+	  return toToken$2(data, pos, 9, l, options);
+	}
+	const encodeString = encodeBytes;
+
+	function toToken$1(_data, _pos, prefix, length) {
+	  return new Token(Type.array, length, prefix);
+	}
+	function decodeArrayCompact(data, pos, minor, _options) {
+	  return toToken$1(data, pos, 1, minor);
+	}
+	function decodeArray8(data, pos, _minor, options) {
+	  return toToken$1(data, pos, 2, readUint8(data, pos + 1, options));
+	}
+	function decodeArray16(data, pos, _minor, options) {
+	  return toToken$1(data, pos, 3, readUint16(data, pos + 1, options));
+	}
+	function decodeArray32(data, pos, _minor, options) {
+	  return toToken$1(data, pos, 5, readUint32(data, pos + 1, options));
+	}
+	function decodeArray64(data, pos, _minor, options) {
+	  const l = readUint64(data, pos + 1, options);
+	  if (typeof l === 'bigint') {
+	    throw new Error(`${decodeErrPrefix} 64-bit integer array lengths not supported`);
+	  }
+	  return toToken$1(data, pos, 9, l);
+	}
+	function decodeArrayIndefinite(data, pos, _minor, options) {
+	  if (options.allowIndefinite === false) {
+	    throw new Error(`${decodeErrPrefix} indefinite length items not allowed`);
+	  }
+	  return toToken$1(data, pos, 1, Infinity);
+	}
+	function encodeArray(buf, token) {
+	  encodeUintValue(buf, Type.array.majorEncoded, token.value);
+	}
+	encodeArray.compareTokens = encodeUint.compareTokens;
+	encodeArray.encodedSize = function encodedSize(token) {
+	  return encodeUintValue.encodedSize(token.value);
+	};
+
+	function toToken(_data, _pos, prefix, length) {
+	  return new Token(Type.map, length, prefix);
+	}
+	function decodeMapCompact(data, pos, minor, _options) {
+	  return toToken(data, pos, 1, minor);
+	}
+	function decodeMap8(data, pos, _minor, options) {
+	  return toToken(data, pos, 2, readUint8(data, pos + 1, options));
+	}
+	function decodeMap16(data, pos, _minor, options) {
+	  return toToken(data, pos, 3, readUint16(data, pos + 1, options));
+	}
+	function decodeMap32(data, pos, _minor, options) {
+	  return toToken(data, pos, 5, readUint32(data, pos + 1, options));
+	}
+	function decodeMap64(data, pos, _minor, options) {
+	  const l = readUint64(data, pos + 1, options);
+	  if (typeof l === 'bigint') {
+	    throw new Error(`${decodeErrPrefix} 64-bit integer map lengths not supported`);
+	  }
+	  return toToken(data, pos, 9, l);
+	}
+	function decodeMapIndefinite(data, pos, _minor, options) {
+	  if (options.allowIndefinite === false) {
+	    throw new Error(`${decodeErrPrefix} indefinite length items not allowed`);
+	  }
+	  return toToken(data, pos, 1, Infinity);
+	}
+	function encodeMap(buf, token) {
+	  encodeUintValue(buf, Type.map.majorEncoded, token.value);
+	}
+	encodeMap.compareTokens = encodeUint.compareTokens;
+	encodeMap.encodedSize = function encodedSize(token) {
+	  return encodeUintValue.encodedSize(token.value);
+	};
+
+	function decodeTagCompact(_data, _pos, minor, _options) {
+	  return new Token(Type.tag, minor, 1);
+	}
+	function decodeTag8(data, pos, _minor, options) {
+	  return new Token(Type.tag, readUint8(data, pos + 1, options), 2);
+	}
+	function decodeTag16(data, pos, _minor, options) {
+	  return new Token(Type.tag, readUint16(data, pos + 1, options), 3);
+	}
+	function decodeTag32(data, pos, _minor, options) {
+	  return new Token(Type.tag, readUint32(data, pos + 1, options), 5);
+	}
+	function decodeTag64(data, pos, _minor, options) {
+	  return new Token(Type.tag, readUint64(data, pos + 1, options), 9);
+	}
+	function encodeTag(buf, token) {
+	  encodeUintValue(buf, Type.tag.majorEncoded, token.value);
+	}
+	encodeTag.compareTokens = encodeUint.compareTokens;
+	encodeTag.encodedSize = function encodedSize(token) {
+	  return encodeUintValue.encodedSize(token.value);
+	};
+
+	const MINOR_FALSE = 20;
+	const MINOR_TRUE = 21;
+	const MINOR_NULL = 22;
+	const MINOR_UNDEFINED = 23;
+	function decodeUndefined(_data, _pos, _minor, options) {
+	  if (options.allowUndefined === false) {
+	    throw new Error(`${decodeErrPrefix} undefined values are not supported`);
+	  } else if (options.coerceUndefinedToNull === true) {
+	    return new Token(Type.null, null, 1);
+	  }
+	  return new Token(Type.undefined, undefined, 1);
+	}
+	function decodeBreak(_data, _pos, _minor, options) {
+	  if (options.allowIndefinite === false) {
+	    throw new Error(`${decodeErrPrefix} indefinite length items not allowed`);
+	  }
+	  return new Token(Type.break, undefined, 1);
+	}
+	function createToken(value, bytes, options) {
+	  if (options) {
+	    if (options.allowNaN === false && Number.isNaN(value)) {
+	      throw new Error(`${decodeErrPrefix} NaN values are not supported`);
+	    }
+	    if (options.allowInfinity === false && (value === Infinity || value === -Infinity)) {
+	      throw new Error(`${decodeErrPrefix} Infinity values are not supported`);
+	    }
+	  }
+	  return new Token(Type.float, value, bytes);
+	}
+	function decodeFloat16(data, pos, _minor, options) {
+	  return createToken(readFloat16(data, pos + 1), 3, options);
+	}
+	function decodeFloat32(data, pos, _minor, options) {
+	  return createToken(readFloat32(data, pos + 1), 5, options);
+	}
+	function decodeFloat64(data, pos, _minor, options) {
+	  return createToken(readFloat64(data, pos + 1), 9, options);
+	}
+	function encodeFloat(buf, token, options) {
+	  const float = token.value;
+	  if (float === false) {
+	    buf.push([Type.float.majorEncoded | MINOR_FALSE]);
+	  } else if (float === true) {
+	    buf.push([Type.float.majorEncoded | MINOR_TRUE]);
+	  } else if (float === null) {
+	    buf.push([Type.float.majorEncoded | MINOR_NULL]);
+	  } else if (float === undefined) {
+	    buf.push([Type.float.majorEncoded | MINOR_UNDEFINED]);
+	  } else {
+	    let decoded;
+	    let success = false;
+	    if (!options || options.float64 !== true) {
+	      encodeFloat16(float);
+	      decoded = readFloat16(ui8a, 1);
+	      if (float === decoded || Number.isNaN(float)) {
+	        ui8a[0] = 249;
+	        buf.push(ui8a.slice(0, 3));
+	        success = true;
+	      } else {
+	        encodeFloat32(float);
+	        decoded = readFloat32(ui8a, 1);
+	        if (float === decoded) {
+	          ui8a[0] = 250;
+	          buf.push(ui8a.slice(0, 5));
+	          success = true;
+	        }
+	      }
+	    }
+	    if (!success) {
+	      encodeFloat64(float);
+	      decoded = readFloat64(ui8a, 1);
+	      ui8a[0] = 251;
+	      buf.push(ui8a.slice(0, 9));
+	    }
+	  }
+	}
+	encodeFloat.encodedSize = function encodedSize(token, options) {
+	  const float = token.value;
+	  if (float === false || float === true || float === null || float === undefined) {
+	    return 1;
+	  }
+	  if (!options || options.float64 !== true) {
+	    encodeFloat16(float);
+	    let decoded = readFloat16(ui8a, 1);
+	    if (float === decoded || Number.isNaN(float)) {
+	      return 3;
+	    }
+	    encodeFloat32(float);
+	    decoded = readFloat32(ui8a, 1);
+	    if (float === decoded) {
+	      return 5;
+	    }
+	  }
+	  return 9;
+	};
+	const buffer = new ArrayBuffer(9);
+	const dataView = new DataView(buffer, 1);
+	const ui8a = new Uint8Array(buffer, 0);
+	function encodeFloat16(inp) {
+	  if (inp === Infinity) {
+	    dataView.setUint16(0, 31744, false);
+	  } else if (inp === -Infinity) {
+	    dataView.setUint16(0, 64512, false);
+	  } else if (Number.isNaN(inp)) {
+	    dataView.setUint16(0, 32256, false);
+	  } else {
+	    dataView.setFloat32(0, inp);
+	    const valu32 = dataView.getUint32(0);
+	    const exponent = (valu32 & 2139095040) >> 23;
+	    const mantissa = valu32 & 8388607;
+	    if (exponent === 255) {
+	      dataView.setUint16(0, 31744, false);
+	    } else if (exponent === 0) {
+	      dataView.setUint16(0, (inp & 2147483648) >> 16 | mantissa >> 13, false);
+	    } else {
+	      const logicalExponent = exponent - 127;
+	      if (logicalExponent < -24) {
+	        dataView.setUint16(0, 0);
+	      } else if (logicalExponent < -14) {
+	        dataView.setUint16(0, (valu32 & 2147483648) >> 16 | 1 << 24 + logicalExponent, false);
+	      } else {
+	        dataView.setUint16(0, (valu32 & 2147483648) >> 16 | logicalExponent + 15 << 10 | mantissa >> 13, false);
+	      }
+	    }
+	  }
+	}
+	function readFloat16(ui8a, pos) {
+	  if (ui8a.length - pos < 2) {
+	    throw new Error(`${decodeErrPrefix} not enough data for float16`);
+	  }
+	  const half = (ui8a[pos] << 8) + ui8a[pos + 1];
+	  if (half === 31744) {
+	    return Infinity;
+	  }
+	  if (half === 64512) {
+	    return -Infinity;
+	  }
+	  if (half === 32256) {
+	    return NaN;
+	  }
+	  const exp = half >> 10 & 31;
+	  const mant = half & 1023;
+	  let val;
+	  if (exp === 0) {
+	    val = mant * 2 ** -24;
+	  } else if (exp !== 31) {
+	    val = (mant + 1024) * 2 ** (exp - 25);
+	  } else {
+	    val = mant === 0 ? Infinity : NaN;
+	  }
+	  return half & 32768 ? -val : val;
+	}
+	function encodeFloat32(inp) {
+	  dataView.setFloat32(0, inp, false);
+	}
+	function readFloat32(ui8a, pos) {
+	  if (ui8a.length - pos < 4) {
+	    throw new Error(`${decodeErrPrefix} not enough data for float32`);
+	  }
+	  const offset = (ui8a.byteOffset || 0) + pos;
+	  return new DataView(ui8a.buffer, offset, 4).getFloat32(0, false);
+	}
+	function encodeFloat64(inp) {
+	  dataView.setFloat64(0, inp, false);
+	}
+	function readFloat64(ui8a, pos) {
+	  if (ui8a.length - pos < 8) {
+	    throw new Error(`${decodeErrPrefix} not enough data for float64`);
+	  }
+	  const offset = (ui8a.byteOffset || 0) + pos;
+	  return new DataView(ui8a.buffer, offset, 8).getFloat64(0, false);
+	}
+	encodeFloat.compareTokens = encodeUint.compareTokens;
+
+	function invalidMinor(data, pos, minor) {
+	  throw new Error(`${decodeErrPrefix} encountered invalid minor (${minor}) for major ${data[pos] >>> 5}`);
+	}
+	function errorer(msg) {
+	  return () => {
+	    throw new Error(`${decodeErrPrefix} ${msg}`);
+	  };
+	}
+	const jump = [];
+	for (let i = 0; i <= 23; i++) {
+	  jump[i] = invalidMinor;
+	}
+	jump[24] = decodeUint8;
+	jump[25] = decodeUint16;
+	jump[26] = decodeUint32;
+	jump[27] = decodeUint64;
+	jump[28] = invalidMinor;
+	jump[29] = invalidMinor;
+	jump[30] = invalidMinor;
+	jump[31] = invalidMinor;
+	for (let i = 32; i <= 55; i++) {
+	  jump[i] = invalidMinor;
+	}
+	jump[56] = decodeNegint8;
+	jump[57] = decodeNegint16;
+	jump[58] = decodeNegint32;
+	jump[59] = decodeNegint64;
+	jump[60] = invalidMinor;
+	jump[61] = invalidMinor;
+	jump[62] = invalidMinor;
+	jump[63] = invalidMinor;
+	for (let i = 64; i <= 87; i++) {
+	  jump[i] = decodeBytesCompact;
+	}
+	jump[88] = decodeBytes8;
+	jump[89] = decodeBytes16;
+	jump[90] = decodeBytes32;
+	jump[91] = decodeBytes64;
+	jump[92] = invalidMinor;
+	jump[93] = invalidMinor;
+	jump[94] = invalidMinor;
+	jump[95] = errorer('indefinite length bytes/strings are not supported');
+	for (let i = 96; i <= 119; i++) {
+	  jump[i] = decodeStringCompact;
+	}
+	jump[120] = decodeString8;
+	jump[121] = decodeString16;
+	jump[122] = decodeString32;
+	jump[123] = decodeString64;
+	jump[124] = invalidMinor;
+	jump[125] = invalidMinor;
+	jump[126] = invalidMinor;
+	jump[127] = errorer('indefinite length bytes/strings are not supported');
+	for (let i = 128; i <= 151; i++) {
+	  jump[i] = decodeArrayCompact;
+	}
+	jump[152] = decodeArray8;
+	jump[153] = decodeArray16;
+	jump[154] = decodeArray32;
+	jump[155] = decodeArray64;
+	jump[156] = invalidMinor;
+	jump[157] = invalidMinor;
+	jump[158] = invalidMinor;
+	jump[159] = decodeArrayIndefinite;
+	for (let i = 160; i <= 183; i++) {
+	  jump[i] = decodeMapCompact;
+	}
+	jump[184] = decodeMap8;
+	jump[185] = decodeMap16;
+	jump[186] = decodeMap32;
+	jump[187] = decodeMap64;
+	jump[188] = invalidMinor;
+	jump[189] = invalidMinor;
+	jump[190] = invalidMinor;
+	jump[191] = decodeMapIndefinite;
+	for (let i = 192; i <= 215; i++) {
+	  jump[i] = decodeTagCompact;
+	}
+	jump[216] = decodeTag8;
+	jump[217] = decodeTag16;
+	jump[218] = decodeTag32;
+	jump[219] = decodeTag64;
+	jump[220] = invalidMinor;
+	jump[221] = invalidMinor;
+	jump[222] = invalidMinor;
+	jump[223] = invalidMinor;
+	for (let i = 224; i <= 243; i++) {
+	  jump[i] = errorer('simple values are not supported');
+	}
+	jump[244] = invalidMinor;
+	jump[245] = invalidMinor;
+	jump[246] = invalidMinor;
+	jump[247] = decodeUndefined;
+	jump[248] = errorer('simple values are not supported');
+	jump[249] = decodeFloat16;
+	jump[250] = decodeFloat32;
+	jump[251] = decodeFloat64;
+	jump[252] = invalidMinor;
+	jump[253] = invalidMinor;
+	jump[254] = invalidMinor;
+	jump[255] = decodeBreak;
+	const quick = [];
+	for (let i = 0; i < 24; i++) {
+	  quick[i] = new Token(Type.uint, i, 1);
+	}
+	for (let i = -1; i >= -24; i--) {
+	  quick[31 - i] = new Token(Type.negint, i, 1);
+	}
+	quick[64] = new Token(Type.bytes, new Uint8Array(0), 1);
+	quick[96] = new Token(Type.string, '', 1);
+	quick[128] = new Token(Type.array, 0, 1);
+	quick[160] = new Token(Type.map, 0, 1);
+	quick[244] = new Token(Type.false, false, 1);
+	quick[245] = new Token(Type.true, true, 1);
+	quick[246] = new Token(Type.null, null, 1);
+
+	function makeCborEncoders() {
+	  const encoders = [];
+	  encoders[Type.uint.major] = encodeUint;
+	  encoders[Type.negint.major] = encodeNegint;
+	  encoders[Type.bytes.major] = encodeBytes;
+	  encoders[Type.string.major] = encodeString;
+	  encoders[Type.array.major] = encodeArray;
+	  encoders[Type.map.major] = encodeMap;
+	  encoders[Type.tag.major] = encodeTag;
+	  encoders[Type.float.major] = encodeFloat;
+	  return encoders;
+	}
+	makeCborEncoders();
+	class Ref {
+	  constructor(obj, parent) {
+	    this.obj = obj;
+	    this.parent = parent;
+	  }
+	  includes(obj) {
+	    let p = this;
+	    do {
+	      if (p.obj === obj) {
+	        return true;
+	      }
+	    } while (p = p.parent);
+	    return false;
+	  }
+	  static createCheck(stack, obj) {
+	    if (stack && stack.includes(obj)) {
+	      throw new Error(`${encodeErrPrefix} object contains circular references`);
+	    }
+	    return new Ref(obj, stack);
+	  }
+	}
+	const simpleTokens = {
+	  null: new Token(Type.null, null),
+	  undefined: new Token(Type.undefined, undefined),
+	  true: new Token(Type.true, true),
+	  false: new Token(Type.false, false),
+	  emptyArray: new Token(Type.array, 0),
+	  emptyMap: new Token(Type.map, 0)
+	};
+	const typeEncoders = {
+	  number(obj, _typ, _options, _refStack) {
+	    if (!Number.isInteger(obj) || !Number.isSafeInteger(obj)) {
+	      return new Token(Type.float, obj);
+	    } else if (obj >= 0) {
+	      return new Token(Type.uint, obj);
+	    } else {
+	      return new Token(Type.negint, obj);
+	    }
+	  },
+	  bigint(obj, _typ, _options, _refStack) {
+	    if (obj >= BigInt(0)) {
+	      return new Token(Type.uint, obj);
+	    } else {
+	      return new Token(Type.negint, obj);
+	    }
+	  },
+	  Uint8Array(obj, _typ, _options, _refStack) {
+	    return new Token(Type.bytes, obj);
+	  },
+	  string(obj, _typ, _options, _refStack) {
+	    return new Token(Type.string, obj);
+	  },
+	  boolean(obj, _typ, _options, _refStack) {
+	    return obj ? simpleTokens.true : simpleTokens.false;
+	  },
+	  null(_obj, _typ, _options, _refStack) {
+	    return simpleTokens.null;
+	  },
+	  undefined(_obj, _typ, _options, _refStack) {
+	    return simpleTokens.undefined;
+	  },
+	  ArrayBuffer(obj, _typ, _options, _refStack) {
+	    return new Token(Type.bytes, new Uint8Array(obj));
+	  },
+	  DataView(obj, _typ, _options, _refStack) {
+	    return new Token(Type.bytes, new Uint8Array(obj.buffer, obj.byteOffset, obj.byteLength));
+	  },
+	  Array(obj, _typ, options, refStack) {
+	    if (!obj.length) {
+	      if (options.addBreakTokens === true) {
+	        return [simpleTokens.emptyArray, new Token(Type.break)];
+	      }
+	      return simpleTokens.emptyArray;
+	    }
+	    refStack = Ref.createCheck(refStack, obj);
+	    const entries = [];
+	    let i = 0;
+	    for (const e of obj) {
+	      entries[i++] = objectToTokens(e, options, refStack);
+	    }
+	    if (options.addBreakTokens) {
+	      return [new Token(Type.array, obj.length), entries, new Token(Type.break)];
+	    }
+	    return [new Token(Type.array, obj.length), entries];
+	  },
+	  Object(obj, typ, options, refStack) {
+	    const isMap = typ !== 'Object';
+	    const keys = isMap ? obj.keys() : Object.keys(obj);
+	    const length = isMap ? obj.size : keys.length;
+	    if (!length) {
+	      if (options.addBreakTokens === true) {
+	        return [simpleTokens.emptyMap, new Token(Type.break)];
+	      }
+	      return simpleTokens.emptyMap;
+	    }
+	    refStack = Ref.createCheck(refStack, obj);
+	    const entries = [];
+	    let i = 0;
+	    for (const key of keys) {
+	      entries[i++] = [objectToTokens(key, options, refStack), objectToTokens(isMap ? obj.get(key) : obj[key], options, refStack)];
+	    }
+	    sortMapEntries(entries, options);
+	    if (options.addBreakTokens) {
+	      return [new Token(Type.map, length), entries, new Token(Type.break)];
+	    }
+	    return [new Token(Type.map, length), entries];
+	  }
+	};
+	typeEncoders.Map = typeEncoders.Object;
+	typeEncoders.Buffer = typeEncoders.Uint8Array;
+	for (const typ of 'Uint8Clamped Uint16 Uint32 Int8 Int16 Int32 BigUint64 BigInt64 Float32 Float64'.split(' ')) {
+	  typeEncoders[`${typ}Array`] = typeEncoders.DataView;
+	}
+	function objectToTokens(obj, options = {}, refStack) {
+	  const typ = is(obj);
+	  const customTypeEncoder = options && options.typeEncoders && options.typeEncoders[typ] || typeEncoders[typ];
+	  if (typeof customTypeEncoder === 'function') {
+	    const tokens = customTypeEncoder(obj, typ, options, refStack);
+	    if (tokens != null) {
+	      return tokens;
+	    }
+	  }
+	  const typeEncoder = typeEncoders[typ];
+	  if (!typeEncoder) {
+	    throw new Error(`${encodeErrPrefix} unsupported type: ${typ}`);
+	  }
+	  return typeEncoder(obj, typ, options, refStack);
+	}
+	function sortMapEntries(entries, options) {
+	  if (options.mapSorter) {
+	    entries.sort(options.mapSorter);
+	  }
+	}
+
+	const defaultDecodeOptions = {
+	  strict: false,
+	  allowIndefinite: true,
+	  allowUndefined: true,
+	  allowBigInt: true
+	};
+	class Tokeniser {
+	  constructor(data, options = {}) {
+	    this.pos = 0;
+	    this.data = data;
+	    this.options = options;
+	  }
+	  done() {
+	    return this.pos >= this.data.length;
+	  }
+	  next() {
+	    const byt = this.data[this.pos];
+	    let token = quick[byt];
+	    if (token === undefined) {
+	      const decoder = jump[byt];
+	      if (!decoder) {
+	        throw new Error(`${decodeErrPrefix} no decoder for major type ${byt >>> 5} (byte 0x${byt.toString(16).padStart(2, '0')})`);
+	      }
+	      const minor = byt & 31;
+	      token = decoder(this.data, this.pos, minor, this.options);
+	    }
+	    this.pos += token.encodedLength;
+	    return token;
+	  }
+	}
+	const DONE = Symbol.for('DONE');
+	const BREAK = Symbol.for('BREAK');
+	function tokenToArray(token, tokeniser, options) {
+	  const arr = [];
+	  for (let i = 0; i < token.value; i++) {
+	    const value = tokensToObject(tokeniser, options);
+	    if (value === BREAK) {
+	      if (token.value === Infinity) {
+	        break;
+	      }
+	      throw new Error(`${decodeErrPrefix} got unexpected break to lengthed array`);
+	    }
+	    if (value === DONE) {
+	      throw new Error(`${decodeErrPrefix} found array but not enough entries (got ${i}, expected ${token.value})`);
+	    }
+	    arr[i] = value;
+	  }
+	  return arr;
+	}
+	function tokenToMap(token, tokeniser, options) {
+	  const useMaps = options.useMaps === true;
+	  const obj = useMaps ? undefined : {};
+	  const m = useMaps ? new Map() : undefined;
+	  for (let i = 0; i < token.value; i++) {
+	    const key = tokensToObject(tokeniser, options);
+	    if (key === BREAK) {
+	      if (token.value === Infinity) {
+	        break;
+	      }
+	      throw new Error(`${decodeErrPrefix} got unexpected break to lengthed map`);
+	    }
+	    if (key === DONE) {
+	      throw new Error(`${decodeErrPrefix} found map but not enough entries (got ${i} [no key], expected ${token.value})`);
+	    }
+	    if (useMaps !== true && typeof key !== 'string') {
+	      throw new Error(`${decodeErrPrefix} non-string keys not supported (got ${typeof key})`);
+	    }
+	    if (options.rejectDuplicateMapKeys === true) {
+	      if (useMaps && m.has(key) || !useMaps && key in obj) {
+	        throw new Error(`${decodeErrPrefix} found repeat map key "${key}"`);
+	      }
+	    }
+	    const value = tokensToObject(tokeniser, options);
+	    if (value === DONE) {
+	      throw new Error(`${decodeErrPrefix} found map but not enough entries (got ${i} [no value], expected ${token.value})`);
+	    }
+	    if (useMaps) {
+	      m.set(key, value);
+	    } else {
+	      obj[key] = value;
+	    }
+	  }
+	  return useMaps ? m : obj;
+	}
+	function tokensToObject(tokeniser, options) {
+	  if (tokeniser.done()) {
+	    return DONE;
+	  }
+	  const token = tokeniser.next();
+	  if (token.type === Type.break) {
+	    return BREAK;
+	  }
+	  if (token.type.terminal) {
+	    return token.value;
+	  }
+	  if (token.type === Type.array) {
+	    return tokenToArray(token, tokeniser, options);
+	  }
+	  if (token.type === Type.map) {
+	    return tokenToMap(token, tokeniser, options);
+	  }
+	  if (token.type === Type.tag) {
+	    if (options.tags && typeof options.tags[token.value] === 'function') {
+	      const tagged = tokensToObject(tokeniser, options);
+	      return options.tags[token.value](tagged);
+	    }
+	    throw new Error(`${decodeErrPrefix} tag not supported (${token.value})`);
+	  }
+	  throw new Error('unsupported');
+	}
+	function decode$1(data, options) {
+	  if (!(data instanceof Uint8Array)) {
+	    throw new Error(`${decodeErrPrefix} data to decode must be a Uint8Array`);
+	  }
+	  options = Object.assign({}, defaultDecodeOptions, options);
+	  const tokeniser = options.tokenizer || new Tokeniser(data, options);
+	  const decoded = tokensToObject(tokeniser, options);
+	  if (decoded === DONE) {
+	    throw new Error(`${decodeErrPrefix} did not find any content to decode`);
+	  }
+	  if (decoded === BREAK) {
+	    throw new Error(`${decodeErrPrefix} got unexpected break`);
+	  }
+	  if (!tokeniser.done()) {
+	    throw new Error(`${decodeErrPrefix} too many terminals, data makes no sense`);
+	  }
+	  return decoded;
+	}
+
+	const CID_CBOR_TAG = 42;
+	function cidDecoder(bytes) {
+	  if (bytes[0] !== 0) {
+	    throw new Error('Invalid CID for CBOR tag 42; expected leading 0x00');
+	  }
+	  return CID.decode(bytes.subarray(1));
+	}
+	const decodeOptions = {
+	  allowIndefinite: false,
+	  coerceUndefinedToNull: true,
+	  allowNaN: false,
+	  allowInfinity: false,
+	  allowBigInt: true,
+	  strict: true,
+	  useMaps: false,
+	  tags: []
+	};
+	decodeOptions.tags[CID_CBOR_TAG] = cidDecoder;
+	const decode = data => decode$1(data, decodeOptions);
+
+	/**
+	 * @typedef {import('../api').Block} Block
+	 * @typedef {import('../api').BlockHeader} BlockHeader
+	 * @typedef {import('../api').BlockIndex} BlockIndex
+	 * @typedef {import('./coding').BytesReader} BytesReader
+	 * @typedef {import('./coding').CarHeader} CarHeader
+	 * @typedef {import('./coding').CarDecoder} CarDecoder
+	 */
 
 	const CIDV0_BYTES = {
 	  SHA2_256: 0x12,
 	  LENGTH: 0x20,
 	  DAG_PB: 0x70
 	};
-	const V2_HEADER_LENGTH = /* characteristics */16 /* v1 offset */ + 8 /* v1 size */ + 8 /* index offset */ + 8;
 
 	/**
-	 * Decodes varint and seeks the buffer
-	 *
-	 * ```js
-	 * // needs bytes to be read first
-	 * const bytes = reader.upTo(8) // maybe async
-	 * ```
-	 *
-	 * @param {Uint8Array} bytes
-	 * @param {import('./coding').Seekable} seeker
-	 * @returns {number}
+	 * @param {BytesReader} reader
+	 * @returns {Promise<number>}
 	 */
-	function decodeVarint(bytes, seeker) {
-	  if (!bytes.length) {
-	    throw new Error('Unexpected end of data');
-	  }
+	async function readVarint(reader) {
+	  const bytes = await reader.upTo(8);
 	  const i = varint$1.decode(bytes);
-	  seeker.seek( /** @type {number} */varint$1.decode.bytes);
+	  reader.seek(varint$1.decode.bytes);
 	  return i;
+	  /* c8 ignore next 2 */
+	  // Node.js 12 c8 bug
 	}
 
 	/**
-	 * Decode v2 header
-	 *
-	 * ```js
-	 * // needs bytes to be read first
-	 * const bytes = reader.exactly(V2_HEADER_LENGTH, true) // maybe async
-	 * ```
-	 *
-	 * @param {Uint8Array} bytes
-	 * @returns {import('./coding').CarV2FixedHeader}
+	 * @param {BytesReader} reader
+	 * @returns {Promise<CarHeader>}
 	 */
-	function decodeV2Header(bytes) {
-	  const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-	  let offset = 0;
-	  const header = {
-	    version: 2,
-	    /** @type {[bigint, bigint]} */
-	    characteristics: [dv.getBigUint64(offset, true), dv.getBigUint64(offset += 8, true)],
-	    dataOffset: Number(dv.getBigUint64(offset += 8, true)),
-	    dataSize: Number(dv.getBigUint64(offset += 8, true)),
-	    indexOffset: Number(dv.getBigUint64(offset += 8, true))
-	  };
-	  return header;
+	async function readHeader(reader) {
+	  const length = await readVarint(reader);
+	  if (length === 0) {
+	    throw new Error('Invalid CAR header (zero length)');
+	  }
+	  const header = await reader.exactly(length);
+	  reader.seek(length);
+	  const block = decode(header);
+	  if (block == null || Array.isArray(block) || typeof block !== 'object') {
+	    throw new Error('Invalid CAR header format');
+	  }
+	  if (block.version !== 1) {
+	    if (typeof block.version === 'string') {
+	      throw new Error(`Invalid CAR version: "${block.version}"`);
+	    }
+	    throw new Error(`Invalid CAR version: ${block.version}`);
+	  }
+	  if (!Array.isArray(block.roots)) {
+	    throw new Error('Invalid CAR header format');
+	  }
+	  if (Object.keys(block).filter(p => p !== 'roots' && p !== 'version').length) {
+	    throw new Error('Invalid CAR header format');
+	  }
+	  return block;
+	  /* c8 ignore next 2 */
+	  // Node.js 12 c8 bug
 	}
 
 	/**
-	 * Checks the length of the multihash to be read afterwards
-	 *
-	 * ```js
-	 * // needs bytes to be read first
-	 * const bytes = reader.upTo(8) // maybe async
-	 * ```
-	 *
-	 * @param {Uint8Array} bytes
+	 * @param {BytesReader} reader
+	 * @returns {Promise<Uint8Array>}
 	 */
-	function getMultihashLength(bytes) {
+	async function readMultihash(reader) {
 	  // | code | length | .... |
 	  // where both code and length are varints, so we have to decode
 	  // them first before we can know total length
 
+	  const bytes = await reader.upTo(8);
 	  varint$1.decode(bytes); // code
-	  const codeLength = /** @type {number} */varint$1.decode.bytes;
+	  const codeLength = varint$1.decode.bytes;
 	  const length = varint$1.decode(bytes.subarray(varint$1.decode.bytes));
-	  const lengthLength = /** @type {number} */varint$1.decode.bytes;
+	  const lengthLength = varint$1.decode.bytes;
 	  const mhLength = codeLength + lengthLength + length;
-	  return mhLength;
-	}
-
-	/** Auto-generated with @ipld/schema@v4.2.0 at Thu Sep 14 2023 from IPLD Schema:
-	 *
-	 * # CarV1HeaderOrV2Pragma is a more relaxed form, and can parse {version:x} where
-	 * # roots are optional. This is typically useful for the {verison:2} CARv2
-	 * # pragma.
-	 *
-	 * type CarV1HeaderOrV2Pragma struct {
-	 * 	roots optional [&Any]
-	 * 	# roots is _not_ optional for CarV1 but we defer that check within code to
-	 * 	# gracefully handle the V2 case where it's just {version:X}
-	 * 	version Int
-	 * }
-	 *
-	 * # CarV1Header is the strict form of the header, and requires roots to be
-	 * # present. This is compatible with the CARv1 specification.
-	 *
-	 * # type CarV1Header struct {
-	 * # 	roots [&Any]
-	 * # 	version Int
-	 * # }
-	 *
-	 */
-
-	const Kinds = {
-	  Null: /** @returns {undefined|null} */( /** @type {any} */obj) => obj === null ? obj : undefined,
-	  Int: /** @returns {undefined|number} */( /** @type {any} */obj) => Number.isInteger(obj) ? obj : undefined,
-	  Float: /** @returns {undefined|number} */( /** @type {any} */obj) => typeof obj === 'number' && Number.isFinite(obj) ? obj : undefined,
-	  String: /** @returns {undefined|string} */( /** @type {any} */obj) => typeof obj === 'string' ? obj : undefined,
-	  Bool: /** @returns {undefined|boolean} */( /** @type {any} */obj) => typeof obj === 'boolean' ? obj : undefined,
-	  Bytes: /** @returns {undefined|Uint8Array} */( /** @type {any} */obj) => obj instanceof Uint8Array ? obj : undefined,
-	  Link: /** @returns {undefined|object} */( /** @type {any} */obj) => obj !== null && typeof obj === 'object' && obj.asCID === obj ? obj : undefined,
-	  List: /** @returns {undefined|Array<any>} */( /** @type {any} */obj) => Array.isArray(obj) ? obj : undefined,
-	  Map: /** @returns {undefined|object} */( /** @type {any} */obj) => obj !== null && typeof obj === 'object' && obj.asCID !== obj && !Array.isArray(obj) && !(obj instanceof Uint8Array) ? obj : undefined
-	};
-	/** @type {{ [k in string]: (obj:any)=>undefined|any}} */
-	const Types = {
-	  'CarV1HeaderOrV2Pragma > roots (anon) > valueType (anon)': Kinds.Link,
-	  'CarV1HeaderOrV2Pragma > roots (anon)': /** @returns {undefined|any} */( /** @type {any} */obj) => {
-	    if (Kinds.List(obj) === undefined) {
-	      return undefined;
-	    }
-	    for (let i = 0; i < obj.length; i++) {
-	      let v = obj[i];
-	      v = Types['CarV1HeaderOrV2Pragma > roots (anon) > valueType (anon)'](v);
-	      if (v === undefined) {
-	        return undefined;
-	      }
-	      if (v !== obj[i]) {
-	        const ret = obj.slice(0, i);
-	        for (let j = i; j < obj.length; j++) {
-	          let v = obj[j];
-	          v = Types['CarV1HeaderOrV2Pragma > roots (anon) > valueType (anon)'](v);
-	          if (v === undefined) {
-	            return undefined;
-	          }
-	          ret.push(v);
-	        }
-	        return ret;
-	      }
-	    }
-	    return obj;
-	  },
-	  Int: Kinds.Int,
-	  CarV1HeaderOrV2Pragma: /** @returns {undefined|any} */( /** @type {any} */obj) => {
-	    if (Kinds.Map(obj) === undefined) {
-	      return undefined;
-	    }
-	    const entries = Object.entries(obj);
-	    /** @type {{[k in string]: any}} */
-	    let ret = obj;
-	    let requiredCount = 1;
-	    for (let i = 0; i < entries.length; i++) {
-	      const [key, value] = entries[i];
-	      switch (key) {
-	        case 'roots':
-	          {
-	            const v = Types['CarV1HeaderOrV2Pragma > roots (anon)'](obj[key]);
-	            if (v === undefined) {
-	              return undefined;
-	            }
-	            if (v !== value || ret !== obj) {
-	              if (ret === obj) {
-	                /** @type {{[k in string]: any}} */
-	                ret = {};
-	                for (let j = 0; j < i; j++) {
-	                  ret[entries[j][0]] = entries[j][1];
-	                }
-	              }
-	              ret.roots = v;
-	            }
-	          }
-	          break;
-	        case 'version':
-	          {
-	            requiredCount--;
-	            const v = Types.Int(obj[key]);
-	            if (v === undefined) {
-	              return undefined;
-	            }
-	            if (v !== value || ret !== obj) {
-	              if (ret === obj) {
-	                /** @type {{[k in string]: any}} */
-	                ret = {};
-	                for (let j = 0; j < i; j++) {
-	                  ret[entries[j][0]] = entries[j][1];
-	                }
-	              }
-	              ret.version = v;
-	            }
-	          }
-	          break;
-	        default:
-	          return undefined;
-	      }
-	    }
-	    if (requiredCount > 0) {
-	      return undefined;
-	    }
-	    return ret;
-	  }
-	};
-	/** @type {{ [k in string]: (obj:any)=>undefined|any}} */
-	const Reprs = {
-	  'CarV1HeaderOrV2Pragma > roots (anon) > valueType (anon)': Kinds.Link,
-	  'CarV1HeaderOrV2Pragma > roots (anon)': /** @returns {undefined|any} */( /** @type {any} */obj) => {
-	    if (Kinds.List(obj) === undefined) {
-	      return undefined;
-	    }
-	    for (let i = 0; i < obj.length; i++) {
-	      let v = obj[i];
-	      v = Reprs['CarV1HeaderOrV2Pragma > roots (anon) > valueType (anon)'](v);
-	      if (v === undefined) {
-	        return undefined;
-	      }
-	      if (v !== obj[i]) {
-	        const ret = obj.slice(0, i);
-	        for (let j = i; j < obj.length; j++) {
-	          let v = obj[j];
-	          v = Reprs['CarV1HeaderOrV2Pragma > roots (anon) > valueType (anon)'](v);
-	          if (v === undefined) {
-	            return undefined;
-	          }
-	          ret.push(v);
-	        }
-	        return ret;
-	      }
-	    }
-	    return obj;
-	  },
-	  Int: Kinds.Int,
-	  CarV1HeaderOrV2Pragma: /** @returns {undefined|any} */( /** @type {any} */obj) => {
-	    if (Kinds.Map(obj) === undefined) {
-	      return undefined;
-	    }
-	    const entries = Object.entries(obj);
-	    /** @type {{[k in string]: any}} */
-	    let ret = obj;
-	    let requiredCount = 1;
-	    for (let i = 0; i < entries.length; i++) {
-	      const [key, value] = entries[i];
-	      switch (key) {
-	        case 'roots':
-	          {
-	            const v = Reprs['CarV1HeaderOrV2Pragma > roots (anon)'](value);
-	            if (v === undefined) {
-	              return undefined;
-	            }
-	            if (v !== value || ret !== obj) {
-	              if (ret === obj) {
-	                /** @type {{[k in string]: any}} */
-	                ret = {};
-	                for (let j = 0; j < i; j++) {
-	                  ret[entries[j][0]] = entries[j][1];
-	                }
-	              }
-	              ret.roots = v;
-	            }
-	          }
-	          break;
-	        case 'version':
-	          {
-	            requiredCount--;
-	            const v = Reprs.Int(value);
-	            if (v === undefined) {
-	              return undefined;
-	            }
-	            if (v !== value || ret !== obj) {
-	              if (ret === obj) {
-	                /** @type {{[k in string]: any}} */
-	                ret = {};
-	                for (let j = 0; j < i; j++) {
-	                  ret[entries[j][0]] = entries[j][1];
-	                }
-	              }
-	              ret.version = v;
-	            }
-	          }
-	          break;
-	        default:
-	          return undefined;
-	      }
-	    }
-	    if (requiredCount > 0) {
-	      return undefined;
-	    }
-	    return ret;
-	  }
-	};
-	const CarV1HeaderOrV2Pragma = {
-	  toTyped: Types.CarV1HeaderOrV2Pragma,
-	  toRepresentation: Reprs.CarV1HeaderOrV2Pragma
-	};
-
-	/**
-	 * @typedef {import('./api').Block} Block
-	 * @typedef {import('./api').BlockHeader} BlockHeader
-	 * @typedef {import('./api').BlockIndex} BlockIndex
-	 * @typedef {import('./coding').BytesReader} BytesReader
-	 * @typedef {import('./coding').CarHeader} CarHeader
-	 * @typedef {import('./coding').CarV2Header} CarV2Header
-	 * @typedef {import('./coding').CarV2FixedHeader} CarV2FixedHeader
-	 * @typedef {import('./coding').CarDecoder} CarDecoder
-	 */
-
-	/**
-	 * Reads header data from a `BytesReader`. The header may either be in the form
-	 * of a `CarHeader` or `CarV2Header` depending on the CAR being read.
-	 *
-	 * @name async decoder.readHeader(reader)
-	 * @param {BytesReader} reader
-	 * @param {number} [strictVersion]
-	 * @returns {Promise<CarHeader|CarV2Header>}
-	 */
-	async function readHeader(reader, strictVersion) {
-	  const length = decodeVarint(await reader.upTo(8), reader);
-	  if (length === 0) {
-	    throw new Error('Invalid CAR header (zero length)');
-	  }
-	  const header = await reader.exactly(length, true);
-	  const block = decode$1(header);
-	  if (CarV1HeaderOrV2Pragma.toTyped(block) === undefined) {
-	    throw new Error('Invalid CAR header format');
-	  }
-	  if (block.version !== 1 && block.version !== 2 || strictVersion !== undefined && block.version !== strictVersion) {
-	    throw new Error(`Invalid CAR version: ${block.version}${strictVersion !== undefined ? ` (expected ${strictVersion})` : ''}`);
-	  }
-	  if (block.version === 1) {
-	    // CarV1HeaderOrV2Pragma makes roots optional, let's make it mandatory
-	    if (!Array.isArray(block.roots)) {
-	      throw new Error('Invalid CAR header format');
-	    }
-	    return block;
-	  }
-	  // version 2
-	  if (block.roots !== undefined) {
-	    throw new Error('Invalid CAR header format');
-	  }
-	  const v2Header = decodeV2Header(await reader.exactly(V2_HEADER_LENGTH, true));
-	  reader.seek(v2Header.dataOffset - reader.pos);
-	  const v1Header = await readHeader(reader, 1);
-	  return Object.assign(v1Header, v2Header);
+	  const multihash = await reader.exactly(mhLength);
+	  reader.seek(mhLength);
+	  return multihash;
+	  /* c8 ignore next 2 */
+	  // Node.js 12 c8 bug
 	}
 
 	/**
@@ -43462,30 +39221,27 @@ if (cid) {
 	 * @returns {Promise<CID>}
 	 */
 	async function readCid(reader) {
-	  const first = await reader.exactly(2, false);
+	  const first = await reader.exactly(2);
 	  if (first[0] === CIDV0_BYTES.SHA2_256 && first[1] === CIDV0_BYTES.LENGTH) {
 	    // cidv0 32-byte sha2-256
-	    const bytes = await reader.exactly(34, true);
-	    const multihash = decode$3(bytes);
+	    const bytes = await reader.exactly(34);
+	    reader.seek(34);
+	    const multihash = decode$6(bytes);
 	    return CID.create(0, CIDV0_BYTES.DAG_PB, multihash);
 	  }
-	  const version = decodeVarint(await reader.upTo(8), reader);
+	  const version = await readVarint(reader);
 	  if (version !== 1) {
 	    throw new Error(`Unexpected CID version (${version})`);
 	  }
-	  const codec = decodeVarint(await reader.upTo(8), reader);
-	  const bytes = await reader.exactly(getMultihashLength(await reader.upTo(8)), true);
-	  const multihash = decode$3(bytes);
+	  const codec = await readVarint(reader);
+	  const bytes = await readMultihash(reader);
+	  const multihash = decode$6(bytes);
 	  return CID.create(version, codec, multihash);
+	  /* c8 ignore next 2 */
+	  // Node.js 12 c8 bug
 	}
 
 	/**
-	 * Reads the leading data of an individual block from CAR data from a
-	 * `BytesReader`. Returns a `BlockHeader` object which contains
-	 * `{ cid, length, blockLength }` which can be used to either index the block
-	 * or read the block binary data.
-	 *
-	 * @name async decoder.readBlockHead(reader)
 	 * @param {BytesReader} reader
 	 * @returns {Promise<BlockHeader>}
 	 */
@@ -43493,35 +39249,40 @@ if (cid) {
 	  // length includes a CID + Binary, where CID has a variable length
 	  // we have to deal with
 	  const start = reader.pos;
-	  let length = decodeVarint(await reader.upTo(8), reader);
+	  let length = await readVarint(reader);
 	  if (length === 0) {
 	    throw new Error('Invalid CAR section (zero length)');
 	  }
 	  length += reader.pos - start;
 	  const cid = await readCid(reader);
-	  const blockLength = length - Number(reader.pos - start); // subtract CID length
+	  const blockLength = length - (reader.pos - start); // subtract CID length
 
 	  return {
 	    cid,
 	    length,
 	    blockLength
 	  };
+	  /* c8 ignore next 2 */
+	  // Node.js 12 c8 bug
 	}
 
 	/**
 	 * @param {BytesReader} reader
-	 * @returns {Promise<Block>}
+	 * @return {Promise<Block>}
 	 */
 	async function readBlock(reader) {
 	  const {
 	    cid,
 	    blockLength
 	  } = await readBlockHead(reader);
-	  const bytes = await reader.exactly(blockLength, true);
+	  const bytes = await reader.exactly(blockLength);
+	  reader.seek(blockLength);
 	  return {
 	    bytes,
 	    cid
 	  };
+	  /* c8 ignore next 2 */
+	  // Node.js 12 c8 bug
 	}
 
 	/**
@@ -43544,26 +39305,16 @@ if (cid) {
 	  };
 	  reader.seek(index.blockLength);
 	  return index;
+	  /* c8 ignore next 2 */
+	  // Node.js 12 c8 bug
 	}
 
 	/**
-	 * Creates a `CarDecoder` from a `BytesReader`. The `CarDecoder` is as async
-	 * interface that will consume the bytes from the `BytesReader` to yield a
-	 * `header()` and either `blocks()` or `blocksIndex()` data.
-	 *
-	 * @name decoder.createDecoder(reader)
 	 * @param {BytesReader} reader
 	 * @returns {CarDecoder}
 	 */
 	function createDecoder(reader) {
-	  const headerPromise = (async () => {
-	    const header = await readHeader(reader);
-	    if (header.version === 2) {
-	      const v1length = reader.pos - header.dataOffset;
-	      reader = limitReader(reader, header.dataSize - v1length);
-	    }
-	    return header;
-	  })();
+	  const headerPromise = readHeader(reader);
 	  return {
 	    header: () => headerPromise,
 	    async *blocks() {
@@ -43582,9 +39333,6 @@ if (cid) {
 	}
 
 	/**
-	 * Creates a `BytesReader` from a `Uint8Array`.
-	 *
-	 * @name decoder.bytesReader(bytes)
 	 * @param {Uint8Array} bytes
 	 * @returns {BytesReader}
 	 */
@@ -43594,18 +39342,17 @@ if (cid) {
 	  /** @type {BytesReader} */
 	  return {
 	    async upTo(length) {
-	      const out = bytes.subarray(pos, pos + Math.min(length, bytes.length - pos));
-	      return out;
+	      return bytes.subarray(pos, pos + Math.min(length, bytes.length - pos));
+	      /* c8 ignore next 2 */
+	      // Node.js 12 c8 bug
 	    },
-	    async exactly(length, seek = false) {
+	    async exactly(length) {
 	      if (length > bytes.length - pos) {
 	        throw new Error('Unexpected end of data');
 	      }
-	      const out = bytes.subarray(pos, pos + length);
-	      if (seek) {
-	        pos += length;
-	      }
-	      return out;
+	      return bytes.subarray(pos, pos + length);
+	      /* c8 ignore next 2 */
+	      // Node.js 12 c8 bug
 	    },
 	    seek(length) {
 	      pos += length;
@@ -43667,20 +39414,19 @@ if (cid) {
 	        await read(length);
 	      }
 	      return currentChunk.subarray(offset, offset + Math.min(currentChunk.length - offset, length));
+	      /* c8 ignore next 2 */
+	      // Node.js 12 c8 bug
 	    },
-	    async exactly(length, seek = false) {
+	    async exactly(length) {
 	      if (currentChunk.length - offset < length) {
 	        await read(length);
 	      }
 	      if (currentChunk.length - offset < length) {
 	        throw new Error('Unexpected end of data');
 	      }
-	      const out = currentChunk.subarray(offset, offset + length);
-	      if (seek) {
-	        pos += length;
-	        offset += length;
-	      }
-	      return out;
+	      return currentChunk.subarray(offset, offset + length);
+	      /* c8 ignore next 2 */
+	      // Node.js 12 c8 bug
 	    },
 	    seek(length) {
 	      pos += length;
@@ -43693,10 +39439,6 @@ if (cid) {
 	}
 
 	/**
-	 * Creates a `BytesReader` from an `AsyncIterable<Uint8Array>`, which allows for
-	 * consumption of CAR data from a streaming source.
-	 *
-	 * @name decoder.asyncIterableReader(asyncIterable)
 	 * @param {AsyncIterable<Uint8Array>} asyncIterable
 	 * @returns {BytesReader}
 	 */
@@ -43708,59 +39450,17 @@ if (cid) {
 	      return null;
 	    }
 	    return next.value;
+	    /* c8 ignore next 2 */
+	    // Node.js 12 c8 bug
 	  }
 	  return chunkReader(readChunk);
 	}
 
 	/**
-	 * Wraps a `BytesReader` in a limiting `BytesReader` which limits maximum read
-	 * to `byteLimit` bytes. It _does not_ update `pos` of the original
-	 * `BytesReader`.
-	 *
-	 * @name decoder.limitReader(reader, byteLimit)
-	 * @param {BytesReader} reader
-	 * @param {number} byteLimit
-	 * @returns {BytesReader}
-	 */
-	function limitReader(reader, byteLimit) {
-	  let bytesRead = 0;
-
-	  /** @type {BytesReader} */
-	  return {
-	    async upTo(length) {
-	      let bytes = await reader.upTo(length);
-	      if (bytes.length + bytesRead > byteLimit) {
-	        bytes = bytes.subarray(0, byteLimit - bytesRead);
-	      }
-	      return bytes;
-	    },
-	    async exactly(length, seek = false) {
-	      const bytes = await reader.exactly(length, seek);
-	      if (bytes.length + bytesRead > byteLimit) {
-	        throw new Error('Unexpected end of data');
-	      }
-	      if (seek) {
-	        bytesRead += length;
-	      }
-	      return bytes;
-	    },
-	    seek(length) {
-	      bytesRead += length;
-	      reader.seek(length);
-	    },
-	    get pos() {
-	      return reader.pos;
-	    }
-	  };
-	}
-
-	/**
 	 * @typedef {import('multiformats').CID} CID
-	 * @typedef {import('./api').Block} Block
-	 * @typedef {import('./api').CarReader} CarReaderIface
+	 * @typedef {import('../api').Block} Block
+	 * @typedef {import('../api').CarReader} CarReaderIface
 	 * @typedef {import('./coding').BytesReader} BytesReader
-	 * @typedef {import('./coding').CarHeader} CarHeader
-	 * @typedef {import('./coding').CarV2Header} CarV2Header
 	 */
 
 	/**
@@ -43782,16 +39482,18 @@ if (cid) {
 	 * @class
 	 * @implements {CarReaderIface}
 	 * @property {number} version The version number of the CAR referenced by this
-	 * reader (should be `1` or `2`).
+	 * reader (should be `1`).
 	 */
 	class CarReader {
 	  /**
 	   * @constructs CarReader
-	   * @param {CarHeader|CarV2Header} header
+	   * @param {number} version
+	   * @param {CID[]} roots
 	   * @param {Block[]} blocks
 	   */
-	  constructor(header, blocks) {
-	    this._header = header;
+	  constructor(version, roots, blocks) {
+	    this._version = version;
+	    this._roots = roots;
 	    this._blocks = blocks;
 	    this._keys = blocks.map(b => b.cid.toString());
 	  }
@@ -43802,28 +39504,30 @@ if (cid) {
 	   * @instance
 	   */
 	  get version() {
-	    return this._header.version;
+	    return this._version;
 	  }
 
 	  /**
 	   * Get the list of roots defined by the CAR referenced by this reader. May be
 	   * zero or more `CID`s.
 	   *
-	   * @function
+	   * @method
 	   * @memberof CarReader
 	   * @instance
 	   * @async
 	   * @returns {Promise<CID[]>}
 	   */
 	  async getRoots() {
-	    return this._header.roots;
+	    return this._roots;
+	    /* c8 ignore next 2 */
+	    // Node.js 12 c8 bug
 	  }
 
 	  /**
 	   * Check whether a given `CID` exists within the CAR referenced by this
 	   * reader.
 	   *
-	   * @function
+	   * @method
 	   * @memberof CarReader
 	   * @instance
 	   * @async
@@ -43832,6 +39536,8 @@ if (cid) {
 	   */
 	  async has(key) {
 	    return this._keys.indexOf(key.toString()) > -1;
+	    /* c8 ignore next 2 */
+	    // Node.js 12 c8 bug
 	  }
 
 	  /**
@@ -43840,7 +39546,7 @@ if (cid) {
 	   * the provided `CID` doesn't exist within the CAR, `undefined` will be
 	   * returned.
 	   *
-	   * @function
+	   * @method
 	   * @memberof CarReader
 	   * @instance
 	   * @async
@@ -43850,6 +39556,8 @@ if (cid) {
 	  async get(key) {
 	    const index = this._keys.indexOf(key.toString());
 	    return index > -1 ? this._blocks[index] : undefined;
+	    /* c8 ignore next 2 */
+	    // Node.js 12 c8 bug
 	  }
 
 	  /**
@@ -43857,7 +39565,7 @@ if (cid) {
 	   * of the `Block`s (`{ cid:CID, bytes:Uint8Array }` pairs) contained within
 	   * the CAR referenced by this reader.
 	   *
-	   * @function
+	   * @method
 	   * @memberof CarReader
 	   * @instance
 	   * @async
@@ -43874,7 +39582,7 @@ if (cid) {
 	   * Returns a `CIDIterator` (`AsyncIterable<CID>`) that iterates over all of
 	   * the `CID`s contained within the CAR referenced by this reader.
 	   *
-	   * @function
+	   * @method
 	   * @memberof CarReader
 	   * @instance
 	   * @async
@@ -43896,13 +39604,15 @@ if (cid) {
 	   * @static
 	   * @memberof CarReader
 	   * @param {Uint8Array} bytes
-	   * @returns {Promise<CarReader>}
+	   * @returns {Promise<CarReader>} blip blop
 	   */
 	  static async fromBytes(bytes) {
 	    if (!(bytes instanceof Uint8Array)) {
 	      throw new TypeError('fromBytes() requires a Uint8Array');
 	    }
 	    return decodeReaderComplete(bytesReader(bytes));
+	    /* c8 ignore next 2 */
+	    // Node.js 12 c8 bug
 	  }
 
 	  /**
@@ -43926,6 +39636,8 @@ if (cid) {
 	      throw new TypeError('fromIterable() requires an async iterable');
 	    }
 	    return decodeReaderComplete(asyncIterableReader(asyncIterable));
+	    /* c8 ignore next 2 */
+	    // Node.js 12 c8 bug
 	  }
 	}
 
@@ -43936,12 +39648,17 @@ if (cid) {
 	 */
 	async function decodeReaderComplete(reader) {
 	  const decoder = createDecoder(reader);
-	  const header = await decoder.header();
+	  const {
+	    version,
+	    roots
+	  } = await decoder.header();
 	  const blocks = [];
 	  for await (const block of decoder.blocks()) {
 	    blocks.push(block);
 	  }
-	  return new CarReader(header, blocks);
+	  return new CarReader(version, roots, blocks);
+	  /* c8 ignore next 2 */
+	  // Node.js 12 c8 bug
 	}
 
 	// @ts-check
@@ -44058,7 +39775,7 @@ if (cid) {
 	      const block = op.cid && (await car.get( /** @type {*} */op.cid));
 	      if (!block) continue; // TODO: alert unusual op
 
-	      const record = decode$7(block.bytes);
+	      const record = decode$3(block.bytes);
 	      // record.seq = commit.seq; 471603945
 	      // record.since = /** @type {string} */(commit.since); 3ksfhcmgghv2g
 	      // record.action = op.action;
@@ -44123,7 +39840,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.57";
+	var version = "0.2.58";
 
 	// @ts-check
 
@@ -52949,7 +48666,7 @@ if (cid) {
 	  const errors = [];
 	  for await (const block of car.blocks()) {
 	    await restRegularly();
-	    const record = decode$7(block.bytes);
+	    const record = decode$3(block.bytes);
 	    if (record.$type) recordsByCID.set(String(block.cid), record);else if (Array.isArray(record.e)) {
 	      let key = '';
 	      const decoder = new TextDecoder();

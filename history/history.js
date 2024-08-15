@@ -17,6 +17,7 @@ import { Timeline } from './timeline';
 import { version } from '../package.json';
 
 import './history.css';
+import { Snackbar } from '@mui/material';
 
 export function History() {
   return (
@@ -47,14 +48,28 @@ function HistoryCore() {
 
   const searchQueryStartsWithSlash = (searchQuery || '').trim().startsWith('/');
 
+  const [downloadingCARFor, setDownloadingCARFor] = React.useState(/** @type{undefined | string | Error} */(undefined));
+
   return (
     <HistoryLayout
       profile={resolved}
       hideSearch={!!post}
       onSearchQueryChanged={setSearchQuery}
-      onSlashCommand={command => {
-        if (/^\/download?$/i.test(command)) {
-          downloadCARAndShow(handle || '', db);
+      onSlashCommand={async command => {
+        if (typeof downloadingCARFor === 'string') return;
+
+        setDownloadingCARFor(handle || '');
+        await new Promise(resolve => setTimeout(resolve, 1));
+        try {
+          if (/^\/download?$/i.test(command)) {
+            downloadCARAndShow(handle || '', db);
+          }
+          await new Promise(resolve => setTimeout(resolve, 1));
+          setDownloadingCARFor(undefined);
+        } catch (error) {
+          console.error('Slash command error', error);
+          await new Promise(resolve => setTimeout(resolve, 1));
+          setDownloadingCARFor(error);
         }
       }}
     >
@@ -74,6 +89,19 @@ function HistoryCore() {
       <div className='history-footer'>
         v{version}
       </div>
+
+      <Snackbar
+        open={!!downloadingCARFor}
+        message={
+          typeof downloadingCARFor === 'string' ?
+          <>
+              Downloading {downloadingCARFor} CAR...
+            </> :
+            <>
+              Error downloading CAR: {downloadingCARFor?.message}
+            </>
+        }
+      />
     </HistoryLayout>
   );
 }
