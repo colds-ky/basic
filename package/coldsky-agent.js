@@ -1,6 +1,6 @@
 // @ts-check
 
-import { BskyAgent } from '@atproto/api';
+import { AtpAgent } from '@atproto/api';
 import { throttledAsyncCache } from './throttled-async-cache';
 import { unwrapShortPDS } from './shorten';
 
@@ -9,34 +9,34 @@ export const BSKY_NETWORK_URL = 'https://bsky.network/';
 export const BSKY_PUBLIC_URL = 'https://public.api.bsky.app/';
 
 /**
- * @typedef {Omit<ConstructorParameters<typeof BskyAgent>[0], 'service'> & {
- *  service?: ConstructorParameters<typeof BskyAgent>[0]['service'],
- *  fetch?: import('@atproto/api').AtpAgentFetchHandler
+ * @typedef {Omit<import('@atproto/api').AtpAgentOptions, 'service'> & {
+ *  service?: import('@atproto/api').AtpAgentOptions['service'],
+ *  fetch?: import('@atproto/api').AtpBaseClient['fetchHandler']
  * }} ColdskyAgentOptions
  */
 
-export class ColdskyAgent extends BskyAgent {
+export class ColdskyAgent extends AtpAgent {
   /** @param {ColdskyAgentOptions} [args] */
   constructor(args) {
     super({
       ...args,
       // most of methods work fine on bsky.social
-      service: args?.service ? unwrapShortPDS(args.service) : BSKY_SOCIAL_URL,
+      service: args?.service ? unwrapShortPDS(String(args.service)) : BSKY_SOCIAL_URL,
     });
 
     // find all clients to patch
     for (const key in this.com.atproto) {
       /** @type {typeof this.com.atproto.admin} */
       const ns = this.com.atproto[key];
-      const baseClient = ns._service?.xrpc?.baseClient;
+      const baseClient = ns._client;
       if (baseClient) this.patchBaseClient(baseClient, !!args?.service, args?.fetch);
     }
   }
 
   /**
-   * @param {typeof this.com.atproto.sync._service.xrpc.baseClient} baseClient
+   * @param {typeof this.com.atproto.sync._client} baseClient
    * @param {boolean} serviceDefined
-   * @param {typeof import('@atproto/api').AtpAgentFetchHandler | undefined} fetchOverride
+   * @param {typeof this.com.atproto.sync._client.fetchHandler | undefined} fetchOverride
    */
   patchBaseClient(baseClient, serviceDefined, fetchOverride) {
     baseClient.lex.assertValidXrpcOutput = function (lexUri, value, ...rest) {
@@ -44,8 +44,10 @@ export class ColdskyAgent extends BskyAgent {
     };
 
     if (fetchOverride) {
-      if (/** @type {*} */(baseClient.fetch)._patchedFetch) return;
-      baseClient.fetch =
+      if (/** @type {*} */(baseClient.fetchHandler)._patchedFetch) return;
+
+      // @ts-ignore fetchHandler is notionally readonly
+      baseClient.fetchHandler =
         fetchOverride;
         // overrideFetch(baseClient.fetch.bind(baseClient), serviceDefined);
     }
@@ -56,10 +58,10 @@ export class ColdskyAgent extends BskyAgent {
 const typedCaches = {};
 
 /**
- * @param {BskyAgent['com']['atproto']['sync']['_service']['xrpc']['baseClient']['fetch'] &
+ * @param {AtpAgent['com']['atproto']['sync']['_client']['fetchHandler'] &
  *  { _patchedFetch?: boolean }} baseFetch
  * @param {boolean} [serviceDefined]
- * @returns {BskyAgent['com']['atproto']['sync']['_service']['xrpc']['baseClient']['fetch'] &
+ * @returns {AtpAgent['com']['atproto']['sync']['_client']['fetchHandler'] &
  *  { _patchedFetch?: boolean }}
  */
 function overrideFetch(baseFetch, serviceDefined) {

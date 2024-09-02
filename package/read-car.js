@@ -2,16 +2,15 @@
 
 import { decode as cbor_x_decode } from 'cbor-x';
 import { CID } from 'multiformats';
-import { CarReader as ipld_CarReader } from '../node_modules/@ipld/car/lib/reader-browser.js';
+import { CarReader as ipld_CarReader } from '@ipld/car/reader';
 
 import { ensureCborXExtended } from './firehose';
-import { unwrapShortDID } from './shorten.js';
 
 /**
- * @param {string} shortDID
+ * @param {string} fullDID
  * @param {ArrayBuffer | Uint8Array} messageBuf
  */
-export async function readCAR(shortDID, messageBuf) {
+export async function readCAR(fullDID, messageBuf) {
   const bytes = messageBuf instanceof ArrayBuffer ? new Uint8Array(messageBuf) : messageBuf;
 
   const car = await ipld_CarReader.fromBytes(bytes);
@@ -59,7 +58,6 @@ export async function readCAR(shortDID, messageBuf) {
   /** @type {import('./firehose').FirehoseRecord[]} */
   const records = [];
 
-  const fullDID = unwrapShortDID(shortDID);
   for (const entry of recordsByCID) {
     const cid = entry[0];
     /** @type {import('./firehose').FirehoseRecord} */

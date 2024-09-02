@@ -55,7 +55,7 @@ export async function syncRepo(args) {
   console.log('@' + profile.handle + ' CAR ' + Math.round(repoData.byteLength / 1024).toLocaleString() + 'Kb downloaded in ', (Date.now() - startDownloadCAR) / 1000, 's');
 
   const startParse = Date.now();
-  const parsed = await readCAR(shortDID, repoData);
+  const parsed = await readCAR(unwrapShortDID(shortDID), repoData);
   console.log('@' + profile.handle + ' parsed repo in ', (Date.now() - startParse) / 1000, 's');
 
   const startUploadingToDB = Date.now();

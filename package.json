@@ -1,6 +1,6 @@
 {
   "name": "coldsky",
-  "version": "0.2.58",
+  "version": "0.2.59",
   "description": "Library and the app for BlueSky",
   "main": "libs.js",
   "scripts": {
@@ -45,24 +45,7 @@
   "optionalDependencies": {
     "gpu.js": "^2.16.0"
   },
-  "leave_aside_overrides": {
-    "@atproto/api": {
-      "multiformats": "$multiformats"
-    },
-    "@atproto/common-web": {
-      "multiformats": "$multiformats"
-    },
-    "@atproto/lexicon": {
-      "multiformats": "$multiformats"
-    },
-    "@ipld/car": {
-      "multiformats": "$multiformats"
-    },
-    "@ipld/dag-cbor": {
-      "multiformats": "$multiformats"
-    },
-    "uint8arrays": {
-      "multiformats": "$multiformats"
-    }
+  "dependencies": {
+    "eld": "^1.0.0"
   }
 }

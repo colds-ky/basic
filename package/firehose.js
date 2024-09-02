@@ -6,7 +6,7 @@ import {
   decode as cbor_x_decode
 } from 'cbor-x';
 import { CID as multiformats_CID } from 'multiformats';
-import { CarReader as ipld_CarReader } from '../node_modules/@ipld/car/lib/reader-browser.js';
+import { CarReader as ipld_CarReader } from '@ipld/car/reader';
 
 /**
  * @typedef {{
@@ -32,6 +32,9 @@ import { CarReader as ipld_CarReader } from '../node_modules/@ipld/car/lib/reade
  *  'app.bsky.graph.listblock': import('@atproto/api').AppBskyGraphListblock.Record,
  *  'app.bsky.actor.profile': import('@atproto/api').AppBskyActorProfile.Record
  *  'app.bsky.feed.generator': import('@atproto/api').AppBskyFeedGenerator.Record
+ *  'app.bsky.feed.postgate': import('@atproto/api').AppBskyFeedPostgate.Record
+ *  'chat.bsky.actor.declaration': import('@atproto/api').ChatBskyActorDeclaration.Record,
+ *  'app.bsky.graph.starterpack': import('@atproto/api').AppBskyGraphStarterpack.Record
  * }} RepoRecord$Typed
  */
 
@@ -51,16 +54,23 @@ import { CarReader as ipld_CarReader } from '../node_modules/@ipld/car/lib/reade
  * FirehoseRecord$Typed<'app.bsky.graph.block'> |
  * FirehoseRecord$Typed<'app.bsky.graph.list'> |
  * FirehoseRecord$Typed<'app.bsky.graph.listitem'> |
+ * FirehoseRecord$Typed<'app.bsky.graph.listblock'> |
  * FirehoseRecord$Typed<'app.bsky.actor.profile'> |
- * FirehoseRecord$Typed<'app.bsky.feed.generator'>
+ * FirehoseRecord$Typed<'app.bsky.feed.generator'> |
+ * FirehoseRecord$Typed<'app.bsky.feed.postgate'> |
+ * FirehoseRecord$Typed<'chat.bsky.actor.declaration'> |
+ * FirehoseRecord$Typed<'app.bsky.graph.starterpack'>
  * } FirehoseRecord
  */
 
 export const known$Types = [
   'app.bsky.feed.like', 'app.bsky.feed.post', 'app.bsky.feed.repost', 'app.bsky.feed.threadgate',
-  'app.bsky.graph.follow', 'app.bsky.graph.block', 'app.bsky.graph.list', 'app.bsky.graph.listitem',
+  'app.bsky.graph.follow', 'app.bsky.graph.block', 'app.bsky.graph.list', 'app.bsky.graph.listitem', 'app.bsky.graph.listblock',
   'app.bsky.actor.profile',
-  'app.bsky.feed.generator'
+  'app.bsky.feed.generator',
+  'app.bsky.feed.postgate',
+  'chat.bsky.actor.declaration',
+  'app.bsky.graph.starterpack'
 ];
 
 firehose.knownTypes = known$Types;
@@ -157,6 +167,7 @@ export async function* firehose() {
         known$Types.indexOf(record.$type) < 0;
 
       if (unexpected) {
+        console.warn('unexpected ', record);
         if (!buf.block.unexpected) buf.block.unexpected = [];
         buf.block.unexpected.push(record);
       } else if (op.action === 'delete') {
