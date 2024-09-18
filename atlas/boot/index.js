@@ -7,7 +7,8 @@ import { createAtlasRenderer } from '../render';
 import { handleWindowResizes } from './handle-window-resizes';
 import { setupScene } from './setup-scene';
 import { startAnimation } from './start-animation';
-import { getGlobalCachedStore } from '../../app';
+import { DB_NAME, getGlobalCachedStore, useDB } from '../../app';
+import { defineCachedStore } from '../../package';
 
 /**
  * @param {HTMLDivElement} elem
@@ -15,6 +16,7 @@ import { getGlobalCachedStore } from '../../app';
  */
 export function boot(elem, unmountPromise) {
   const clock = makeClock();
+  const db = defineCachedStore({ dbName: DB_NAME })
 
   let lastRender = clock.nowMSec;
 
@@ -44,16 +46,16 @@ export function boot(elem, unmountPromise) {
 
   const atlasRenderer = createAtlasRenderer({
     clock,
-    nodesLive: streamFirehoseThreads(),
-    getKey: (thread) => thread.root.uri,
-    getPoint: (thread, point) => {
-      point.x = thread.x;
-      point.y = thread.y;
+    nodesLive: streamAccountPositions(),
+    getKey: (profile) => profile,
+    getPoint: (profile, point) => {
+      point.x = profile.x;
+      point.y = profile.y;
       point.h = 0;
-      point.weight = thread.all.length / 2000;
+      point.weight = profile.socialWeight / 2000;
     },
-    getLabel: (thread) => (thread.root.text || '').slice(0, 10),
-    getDescription: (thread) => thread.root.text || '',
+    getLabel: (profile) => (profile.handle || profile.shortDID).slice(0, 10),
+    getDescription: (profile) => profile.displayName || '',
     getColor: () => 0xFFFFFFFF,
     getFlashTime: () => { }
   });
@@ -72,41 +74,72 @@ export function boot(elem, unmountPromise) {
   }
 
   async function* streamAccountPositions() {
-    /** @type {AccountPosition[]} */
-    let accountPositions = [];
+    /** @type {ProfilePosition[]} */
+    const profilePositions = [];
     /** @type {{[uri: string]: number}} */
-    const accountIndexByShortDID = {};
+    const profileIndexByShortDID = {};
 
     let lastInject = Date.now();
 
-    for await (const block of getGlobalCachedStore().firehose()) {
-      for (const msg of block.messages) {
-        switch (msg.$type) {
-          case 'app.bsky.actor.profile':
-            
+    for await (const chunk of firehoseThreads(db)) {
+      /** @type {typeof chunk} */
+      const distinctThreads = [];
+      const distinctNewShortDIDs = [];
+      for (const th of chunk) {
+        let matchExisting = false;
+        for (let i = 0; i < distinctThreads.length; i++) {
+          if (distinctThreads[i].root.uri === th.root.uri) {
+            distinctThreads[i] = th;
+            matchExisting = true;
+            break;
+          }
         }
-      }
+        if (!matchExisting) distinctThreads.push(th);
 
-      if (Date.now() - lastInject > 400) {
-        for (const th of newThreads) {
-          accounts = accounts.slice();
-          const thWithPos = /** @type {ThreadWithPosition} */(th);
-          calcPos(thWithPos);
-
-          const uri = th.root.uri;
-          if (uri in threadIndexByUri) {
-            accounts[threadIndexByUri[uri]] = thWithPos;
-          } else {
-            threadIndexByUri[uri] = accounts.length;
-            accounts.push(thWithPos);
+        matchExisting = false;
+        for (let i = 0; i < distinctNewShortDIDs.length; i++) {
+          if (distinctNewShortDIDs[i] === th.root.shortDID) {
+            distinctNewShortDIDs[i] = th.root.shortDID;
+            matchExisting = true;
+            break;
           }
         }
 
-        lastInject = Date.now();
-
-        console.log('threads: ', accounts);
-        yield accounts;
+        if (!matchExisting) distinctNewShortDIDs.push(th.root.shortDID);
       }
+
+      const retrieveProfiles = [];
+      for (const th of distinctThreads) {
+        const thWithPos = /** @type {ThreadWithPosition} */(th);
+        calcPos(thWithPos);
+
+        if (!profileIndexByShortDID[th.root.shortDID])
+          retrieveProfiles.push((async () => {
+            try {
+              for await (const profile of db.getProfileIncrementally(th.root.shortDID)) {
+                if (!profileIndexByShortDID[profile.shortDID]) {
+                  const index = profilePositions.length;
+                  profilePositions.push({
+                    ...profile,
+                    index,
+                    socialWeight: (profile.followersCount || 1) * 20,
+                    x: thWithPos.x,
+                    y: thWithPos.y
+                  });
+                  profileIndexByShortDID[profile.shortDID] = index;
+                }
+              }
+            } catch (profileError) {
+            }
+          })());
+      }
+
+      await Promise.all(retrieveProfiles);
+
+      lastInject = Date.now();
+
+      console.log('threads: ', profilePositions);
+      yield profilePositions;
     }
   }
 
@@ -148,11 +181,10 @@ export function boot(elem, unmountPromise) {
 }
 
 /**
- * @typedef {{
- *  account: AccountInfo;
+ * @typedef {import('../../package').CompactProfile & {
  *  index: number;
  *  x: number;
  *  y: number;
  *  socialWeight: number;
- * }} AccountPosition
+ * }} ProfilePosition
  */

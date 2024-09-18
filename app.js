@@ -15,11 +15,12 @@ import { History } from './history';
 import { Landing } from './landing';
 import { breakFeedURIPostOnly, breakPostURL, defineCachedStore, detectProfileURL } from './package';
 import { ShowReadme } from './widgets/show-readme/show-readme';
+import { AtlasComponent } from './atlas';
 
 /** @typedef {ReturnType<typeof defineCachedStore>} DBAccess */
 /** @type {DBAccess} */
 var db;
-const DB_NAME = 'gisting-cache';
+export const DB_NAME = 'gisting-cache';
 
 const DBContext = React.createContext(/** @type {DBAccess} */(/** @type {*} */(null)));
 
@@ -75,6 +76,7 @@ function runApp() {
     [
       { path: '/', Component: Landing },
       { path: '/index.html', Component: Landing },
+      { path: '/atlas', Component: AtlasComponent },
       { path: '/coldsky', Component: ShowReadme },
       { path: '/profile/:handle/post/:post', Component: History },
       { path: '/profile/:handle', Component: History },

@@ -40271,7 +40271,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.59";
+	var version = "0.2.60";
 
 	// @ts-check
 

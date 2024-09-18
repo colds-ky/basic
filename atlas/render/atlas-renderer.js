@@ -7,6 +7,7 @@ import { processNodesToTiles } from './process-nodes-to-tiles';
 import { staticShaderRenderer } from './static-shader-renderer';
 import { renderGeoLabels } from './render-geo-labels';
 import { highlighter } from './highlighter';
+import { BoxGeometry, Mesh, MeshBasicMaterial, MeshPhongMaterial } from 'three';
 
 // import { Map, Set } from 'immutable';
 // import { dynamicShaderRenderer } from './dynamic-shader-renderer';
@@ -167,7 +168,22 @@ export function createAtlasRenderer({
         flashRenderer.mesh.parent?.add(geoLayer.layerGroup);
       }
 
-      // redraw();
+      staticRenderer.updateNodes({ nodes });
+      const now = Date.now();
+      flashRenderer.updateNodes({
+        nodes,
+        getTimes: (n, tm) => {
+          if (Math.random() > 0.9) {
+            tm.start = now - 100;
+            tm.stop = now + 100;
+          }
+        }
+      });
+
+      geoLayer?.updateWithCamera(latestCamera);
+
+      if (latestCamera)
+        redraw(latestCamera);
     }
   }
 

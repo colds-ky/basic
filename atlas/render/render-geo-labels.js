@@ -22,7 +22,7 @@ import { distance2D } from '../coords';
  * }} _
  */
 export function renderGeoLabels({
-  nodes,
+  nodes: currentNodes,
   tiles,
   getKey,
   getPoint,
@@ -33,6 +33,9 @@ export function renderGeoLabels({
   clock,
   includeFixed
 }) {
+
+  currentNodes = currentNodes.slice();
+
   const ANIMATE_LENGTH_SEC = 0.7;
   const FIXED_ANIMATE_LENGTH_SEC = 0.5;
   const FIXED_INTRO_LENGTH_SEC = 0.4;
@@ -86,7 +89,7 @@ export function renderGeoLabels({
 
     if (labelsByKey.get(key)) return;
 
-    const nodeMapped = nodes.find(node => getKey(node) === key);
+    const nodeMapped = currentNodes.find(node => getKey(node) === key);
     if (!nodeMapped) return;
     const point = { x: 0, y: 0, h: 0, weight: 0 };
     getPoint(nodeMapped, point);
@@ -135,7 +138,7 @@ export function renderGeoLabels({
     /** @type {T[]} */
     const largestNodes = [];
 
-    for (const n of nodes) {
+    for (const n of currentNodes) {
       const key = getKey(n);
       if (includeFixedSet.has(key)) {
         fixedNodes.push(n);
