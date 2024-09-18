@@ -40473,7 +40473,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.61";
+	var version = "0.2.62";
 
 	// @ts-check
 
@@ -49140,10 +49140,10 @@ if (cid) {
 	  async function syncRepoWithData(records, now) {
 	    let lastSync = '';
 	    for (const record of records) {
-	      const parsedURI = breakFeedURIPostOnly(record.uri);
-	      if (parsedURI?.postID && parsedURI.postID > lastSync) {
-	        // only consider POSTs, not other feed URIs
-	        if (record.uri.indexOf('app.bsky.feed.like') >= 0) {
+	      if (record.$type === 'app.bsky.feed.like' || record.$type === 'app.bsky.feed.post') {
+	        const parsedURI = breakFeedURI(record.uri);
+	        if (parsedURI?.postID && parsedURI.postID > lastSync) {
+	          // only consider POSTs, not other feed URIs
 	          lastSync = parsedURI.postID;
 	        }
 	      }
@@ -49157,10 +49157,12 @@ if (cid) {
 	    }
 	    await currentBulkUpdate;
 	    await performUpdate();
-	    db.repoSync.put({
-	      shortDID: shortenDID(records[0].repo),
-	      lastSyncRev: lastSync
-	    });
+	    if (lastSync) {
+	      db.repoSync.put({
+	        shortDID: shortenDID(records[0].repo),
+	        lastSyncRev: lastSync
+	      });
+	    }
 	    return compact;
 	  }
 	}

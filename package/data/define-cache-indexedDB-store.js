@@ -2,7 +2,7 @@
 
 import Dexie from 'dexie';
 import { defineStore } from '.';
-import { breakFeedURIPostOnly, breakPostURL, likelyDID, makeFeedUri, shortenDID, shortenHandle } from '../shorten';
+import { breakFeedURI, breakFeedURIPostOnly, breakPostURL, likelyDID, makeFeedUri, shortenDID, shortenHandle } from '../shorten';
 import { createRepoData } from './repo-data';
 import { breakIntoWords, detectWordStartsNormalized } from './capture-records/compact-post-words';
 import Fuse from 'fuse.js';
@@ -484,10 +484,10 @@ export function defineCacheIndexedDBStore(dbName) {
   async function syncRepoWithData(records, now) {
     let lastSync = '';
     for (const record of records) {
-      const parsedURI = breakFeedURIPostOnly(record.uri);
-      if (parsedURI?.postID && parsedURI.postID > lastSync) {
-        // only consider POSTs, not other feed URIs
-        if (record.uri.indexOf('app.bsky.feed.like') >= 0) {
+      if (record.$type === 'app.bsky.feed.like' || record.$type === 'app.bsky.feed.post') {
+        const parsedURI = breakFeedURI(record.uri);
+        if (parsedURI?.postID && parsedURI.postID > lastSync) {
+          // only consider POSTs, not other feed URIs
           lastSync = parsedURI.postID;
         }
       }
@@ -504,7 +504,9 @@ export function defineCacheIndexedDBStore(dbName) {
     await currentBulkUpdate;
     await performUpdate();
 
-    db.repoSync.put({ shortDID: shortenDID(records[0].repo), lastSyncRev: lastSync });
+    if (lastSync) {
+      db.repoSync.put({ shortDID: shortenDID(records[0].repo), lastSyncRev: lastSync });
+    }
 
     return compact;
   }
