@@ -40473,7 +40473,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.62";
+	var version = "0.2.63";
 
 	// @ts-check
 
@@ -50056,22 +50056,15 @@ if (cid) {
 	/**
 	 * @param {{
 	 *  dbName?: string,
-	 *  fetch?: import('@atproto/api').AtpAgentFetchHandler,
 	 *  service?: string
-	 * }} _
+	 * }} [options]
 	 */
 	function defineCachedStore({
 	  dbName,
-	  fetch: fetchOverride,
 	  service
-	}) {
+	} = {}) {
 	  const dbStore = defineCacheIndexedDBStore(dbName);
-
-	  /**
-	   * @type {BskyAgent}
-	   */
 	  const agent = /** @type {*} */new ColdskyAgent({
-	    fetch: fetchOverride,
 	    service: service || BSKY_PUBLIC_URL
 	  });
 	  const agent_getProfile_throttled = throttledAsyncCache(actor => agent.getProfile({

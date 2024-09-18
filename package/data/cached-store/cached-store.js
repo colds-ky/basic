@@ -1,6 +1,6 @@
 // @ts-check
 
-import { BskyAgent } from '@atproto/api';
+import { AtpAgent } from '@atproto/api';
 
 import { BSKY_PUBLIC_URL, ColdskyAgent } from '../../coldsky-agent';
 import { throttledAsyncCache } from '../../throttled-async-cache';
@@ -22,18 +22,13 @@ import { syncRepo } from './sync-repo';
 /**
  * @param {{
  *  dbName?: string,
- *  fetch?: import('@atproto/api').AtpAgentFetchHandler,
  *  service?: string
- * }} _
+ * }} [options]
  */
-export function defineCachedStore({ dbName, fetch: fetchOverride, service }) {
+export function defineCachedStore({ dbName, service } = {}) {
   const dbStore = defineCacheIndexedDBStore(dbName);
 
-  /**
-   * @type {BskyAgent}
-   */
   const agent = /** @type {*} */(new ColdskyAgent({
-    fetch: fetchOverride,
     service: service || BSKY_PUBLIC_URL
   }));
 
