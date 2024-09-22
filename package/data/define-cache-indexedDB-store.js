@@ -60,6 +60,25 @@ export function defineCacheIndexedDBStore(dbName) {
     repoSync: 'shortDID'
   });
 
+  db.version(9).stores({
+    posts: 'uri, shortDID, replyTo, threadStart, *quoting, *words, *likedBy, repostedBy*',
+    profiles: 'shortDID, *handle, *words',
+    repoSync: 'shortDID'
+  }).upgrade(async tr => {
+    await tr.table('repoSync').toCollection().modify(rsync => {
+      // likes were not being captured, so full re-download is required now
+      delete rsync.lastSyncRev;
+    });
+    await tr.table('posts').toCollection().modify(post => {
+      if (post.likeCount)
+        post.likedBy = Array(post.likeCount).fill('?');
+      if (post.repostCount)
+        post.repostedBy = Array(post.repostCount).fill('?');
+
+      delete post.likeCount;
+      delete post.repostCount;
+    });
+  });
 
   const memStore = defineStore({
     post: handlePostUpdate,

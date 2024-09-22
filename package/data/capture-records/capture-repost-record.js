@@ -19,12 +19,19 @@ export function captureRepostRecord(repo, repostRecord, store, intercepts) {
 
   const existingPost = repoData.posts.get(repostRecord.subject.uri);
   if (existingPost) {
-    existingPost.repostCount = (existingPost.repostCount || 0) + 1;
+    if (existingPost.repostedBy) {
+      let lastPlaceholderRepost = existingPost.repostedBy.length;
+      while (lastPlaceholderRepost > 0 && existingPost.repostedBy[lastPlaceholderRepost - 1] === '?')
+        lastPlaceholderRepost--;
+      existingPost.repostedBy[lastPlaceholderRepost] = shortDID;
+    } else {
+      existingPost.repostedBy = [shortDID];
+    }
     intercepts?.post?.(existingPost);
     return existingPost;
   } else {
     const speculativePost = createSpeculativePost(shortDID, repostRecord.subject.uri);
-    speculativePost.repostCount = 1;
+    speculativePost.repostedBy = [shortDID];
     repoData.posts.set(repostRecord.subject.uri, speculativePost);
     intercepts?.post?.(speculativePost);
     return speculativePost;

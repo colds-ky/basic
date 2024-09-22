@@ -85,9 +85,9 @@ async function* getFirehoseThreads(db) {
     }
 
     newThreads.sort((t1, t2) => {
-      const likes1 = (t1.current?.likeCount || 0) + (t1.root?.likeCount || 0);
+      const likes1 = (t1.current?.likedBy?.length || 0) + (t1.root?.likedBy?.length || 0);
 
-      const likes2 = (t2.current?.likeCount || 0) + (t2.root?.likeCount || 0);
+      const likes2 = (t2.current?.likedBy?.length || 0) + (t2.root?.likedBy?.length || 0);
 
       return likes2 - likes1;
     });

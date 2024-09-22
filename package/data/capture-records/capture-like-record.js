@@ -19,12 +19,19 @@ export function captureLikeRecord(repo, likeRecord, store, intercepts) {
 
   const existingPost = repoData.posts.get(likeRecord.subject.uri);
   if (existingPost) {
-    existingPost.likeCount = (existingPost.likeCount || 0) + 1;
+    if (existingPost.likedBy) {
+      let lastPlaceholderLike = existingPost.likedBy.length;
+      while (lastPlaceholderLike > 0 && existingPost.likedBy[lastPlaceholderLike - 1] === '?')
+        lastPlaceholderLike--;
+      existingPost.likedBy[lastPlaceholderLike] = shortDID;
+    } else {
+      existingPost.likedBy = [shortDID];
+    }
     intercepts?.post?.(existingPost);
     return existingPost;
   } else {
     const speculativePost = createSpeculativePost(shortDID, likeRecord.subject.uri);
-    speculativePost.likeCount = 1;
+    speculativePost.likedBy = [shortDID];
     repoData.posts.set(likeRecord.subject.uri, speculativePost);
     intercepts?.post?.(speculativePost);
     return speculativePost;

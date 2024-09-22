@@ -40473,7 +40473,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.65";
+	var version = "0.2.67";
 
 	// @ts-check
 
@@ -48727,9 +48727,9 @@ if (cid) {
 	    threadStart: undefined,
 	    replyTo: undefined,
 	    words: undefined,
-	    repostCount: undefined,
+	    likedBy: undefined,
+	    repostedBy: undefined,
 	    quoting: undefined,
-	    likeCount: undefined,
 	    placeholder: true,
 	    asOf: undefined
 	  };
@@ -48788,6 +48788,22 @@ if (cid) {
 	    posts: 'uri, shortDID, replyTo, threadStart, *quoting, *words',
 	    profiles: 'shortDID, *handle, *words',
 	    repoSync: 'shortDID'
+	  });
+	  db.version(9).stores({
+	    posts: 'uri, shortDID, replyTo, threadStart, *quoting, *words, *likedBy, repostedBy*',
+	    profiles: 'shortDID, *handle, *words',
+	    repoSync: 'shortDID'
+	  }).upgrade(async tr => {
+	    await tr.table('repoSync').toCollection().modify(rsync => {
+	      // likes were not being captured, so full re-download is required now
+	      delete rsync.lastSyncRev;
+	    });
+	    await tr.table('posts').toCollection().modify(post => {
+	      if (post.likeCount) post.likedBy = Array(post.likeCount).fill('?');
+	      if (post.repostCount) post.repostedBy = Array(post.repostCount).fill('?');
+	      delete post.likeCount;
+	      delete post.repostCount;
+	    });
 	  });
 	  const memStore = defineStore({
 	    post: handlePostUpdate,
@@ -50312,12 +50328,18 @@ if (cid) {
 	  if (!repoData) store.set(shortDID, repoData = createRepoData(shortDID));
 	  const existingPost = repoData.posts.get(likeRecord.subject.uri);
 	  if (existingPost) {
-	    existingPost.likeCount = (existingPost.likeCount || 0) + 1;
+	    if (existingPost.likedBy) {
+	      let lastPlaceholderLike = existingPost.likedBy.length;
+	      while (lastPlaceholderLike > 0 && existingPost.likedBy[lastPlaceholderLike - 1] === '?') lastPlaceholderLike--;
+	      existingPost.likedBy[lastPlaceholderLike] = shortDID;
+	    } else {
+	      existingPost.likedBy = [shortDID];
+	    }
 	    intercepts?.post?.(existingPost);
 	    return existingPost;
 	  } else {
 	    const speculativePost = createSpeculativePost(shortDID, likeRecord.subject.uri);
-	    speculativePost.likeCount = 1;
+	    speculativePost.likedBy = [shortDID];
 	    repoData.posts.set(likeRecord.subject.uri, speculativePost);
 	    intercepts?.post?.(speculativePost);
 	    return speculativePost;
@@ -50533,8 +50555,8 @@ if (cid) {
 	    threadStart: record.reply?.root?.uri === uri ? undefined : record.reply?.root?.uri,
 	    replyTo: record.reply?.parent?.uri,
 	    words,
-	    likeCount: undefined,
-	    repostCount: undefined,
+	    likedBy: undefined,
+	    repostedBy: undefined,
 	    quoting,
 	    asOf: Date.parse(record.createdAt) || asOf,
 	    labels: undefined
@@ -50598,8 +50620,8 @@ if (cid) {
 	  if (existingPost && !existingPost.placeholder && typeof existingPost.asOf === 'number' && existingPost.asOf > asOf) return existingPost;
 	  const createdPost = makeCompactPost(repo, uri, postRecord, asOf);
 	  if (existingPost) {
-	    createdPost.likeCount = existingPost.likeCount;
-	    createdPost.repostCount = existingPost.repostCount;
+	    createdPost.likedBy = existingPost.likedBy?.slice();
+	    createdPost.repostedBy = existingPost.repostedBy?.slice();
 	  }
 	  repoData.posts.set(uri, createdPost);
 	  intercepts?.post?.(createdPost);
@@ -50654,12 +50676,18 @@ if (cid) {
 	  if (!repoData) store.set(shortDID, repoData = createRepoData(shortDID));
 	  const existingPost = repoData.posts.get(repostRecord.subject.uri);
 	  if (existingPost) {
-	    existingPost.repostCount = (existingPost.repostCount || 0) + 1;
+	    if (existingPost.repostedBy) {
+	      let lastPlaceholderRepost = existingPost.repostedBy.length;
+	      while (lastPlaceholderRepost > 0 && existingPost.repostedBy[lastPlaceholderRepost - 1] === '?') lastPlaceholderRepost--;
+	      existingPost.repostedBy[lastPlaceholderRepost] = shortDID;
+	    } else {
+	      existingPost.repostedBy = [shortDID];
+	    }
 	    intercepts?.post?.(existingPost);
 	    return existingPost;
 	  } else {
 	    const speculativePost = createSpeculativePost(shortDID, repostRecord.subject.uri);
-	    speculativePost.repostCount = 1;
+	    speculativePost.repostedBy = [shortDID];
 	    repoData.posts.set(repostRecord.subject.uri, speculativePost);
 	    intercepts?.post?.(speculativePost);
 	    return speculativePost;
@@ -50760,10 +50788,30 @@ if (cid) {
 	  captureProfile(postView.author, store, now, intercepts);
 	  const compactPost = capturePostRecord(postView.author.did, postView.uri, /** @type {*} */postView.record, store, now, intercepts);
 	  if (!compactPost) return;
-	  compactPost.likeCount = postView.likeCount;
-	  compactPost.repostCount = postView.repostCount;
+	  compactPost.likedBy = adjustCountWithPlaceholders(postView.likeCount, compactPost.likedBy);
+	  compactPost.repostedBy = adjustCountWithPlaceholders(postView.repostCount, compactPost.repostedBy);
 	  compactPost.labels = capturePostLabels(postView.labels);
 	  return compactPost;
+	}
+
+	/**
+	 * @param {number | undefined} count
+	 * @param {string[] | undefined} array
+	 */
+	function adjustCountWithPlaceholders(count, array) {
+	  if (typeof count !== 'number') return;
+	  if (!array || array.length < count) {
+	    if (!array) array = [];
+	    for (let i = array.length; i < count; i++) {
+	      array.push('?');
+	    }
+	  } else if (array.length > count) {
+	    let setLength = count;
+	    // do not remove non-placeholder likes
+	    while (array[setLength - 1] !== '?') setLength++;
+	    if (setLength < array.length) array.length = setLength;
+	  }
+	  return array;
 	}
 
 	/**
@@ -50946,8 +50994,8 @@ if (cid) {
 	 *  threadStart: string | undefined,
 	 *  replyTo: string | undefined,
 	 *  words: string[] | undefined,
-	 *  likeCount: number | undefined,
-	 *  repostCount: number | undefined,
+	 *  repostedBy: string[] | undefined,
+	 *  likedBy: string[] | undefined,
 	 *  labels: Record<string, string> | undefined,
 	 *  asOf: number | undefined
 	 * }} CompactPost

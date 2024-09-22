@@ -12,8 +12,8 @@
  *  threadStart: string | undefined,
  *  replyTo: string | undefined,
  *  words: string[] | undefined,
- *  likeCount: number | undefined,
- *  repostCount: number | undefined,
+ *  repostedBy: string[] | undefined,
+ *  likedBy: string[] | undefined,
  *  labels: Record<string, string> | undefined,
  *  asOf: number | undefined
  * }} CompactPost
@@ -98,14 +98,14 @@ export function isCompactPost(obj) {
 
 /**
  * @typedef {CompactProfile &
- *  Partial<Omit<import('fuse.js').FuseResult<any>, 'item'>> & {
+ *  Partial<Omit<import('fuse.js').default.FuseResult<any>, 'item'>> & {
  *    searchWords?: string[]
  * }} MatchCompactProfile
  */
 
 /**
  * @typedef {CompactPost &
- *  Partial<Omit<import('fuse.js').FuseResult<any>, 'item'>> & {
+ *  Partial<Omit<import('fuse.js').default.FuseResult<any>, 'item'>> & {
  *    searchWords?: string[]
  * }} MatchCompactPost
  */

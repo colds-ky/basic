@@ -133,11 +133,35 @@ export function capturePostView(postView, store, now, intercepts) {
   );
   if (!compactPost) return;
 
-  compactPost.likeCount = postView.likeCount;
-  compactPost.repostCount = postView.repostCount;
+  compactPost.likedBy = adjustCountWithPlaceholders(postView.likeCount, compactPost.likedBy);
+  compactPost.repostedBy = adjustCountWithPlaceholders(postView.repostCount, compactPost.repostedBy);
+
   compactPost.labels = capturePostLabels(postView.labels);
 
   return compactPost;
+}
+
+/**
+ * @param {number | undefined} count
+ * @param {string[] | undefined} array
+ */
+function adjustCountWithPlaceholders(count, array) {
+  if (typeof count !== 'number') return;
+
+  if (!array || array.length < count) {
+    if (!array) array = [];
+    for (let i = array.length; i < count; i++) {
+      array.push('?');
+    }
+  } else if (array.length > count) {
+    let setLength = count;
+    // do not remove non-placeholder likes
+    while (array[setLength - 1] !== '?') setLength++;
+    if (setLength < array.length)
+      array.length = setLength;
+  }
+
+  return array;
 }
 
 /**

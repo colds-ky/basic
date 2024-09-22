@@ -161,7 +161,7 @@ export function CompletePostContent({
   const [expanded, setExpanded] = React.useState(false);
 
   const replyAvatars = useMemo(() => collectReplyAvatars(replies), [replies]);
-  const notesHeight = (replyAvatars?.length || 0) + (post.likeCount ? 1 : 0);
+  const notesHeight = (replyAvatars?.length || 0) + (post.likedBy?.length ? 1 : 0);
 
   let wholeClassName = className ? 'complete-post-content ' + className : 'complete-post-content';
   if (notesHeight && !expanded) wholeClassName += ' notes-height-' + notesHeight;
@@ -207,7 +207,7 @@ export function CompletePostContent({
         <div className='post-likes'>
           <span className='tiny-text-for-copy-paste'>
             {
-              !post.likeCount ? undefined :
+              !post.likedBy?.length ? undefined :
                 localise(
                   'likes: ',
                   { uk: 'вподобайки: ' }
@@ -215,18 +215,18 @@ export function CompletePostContent({
             }
           </span>
           {
-            !post?.likeCount || post.likeCount === 1 ? undefined :
+            !post?.likedBy?.length || post.likedBy?.length === 1 ? undefined :
                 (
                   post.embeds?.length ?
                     <div className='post-like-count'>
-                      {post.likeCount.toLocaleString()}
+                      {post.likedBy?.length.toLocaleString()}
                     </div> :
                     <span className='post-like-count'>
-                      {post.likeCount.toLocaleString()}
+                      {post.likedBy?.length.toLocaleString()}
                     </span>
                 )
           }
-          <FavoriteBorder className={post.likeCount ? 'heart-icon heart-icon-with-likes' : 'heart-icon heart-icon-no-likes'} />
+          <FavoriteBorder className={post.likedBy?.length ? 'heart-icon heart-icon-with-likes' : 'heart-icon heart-icon-no-likes'} />
         </div>
       </div>
       {

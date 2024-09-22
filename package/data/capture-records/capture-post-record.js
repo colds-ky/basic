@@ -36,8 +36,8 @@ export function capturePostRecord(repo, uri, postRecord, store, asOf, intercepts
   const createdPost = makeCompactPost(repo, uri, postRecord, asOf);
 
   if (existingPost) {
-    createdPost.likeCount = existingPost.likeCount;
-    createdPost.repostCount = existingPost.repostCount;
+    createdPost.likedBy = existingPost.likedBy?.slice();
+    createdPost.repostedBy = existingPost.repostedBy?.slice();
   }
 
   repoData.posts.set(uri, createdPost);

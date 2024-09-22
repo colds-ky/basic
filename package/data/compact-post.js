@@ -52,8 +52,8 @@ export function makeCompactPost(repo, uri, record, asOf) {
     threadStart: record.reply?.root?.uri === uri ? undefined : record.reply?.root?.uri,
     replyTo: record.reply?.parent?.uri,
     words,
-    likeCount: undefined,
-    repostCount: undefined,
+    likedBy: undefined,
+    repostedBy: undefined,
     quoting,
     asOf: Date.parse(record.createdAt) || asOf,
     labels: undefined

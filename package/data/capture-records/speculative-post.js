@@ -15,9 +15,9 @@ export function createSpeculativePost(shortDID, uri) {
     threadStart: undefined,
     replyTo: undefined,
     words: undefined,
-    repostCount: undefined,
+    likedBy: undefined,
+    repostedBy: undefined,
     quoting: undefined,
-    likeCount: undefined,
     placeholder: true,
     asOf: undefined
   };

@@ -113,7 +113,7 @@ export function threadStructure(thread, isSignificantPost) {
    * @param {import('../../package').CompactPost} post 
    */
   function initialInterestWeight(post) {
-    return post.likeCount || 1;
+    return post.likedBy?.length || 1;
   }
 
   /**
