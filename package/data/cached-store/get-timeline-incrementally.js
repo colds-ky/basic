@@ -8,10 +8,12 @@ import { searchAccountHistoryPostsIncrementally } from './search-posts-increment
  * @typedef {{
  *  shortDID: string | null | undefined,
  *  searchQuery: string | null | undefined,
+ * likesAndReposts?: boolean | undefined,
  *  agent_getProfile_throttled: (did) => ReturnType<import('@atproto/api').BskyAgent['getProfile']>,
  *  agent_resolveHandle_throttled: (handle) => ReturnType<import('@atproto/api').BskyAgent['resolveHandle']>,
  *  agent_searchPosts_throttled: import('./search-posts-incrementally').Args['agent_searchPosts_throttled'],
  *  agent_getPostThread_throttled: (uri) => ReturnType<import('@atproto/api').BskyAgent['getPostThread']>,
+ *  agent_getRepoRecord_throttled: (repo, rkey, collection) => ReturnType<import('@atproto/api').BskyAgent['com']['atproto']['repo']['getRecord']>,
  *  dbStore: ReturnType<typeof import('../define-cache-indexedDB-store').defineCacheIndexedDBStore>
  * }} Args
  */
@@ -21,7 +23,7 @@ import { searchAccountHistoryPostsIncrementally } from './search-posts-increment
  * @returns {AsyncGenerator<import('.').IncrementalMatchThreadResult>}
  */
 export async function* getTimelineIncrementally(args) {
-  const { shortDID, searchQuery } = args;
+  const { shortDID, searchQuery, likesAndReposts } = args;
   const enrichPostToThreadParallel = throttledAsyncCache(
   /**
    * @param {string} uri
@@ -48,7 +50,9 @@ export async function* getTimelineIncrementally(args) {
 
   const searchPostIterator = searchAccountHistoryPostsIncrementally({
     ...args,
-    shortDID, searchQuery,
+    shortDID,
+    searchQuery,
+    likesAndReposts
   });
 
   for await (const entries of searchPostIterator) {

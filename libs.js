@@ -49000,9 +49000,11 @@ if (cid) {
 	  /**
 	   * @param {string | null | undefined} did
 	   * @param {string | null | undefined} text
+	   * @param {boolean} [likesAndReposts]
+	   * @param {{ add(uri: string): void }} [missingLikesAndReposts]
 	   * @returns {Promise<import('.').MatchCompactPost[]>}
 	   */
-	  async function searchPosts(did, text) {
+	  async function searchPosts(did, text, likesAndReposts, missingLikesAndReposts) {
 	    const wordStarts = detectWordStartsNormalized(text, undefined);
 	    if (!wordStarts?.length && !did) return [];
 	    const words = breakIntoWords(text || '');
@@ -49014,10 +49016,28 @@ if (cid) {
 	    const map = new Map();
 
 	    // search by both shortDID and words
-	    const dbPosts = !shortDID ? await db.posts.where('words').anyOf(wordStarts || []).toArray() : !wordStarts?.length ? await db.posts.where('shortDID').equals(shortDID).toArray() : await db.posts.where('shortDID').equals(shortDID).and(post => !!post.words && post.words.some(wordMatcher)).toArray();
+	    const dbPostsQuery = !shortDID ? db.posts.where('words').anyOf(wordStarts || []) : !wordStarts?.length ? db.posts.where('shortDID').equals(shortDID) : db.posts.where('shortDID').equals(shortDID).and(post => !!post.words && post.words.some(wordMatcher));
+	    const likesQuery = !likesAndReposts || !shortDID || !wordStarts?.length ? undefined : db.posts.where('likedBy').anyOf([shortDID]).and(post => !!post.words && post.words.some(wordMatcher) || !!missingLikesAndReposts && !!post.placeholder);
+	    const repostsQuery = !likesAndReposts || !shortDID || !wordStarts?.length ? undefined : db.posts.where('repostedBy').anyOf([shortDID]).and(post => !!post.words && post.words.some(wordMatcher) || !!missingLikesAndReposts && !!post.placeholder);
+	    const dbPostsPromise = dbPostsQuery.toArray();
+	    const likesPromise = likesQuery?.toArray();
+	    const repostsPromise = repostsQuery?.toArray();
+	    const dbPosts = await dbPostsPromise;
+	    const likes = await likesPromise;
+	    const reposts = await repostsPromise;
 	    const allPostsForShortDIDPromise = !shortDID ? undefined : db.posts.where('shortDID').equals(shortDID).count();
 	    for (const post of dbPosts) {
 	      map.set(post.uri, post);
+	    }
+	    if (likes) {
+	      for (const post of likes) {
+	        if (post.placeholder) missingLikesAndReposts?.add(post.uri);else map.set(post.uri, post);
+	      }
+	    }
+	    if (reposts) {
+	      for (const post of reposts) {
+	        if (post.placeholder) missingLikesAndReposts?.add(post.uri);else map.set(post.uri, post);
+	      }
 	    }
 	    for (const uncachedPost of outstandingPostUpdatesInProgressByURI.values()) {
 	      if (shortDID && uncachedPost.shortDID !== shortDID) continue;
@@ -49594,9 +49614,11 @@ if (cid) {
 	 * @typedef {{
 	 *  shortDID: string | null | undefined,
 	 *  searchQuery: string | null | undefined,
+	 *  likesAndReposts?: boolean | undefined,
 	 *  agent_getProfile_throttled: (did) => ReturnType<import('@atproto/api').BskyAgent['getProfile']>,
 	 *  agent_resolveHandle_throttled: (handle) => ReturnType<import('@atproto/api').BskyAgent['resolveHandle']>,
 	 *  agent_searchPosts_throttled: (q: string, limit: number | undefined, sort: string | undefined, cursor?: string) => ReturnType<import('@atproto/api').BskyAgent['app']['bsky']['feed']['searchPosts']>,
+	 *  agent_getRepoRecord_throttled: (repo, rkey, collection) => ReturnType<import('@atproto/api').BskyAgent['com']['atproto']['repo']['getRecord']>,
 	 *  dbStore: ReturnType<typeof import('../define-cache-indexedDB-store').defineCacheIndexedDBStore>
 	 * }} Args
 	 */
@@ -49626,12 +49648,15 @@ if (cid) {
 	  const {
 	    shortDID,
 	    searchQuery,
+	    likesAndReposts,
 	    dbStore,
 	    agent_searchPosts_throttled
 	  } = args;
 	  let REPORT_UPDATES_FREQUENCY_MSEC = 700;
-	  const cachedMatchesPromise = dbStore.searchPosts(shortDID, searchQuery);
-	  const allCachedHistoryPromise = !searchQuery ? cachedMatchesPromise : dbStore.searchPosts(shortDID, undefined);
+	  const cachedMatchesPromise = dbStore.searchPosts(shortDID, searchQuery, likesAndReposts);
+	  /** @type {Set<string> | undefined} */
+	  const missingLikesAndReposts = !likesAndReposts ? undefined : new Set();
+	  const allCachedHistoryPromise = !searchQuery ? cachedMatchesPromise : dbStore.searchPosts(shortDID, undefined, likesAndReposts, missingLikesAndReposts);
 	  const plcDirHistoryPromise = plcDirectoryHistoryRaw(/** @type {string} */shortDID);
 	  let lastSearchReport = 0;
 	  /** @type {import('..').CompactPost[] | undefined}  */
@@ -49699,13 +49724,30 @@ if (cid) {
 	      fullRepoIndexed = true;
 	    }
 	  });
+
+	  /** @type {ReturnType<typeof getPostOnly>[]} */
+	  let queuedMissingLikesAndReposts = [];
+	  const addMissingLikesAndRepostsToTheQueue = () => {
+	    if (missingLikesAndReposts && missingLikesAndReposts.size > queuedMissingLikesAndReposts.length) {
+	      const arr = [...missingLikesAndReposts];
+	      for (let i = queuedMissingLikesAndReposts.length; i < arr.length; i++) {
+	        const uri = arr[i];
+	        queuedMissingLikesAndReposts[i] = getPostOnly({
+	          uri,
+	          dbStore,
+	          agent_getRepoRecord_throttled: args.agent_getRepoRecord_throttled
+	        });
+	      }
+	    }
+	  };
 	  for await (const searchResult of parallelSearch) {
 	    if (searchResult) {
 	      if (!processedBatch) processedBatch = searchResult;else processedBatch = processedBatch.concat(searchResult);
 	    }
 	    if (Date.now() - lastSearchReport > REPORT_UPDATES_FREQUENCY_MSEC) {
 	      /** @type {import('.').IncrementalMatchCompactPosts} */
-	      const newMatches = await dbStore.searchPosts(shortDID, searchQuery);
+	      const newMatches = await dbStore.searchPosts(shortDID, searchQuery, likesAndReposts, missingLikesAndReposts);
+	      addMissingLikesAndRepostsToTheQueue();
 	      lastMatches = newMatches;
 	      lastSearchReport = Date.now();
 	      newMatches.processedBatch = processedBatch;
@@ -49715,9 +49757,13 @@ if (cid) {
 	      lastSearchReport = Date.now();
 	    }
 	  }
+	  if (queuedMissingLikesAndReposts.length) {
+	    await Promise.all(queuedMissingLikesAndReposts);
+	  }
 
 	  /** @type {import('.').IncrementalMatchCompactPosts} */
-	  const finalMatches = await dbStore.searchPosts(shortDID, searchQuery);
+	  const finalMatches = await dbStore.searchPosts(shortDID, searchQuery, likesAndReposts, missingLikesAndReposts);
+	  addMissingLikesAndRepostsToTheQueue();
 	  finalMatches.processedBatch = processedBatch;
 	  if (!finalMatches.processedAllCount) finalMatches.processedAllCount = knownHistoryUri.size;
 	  processedBatch = undefined;
@@ -49815,10 +49861,12 @@ if (cid) {
 	 * @typedef {{
 	 *  shortDID: string | null | undefined,
 	 *  searchQuery: string | null | undefined,
+	 * likesAndReposts?: boolean | undefined,
 	 *  agent_getProfile_throttled: (did) => ReturnType<import('@atproto/api').BskyAgent['getProfile']>,
 	 *  agent_resolveHandle_throttled: (handle) => ReturnType<import('@atproto/api').BskyAgent['resolveHandle']>,
 	 *  agent_searchPosts_throttled: import('./search-posts-incrementally').Args['agent_searchPosts_throttled'],
 	 *  agent_getPostThread_throttled: (uri) => ReturnType<import('@atproto/api').BskyAgent['getPostThread']>,
+	 *  agent_getRepoRecord_throttled: (repo, rkey, collection) => ReturnType<import('@atproto/api').BskyAgent['com']['atproto']['repo']['getRecord']>,
 	 *  dbStore: ReturnType<typeof import('../define-cache-indexedDB-store').defineCacheIndexedDBStore>
 	 * }} Args
 	 */
@@ -49830,7 +49878,8 @@ if (cid) {
 	async function* getTimelineIncrementally(args) {
 	  const {
 	    shortDID,
-	    searchQuery
+	    searchQuery,
+	    likesAndReposts
 	  } = args;
 	  const enrichPostToThreadParallel = throttledAsyncCache(
 	  /**
@@ -49860,7 +49909,8 @@ if (cid) {
 	  const searchPostIterator = searchAccountHistoryPostsIncrementally({
 	    ...args,
 	    shortDID,
-	    searchQuery
+	    searchQuery,
+	    likesAndReposts
 	  });
 	  for await (const entries of searchPostIterator) {
 	    // start enriching posts to threads from the most recent
@@ -50138,14 +50188,17 @@ if (cid) {
 	    /**
 	     * @param {string | null | undefined} shortDID
 	     * @param {string | null | undefined} searchQuery
+	     * @param {boolean} [likesAndReposts]
 	     */
-	    searchPostsIncrementally: (shortDID, searchQuery) => searchPostsIncrementally({
+	    searchPostsIncrementally: (shortDID, searchQuery, likesAndReposts) => searchPostsIncrementally({
 	      shortDID,
 	      searchQuery,
+	      likesAndReposts,
 	      dbStore,
 	      agent_getProfile_throttled,
 	      agent_resolveHandle_throttled,
-	      agent_searchPosts_throttled
+	      agent_searchPosts_throttled,
+	      agent_getRepoRecord_throttled
 	    }),
 	    searchProfilesIncrementally: (searchQuery, max) => searchProfilesIncrementally({
 	      searchQuery,
@@ -50157,15 +50210,18 @@ if (cid) {
 	    /**
 	     * @param {string | null | undefined} shortDID
 	     * @param {string | null | undefined} searchQuery
+	     * @param {boolean} [likesAndReposts]
 	     */
-	    getTimelineIncrementally: (shortDID, searchQuery) => getTimelineIncrementally({
+	    getTimelineIncrementally: (shortDID, searchQuery, likesAndReposts) => getTimelineIncrementally({
 	      shortDID,
 	      searchQuery,
+	      likesAndReposts,
 	      dbStore,
 	      agent_getProfile_throttled,
 	      agent_resolveHandle_throttled,
 	      agent_getPostThread_throttled,
-	      agent_searchPosts_throttled
+	      agent_searchPosts_throttled,
+	      agent_getRepoRecord_throttled
 	    }),
 	    syncRepo: shortDID => syncRepo({
 	      shortDID,
@@ -50329,9 +50385,11 @@ if (cid) {
 	  const existingPost = repoData.posts.get(likeRecord.subject.uri);
 	  if (existingPost) {
 	    if (existingPost.likedBy) {
-	      let lastPlaceholderLike = existingPost.likedBy.length;
-	      while (lastPlaceholderLike > 0 && existingPost.likedBy[lastPlaceholderLike - 1] === '?') lastPlaceholderLike--;
-	      existingPost.likedBy[lastPlaceholderLike] = shortDID;
+	      if (!existingPost.likedBy.includes(shortDID)) {
+	        let lastPlaceholderLike = existingPost.likedBy.length;
+	        while (lastPlaceholderLike > 0 && existingPost.likedBy[lastPlaceholderLike - 1] === '?') lastPlaceholderLike--;
+	        existingPost.likedBy[lastPlaceholderLike] = shortDID;
+	      }
 	    } else {
 	      existingPost.likedBy = [shortDID];
 	    }
@@ -50677,9 +50735,11 @@ if (cid) {
 	  const existingPost = repoData.posts.get(repostRecord.subject.uri);
 	  if (existingPost) {
 	    if (existingPost.repostedBy) {
-	      let lastPlaceholderRepost = existingPost.repostedBy.length;
-	      while (lastPlaceholderRepost > 0 && existingPost.repostedBy[lastPlaceholderRepost - 1] === '?') lastPlaceholderRepost--;
-	      existingPost.repostedBy[lastPlaceholderRepost] = shortDID;
+	      if (!existingPost.repostedBy.includes(shortDID)) {
+	        let lastPlaceholderRepost = existingPost.repostedBy.length;
+	        while (lastPlaceholderRepost > 0 && existingPost.repostedBy[lastPlaceholderRepost - 1] === '?') lastPlaceholderRepost--;
+	        existingPost.repostedBy[lastPlaceholderRepost] = shortDID;
+	      }
 	    } else {
 	      existingPost.repostedBy = [shortDID];
 	    }

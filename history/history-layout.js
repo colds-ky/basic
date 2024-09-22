@@ -1,5 +1,7 @@
 // @ts-check
 
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import SearchIcon from '@mui/icons-material/Search';
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -14,7 +16,7 @@ import './history-layout.css';
  *  className?: string,
  *  profile: import('../package').CompactProfile & { placeholder?: boolean },
  *  hideSearch?: boolean,
- *  onSearchQueryChanged?: (searchText: string) => void,
+ *  onSearchQueryChanged?: (searchText: string, likesAndReposts: boolean) => void,
  *  onSlashCommand?: (command: string) => void,
  *  children?: React.ReactNode,
  * }} Props
@@ -33,24 +35,40 @@ export function HistoryLayout({
 
   const [searchParams, setSearchParams] = useSearchParams();
   const searchText = searchParams.get('q') || '';
+  const searchWith = searchParams.get('with');
+  const searchLikesAndReposts = /likes/i.test(searchWith || '');
 
+  /**
+   * @param {{
+   *  searchText?: string,
+   *  likesAndReposts?: boolean
+   * }} values
+   */
+  const updateSearchParams = (values) => {
+    /** @type {Record<string, string>} */
+    const params = {};
+    const forSearchText = 'searchText' in values ? values.searchText : searchText;
+    const forLikesAndReposts = 'likesAndReposts' in values ? values.likesAndReposts : searchLikesAndReposts;
+    if (forSearchText) params.q = forSearchText;
+    if (forLikesAndReposts) params.with = 'likes';
+    setSearchParams(params, { replace: !searchText });
+  };
+  
   const showSearch = forceShowSearch || !!searchText;
 
   if (searchText !== timeout.searchText) {
     clearTimeout(timeout.timeout);
     timeout.searchText = searchText;
     if (!/\S/.test(searchText)) {
-      console.log('setSearchParams', searchText, { replace: !searchText });
-      setSearchParams({}, { replace: !searchText });
-      onSearchQueryChanged?.('');
+      updateSearchParams({ searchText: '' });
+      onSearchQueryChanged?.('', searchLikesAndReposts);
       return;
     }
 
     timeout.timeout = /** @type {*} */(setTimeout(async () => {
       timeout.timeout = 0;
-      console.log('setSearchParams', searchText, { replace: !!searchText });
-      setSearchParams({ q: searchText }, { replace: !!searchText });
-      onSearchQueryChanged?.(searchText);
+      updateSearchParams({ searchText });
+      onSearchQueryChanged?.(searchText, searchLikesAndReposts);
     }, 400));
   }
 
@@ -91,18 +109,18 @@ export function HistoryLayout({
 
       {
         hideSearch ? undefined :
-        <div className={
-          showSearch ?
-            'history-search-bar history-search-bar-expanded' :
-            'history-search-bar history-search-bar-collapsed'}>
-          {
-            !showSearch ? undefined :
-              <input
+          <div className={
+            showSearch ?
+              'history-search-bar history-search-bar-expanded' :
+              'history-search-bar history-search-bar-collapsed'}>
+            {
+              !showSearch ? undefined :
+                <input
                   id='history-search-input'
                   value={searchText}
                   onChange={e => {
                     const newSearchText = e.target.value;
-                    setSearchParams({ q: newSearchText }, { replace: !!searchText === !!newSearchText });
+                    updateSearchParams({ searchText: newSearchText });
                   }}
                   onKeyDown={e => {
                     if (e.key === 'Enter' || e.keyCode === 13) {
@@ -111,22 +129,38 @@ export function HistoryLayout({
                         onSlashCommand?.(searchText);
                     }
                   }}
-              />
-          }
-          <SearchIcon className='history-search-icon' onClick={() => {
-            setForceShowSearch(true);
-            setTimeout(() => {
-              const input = /** @type {HTMLInputElement} */(document.getElementById('history-search-input'));
-              input?.focus();
-              if (input) {
-                input.select();
-                input.onblur = () => {
-                  setForceShowSearch(false);
-                };
-              }
-            }, 1);
-          }} />
-        </div>
+                />
+            }
+            {
+              searchLikesAndReposts ?
+                <FavoriteIcon className='history-search-likes-and-reposts-icon history-search-likes-and-reposts-icon-with-likes-and-reposts'
+                  onClick={() => {
+                    updateSearchParams({ likesAndReposts: false });
+                    if (searchText)
+                      onSearchQueryChanged?.(searchText, false);
+                  }} /> :
+                <FavoriteBorderIcon className='history-search-likes-and-reposts-icon history-search-likes-and-reposts-icon-no-likes-and-reposts'
+                  onClick={() => {
+                    updateSearchParams({ likesAndReposts: true });
+                    if (searchText)
+                      onSearchQueryChanged?.(searchText, true);
+                  }} />
+            }
+            <SearchIcon className='history-search-icon'
+              onClick={() => {
+                setForceShowSearch(true);
+                setTimeout(() => {
+                  const input = /** @type {HTMLInputElement} */(document.getElementById('history-search-input'));
+                  input?.focus();
+                  if (input) {
+                    input.select();
+                    input.onblur = () => {
+                      setForceShowSearch(false);
+                    };
+                  }
+                }, 1);
+              }} />
+          </div>
       }
 
       <PreFormatted

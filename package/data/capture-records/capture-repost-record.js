@@ -20,10 +20,12 @@ export function captureRepostRecord(repo, repostRecord, store, intercepts) {
   const existingPost = repoData.posts.get(repostRecord.subject.uri);
   if (existingPost) {
     if (existingPost.repostedBy) {
-      let lastPlaceholderRepost = existingPost.repostedBy.length;
-      while (lastPlaceholderRepost > 0 && existingPost.repostedBy[lastPlaceholderRepost - 1] === '?')
-        lastPlaceholderRepost--;
-      existingPost.repostedBy[lastPlaceholderRepost] = shortDID;
+      if (!existingPost.repostedBy.includes(shortDID)) {
+        let lastPlaceholderRepost = existingPost.repostedBy.length;
+        while (lastPlaceholderRepost > 0 && existingPost.repostedBy[lastPlaceholderRepost - 1] === '?')
+          lastPlaceholderRepost--;
+        existingPost.repostedBy[lastPlaceholderRepost] = shortDID;
+      }
     } else {
       existingPost.repostedBy = [shortDID];
     }

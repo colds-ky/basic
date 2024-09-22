@@ -4,18 +4,18 @@ import { FavoriteBorder } from '@mui/icons-material';
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
-import { breakFeedURIPostOnly, breakPostURL } from '../../package';
+import { useDB } from '../../app';
 import { forAwait } from '../../app-shared/forAwait';
 import { localise } from '../../app-shared/localise';
+import { breakFeedURIPostOnly, breakPostURL } from '../../package';
 import { AccountChip } from '../account/account-chip';
 import { PostEmbedsSection } from './embedded';
 import { PostTextContent } from './post-text-content';
 import { PostTimestamp } from './post-timestamp';
 import { PostTopLine } from './post-top-line';
+import { ThreadNestedChildren } from './thread-nested-children';
 
 import './post.css';
-import { ThreadNestedChildren } from './thread-nested-children';
-import { useDB } from '../../app';
 
 /**
  * @typedef {import('../../package').MatchCompactPost} MatchCompactPost

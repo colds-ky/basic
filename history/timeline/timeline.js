@@ -18,15 +18,16 @@ const EXPAND_VISIBLE_POSTS = 14;
  * @param {{
  *  shortDID: string,
  *  searchQuery?: string,
+ *  likesAndReposts?: boolean
  * }} _
  */
-export function Timeline({ shortDID, searchQuery }) {
+export function Timeline({ shortDID, searchQuery, likesAndReposts }) {
   const db = useDB();
   const [maxPosts, setMaxPosts] = useState(INITIAL_VISIBLE_POSTS);
 
   const [retrieved, searchMore] = useForAwait(
     shortDID + '\n' + searchQuery,
-    () => db.getTimelineIncrementally(shortDID, searchQuery));
+    () => db.getTimelineIncrementally(shortDID, searchQuery, likesAndReposts));
 
   const [largerMarkerVisible, setLargerMarkerVisible] = useState(!!(retrieved?.length));
   const [buttonMarkerVisbile, setButtonMarkerVisible] = useState(!!(retrieved?.length));
@@ -80,14 +81,18 @@ export function Timeline({ shortDID, searchQuery }) {
       }
       {
         visiblePosts.map((thread, i) => (
-            <ThreadView
-              key={i}
-              thread={thread}
-              significantPost={post => searchQuery ? !!post.matches?.length : post.shortDID === shortDID}
-              linkTimestamp
-              linkAuthor
-            />
-          ))
+          <ThreadView
+            key={i}
+            thread={thread}
+            significantPost={post =>
+              post.likedBy?.includes(shortDID) ||
+                post.repostedBy?.includes(shortDID) ||
+                searchQuery ? !!post.matches?.length :
+                post.shortDID === shortDID}
+            linkTimestamp
+            linkAuthor
+          />
+        ))
       }
       <Visible
         onVisible={() => {

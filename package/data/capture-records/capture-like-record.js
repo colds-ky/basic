@@ -20,10 +20,12 @@ export function captureLikeRecord(repo, likeRecord, store, intercepts) {
   const existingPost = repoData.posts.get(likeRecord.subject.uri);
   if (existingPost) {
     if (existingPost.likedBy) {
-      let lastPlaceholderLike = existingPost.likedBy.length;
-      while (lastPlaceholderLike > 0 && existingPost.likedBy[lastPlaceholderLike - 1] === '?')
-        lastPlaceholderLike--;
-      existingPost.likedBy[lastPlaceholderLike] = shortDID;
+      if (!existingPost.likedBy.includes(shortDID)) {
+        let lastPlaceholderLike = existingPost.likedBy.length;
+        while (lastPlaceholderLike > 0 && existingPost.likedBy[lastPlaceholderLike - 1] === '?')
+          lastPlaceholderLike--;
+        existingPost.likedBy[lastPlaceholderLike] = shortDID;
+      }
     } else {
       existingPost.likedBy = [shortDID];
     }

@@ -759,7 +759,7 @@ a.account-label.account-handle {
   width: 100%;
   z-index: 5;
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
 }
 .history-layout .history-search-bar .history-search-icon {
   color: #a07c22;
@@ -771,12 +771,24 @@ a.account-label.account-handle {
   border: solid 1px #e7ddb5;
   box-shadow: 0.05em 0.07em 0.15em #0000001a;
 }
-.history-layout .history-search-bar-expanded .history-search-icon {
+.history-layout .history-search-bar .history-search-likes-and-reposts-icon {
+  display: none;
+}
+.history-layout .history-search-bar-expanded .history-search-icon,
+.history-layout .history-search-bar-expanded .history-search-likes-and-reposts-icon {
   background: transparent;
   color: white;
   box-shadow: none;
   border: none;
   filter: drop-shadow(1px 2px 2px #a77d00);
+}
+.history-layout .history-search-bar-expanded .history-search-likes-and-reposts-icon {
+  cursor: pointer;
+  display: block;
+  font-size: 100%;
+  opacity: 0.6;
+  margin-right: 0.5em;
+  margin-bottom: 0.1em;
 }
 .history-layout .history-search-bar #history-search-input {
   border: none;

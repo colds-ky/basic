@@ -6,15 +6,18 @@ import { ColdskyAgent } from '../../coldsky-agent';
 import { plcDirectoryHistoryRaw } from '../../plc-directory';
 import { unwrapShortDID, unwrapShortHandle } from '../../shorten';
 import { breakIntoWords } from '../capture-records/compact-post-words';
+import { getPostOnly } from './get-post-only';
 import { syncRepo } from './sync-repo';
 
 /**
  * @typedef {{
  *  shortDID: string | null | undefined,
  *  searchQuery: string | null | undefined,
+ *  likesAndReposts?: boolean | undefined,
  *  agent_getProfile_throttled: (did) => ReturnType<import('@atproto/api').BskyAgent['getProfile']>,
  *  agent_resolveHandle_throttled: (handle) => ReturnType<import('@atproto/api').BskyAgent['resolveHandle']>,
  *  agent_searchPosts_throttled: (q: string, limit: number | undefined, sort: string | undefined, cursor?: string) => ReturnType<import('@atproto/api').BskyAgent['app']['bsky']['feed']['searchPosts']>,
+ *  agent_getRepoRecord_throttled: (repo, rkey, collection) => ReturnType<import('@atproto/api').BskyAgent['com']['atproto']['repo']['getRecord']>,
  *  dbStore: ReturnType<typeof import('../define-cache-indexedDB-store').defineCacheIndexedDBStore>
  * }} Args
  */
@@ -38,13 +41,15 @@ export function searchPostsIncrementally(args) {
  * @param {Args} args
  */
 export async function* searchAccountHistoryPostsIncrementally(args) {
-  const { shortDID, searchQuery, dbStore, agent_searchPosts_throttled } = args;
+  const { shortDID, searchQuery, likesAndReposts, dbStore, agent_searchPosts_throttled } = args;
 
   let REPORT_UPDATES_FREQUENCY_MSEC = 700;
 
-  const cachedMatchesPromise = dbStore.searchPosts(shortDID, searchQuery);
+  const cachedMatchesPromise = dbStore.searchPosts(shortDID, searchQuery, likesAndReposts);
+  /** @type {Set<string> | undefined} */
+  const missingLikesAndReposts = !likesAndReposts ? undefined : new Set();
   const allCachedHistoryPromise = !searchQuery ? cachedMatchesPromise :
-    dbStore.searchPosts(shortDID, undefined);
+    dbStore.searchPosts(shortDID, undefined, likesAndReposts, missingLikesAndReposts);
 
   const plcDirHistoryPromise = plcDirectoryHistoryRaw(/** @type {string} */(shortDID));
 
@@ -138,6 +143,22 @@ export async function* searchAccountHistoryPostsIncrementally(args) {
         fullRepoIndexed = true;
       }
     });
+  
+  /** @type {ReturnType<typeof getPostOnly>[]} */
+  let queuedMissingLikesAndReposts = [];
+  const addMissingLikesAndRepostsToTheQueue = () => {
+    if (missingLikesAndReposts && missingLikesAndReposts.size > queuedMissingLikesAndReposts.length) {
+      const arr = [...missingLikesAndReposts];
+      for (let i = queuedMissingLikesAndReposts.length; i < arr.length; i++) {
+        const uri = arr[i];
+        queuedMissingLikesAndReposts[i] = getPostOnly({
+          uri,
+          dbStore,
+          agent_getRepoRecord_throttled: args.agent_getRepoRecord_throttled
+        });
+      }
+    }
+  };
 
   for await (const searchResult of parallelSearch) {
     if (searchResult) {
@@ -146,9 +167,10 @@ export async function* searchAccountHistoryPostsIncrementally(args) {
     }
 
     if (Date.now() - lastSearchReport > REPORT_UPDATES_FREQUENCY_MSEC) {
-
       /** @type {import('.').IncrementalMatchCompactPosts} */
-      const newMatches = await dbStore.searchPosts(shortDID, searchQuery);
+      const newMatches = await dbStore.searchPosts(shortDID, searchQuery, likesAndReposts, missingLikesAndReposts);
+      addMissingLikesAndRepostsToTheQueue();
+
       lastMatches = newMatches;
       lastSearchReport = Date.now();
       anyUpdates = false;
@@ -162,8 +184,13 @@ export async function* searchAccountHistoryPostsIncrementally(args) {
     }
   }
 
+  if (queuedMissingLikesAndReposts.length) {
+    await Promise.all(queuedMissingLikesAndReposts);
+  }
+
   /** @type {import('.').IncrementalMatchCompactPosts} */
-  const finalMatches = await dbStore.searchPosts(shortDID, searchQuery);
+  const finalMatches = await dbStore.searchPosts(shortDID, searchQuery, likesAndReposts, missingLikesAndReposts);
+  addMissingLikesAndRepostsToTheQueue();
   finalMatches.processedBatch = processedBatch;
   if (!finalMatches.processedAllCount)
     finalMatches.processedAllCount = knownHistoryUri.size;

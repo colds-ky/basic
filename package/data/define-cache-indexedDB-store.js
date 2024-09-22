@@ -315,9 +315,11 @@ export function defineCacheIndexedDBStore(dbName) {
   /**
    * @param {string | null | undefined} did
    * @param {string | null | undefined} text
+   * @param {boolean} [likesAndReposts]
+   * @param {{ add(uri: string): void }} [missingLikesAndReposts]
    * @returns {Promise<import('.').MatchCompactPost[]>}
    */
-  async function searchPosts(did, text) {
+  async function searchPosts(did, text, likesAndReposts, missingLikesAndReposts) {
     const wordStarts = detectWordStartsNormalized(text, undefined);
     if (!wordStarts?.length && !did) return [];
 
@@ -333,19 +335,50 @@ export function defineCacheIndexedDBStore(dbName) {
     const map = new Map();
 
     // search by both shortDID and words
-    const dbPosts =
+    const dbPostsQuery =
       !shortDID ?
-        await db.posts.where('words').anyOf(wordStarts || []).toArray() :
+        db.posts.where('words').anyOf(wordStarts || []) :
         !wordStarts?.length ?
-          await db.posts.where('shortDID').equals(shortDID).toArray() :
-          await db.posts.where('shortDID').equals(shortDID).and(
-            post => !!post.words && post.words.some(wordMatcher)).toArray();
+          db.posts.where('shortDID').equals(shortDID) :
+          db.posts.where('shortDID').equals(shortDID).and(
+            post => !!post.words && post.words.some(wordMatcher));
+    
+    const likesQuery = !likesAndReposts || !shortDID || !wordStarts?.length ? undefined :
+      db.posts.where('likedBy').anyOf([shortDID]).and(
+        post => !!post.words && post.words.some(wordMatcher) ||
+          !!missingLikesAndReposts && !!post.placeholder);
+
+    const repostsQuery = !likesAndReposts || !shortDID || !wordStarts?.length ? undefined :
+      db.posts.where('repostedBy').anyOf([shortDID]).and(
+        post => !!post.words && post.words.some(wordMatcher) ||
+          !!missingLikesAndReposts && !!post.placeholder);
+
+    const dbPostsPromise = dbPostsQuery.toArray();
+    const likesPromise = likesQuery?.toArray();
+    const repostsPromise = repostsQuery?.toArray();
+
+    const dbPosts = await dbPostsPromise;
+    const likes = await likesPromise;
+    const reposts = await repostsPromise;
 
     const allPostsForShortDIDPromise = !shortDID ? undefined :
       db.posts.where('shortDID').equals(shortDID).count();
 
     for (const post of dbPosts) {
       map.set(post.uri, post);
+    }
+
+    if (likes) {
+      for (const post of likes) {
+        if (post.placeholder) missingLikesAndReposts?.add(post.uri);
+        else map.set(post.uri, post);
+      }
+    }
+    if (reposts) {
+      for (const post of reposts) {
+        if (post.placeholder) missingLikesAndReposts?.add(post.uri);
+        else map.set(post.uri, post);
+      }
     }
 
     for (const uncachedPost of outstandingPostUpdatesInProgressByURI.values()) {

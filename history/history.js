@@ -45,6 +45,7 @@ function HistoryCore() {
   setGlobalAppView(handle ? { account: handle } : undefined);
 
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [likesAndReposts, setLikesAndReposts] = React.useState(false);
 
   const searchQueryStartsWithSlash = (searchQuery || '').trim().startsWith('/');
 
@@ -54,7 +55,10 @@ function HistoryCore() {
     <HistoryLayout
       profile={resolved}
       hideSearch={!!post}
-      onSearchQueryChanged={setSearchQuery}
+      onSearchQueryChanged={(searchQuery, likesAndReposts) => {
+        setSearchQuery(searchQuery);
+        setLikesAndReposts(likesAndReposts);
+      }}
       onSlashCommand={async command => {
         if (typeof downloadingCARFor === 'string') return;
 
@@ -78,7 +82,9 @@ function HistoryCore() {
           !post ?
             <Timeline
               shortDID={resolved.shortDID}
-              searchQuery={searchQueryStartsWithSlash ? '' : searchQuery} /> :
+              searchQuery={searchQueryStartsWithSlash ? '' : searchQuery}
+              likesAndReposts={likesAndReposts}
+            /> :
             <Thread
               uri={makeFeedUri(resolved.shortDID, post)}
               significantPost={post => post.shortDID === resolved.shortDID}

@@ -75,15 +75,18 @@ export function defineCachedStore({ dbName, service } = {}) {
     /**
      * @param {string | null | undefined} shortDID
      * @param {string | null | undefined} searchQuery
+     * @param {boolean} [likesAndReposts]
      */
-    searchPostsIncrementally: (shortDID, searchQuery) =>
+    searchPostsIncrementally: (shortDID, searchQuery, likesAndReposts) =>
       searchPostsIncrementally({
         shortDID,
         searchQuery,
+        likesAndReposts,
         dbStore,
         agent_getProfile_throttled,
         agent_resolveHandle_throttled,
-        agent_searchPosts_throttled
+        agent_searchPosts_throttled,
+        agent_getRepoRecord_throttled
       }),
 
     searchProfilesIncrementally: (searchQuery, max) =>
@@ -98,16 +101,19 @@ export function defineCachedStore({ dbName, service } = {}) {
     /**
      * @param {string | null | undefined} shortDID
      * @param {string | null | undefined} searchQuery
+     * @param {boolean} [likesAndReposts]
      */
-    getTimelineIncrementally: (shortDID, searchQuery) =>
+    getTimelineIncrementally: (shortDID, searchQuery, likesAndReposts) =>
       getTimelineIncrementally({
         shortDID,
         searchQuery,
+        likesAndReposts,
         dbStore,
         agent_getProfile_throttled,
         agent_resolveHandle_throttled,
         agent_getPostThread_throttled,
-        agent_searchPosts_throttled
+        agent_searchPosts_throttled,
+        agent_getRepoRecord_throttled
       }),
     
     syncRepo: (shortDID) =>
