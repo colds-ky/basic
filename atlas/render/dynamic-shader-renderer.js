@@ -10,14 +10,12 @@ import {
 } from 'three';
 
 /**
- * @template T
+ * @template {import('./atlas-renderer').Particle} TParticle
  * @param {{
  *  clock: ReturnType<typeof import('../clock').makeClock>,
  *  allocateCount: number,
  *  fragmentShader?: string,
  *  vertexShader?: string,
- *  getPoint: (item: T, point: { x: number, y: number, h: number, weight: number }) => void,
- *  getColor: (item: T) => number,
  * }} _ 
  */
 export function dynamicShaderRenderer({
@@ -25,8 +23,6 @@ export function dynamicShaderRenderer({
   allocateCount,
   fragmentShader,
   vertexShader,
-  getPoint,
-  getColor
 }) {
   let {
     geometry,
@@ -140,31 +136,19 @@ export function dynamicShaderRenderer({
 
   /**
    * @param {{
-   *  nodes: T[],
-   *  getTimes: (item: T, times: { start: number, stop: number }) => void
+   *  nodes: TParticle[]
    * }} _
    */
-  function updateNodes({ nodes, getTimes }) {
-    const point = {
-      x: 0,
-      y: 0,
-      h: 0,
-      weight: 0
-    };
-
-    const times = {
-      start: 0,
-      stop: 0
-    };
+  function updateNodes({ nodes }) {
 
     let flashNodeCount = 0;
     for (let i = 0; i < nodes.length; i++) {
       const n = nodes[i];
 
-      getTimes(n, times);
-      if (times.start === times.start ||
-        clock.nowMSec < times.start ||
-        clock.nowMSec >= times.stop)
+      if (!n.flash ||
+        n.flash.start === n.flash.start ||
+        clock.nowMSec < n.flash.start ||
+        clock.nowMSec >= n.flash.stop)
         continue;
 
       ensureGeometryIncrease(
@@ -173,17 +157,16 @@ export function dynamicShaderRenderer({
         flashNodeCount /* occupied */
       );
 
-      getPoint(n, point);
-      offsetBuf[flashNodeCount * 3 + 0] = point.x;
-      offsetBuf[flashNodeCount * 3 + 1] = point.h;
-      offsetBuf[flashNodeCount * 3 + 2] = point.y;
+      offsetBuf[flashNodeCount * 3 + 0] = n.x;
+      offsetBuf[flashNodeCount * 3 + 1] = (n.h || 0);
+      offsetBuf[flashNodeCount * 3 + 2] = n.y;
 
-      diameterBuf[flashNodeCount] = point.weight;
+      diameterBuf[flashNodeCount] = n.mass;
 
-      colorBuf[flashNodeCount] = getColor(n);
+      colorBuf[flashNodeCount] = n.color;
 
-      extraBuf[flashNodeCount * 2 + 0] = times.start;
-      extraBuf[flashNodeCount * 2 + 1] = times.stop;
+      extraBuf[flashNodeCount * 2 + 0] = n.flash.start;
+      extraBuf[flashNodeCount * 2 + 1] = n.flash.stop;
 
       flashNodeCount++;
     }

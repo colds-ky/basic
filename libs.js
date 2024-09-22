@@ -40473,7 +40473,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.63";
+	var version = "0.2.65";
 
 	// @ts-check
 
@@ -40573,7 +40573,7 @@ if (cid) {
 	  function addShortDID(did, ratio) {
 	    if (!did) return;
 	    const shortDID = shortenDID(did);
-	    let increment = (typeof filterShortDIDs === 'function' ? filterShortDIDs(did) : 1) * (1);
+	    let increment = (typeof filterShortDIDs === 'function' ? filterShortDIDs(did) : 1) * (ratio || 1);
 	    if (!increment) return;
 	    shortDIDs[shortDID] = (shortDIDs[shortDID] || 0) + increment;
 	    addedAny = true;
@@ -40718,7 +40718,7 @@ if (cid) {
 	 */
 	async function* mergeMap(input, project) {
 	  for await (const item of input) {
-	    const mapped = item;
+	    const mapped = project ? project(item) : item;
 	    for await (const subItem of (/** @type {AsyncIterable<TProject>} */mapped)) {
 	      yield subItem;
 	    }
@@ -41078,7 +41078,7 @@ if (cid) {
 	      return __assign.apply(this, arguments);
 	    };
 	    function __spreadArray(to, from, pack) {
-	      for (var i = 0, l = from.length, ar; i < l; i++) {
+	      if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
 	        if (ar || !(i in from)) {
 	          if (!ar) ar = Array.prototype.slice.call(from, 0, i);
 	          ar[i] = from[i];
@@ -42789,7 +42789,7 @@ if (cid) {
 	        if (this.add !== undefined) {
 	          var term = this.add;
 	          if (isArray(term)) {
-	            return __spreadArray(__spreadArray([], isArray(value) ? value : [], true), term).sort();
+	            return __spreadArray(__spreadArray([], isArray(value) ? value : [], true), term, true).sort();
 	          }
 	          if (typeof term === 'number') return (Number(value) || 0) + term;
 	          if (typeof term === 'bigint') {
@@ -45523,8 +45523,8 @@ if (cid) {
 	                  req = req.type === 'add' || req.type === 'put' ? __assign(__assign({}, req), {
 	                    keys: keys
 	                  }) : __assign({}, req);
-	                  if (req.type !== 'delete') req.values = __spreadArray([], req.values);
-	                  if (req.keys) req.keys = __spreadArray([], req.keys);
+	                  if (req.type !== 'delete') req.values = __spreadArray([], req.values, true);
+	                  if (req.keys) req.keys = __spreadArray([], req.keys, true);
 	                  return getExistingValues(downTable, req, keys).then(function (existingValues) {
 	                    var contexts = keys.map(function (key, i) {
 	                      var existingValue = existingValues[i];

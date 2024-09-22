@@ -24,57 +24,46 @@ const MAX_WEIGHT = 0.6;
 const FADE_TIME_MSEC = 10 * 60 * 1000;
 
 /**
- * @template T
- * @template {any} K
+ * @typedef {{
+ *  x: number,
+ *  y: number,
+ *  h?: number,
+ *  mass: number,
+ *  color: number,
+ *  key?: any,
+ *  label?: string,
+ *  description?: string,
+ *  flash?: { start: number, stop: number }
+ * }} Particle
+ */
+
+/**
+ * @template {Particle} TParticle
  * @param {{
  *  clock: ReturnType<import('../clock').makeClock>,
- *  nodesLive: AsyncIterable<T[]>,
- *  getKey: (item: T) => K,
- *  getPoint: (item: T, point: { x: number, y: number, h: number, weight: number }) => void,
- *  getLabel: (item: T) => string,
- *  getDescription: (item: T) => string,
- *  getColor: (item: T) => number,
- *  getFlashTime: (item: T, flash: { start: number, stop: number }) => void
+ *  nodesLive: AsyncIterable<TParticle[]>
  * }} _
  */
 export function createAtlasRenderer({
   clock,
   nodesLive,
-  getKey,
-  getPoint,
-  getLabel,
-  getDescription,
-  getColor,
-  getFlashTime
 }) {
-  /** @type {Map<K, T>} */
+  /** @type {Map<any, TParticle>} */
   let knownNodes;
 
-  /** @type {ReturnType<typeof staticShaderRenderer<T>> | undefined} */
+  /** @type {ReturnType<typeof staticShaderRenderer<TParticle>> | undefined} */
   let staticRenderer;
-
-  /** @type {ReturnType<typeof renderGeoLabels<T, K>> | undefined} */
-  let geoLayer;
 
   /** @type {PerspectiveCamera | undefined} */
   let latestCamera;
 
-  /** @type {T[]} */
+  /** @type {TParticle[]} */
   let latestNodes = [];
 
-  const focusAndHighlightNode = highlighter({
-    getKey,
-    getPoint,
-    getLabel,
-    getDescription,
-    getColor,
-    MAX_HIGHLIGHT_COUNT: 5
-  });
+  const focusAndHighlightNode = highlighter({ MAX_HIGHLIGHT_COUNT: 5 });
 
   const flashRenderer = dynamicShaderRenderer({
     clock,
-    getPoint,
-    getColor,
     allocateCount: 6000, // high margin
     vertexShader: /* glsl */`
             float startTime = min(extra.x, extra.y);
@@ -128,7 +117,6 @@ export function createAtlasRenderer({
     mesh: flashRenderer.mesh,
     redraw,
     getNodeAtScreenPosition,
-    setTooltip,
     animateAndPin
   };
 
@@ -140,50 +128,17 @@ export function createAtlasRenderer({
         staticRenderer = staticShaderRenderer({
           clock,
           nodes,
-          getPoint,
-          getColor
         });
         flashRenderer.mesh.parent?.add(staticRenderer.mesh);
-
-        const TILE_DIMENSION_COUNT = 64;
-
-        const nodeLabelTiles = processNodesToTiles({
-          nodes,
-          getPoint,
-          dimensionCount: TILE_DIMENSION_COUNT
-        });
-
-        geoLayer = renderGeoLabels({
-          nodes,
-          tiles: nodeLabelTiles,
-          getKey,
-          getPoint,
-          getLabel,
-          getDescription,
-          getColor,
-          tileDimensionCount: TILE_DIMENSION_COUNT,
-          clock
-        });
-
-        flashRenderer.mesh.parent?.add(geoLayer.layerGroup);
       }
 
       staticRenderer.updateNodes({ nodes });
       const now = Date.now();
-      flashRenderer.updateNodes({
-        nodes,
-        getTimes: (n, tm) => {
-          if (Math.random() > 0.9) {
-            tm.start = now - 100;
-            tm.stop = now + 100;
-          }
-        }
-      });
+      flashRenderer.updateNodes({ nodes });
 
-      geoLayer?.updateWithCamera(latestCamera);
-
-      if (latestCamera)
+      if (latestCamera) {
         redraw(latestCamera);
+      }
     }
   }
 
@@ -196,8 +151,8 @@ export function createAtlasRenderer({
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
 
-    /** @type {T | undefined} */
-    let closestETF;
+    /** @type {TParticle | undefined} */
+    let closestNode;
     let closestDistance = 0;
     let closestScreenX = 0;
     let closestScreenY = 0;
@@ -205,46 +160,36 @@ export function createAtlasRenderer({
     latestCamera.updateMatrixWorld();
     latestCamera.updateProjectionMatrix();
     const buf = new Vector3();
-    const point = { x: 0, y: 0, h: 0, weight: 0 };
     for (const node of knownNodes.values()) {
-      getPoint(node, point);
-      buf.set(point.x, point.h, point.y);
+      buf.set(node.x, (node.h || 0), node.y);
       buf.project(latestCamera);
 
       const x = (buf.x + 1) * screenWidth / 2;
       const y = screenHeight - (buf.y + 1) * screenHeight / 2;
 
       let distance = distance2D(screenPosition.x, screenPosition.y, x, y);
-      if (!closestETF || distance < closestDistance) {
-        closestETF = node;
+      if (!closestNode || distance < closestDistance) {
+        closestNode = node;
         closestDistance = distance;
         closestScreenX = x;
         closestScreenY = y;
       }
     }
 
-    if (closestETF && closestDistance < 32)
-      return { ...closestETF, screenX: closestScreenX, screenY: closestScreenY };
-  }
-
-  /**
-   * @param {T} node
-   */
-  function setTooltip(node) {
-    if (geoLayer) geoLayer.setTooltip(node);
+    if (closestNode && closestDistance < 32)
+      return { ...closestNode, screenX: closestScreenX, screenY: closestScreenY };
   }
 
   /**
  * @param {{
- *  node: T,
+ *  node: TParticle,
  *  scene: Scene,
- *  moveAndPauseRotation: (coord: {x: number, y: number, h: number}, towards: {x: number, y: number, h: number}) => void
+ *  moveAndPauseRotation: (coord: {x: number, y: number, h?: number}, towards: {x: number, y: number, h?: number}) => void
  * }} _
  */
   function animateAndPin({ node, scene, moveAndPauseRotation }) {
-    const key = getKey(node);
-    const etfEntry = knownNodes.get(key);
-    if (!etfEntry || !latestCamera) return;
+    const nodeEntry = knownNodes.get(node.key ?? node);
+    if (!nodeEntry || !latestCamera) return;
 
     focusAndHighlightNode({
       node,
@@ -262,7 +207,6 @@ export function createAtlasRenderer({
     if (Math.random() > 10) {
       flashRenderer.updateNodes({
         nodes: latestNodes,
-        getTimes: getFlashTime
       });
     }
 
@@ -270,7 +214,7 @@ export function createAtlasRenderer({
       nodes: latestNodes
     });
 
-    geoLayer?.updateWithCamera(camera);
+    // geoLayer?.updateWithCamera(camera);
   }
 
 }

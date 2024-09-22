@@ -47,18 +47,6 @@ export function boot(elem, unmountPromise) {
   const atlasRenderer = createAtlasRenderer({
     clock,
     nodesLive: streamAccountPositions(),
-    getKey: (profile) => profile,
-    getPoint: (profile, point) => {
-      point.x = profile.x;
-      point.y = profile.y;
-      point.h = 0;
-      point.weight = profile.socialWeight / 20000;
-      // point.weight *= point.weight;
-    },
-    getLabel: (profile) => (profile.handle || profile.shortDID).slice(0, 10),
-    getDescription: (profile) => profile.displayName || '',
-    getColor: (profile) => profile.color,
-    getFlashTime: () => { }
   });
 
   scene.add(atlasRenderer.mesh);
@@ -118,7 +106,7 @@ export function boot(elem, unmountPromise) {
         const existingProfileIndex = profileIndexByShortDID[th.root.shortDID];
         if (typeof existingProfileIndex === 'number') {
           if (!seenThreadUris.has(th.root.uri)) {
-            profilePositions[existingProfileIndex].socialWeight += Math.sqrt(th.all.length);
+            profilePositions[existingProfileIndex].mass += Math.sqrt(th.all.length) / 20000;
             seenThreadUris.add(th.root.uri);
           }
         } else {
@@ -130,7 +118,7 @@ export function boot(elem, unmountPromise) {
                   profilePositions.push({
                     ...profile,
                     index,
-                    socialWeight: (profile.followersCount || 1) + th.all.length,
+                    mass: Math.log10((profile.followersCount || 1) + th.all.length) / 200 + 0.002,
                     x: thWithPos.x,
                     y: thWithPos.y,
                     color: deriveColor(profile.shortDID)
@@ -208,7 +196,7 @@ export function boot(elem, unmountPromise) {
  *  index: number;
  *  x: number;
  *  y: number;
- *  socialWeight: number;
+ *  mass: number;
  *  color: number;
  * }} ProfilePosition
  */

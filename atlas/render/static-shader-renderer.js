@@ -11,18 +11,16 @@ import {
 
 
 /**
- * @template T
+ * @template {import('./atlas-renderer').Particle} TParticle
  * @param {{
- *  clock: ReturnType<import('../clock').makeClock>,
- *  nodes: T[],
- *  getPoint: (item: T, point: { x: number, y: number, h: number, weight: number }) => void,
- *  getColor: (item: T) => number
+ *  clock: { nowSeconds: number },
+ *  nodes: TParticle[],
  * }} _
  */
-export function staticShaderRenderer({ clock, nodes, getPoint, getColor }) {
+export function staticShaderRenderer({ clock, nodes: nodeArray }) {
   let allocateCount = Math.max(
-    Math.floor(nodes.length * 1.15),
-    nodes.length + 100);
+    Math.floor(nodeArray.length * 1.15),
+    nodeArray.length + 100);
 
   let {
     geometry,
@@ -31,18 +29,16 @@ export function staticShaderRenderer({ clock, nodes, getPoint, getColor }) {
     colorBuf
   } = createGeometryAndBuffers(allocateCount);
 
-  const point = { x: 0, y: 0, h: 0, weight: 0 };
-  for (let i = 0; i < nodes.length; i++) {
-    const node = nodes[i];
-    getPoint(node, point);
-    offsetBuf[i * 3 + 0] = point.x;
-    offsetBuf[i * 3 + 1] = point.h; // TODO: 
-    offsetBuf[i * 3 + 2] = point.y;
-    diameterBuf[i] = point.weight;
+  for (let i = 0; i < nodeArray.length; i++) {
+    const node = nodeArray[i];
+    offsetBuf[i * 3 + 0] = node.x;
+    offsetBuf[i * 3 + 1] = (node.h || 0); 
+    offsetBuf[i * 3 + 2] = node.y;
+    diameterBuf[i] = node.mass;
 
-    colorBuf[i] = getColor(node) * 256 | 0xFF;
+    colorBuf[i] = node.color * 256 | 0xFF;
   }
-  geometry.instanceCount = nodes.length;
+  geometry.instanceCount = nodeArray.length;
 
   const material = new ShaderMaterial({
     uniforms: {
@@ -132,13 +128,14 @@ export function staticShaderRenderer({ clock, nodes, getPoint, getColor }) {
   };
 
   /**
-   * @param {{ nodes: T[] }} _
+   * @param {{ nodes: TParticle[] }} _
    */
   function updateNodes({ nodes }) {
-    if (nodes.length > allocateCount) {
+    nodeArray = nodes;
+    if (nodeArray.length > allocateCount) {
       const newAllocateCount = Math.max(
-        Math.floor(nodes.length * 1.5),
-        nodes.length + 300);
+        Math.floor(nodeArray.length * 1.5),
+        nodeArray.length + 300);
       console.log('Reallocating buffers from ', allocateCount, ' to ', newAllocateCount);
       allocateCount = newAllocateCount;
 
@@ -153,23 +150,22 @@ export function staticShaderRenderer({ clock, nodes, getPoint, getColor }) {
       mesh.geometry = geometry;
     }
 
-    for (let i = 0; i < nodes.length; i++) {
-      const node = nodes[i];
-      getPoint(node, point);
-      offsetBuf[i * 3 + 0] = point.x;
-      offsetBuf[i * 3 + 1] = point.h;
-      offsetBuf[i * 3 + 2] = point.y;
+    for (let i = 0; i < nodeArray.length; i++) {
+      const node = nodeArray[i];
+      offsetBuf[i * 3 + 0] = node.x;
+      offsetBuf[i * 3 + 1] = (node.h || 0);
+      offsetBuf[i * 3 + 2] = node.y;
 
-      diameterBuf[i] = point.weight;
+      diameterBuf[i] = node.mass;
 
-      colorBuf[i] = getColor(node);
+      colorBuf[i] = node.color;
     }
 
     geometry.attributes['offset'].needsUpdate = true;
     geometry.attributes['diameter'].needsUpdate = true;
     geometry.attributes['color'].needsUpdate = true;
 
-    geometry.instanceCount = nodes.length;
+    geometry.instanceCount = nodeArray.length;
   }
 }
 
@@ -196,4 +192,3 @@ function createGeometryAndBuffers(allocateCount) {
 
   return { geometry, offsetBuf, diameterBuf, colorBuf };
 }
-
