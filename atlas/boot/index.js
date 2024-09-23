@@ -8,7 +8,8 @@ import { handleWindowResizes } from './handle-window-resizes';
 import { setupScene } from './setup-scene';
 import { startAnimation } from './start-animation';
 import { DB_NAME, getGlobalCachedStore, useDB } from '../../app';
-import { defineCachedStore } from '../../package';
+import { defineCachedStore, firehose } from '../../package';
+import { BoxGeometry, EdgesGeometry, LineBasicMaterial, LineSegments, WireframeGeometry } from 'three';
 
 /**
  * @param {HTMLDivElement} elem
@@ -50,6 +51,13 @@ export function boot(elem, unmountPromise) {
   });
 
   scene.add(atlasRenderer.mesh);
+
+  const box = new BoxGeometry(1, 1, 1);
+  const geo = new EdgesGeometry(/** @type {*} */(box));
+  const mat = new LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+  const wireframe = new LineSegments(geo, mat);
+  scene.add(wireframe);
+
 
   function onRedrawLive() {
     const delta = lastRender ? clock.nowMSec - lastRender : 0;

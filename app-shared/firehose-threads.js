@@ -27,6 +27,7 @@ export function firehoseThreads(db) {
             if (streaming.isEnded) return;
 
             if (thread) lastUpdatedThread = thread;
+            if (!thread?.current?.placeholder) break;
           }
           return lastUpdatedThread;
         });

@@ -40473,7 +40473,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.67";
+	var version = "0.2.68";
 
 	// @ts-check
 
