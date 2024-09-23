@@ -1,15 +1,17 @@
 // @ts-check
 
+import { BoxGeometry, EdgesGeometry, LineBasicMaterial, LineSegments, WireframeGeometry } from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
+
+import { DB_NAME, getGlobalCachedStore, useDB } from '../../app';
 import { firehoseThreads } from '../../app-shared';
+import { defineCachedStore, firehose } from '../../package';
 import { makeClock } from '../clock';
 import { createAtlasRenderer } from '../render';
 import { handleWindowResizes } from './handle-window-resizes';
 import { setupScene } from './setup-scene';
 import { startAnimation } from './start-animation';
-import { DB_NAME, getGlobalCachedStore, useDB } from '../../app';
-import { defineCachedStore, firehose } from '../../package';
-import { BoxGeometry, EdgesGeometry, LineBasicMaterial, LineSegments, WireframeGeometry } from 'three';
+import { layoutCalculator } from '../layout/calculator';
 
 /**
  * @param {HTMLDivElement} elem
@@ -17,7 +19,11 @@ import { BoxGeometry, EdgesGeometry, LineBasicMaterial, LineSegments, WireframeG
  */
 export function boot(elem, unmountPromise) {
   const clock = makeClock();
-  const db = defineCachedStore({ dbName: DB_NAME })
+  const db = defineCachedStore({ dbName: DB_NAME });
+  /** @type {ProfilePosition[]} */
+  const profilePositions = [];
+  /** @type {[ProfilePosition,ProfilePosition][]} */
+  const profileLinks = [];
 
   let lastRender = clock.nowMSec;
 
@@ -68,11 +74,15 @@ export function boot(elem, unmountPromise) {
   }
 
   function onRedrawRare() {
+    const layout = layoutCalculator({
+      nodes: profilePositions,
+      edges: profileLinks
+    });
+
+    layout.run(100);
   }
 
   async function* streamAccountPositions() {
-    /** @type {ProfilePosition[]} */
-    const profilePositions = [];
     /** @type {{[uri: string]: number}} */
     const profileIndexByShortDID = {};
 
