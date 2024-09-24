@@ -1,7 +1,7 @@
 // @ts-check
 
 import { createTheme, ThemeProvider } from '@mui/material';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   createBrowserRouter,
@@ -10,6 +10,7 @@ import {
   useNavigate,
   useParams,
 } from "react-router-dom";
+import Dexie from 'dexie';
 
 import { History } from './history';
 import { Landing } from './landing';
@@ -77,6 +78,47 @@ function runApp() {
       { path: '/', Component: Landing },
       { path: '/index.html', Component: Landing },
       { path: '/atlas', Component: AtlasComponent },
+      {
+        path: '/db', Component: () => {
+          const [result, setResult] = useState(/** @type {*} */(undefined));
+          useEffect(() => {
+            (async () => {
+              try {
+                const dbNames = await Dexie.getDatabaseNames();
+                const deps = Dexie.dependencies;
+                const errnames = Dexie.errnames;
+                const maxKey = Dexie.maxKey;
+                const dx = new Dexie('gisting-cache');
+                await dx.open();
+                const coreSchema = dx.core?.schema;
+                const hasFailed = dx.hasFailed();
+                const verno = dx.verno;
+
+                setResult({
+                  dbNames,
+                  deps,
+                  errnames,
+                  maxKey,
+                  coreSchema,
+                  hasFailed,
+                  verno
+                });
+              } catch (error) {
+                setResult({ error: error.message, stack: error.stack });
+              }
+            })();
+          });
+
+          return (
+            <>
+              <h2>IndexedDB Dexie interface</h2>
+              <pre>
+                {JSON.stringify(result, null, 2)};
+              </pre>
+            </>
+          );
+        }
+      },
       { path: '/coldsky', Component: ShowReadme },
       { path: '/profile/:handle/post/:post', Component: History },
       { path: '/profile/:handle', Component: History },
@@ -122,4 +164,5 @@ function runApp() {
     </ThemeProvider>
   );
 }
+
 runApp();
