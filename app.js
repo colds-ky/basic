@@ -83,18 +83,52 @@ function runApp() {
           const [result, setResult] = useState(/** @type {*} */(undefined));
           useEffect(() => {
             (async () => {
+              const start = Date.now();
               try {
-                const dbNames = await Dexie.getDatabaseNames();
                 const deps = Dexie.dependencies;
                 const errnames = Dexie.errnames;
                 const maxKey = Dexie.maxKey;
+                setResult({
+                  acting: 'getDatabaseNames()...',
+                  deps,
+                  errnames,
+                  maxKey
+                });
+                const dbNames = await Dexie.getDatabaseNames();
+
+                setResult({
+                  acting: 'new Dexie()...',
+                  dbNames,
+                  deps,
+                  errnames,
+                  maxKey
+                });
+
                 const dx = new Dexie('gisting-cache');
+
+                setResult({
+                  acting: 'dexie.open()...',
+                  dbNames,
+                  deps,
+                  errnames,
+                  maxKey
+                });
+
                 await dx.open();
+                setResult({
+                  acting: 'collecting properties...',
+                  dbNames,
+                  deps,
+                  errnames,
+                  maxKey
+                });
+
                 const coreSchema = dx.core?.schema;
                 const hasFailed = dx.hasFailed();
                 const verno = dx.verno;
 
                 setResult({
+                  acting: 'complete in ' + (Date.now() - start) + 'ms.',
                   dbNames,
                   deps,
                   errnames,
@@ -104,7 +138,11 @@ function runApp() {
                   verno
                 });
               } catch (error) {
-                setResult({ error: error.message, stack: error.stack });
+                setResult({
+                  acting: 'failed in ' + (Date.now() - start) + 'ms.',
+                  error: error.message,
+                  stack: error.stack
+                });
               }
             })();
           });
