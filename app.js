@@ -17,6 +17,7 @@ import { Landing } from './landing';
 import { breakFeedURIPostOnly, breakPostURL, defineCachedStore, detectProfileURL } from './package';
 import { ShowReadme } from './widgets/show-readme/show-readme';
 import { AtlasComponent } from './atlas';
+import { version } from './package.json';
 
 /** @typedef {ReturnType<typeof defineCachedStore>} DBAccess */
 /** @type {DBAccess} */
@@ -89,7 +90,7 @@ function runApp() {
                 const errnames = Dexie.errnames;
                 const maxKey = Dexie.maxKey;
                 setResult({
-                  acting: 'getDatabaseNames()...',
+                  app: 'v' + version + ' getDatabaseNames()...',
                   deps,
                   errnames,
                   maxKey
@@ -97,7 +98,7 @@ function runApp() {
                 const dbNames = await Dexie.getDatabaseNames();
 
                 setResult({
-                  acting: 'new Dexie()...',
+                  app: 'v' + version + ' new Dexie()...',
                   dbNames,
                   deps,
                   errnames,
@@ -107,7 +108,7 @@ function runApp() {
                 const dx = new Dexie('gisting-cache');
 
                 setResult({
-                  acting: 'dexie.open()...',
+                  app: 'v' + version + ' dexie.open()...',
                   dbNames,
                   deps,
                   errnames,
@@ -116,7 +117,7 @@ function runApp() {
 
                 await dx.open();
                 setResult({
-                  acting: 'collecting properties...',
+                  app: 'v' + version + ' collecting properties...',
                   dbNames,
                   deps,
                   errnames,
@@ -128,7 +129,7 @@ function runApp() {
                 const verno = dx.verno;
 
                 setResult({
-                  acting: 'complete in ' + (Date.now() - start) + 'ms.',
+                  app: 'v' + version + ' complete in ' + (Date.now() - start) + 'ms.',
                   dbNames,
                   deps,
                   errnames,
@@ -139,7 +140,7 @@ function runApp() {
                 });
               } catch (error) {
                 setResult({
-                  acting: 'failed in ' + (Date.now() - start) + 'ms.',
+                  app: 'v' + version + ' failed in ' + (Date.now() - start) + 'ms.',
                   error: error.message,
                   stack: error.stack
                 });
