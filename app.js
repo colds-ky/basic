@@ -18,6 +18,7 @@ import { breakFeedURIPostOnly, breakPostURL, defineCachedStore, detectProfileURL
 import { ShowReadme } from './widgets/show-readme/show-readme';
 import { AtlasComponent } from './atlas';
 import { version } from './package.json';
+import { version as dexiePkgVersion } from './node_modules/dexie/package.json';
 
 /** @typedef {ReturnType<typeof defineCachedStore>} DBAccess */
 /** @type {DBAccess} */
@@ -81,19 +82,19 @@ function runApp() {
       { path: '/atlas', Component: AtlasComponent },
       {
         path: '/db', Component: () => {
-          const [result, setResult] = useState(/** @type {*} */(undefined));
+          const [result, setResult] = useState(/** @type {*} */({ app: 'initialising...' }));
           useEffect(() => {
             (async () => {
               const start = Date.now();
               try {
                 const deps = Dexie.dependencies;
-                const errnames = Dexie.errnames;
                 const maxKey = Dexie.maxKey;
                 setResult({
                   app: 'v' + version + ' getDatabaseNames()...',
                   deps,
-                  errnames,
-                  maxKey
+                  maxKey,
+                  dexiePkgVersion,
+                  version: Dexie.version
                 });
                 const dbNames = await Dexie.getDatabaseNames();
 
@@ -101,7 +102,6 @@ function runApp() {
                   app: 'v' + version + ' new Dexie()...',
                   dbNames,
                   deps,
-                  errnames,
                   maxKey
                 });
 
@@ -111,8 +111,9 @@ function runApp() {
                   app: 'v' + version + ' dexie.open()...',
                   dbNames,
                   deps,
-                  errnames,
-                  maxKey
+                  maxKey,
+                  dexiePkgVersion,
+                  version: Dexie.version
                 });
 
                 await dx.open();
@@ -120,8 +121,9 @@ function runApp() {
                   app: 'v' + version + ' collecting properties...',
                   dbNames,
                   deps,
-                  errnames,
-                  maxKey
+                  maxKey,
+                  dexiePkgVersion,
+                  version: Dexie.version
                 });
 
                 const coreSchema = dx.core?.schema;
@@ -132,21 +134,24 @@ function runApp() {
                   app: 'v' + version + ' complete in ' + (Date.now() - start) + 'ms.',
                   dbNames,
                   deps,
-                  errnames,
                   maxKey,
                   coreSchema,
                   hasFailed,
-                  verno
+                  verno,
+                  dexiePkgVersion,
+                  version: Dexie.version
                 });
               } catch (error) {
                 setResult({
                   app: 'v' + version + ' failed in ' + (Date.now() - start) + 'ms.',
                   error: error.message,
-                  stack: error.stack
+                  stack: error.stack,
+                  dexiePkgVersion,
+                  version: Dexie.version
                 });
               }
             })();
-          });
+          }, []);
 
           return (
             <>
