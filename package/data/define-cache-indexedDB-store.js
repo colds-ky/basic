@@ -69,16 +69,18 @@ export function defineCacheIndexedDBStore(dbName) {
       // likes were not being captured, so full re-download is required now
       delete rsync.lastSyncRev;
     });
-    await tr.table('posts').toCollection().modify(post => {
-      if (post.likeCount)
-        post.likedBy = Array(post.likeCount).fill('?');
-      if (post.repostCount)
-        post.repostedBy = Array(post.repostCount).fill('?');
+    // await tr.table('posts').toCollection().modify(post => {
+    //   if (post.likeCount)
+    //     post.likedBy = Array(post.likeCount).fill('?');
+    //   if (post.repostCount)
+    //     post.repostedBy = Array(post.repostCount).fill('?');
 
-      delete post.likeCount;
-      delete post.repostCount;
-    });
+    //   delete post.likeCount;
+    //   delete post.repostCount;
+    // });
   });
+
+  db.version(10);
 
   const memStore = defineStore({
     post: handlePostUpdate,

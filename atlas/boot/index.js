@@ -74,6 +74,8 @@ export function boot(elem, unmountPromise) {
   }
 
   function onRedrawRare() {
+    if (profilePositions.length < 10) return;
+
     const layout = layoutCalculator({
       nodes: profilePositions,
       edges: profileLinks
@@ -131,17 +133,32 @@ export function boot(elem, unmountPromise) {
           retrieveProfiles.push((async () => {
             try {
               for await (const profile of db.getProfileIncrementally(th.root.shortDID)) {
-                if (!profileIndexByShortDID[profile.shortDID]) {
-                  const index = profilePositions.length;
-                  profilePositions.push({
-                    ...profile,
-                    index,
-                    mass: Math.log10((profile.followersCount || 1) + th.all.length) / 200 + 0.002,
-                    x: thWithPos.x,
-                    y: thWithPos.y,
-                    color: deriveColor(profile.shortDID)
-                  });
-                  profileIndexByShortDID[profile.shortDID] = index;
+                const index = profilePositions.length;
+                const newProfilePos = {
+                  ...profile,
+                  index,
+                  mass: Math.log10((profile.followersCount || 1) + th.all.length) / 200 + 0.002,
+                  x: thWithPos.x,
+                  y: thWithPos.y,
+                  color: deriveColor(profile.shortDID)
+                }
+                profilePositions.push(newProfilePos);
+                profileIndexByShortDID[profile.shortDID] = index;
+
+                if (typeof profileIndexByShortDID[profile.shortDID] !== 'number') {
+                  /** @type {Set<string>} */
+                  const linked = new Set();
+                  for (const post of th.all) {
+                    if (post.shortDID !== profile.shortDID && !linked.has(post.shortDID)) {
+                      const linkedProfileIndex = profileIndexByShortDID[post.shortDID];
+                      if (typeof linkedProfileIndex === 'number') {
+                        const linkedProfile = profilePositions[linkedProfileIndex];
+                        profileLinks.push([linkedProfile, newProfilePos]);
+                        profileLinks.push([newProfilePos, linkedProfile]);
+                        linked.add(linkedProfile.shortDID);
+                      }
+                    }
+                  }
                 }
               }
             } catch (profileError) {

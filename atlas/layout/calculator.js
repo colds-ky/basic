@@ -30,7 +30,8 @@ export function layoutCalculator({ nodes, edges, speed, gravity }) {
 
   const k = Math.sqrt(k_2);
 
-  const textureSize = nodes.length + Math.floor((edges.length * 2 + 3) / 4);
+  let textureSize = nodes.length + Math.floor((edges.length * 2 + 3) / 4);
+  textureSize = (Math.floor(textureSize / 16) + 1) * 16;
 
   const canvas = document.createElement('canvas');
 
@@ -376,8 +377,13 @@ function buildTextureData({ nodes, edges }) {
       dataArray.push(+dest);
     }
   }
+
+  for (let i = 0; i < 16; i++) {
+    dataArray.push(0);
+  }
+
   // Dummy
-  while (dataArray.length % 4 != 0)
+  while (dataArray.length % 16 != 0)
     dataArray.push(0);
   // console.log(dataArray);
   return {

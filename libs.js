@@ -40473,7 +40473,7 @@ if (cid) {
 	  cbor_x_extended = true;
 	}
 
-	var version = "0.2.68";
+	var version = "0.2.69";
 
 	// @ts-check
 
@@ -48798,13 +48798,17 @@ if (cid) {
 	      // likes were not being captured, so full re-download is required now
 	      delete rsync.lastSyncRev;
 	    });
-	    await tr.table('posts').toCollection().modify(post => {
-	      if (post.likeCount) post.likedBy = Array(post.likeCount).fill('?');
-	      if (post.repostCount) post.repostedBy = Array(post.repostCount).fill('?');
-	      delete post.likeCount;
-	      delete post.repostCount;
-	    });
+	    // await tr.table('posts').toCollection().modify(post => {
+	    //   if (post.likeCount)
+	    //     post.likedBy = Array(post.likeCount).fill('?');
+	    //   if (post.repostCount)
+	    //     post.repostedBy = Array(post.repostCount).fill('?');
+
+	    //   delete post.likeCount;
+	    //   delete post.repostCount;
+	    // });
 	  });
+	  db.version(10);
 	  const memStore = defineStore({
 	    post: handlePostUpdate,
 	    profile: handleProfileUpdate
