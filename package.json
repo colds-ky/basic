@@ -1,8 +1,9 @@
 {
   "name": "coldsky",
-  "version": "0.2.77",
+  "version": "0.2.78",
   "description": "Library and the app for BlueSky",
   "main": "libs.js",
+  "module": "package/index.js",
   "scripts": {
     "build": "node build.js",
     "watch": "node build.js --watch",
@@ -17,9 +18,12 @@
   ],
   "author": "Oleg Mihailik",
   "license": "not yet",
-  "devDependencies": {
+  "dependencies": {
     "@atproto/api": "*",
-    "@atproto/repo": "*",
+    "@ipld/car": "*",
+    "cbor-x": "*"
+  },
+  "devDependencies": {
     "@babel/core": "*",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",

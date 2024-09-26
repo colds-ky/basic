@@ -3,3 +3,11 @@
 /index.*
 /*.jpeg
 /*.jpg
+
+/app*/**
+/atlas
+/coldsky
+/gisting
+/landing
+/unicode-styles
+/widgets
