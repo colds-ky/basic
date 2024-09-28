@@ -37,7 +37,7 @@ async function rollupBuilder() {
     external: ['crypto'],
     output: {
       sourcemap: true,
-      format: 'umd',
+      format: 'esm',
       exports: 'named',
       file: 'libs.js',
       globals: { crypto: 'crypto' },
@@ -52,7 +52,7 @@ async function rollupBuilder() {
         event.result.write({
           file: 'libs.js',
           sourcemap: true,
-          format: 'umd',
+          format: 'esm',
           globals: { crypto: 'crypto' },
           name: 'coldsky'
         });
@@ -65,7 +65,7 @@ async function rollupBuilder() {
     await bundle.write({
       file: 'libs.js',
       sourcemap: true,
-      format: 'umd',
+      format: 'esm',
       globals: { crypto: 'crypto' },
       name: 'coldsky'
     });

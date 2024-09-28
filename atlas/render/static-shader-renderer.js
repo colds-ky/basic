@@ -9,18 +9,34 @@ import {
   ShaderMaterial
 } from 'three';
 
+/**
+ * @typedef {{
+ *  x: number,
+ *  y: number,
+ *  h?: number,
+ *  mass: number,
+ *  color: number,
+ *  key?: any,
+ *  label?: string,
+ *  description?: string,
+ *  flash?: { start: number, stop: number }
+ * }} Particle
+ */
 
 /**
- * @template {import('./atlas-renderer').Particle} TParticle
+ * @template {Particle} TParticle
  * @param {{
  *  clock: { nowSeconds: number },
  *  nodes: TParticle[],
+ *  massScale?: number
  * }} _
  */
-export function staticShaderRenderer({ clock, nodes: nodeArray }) {
+export function staticShaderRenderer({ clock, nodes: nodeArray, massScale }) {
   let allocateCount = Math.max(
     Math.floor(nodeArray.length * 1.15),
     nodeArray.length + 100);
+
+  const massScaleFactor = massScale || 1;
 
   let {
     geometry,
@@ -32,9 +48,9 @@ export function staticShaderRenderer({ clock, nodes: nodeArray }) {
   for (let i = 0; i < nodeArray.length; i++) {
     const node = nodeArray[i];
     offsetBuf[i * 3 + 0] = node.x;
-    offsetBuf[i * 3 + 1] = (node.h || 0); 
+    offsetBuf[i * 3 + 1] = (node.h || 0);
     offsetBuf[i * 3 + 2] = node.y;
-    diameterBuf[i] = node.mass;
+    diameterBuf[i] = node.mass * massScaleFactor;
 
     colorBuf[i] = node.color * 256 | 0xFF;
   }
@@ -116,7 +132,12 @@ export function staticShaderRenderer({ clock, nodes: nodeArray }) {
     depthWrite: false
   });
 
-  const mesh = new Mesh(geometry, material);
+  const mesh = new Mesh(
+    geometry,
+    /** @type {import('three').MeshBasicMaterial} */
+      (/** @type {Partial<import('three').Material>} */
+      (material))
+    );
   mesh.frustumCulled = false;
   mesh.onBeforeRender = () => {
     material.uniforms['time'].value = clock.nowSeconds;
@@ -156,7 +177,7 @@ export function staticShaderRenderer({ clock, nodes: nodeArray }) {
       offsetBuf[i * 3 + 1] = (node.h || 0);
       offsetBuf[i * 3 + 2] = node.y;
 
-      diameterBuf[i] = node.mass;
+      diameterBuf[i] = node.mass * massScaleFactor;
 
       colorBuf[i] = node.color;
     }

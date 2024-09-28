@@ -1,6 +1,6 @@
 {
   "name": "coldsky",
-  "version": "0.2.79",
+  "version": "0.2.80",
   "description": "Library and the app for BlueSky",
   "main": "libs.js",
   "module": "package/index.js",
@@ -44,7 +44,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
     "rollup": "*",
-    "three": "^0.166.1",
+    "three": "^0.167.1",
     "troika-three-text": "^0.49.1"
   },
   "optionalDependencies": {
