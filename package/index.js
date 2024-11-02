@@ -5,6 +5,7 @@ export * from './is-promise';
 export * from './coldsky-agent';
 export * from '@atproto/api';
 export * from './firehose';
+export * from './read-car';
 
 export { version } from '../package.json';
 export { firehoseShortDIDs } from './firehose-short-dids';

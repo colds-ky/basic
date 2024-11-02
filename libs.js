@@ -45962,7 +45962,87 @@ function ensureCborXExtended() {
   cbor_x_extended = true;
 }
 
-var version = "0.2.80";
+// @ts-check
+
+
+/**
+ * @param {string} fullDID
+ * @param {ArrayBuffer | Uint8Array} messageBuf
+ */
+async function readCAR(fullDID, messageBuf) {
+  const bytes = messageBuf instanceof ArrayBuffer ? new Uint8Array(messageBuf) : messageBuf;
+  const car = await CarReader.fromBytes(bytes);
+  ensureCborXExtended();
+  const recordsByCID = new Map();
+  const keyByCID = new Map();
+  let lastRest = Date.now();
+  const errors = [];
+  for await (const block of car.blocks()) {
+    await restRegularly();
+    const record = decode$b(block.bytes);
+    if (record.$type) recordsByCID.set(String(block.cid), record);else if (Array.isArray(record.e)) {
+      let key = '';
+      const decoder = new TextDecoder();
+      for (const sub of record.e) {
+        if (!sub.k || !sub.v) continue;
+        try {
+          const keySuffix = decoder.decode(sub.k);
+          key = key.slice(0, sub.p || 0) + keySuffix;
+          let cid;
+          if (sub.v.multihash) {
+            cid = sub.v;
+          } else if (sub.v.value) {
+            const expandWithoutZero = sub.v.value[0] ? sub.v.value : /** @type {Uint8Array} */sub.v.value.subarray(1);
+            cid = CID$2.decode(expandWithoutZero);
+          }
+          if (!cid) continue;
+          keyByCID.set(String(cid), key);
+        } catch (error) {
+          if (!errors.length) console.error(error);
+          errors.push(error);
+        }
+      }
+    }
+  }
+
+  /** @type {import('./firehose').FirehoseRecord[]} */
+  const records = [];
+  for (const entry of recordsByCID) {
+    const cid = entry[0];
+    /** @type {import('./firehose').FirehoseRecord} */
+    const record = entry[1];
+    record.repo = fullDID;
+    const key = keyByCID.get(cid);
+    if (key) {
+      record.path = key;
+      record.uri = 'at://' + fullDID + '/' + key;
+    }
+    records.push(record);
+    await restRegularly();
+  }
+
+  // record.seq = commit.seq; 471603945
+  // record.since = /** @type {string} */(commit.since); 3ksfhcmgghv2g
+  // record.action = op.action;
+  // record.cid = cid;
+  // record.path = op.path;
+  // record.timestamp = commit.time ? Date.parse(commit.time) : Date.now(); 2024-05-13T19:59:10.457Z
+
+  // record.repo = fullDID;
+  // record.uri = fullDID + '/' + 'op.path';
+  // record.action = 'create';
+
+  return records;
+  function restRegularly() {
+    const now = Date.now();
+    if (now - lastRest > 20) {
+      lastRest = now;
+      return new Promise(resolve => setTimeout(resolve, 1));
+    }
+  }
+}
+
+var version = "0.2.81";
 
 // @ts-check
 
@@ -54952,86 +55032,6 @@ async function* getProfileIncrementally({
 
 
 /**
- * @param {string} fullDID
- * @param {ArrayBuffer | Uint8Array} messageBuf
- */
-async function readCAR(fullDID, messageBuf) {
-  const bytes = messageBuf instanceof ArrayBuffer ? new Uint8Array(messageBuf) : messageBuf;
-  const car = await CarReader.fromBytes(bytes);
-  ensureCborXExtended();
-  const recordsByCID = new Map();
-  const keyByCID = new Map();
-  let lastRest = Date.now();
-  const errors = [];
-  for await (const block of car.blocks()) {
-    await restRegularly();
-    const record = decode$b(block.bytes);
-    if (record.$type) recordsByCID.set(String(block.cid), record);else if (Array.isArray(record.e)) {
-      let key = '';
-      const decoder = new TextDecoder();
-      for (const sub of record.e) {
-        if (!sub.k || !sub.v) continue;
-        try {
-          const keySuffix = decoder.decode(sub.k);
-          key = key.slice(0, sub.p || 0) + keySuffix;
-          let cid;
-          if (sub.v.multihash) {
-            cid = sub.v;
-          } else if (sub.v.value) {
-            const expandWithoutZero = sub.v.value[0] ? sub.v.value : /** @type {Uint8Array} */sub.v.value.subarray(1);
-            cid = CID$2.decode(expandWithoutZero);
-          }
-          if (!cid) continue;
-          keyByCID.set(String(cid), key);
-        } catch (error) {
-          if (!errors.length) console.error(error);
-          errors.push(error);
-        }
-      }
-    }
-  }
-
-  /** @type {import('./firehose').FirehoseRecord[]} */
-  const records = [];
-  for (const entry of recordsByCID) {
-    const cid = entry[0];
-    /** @type {import('./firehose').FirehoseRecord} */
-    const record = entry[1];
-    record.repo = fullDID;
-    const key = keyByCID.get(cid);
-    if (key) {
-      record.path = key;
-      record.uri = 'at://' + fullDID + '/' + key;
-    }
-    records.push(record);
-    await restRegularly();
-  }
-
-  // record.seq = commit.seq; 471603945
-  // record.since = /** @type {string} */(commit.since); 3ksfhcmgghv2g
-  // record.action = op.action;
-  // record.cid = cid;
-  // record.path = op.path;
-  // record.timestamp = commit.time ? Date.parse(commit.time) : Date.now(); 2024-05-13T19:59:10.457Z
-
-  // record.repo = fullDID;
-  // record.uri = fullDID + '/' + 'op.path';
-  // record.action = 'create';
-
-  return records;
-  function restRegularly() {
-    const now = Date.now();
-    if (now - lastRest > 20) {
-      lastRest = now;
-      return new Promise(resolve => setTimeout(resolve, 1));
-    }
-  }
-}
-
-// @ts-check
-
-
-/**
  * @typedef {{
  *  shortDID: string | null | undefined,
  *  agent_getProfile_throttled: (did) => ReturnType<import('@atproto/api').BskyAgent['getProfile']>,
@@ -56596,5 +56596,5 @@ const atproto = atproto_api_import;
 //   }
 // }
 
-export { BSKY_NETWORK_URL, BSKY_PUBLIC_URL, BSKY_SOCIAL_URL, ColdskyAgent, atproto, breakFeedURI, breakFeedURIPostOnly, breakIntoWords, breakPostURL, defineCacheIndexedDBStore, defineCachedStore, defineStore, detectProfileURL, detectWordStartsNormalized, ensureCborXExtended, firehose$1 as firehose, firehoseShortDIDs, getFeedBlobUrl, getProfileBlobUrl, isCompactPost, isPromise, known$Types, likelyDID, makeBskyPostURL, makeFeedUri, parseTimestampOffset, plcDirectoryCompact, plcDirectoryHistoryCompact, plcDirectoryHistoryRaw, plcDirectoryRaw, shortenDID, shortenHandle, shortenPDS, timestampOffsetToString, unwrapShortDID, unwrapShortHandle, unwrapShortPDS, version };
+export { BSKY_NETWORK_URL, BSKY_PUBLIC_URL, BSKY_SOCIAL_URL, ColdskyAgent, atproto, breakFeedURI, breakFeedURIPostOnly, breakIntoWords, breakPostURL, defineCacheIndexedDBStore, defineCachedStore, defineStore, detectProfileURL, detectWordStartsNormalized, ensureCborXExtended, firehose$1 as firehose, firehoseShortDIDs, getFeedBlobUrl, getProfileBlobUrl, isCompactPost, isPromise, known$Types, likelyDID, makeBskyPostURL, makeFeedUri, parseTimestampOffset, plcDirectoryCompact, plcDirectoryHistoryCompact, plcDirectoryHistoryRaw, plcDirectoryRaw, readCAR, shortenDID, shortenHandle, shortenPDS, timestampOffsetToString, unwrapShortDID, unwrapShortHandle, unwrapShortPDS, version };
 //# sourceMappingURL=libs.js.map
