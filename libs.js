@@ -45966,10 +45966,12 @@ function ensureCborXExtended() {
 
 
 /**
- * @param {string} fullDID
+ * @param {string} did
  * @param {ArrayBuffer | Uint8Array} messageBuf
+ * @param {{ sleep?: number }} [options]
  */
-async function readCAR(fullDID, messageBuf) {
+async function readCAR(did, messageBuf, options) {
+  const fullDID = unwrapShortDID(did);
   const bytes = messageBuf instanceof ArrayBuffer ? new Uint8Array(messageBuf) : messageBuf;
   const car = await CarReader.fromBytes(bytes);
   ensureCborXExtended();
@@ -45977,7 +45979,8 @@ async function readCAR(fullDID, messageBuf) {
   const keyByCID = new Map();
   let lastRest = Date.now();
   const errors = [];
-  for await (const block of car.blocks()) {
+  const blocks = typeof car._blocks === 'object' && car._blocks && Array.isArray(car._blocks) ? car._blocks : car.blocks();
+  for await (const block of blocks) {
     await restRegularly();
     const record = decode$b(block.bytes);
     if (record.$type) recordsByCID.set(String(block.cid), record);else if (Array.isArray(record.e)) {
@@ -46035,14 +46038,15 @@ async function readCAR(fullDID, messageBuf) {
   return records;
   function restRegularly() {
     const now = Date.now();
-    if (now - lastRest > 20) {
+    const sleep = typeof options?.sleep === 'number' ? options.sleep : 20;
+    if (now - lastRest > sleep) {
       lastRest = now;
       return new Promise(resolve => setTimeout(resolve, 1));
     }
   }
 }
 
-var version = "0.2.81";
+var version = "0.2.82";
 
 // @ts-check
 
