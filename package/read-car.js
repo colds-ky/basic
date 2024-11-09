@@ -51,6 +51,8 @@ export async function readCAR(did, messageBuf, options) {
           if (!cid) continue;
 
           keyByCID.set(String(cid), key);
+
+          restRegularly();
         } catch (error) {
           if (!errors.length) console.error(error);
           errors.push(error);
@@ -90,12 +92,13 @@ export async function readCAR(did, messageBuf, options) {
 
   return records;
 
-  function restRegularly() {
+  async function restRegularly() {
     const now = Date.now();
-    const sleep = typeof options?.sleep === 'number' ? options.sleep : 20;
+    const sleep = typeof options?.sleep === 'number' ? options.sleep : 200;
     if (now - lastRest > sleep) {
       lastRest = now;
-      return new Promise(resolve => setTimeout(resolve, 1));
+      await new Promise(resolve => setTimeout(resolve, 1));
+      lastRest = now;
     }
   }
 }
