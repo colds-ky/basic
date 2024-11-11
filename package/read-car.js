@@ -7,6 +7,9 @@ import { CarReader as ipld_CarReader } from '@ipld/car/reader';
 import { ensureCborXExtended } from './firehose';
 import { unwrapShortDID } from './shorten';
 
+var READING_CYCLES_BEFORE_REST = 5000;
+var COLLECTING_CYCLES_BEFORE_REST = 15000;
+
 /**
  * @param {string} did
  * @param {ArrayBuffer | Uint8Array} messageBuf
@@ -28,7 +31,7 @@ export async function readCAR(did, messageBuf, options) {
   let entriesChunk = 0;
   for await (const block of blocks) {
     entriesChunk++;
-    if (entriesChunk > 1000) {
+    if (entriesChunk > READING_CYCLES_BEFORE_REST) {
       entriesChunk = 0;
       await restRegularly();
     }
@@ -59,7 +62,7 @@ export async function readCAR(did, messageBuf, options) {
           keyByCID.set(String(cid), key);
 
           entriesChunk++;
-          if (entriesChunk > 1000) {
+          if (entriesChunk > READING_CYCLES_BEFORE_REST) {
             entriesChunk = 0;
             await restRegularly();
           }
@@ -90,7 +93,7 @@ export async function readCAR(did, messageBuf, options) {
     records.push({ ...record });
 
     entriesChunk++;
-    if (entriesChunk > 5000) {
+    if (entriesChunk > COLLECTING_CYCLES_BEFORE_REST) {
       entriesChunk = 0;
       await restRegularly();
     }
@@ -109,13 +112,16 @@ export async function readCAR(did, messageBuf, options) {
 
   return records;
 
-  async function restRegularly() {
+  function restRegularly() {
     const now = Date.now();
     const sleep = typeof options?.sleep === 'number' ? options.sleep : 200;
     if (now - lastRest > sleep) {
       lastRest = now;
-      await new Promise(resolve => setTimeout(resolve, 1));
-      lastRest = now;
+      return new Promise(resolve => setTimeout(resolve, 1)).then(setLastRestNow);
     }
+  }
+
+  function setLastRestNow() {
+    lastRest = Date.now();
   }
 }

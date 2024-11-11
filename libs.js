@@ -40469,6 +40469,8 @@ function ensureCborXExtended() {
 
 // @ts-check
 
+var READING_CYCLES_BEFORE_REST = 5000;
+var COLLECTING_CYCLES_BEFORE_REST = 15000;
 
 /**
  * @param {string} did
@@ -40488,7 +40490,7 @@ async function readCAR(did, messageBuf, options) {
   let entriesChunk = 0;
   for await (const block of blocks) {
     entriesChunk++;
-    if (entriesChunk > 1000) {
+    if (entriesChunk > READING_CYCLES_BEFORE_REST) {
       entriesChunk = 0;
       await restRegularly();
     }
@@ -40511,7 +40513,7 @@ async function readCAR(did, messageBuf, options) {
           if (!cid) continue;
           keyByCID.set(String(cid), key);
           entriesChunk++;
-          if (entriesChunk > 1000) {
+          if (entriesChunk > READING_CYCLES_BEFORE_REST) {
             entriesChunk = 0;
             await restRegularly();
           }
@@ -40542,7 +40544,7 @@ async function readCAR(did, messageBuf, options) {
       ...record
     });
     entriesChunk++;
-    if (entriesChunk > 5000) {
+    if (entriesChunk > COLLECTING_CYCLES_BEFORE_REST) {
       entriesChunk = 0;
       await restRegularly();
     }
@@ -40560,18 +40562,20 @@ async function readCAR(did, messageBuf, options) {
   // record.action = 'create';
 
   return records;
-  async function restRegularly() {
+  function restRegularly() {
     const now = Date.now();
     const sleep = typeof options?.sleep === 'number' ? options.sleep : 200;
     if (now - lastRest > sleep) {
       lastRest = now;
-      await new Promise(resolve => setTimeout(resolve, 1));
-      lastRest = now;
+      return new Promise(resolve => setTimeout(resolve, 1)).then(setLastRestNow);
     }
+  }
+  function setLastRestNow() {
+    lastRest = Date.now();
   }
 }
 
-var version = "0.2.84";
+var version = "0.2.85";
 
 // @ts-check
 
