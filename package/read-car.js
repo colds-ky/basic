@@ -24,8 +24,14 @@ export async function readCAR(did, messageBuf, options) {
   let lastRest = Date.now();
   const errors = [];
   const blocks = typeof car._blocks === 'object' && car._blocks && Array.isArray(car._blocks) ? car._blocks : car.blocks();
+
+  let entriesChunk = 0;
   for await (const block of blocks) {
-    await restRegularly();
+    entriesChunk++;
+    if (entriesChunk > 1000) {
+      entriesChunk = 0;
+      await restRegularly();
+    }
 
     const record = cbor_x_decode(block.bytes);
     if (record.$type) recordsByCID.set(String(block.cid), record);
@@ -52,7 +58,11 @@ export async function readCAR(did, messageBuf, options) {
 
           keyByCID.set(String(cid), key);
 
-          restRegularly();
+          entriesChunk++;
+          if (entriesChunk > 1000) {
+            entriesChunk = 0;
+            await restRegularly();
+          }
         } catch (error) {
           if (!errors.length) console.error(error);
           errors.push(error);
@@ -64,6 +74,7 @@ export async function readCAR(did, messageBuf, options) {
   /** @type {import('./firehose').FirehoseRecord[]} */
   const records = [];
 
+  entriesChunk = 0;
   for (const entry of recordsByCID) {
     const cid = entry[0];
     /** @type {import('./firehose').FirehoseRecord} */
@@ -74,9 +85,15 @@ export async function readCAR(did, messageBuf, options) {
       record.path = key;
       record.uri = 'at://' + fullDID + '/' + key;
     }
-    records.push(record);
 
-    await restRegularly();
+    // let's recreate the record, to pack the GC and avoid deoptimized objects
+    records.push({ ...record });
+
+    entriesChunk++;
+    if (entriesChunk > 5000) {
+      entriesChunk = 0;
+      await restRegularly();
+    }
   }
 
     // record.seq = commit.seq; 471603945

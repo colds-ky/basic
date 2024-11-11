@@ -40485,8 +40485,13 @@ async function readCAR(did, messageBuf, options) {
   let lastRest = Date.now();
   const errors = [];
   const blocks = typeof car._blocks === 'object' && car._blocks && Array.isArray(car._blocks) ? car._blocks : car.blocks();
+  let entriesChunk = 0;
   for await (const block of blocks) {
-    await restRegularly();
+    entriesChunk++;
+    if (entriesChunk > 1000) {
+      entriesChunk = 0;
+      await restRegularly();
+    }
     const record = decode$3(block.bytes);
     if (record.$type) recordsByCID.set(String(block.cid), record);else if (Array.isArray(record.e)) {
       let key = '';
@@ -40505,7 +40510,11 @@ async function readCAR(did, messageBuf, options) {
           }
           if (!cid) continue;
           keyByCID.set(String(cid), key);
-          restRegularly();
+          entriesChunk++;
+          if (entriesChunk > 1000) {
+            entriesChunk = 0;
+            await restRegularly();
+          }
         } catch (error) {
           if (!errors.length) console.error(error);
           errors.push(error);
@@ -40516,6 +40525,7 @@ async function readCAR(did, messageBuf, options) {
 
   /** @type {import('./firehose').FirehoseRecord[]} */
   const records = [];
+  entriesChunk = 0;
   for (const entry of recordsByCID) {
     const cid = entry[0];
     /** @type {import('./firehose').FirehoseRecord} */
@@ -40526,8 +40536,16 @@ async function readCAR(did, messageBuf, options) {
       record.path = key;
       record.uri = 'at://' + fullDID + '/' + key;
     }
-    records.push(record);
-    await restRegularly();
+
+    // let's recreate the record, to pack the GC and avoid deoptimized objects
+    records.push({
+      ...record
+    });
+    entriesChunk++;
+    if (entriesChunk > 5000) {
+      entriesChunk = 0;
+      await restRegularly();
+    }
   }
 
   // record.seq = commit.seq; 471603945
@@ -40553,7 +40571,7 @@ async function readCAR(did, messageBuf, options) {
   }
 }
 
-var version = "0.2.83";
+var version = "0.2.84";
 
 // @ts-check
 
