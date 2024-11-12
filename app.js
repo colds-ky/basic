@@ -1,6 +1,7 @@
 // @ts-check
 
 import { createTheme, ThemeProvider } from '@mui/material';
+import Dexie from 'dexie';
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
@@ -10,15 +11,15 @@ import {
   useNavigate,
   useParams,
 } from "react-router-dom";
-import Dexie from 'dexie';
 
+import { AtlasComponent } from './atlas';
+import { Bot } from './bot';
 import { History } from './history';
 import { Landing } from './landing';
-import { breakFeedURIPostOnly, breakPostURL, defineCachedStore, detectProfileURL } from './package';
-import { ShowReadme } from './widgets/show-readme/show-readme';
-import { AtlasComponent } from './atlas';
-import { version } from './package.json';
 import { version as dexiePkgVersion } from './node_modules/dexie/package.json';
+import { breakFeedURIPostOnly, breakPostURL, defineCachedStore, detectProfileURL } from './package';
+import { version } from './package.json';
+import { ShowReadme } from './widgets/show-readme/show-readme';
 
 /** @typedef {ReturnType<typeof defineCachedStore>} DBAccess */
 /** @type {DBAccess} */
@@ -44,7 +45,7 @@ function runApp() {
   const useRouter =
     /file/i.test(location.protocol) ?
       createHashRouter : createBrowserRouter;
-  
+
   const ParseLink = () => {
     let path = useParams()['*'];
     const navigate = useNavigate();
@@ -75,101 +76,117 @@ function runApp() {
     else return exit('/?q=' + path);
   };
 
+  const useBot = [location.host, location.hash].some(h =>
+    /rekun/i.test([...h].reverse().join('')));
+
   const router = useRouter(
-    [
-      { path: '/', Component: Landing },
-      { path: '/index.html', Component: Landing },
-      { path: '/atlas', Component: AtlasComponent },
-      {
-        path: '/db', Component: () => {
-          const [result, setResult] = useState(/** @type {*} */({ app: 'initialising...' }));
-          useEffect(() => {
-            (async () => {
-              const start = Date.now();
-              try {
-                const deps = Dexie.dependencies;
-                const maxKey = Dexie.maxKey;
-                setResult({
-                  app: 'v' + version + ' getDatabaseNames()...',
-                  deps,
-                  maxKey,
-                  dexiePkgVersion,
-                  version: Dexie.version
-                });
-                const dbNames = await Dexie.getDatabaseNames();
-
-                setResult({
-                  app: 'v' + version + ' new Dexie()...',
-                  dbNames,
-                  deps,
-                  maxKey
-                });
-
-                const dx = new Dexie('gisting-cache');
-
-                setResult({
-                  app: 'v' + version + ' dexie.open()...',
-                  dbNames,
-                  deps,
-                  maxKey,
-                  dexiePkgVersion,
-                  version: Dexie.version
-                });
-
-                await dx.open();
-                setResult({
-                  app: 'v' + version + ' collecting properties...',
-                  dbNames,
-                  deps,
-                  maxKey,
-                  dexiePkgVersion,
-                  version: Dexie.version
-                });
-
-                const coreSchema = dx.core?.schema;
-                const hasFailed = dx.hasFailed();
-                const verno = dx.verno;
-
-                setResult({
-                  app: 'v' + version + ' complete in ' + (Date.now() - start) + 'ms.',
-                  dbNames,
-                  deps,
-                  maxKey,
-                  coreSchema,
-                  hasFailed,
-                  verno,
-                  dexiePkgVersion,
-                  version: Dexie.version
-                });
-              } catch (error) {
-                setResult({
-                  app: 'v' + version + ' failed in ' + (Date.now() - start) + 'ms.',
-                  error: error.message,
-                  stack: error.stack,
-                  dexiePkgVersion,
-                  version: Dexie.version
-                });
-              }
-            })();
-          }, []);
-
-          return (
-            <>
-              <h2>IndexedDB Dexie interface</h2>
-              <pre>
-                {JSON.stringify(result, null, 2)};
-              </pre>
-            </>
-          );
+    useBot ?
+      [
+        { path: '/', Component: Bot },
+        {
+          path: '*', Component: () => {
+            const navigate = useNavigate();
+            useEffect(() => {
+              navigate('/');
+            });
+            return '';
+          }
         }
-      },
-      { path: '/coldsky', Component: ShowReadme },
-      { path: '/profile/:handle/post/:post', Component: History },
-      { path: '/profile/:handle', Component: History },
-      { path: '/:handle', Component: History },
-      { path: '/:handle/:post', Component: History },
-      { path: '*', Component: ParseLink },
-    ], {
+      ] :
+      [
+        { path: '/', Component: Landing },
+        { path: '/index.html', Component: Landing },
+        { path: '/atlas', Component: AtlasComponent },
+        {
+          path: '/db', Component: () => {
+            const [result, setResult] = useState(/** @type {*} */({ app: 'initialising...' }));
+            useEffect(() => {
+              (async () => {
+                const start = Date.now();
+                try {
+                  const deps = Dexie.dependencies;
+                  const maxKey = Dexie.maxKey;
+                  setResult({
+                    app: 'v' + version + ' getDatabaseNames()...',
+                    deps,
+                    maxKey,
+                    dexiePkgVersion,
+                    version: Dexie.version
+                  });
+                  const dbNames = await Dexie.getDatabaseNames();
+
+                  setResult({
+                    app: 'v' + version + ' new Dexie()...',
+                    dbNames,
+                    deps,
+                    maxKey
+                  });
+
+                  const dx = new Dexie('gisting-cache');
+
+                  setResult({
+                    app: 'v' + version + ' dexie.open()...',
+                    dbNames,
+                    deps,
+                    maxKey,
+                    dexiePkgVersion,
+                    version: Dexie.version
+                  });
+
+                  await dx.open();
+                  setResult({
+                    app: 'v' + version + ' collecting properties...',
+                    dbNames,
+                    deps,
+                    maxKey,
+                    dexiePkgVersion,
+                    version: Dexie.version
+                  });
+
+                  const coreSchema = dx.core?.schema;
+                  const hasFailed = dx.hasFailed();
+                  const verno = dx.verno;
+
+                  setResult({
+                    app: 'v' + version + ' complete in ' + (Date.now() - start) + 'ms.',
+                    dbNames,
+                    deps,
+                    maxKey,
+                    coreSchema,
+                    hasFailed,
+                    verno,
+                    dexiePkgVersion,
+                    version: Dexie.version
+                  });
+                } catch (error) {
+                  setResult({
+                    app: 'v' + version + ' failed in ' + (Date.now() - start) + 'ms.',
+                    error: error.message,
+                    stack: error.stack,
+                    dexiePkgVersion,
+                    version: Dexie.version
+                  });
+                }
+              })();
+            }, []);
+
+            return (
+              <>
+                <h2>IndexedDB Dexie interface</h2>
+                <pre>
+                  {JSON.stringify(result, null, 2)};
+                </pre>
+              </>
+            );
+          }
+        },
+        { path: '/coldsky', Component: ShowReadme },
+        { path: '/profile/:handle/post/:post', Component: History },
+        { path: '/profile/:handle', Component: History },
+        { path: '/:handle', Component: History },
+        { path: '/:handle/:post', Component: History },
+        { path: '*', Component: ParseLink },
+      ], {
     basename
   });
 
