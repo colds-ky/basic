@@ -80,8 +80,8 @@ export function EmbedLinks({ className, post, links, ...rest }) {
  */
 function LinkURL({ url }) {
   const parsed = new URL(url);
-  const hostnamePos = url.indexOf(parsed.hostname);
-  if (!hostnamePos) return <span>{url}</span>;
+  const hostnamePos = !parsed ? -1 : url.indexOf(parsed.hostname);
+  if (hostnamePos < 0) return <span>{url}</span>;
   const lead = url.slice(0, hostnamePos);
   const trail = url.slice(hostnamePos + parsed.hostname.length);
   return (
