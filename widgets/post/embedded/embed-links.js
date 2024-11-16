@@ -79,9 +79,13 @@ export function EmbedLinks({ className, post, links, ...rest }) {
  * }} _
  */
 function LinkURL({ url }) {
-  const parsed = new URL(url);
+  let parsed;
+  try {
+    parsed = new URL(url);
+  } catch (err) {}
   const hostnamePos = !parsed ? -1 : url.indexOf(parsed.hostname);
-  if (hostnamePos < 0) return <span>{url}</span>;
+  if (!parsed || hostnamePos < 0) return <span>{url}</span>;
+
   const lead = url.slice(0, hostnamePos);
   const trail = url.slice(hostnamePos + parsed.hostname.length);
   return (
