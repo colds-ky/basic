@@ -258,3 +258,8 @@ export function getFeedBlobUrl(did, cid) {
   if (!did || !cid) return undefined;
   return `https://cdn.bsky.app/img/feed_thumbnail/plain/${unwrapShortDID(did)}/${cid}@jpeg`;
 }
+
+export function getFeedVideoBlobUrl(did, cid) {
+  if (!did || !cid) return undefined;
+  return `https://video.bsky.app/watch/${unwrapShortDID(did)}/${cid}/thumbnail.jpg`;
+}

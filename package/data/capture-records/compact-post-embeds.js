@@ -1,7 +1,7 @@
 // @ts-check
 
-import { AppBskyEmbedRecordWithMedia } from '@atproto/api';
-import { getFeedBlobUrl } from '../../shorten';
+import { AppBskyEmbedRecordWithMedia, AppBskyEmbedVideo } from '@atproto/api';
+import { getFeedBlobUrl, getFeedVideoBlobUrl } from '../../shorten';
 import { addToArray } from '../compact-post';
 
 /**
@@ -15,6 +15,7 @@ export function extractEmbeds(shortDID, embed) {
   let embeds = undefined;
 
   embeds = addEmbedImages(shortDID, /** @type {import('@atproto/api').AppBskyEmbedImages.Main} */(embed).images, embeds);
+  embeds = addEmbedVideo(shortDID, /** @type {import('@atproto/api').AppBskyEmbedVideo.Main} */(embed), embeds);
   embeds = addEmbedExternal(shortDID, /** @type {import('@atproto/api').AppBskyEmbedExternal.Main} */(embed).external, embeds);
   embeds = addEmbedRecord(/** @type {import('@atproto/api').AppBskyEmbedRecord.Main} */(embed).record, embeds);
   embeds = addEmbedRecordMedia(shortDID, /** @type {import('@atproto/api').AppBskyEmbedRecordWithMedia.Main} */(embed), embeds);
@@ -37,6 +38,20 @@ function addEmbedImages(shortDID, embedImages, embeds) {
       aspectRatio: img.aspectRatio
     }));
   }
+  return embeds;
+}
+
+/**
+ * @param {string} shortDID
+ * @param {import('@atproto/api').AppBskyEmbedVideo.Main | undefined} embedVideo 
+ * @param {import('../..').CompactEmbed[] | undefined} embeds 
+ */
+function addEmbedVideo(shortDID, embedVideo, embeds) {
+  embeds = addToArray(embeds, /** @type {import('../..').CompactEmbed} */({
+    imgSrc: getFeedVideoBlobUrl(shortDID, embedVideo?.video?.ref?.toString()),
+    description: embedVideo?.alt || undefined,
+    aspectRatio: embedVideo?.aspectRatio
+  }));
   return embeds;
 }
 
@@ -75,6 +90,11 @@ function addEmbedRecordMedia(shortDID, embedRecordMedia, embeds) {
   embeds = addEmbedImages(
     shortDID,
     /** @type {import('@atproto/api').AppBskyEmbedImages.Main} */(embedRecordMedia?.media)?.images,
+    embeds);
+
+  embeds = addEmbedVideo(
+    shortDID,
+    /** @type {import('@atproto/api').AppBskyEmbedVideo.Main} */(embedRecordMedia?.media),
     embeds);
 
   embeds = addEmbedExternal(

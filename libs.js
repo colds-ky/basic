@@ -27370,6 +27370,10 @@ function getFeedBlobUrl(did, cid) {
   if (!did || !cid) return undefined;
   return `https://cdn.bsky.app/img/feed_thumbnail/plain/${unwrapShortDID(did)}/${cid}@jpeg`;
 }
+function getFeedVideoBlobUrl(did, cid) {
+  if (!did || !cid) return undefined;
+  return `https://video.bsky.app/watch/${unwrapShortDID(did)}/${cid}/thumbnail.jpg`;
+}
 
 /**
  * @param {any} x
@@ -45129,6 +45133,7 @@ function extractEmbeds(shortDID, embed) {
   /** @type {import('../..').CompactEmbed[] | undefined} */
   let embeds = undefined;
   embeds = addEmbedImages(shortDID, /** @type {import('@atproto/api').AppBskyEmbedImages.Main} */embed.images, embeds);
+  embeds = addEmbedVideo(shortDID, /** @type {import('@atproto/api').AppBskyEmbedVideo.Main} */embed, embeds);
   embeds = addEmbedExternal(shortDID, /** @type {import('@atproto/api').AppBskyEmbedExternal.Main} */embed.external, embeds);
   embeds = addEmbedRecord(/** @type {import('@atproto/api').AppBskyEmbedRecord.Main} */embed.record, embeds);
   embeds = addEmbedRecordMedia(shortDID, /** @type {import('@atproto/api').AppBskyEmbedRecordWithMedia.Main} */embed, embeds);
@@ -45150,6 +45155,20 @@ function addEmbedImages(shortDID, embedImages, embeds) {
       aspectRatio: img.aspectRatio
     });
   }
+  return embeds;
+}
+
+/**
+ * @param {string} shortDID
+ * @param {import('@atproto/api').AppBskyEmbedVideo.Main | undefined} embedVideo 
+ * @param {import('../..').CompactEmbed[] | undefined} embeds 
+ */
+function addEmbedVideo(shortDID, embedVideo, embeds) {
+  embeds = addToArray(embeds, /** @type {import('../..').CompactEmbed} */{
+    imgSrc: getFeedVideoBlobUrl(shortDID, embedVideo?.video?.ref?.toString()),
+    description: embedVideo?.alt || undefined,
+    aspectRatio: embedVideo?.aspectRatio
+  });
   return embeds;
 }
 
@@ -45186,6 +45205,7 @@ function addEmbedRecord(embedRecord, embeds) {
  */
 function addEmbedRecordMedia(shortDID, embedRecordMedia, embeds) {
   embeds = addEmbedImages(shortDID, /** @type {import('@atproto/api').AppBskyEmbedImages.Main} */embedRecordMedia?.media?.images, embeds);
+  embeds = addEmbedVideo(shortDID, /** @type {import('@atproto/api').AppBskyEmbedVideo.Main} */embedRecordMedia?.media, embeds);
   embeds = addEmbedExternal(shortDID, /** @type {import('@atproto/api').AppBskyEmbedExternal.Main} */embedRecordMedia?.media?.external, embeds);
   embeds = addEmbedRecord(/** @type {import('@atproto/api').AppBskyEmbedRecord.Main} */embedRecordMedia?.record?.record, embeds);
   return embeds;
@@ -45804,5 +45824,5 @@ const atproto = atproto_api_import;
 //   }
 // }
 
-export { BSKY_NETWORK_URL, BSKY_PUBLIC_URL, BSKY_SOCIAL_URL, ColdskyAgent, atproto, breakFeedURI, breakFeedURIPostOnly, breakIntoWords, breakPostURL, defineCacheIndexedDBStore, defineCachedStore, defineStore, detectProfileURL, detectWordStartsNormalized, ensureCborXExtended, firehose$1 as firehose, firehoseShortDIDs, getFeedBlobUrl, getProfileBlobUrl, isCompactPost, isPromise, known$Types, likelyDID, makeBskyPostURL, makeFeedUri, parseTimestampOffset, plcDirectoryCompact, plcDirectoryHistoryCompact, plcDirectoryHistoryRaw, plcDirectoryRaw, readCAR, shortenDID, shortenHandle, shortenPDS, timestampOffsetToString, unwrapShortDID, unwrapShortHandle, unwrapShortPDS, version };
+export { BSKY_NETWORK_URL, BSKY_PUBLIC_URL, BSKY_SOCIAL_URL, ColdskyAgent, atproto, breakFeedURI, breakFeedURIPostOnly, breakIntoWords, breakPostURL, defineCacheIndexedDBStore, defineCachedStore, defineStore, detectProfileURL, detectWordStartsNormalized, ensureCborXExtended, firehose$1 as firehose, firehoseShortDIDs, getFeedBlobUrl, getFeedVideoBlobUrl, getProfileBlobUrl, isCompactPost, isPromise, known$Types, likelyDID, makeBskyPostURL, makeFeedUri, parseTimestampOffset, plcDirectoryCompact, plcDirectoryHistoryCompact, plcDirectoryHistoryRaw, plcDirectoryRaw, readCAR, shortenDID, shortenHandle, shortenPDS, timestampOffsetToString, unwrapShortDID, unwrapShortHandle, unwrapShortPDS, version };
 //# sourceMappingURL=libs.js.map
