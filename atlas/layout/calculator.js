@@ -42,19 +42,20 @@ export function layoutCalculator({ nodes, edges, speed, gravity }) {
   canvas.height = 1;
 
   const gl = (() => {
-    const gl = canvas.getContext("webgl2", { alpha: false, depth: false, antialias: false });
-    if (!gl) throw new Error('WebGL is required.');
+    const gl = canvas.getContext("webgl", { alpha: false, depth: false, antialias: false });
+    if (!gl) throw new Error('WebGL 2 is required.');
     return gl
   })();
 
   // Attempt to activate the extension, returns null if unavailable
-  const textureFloat = gl.getExtension('OES_texture_float');
+  let textureFloat = gl.getExtension('OES_texture_float');
+  if (!textureFloat) throw new Error('OES_texture_float is required.');
+  textureFloat = gl.getExtension('OES_texture_float_linear');
+  if (!textureFloat) throw new Error('OES_texture_float_linear is required.');
 
   const { data, maxEdgePerVetex } = buildTextureData({ nodes, edges });
-  let texture_input = makeSizedTexture({ gl, width: textureSize, height: 1, type: WebGLRenderingContext.FLOAT, data });
-  let texture_output = makeSizedTexture({ gl, width: textureSize, height: 1, type: WebGLRenderingContext.FLOAT, data });
-
-
+  let texture_input = makeSizedTexture({ gl, width: textureSize, height: 1, data });
+  let texture_output = makeSizedTexture({ gl, width: textureSize, height: 1, data });
 
 
 
@@ -219,7 +220,7 @@ void main()
     while (true) {
 
       const tmp = texture_input;
-      texture_input = this.texture_output;
+      texture_input = texture_output;
       texture_output = tmp;
 
       var outputBuffer = attachFrameBuffer({ gl, texture: texture_output });
@@ -229,12 +230,12 @@ void main()
       getStandardVertices(gl);
 
       // TODO: what?
-      gl.vertexAttribPointer(this.positionHandle, 3, gl.FLOAT, false, 20, 0);
-      gl.vertexAttribPointer(this.textureCoordHandle, 2, gl.FLOAT, false, 20, 12);
+      gl.vertexAttribPointer(positionHandle, 3, gl.FLOAT, false, 20, 0);
+      gl.vertexAttribPointer(textureCoordHandle, 2, gl.FLOAT, false, 20, 12);
 
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, texture_input);
-      gl.uniform1i(this.textureHandle, 0);
+      gl.uniform1i(textureHandle, 0);
 
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
@@ -298,11 +299,10 @@ function attachFrameBuffer({ gl, texture }) {
  *  gl: WebGLRenderingContext,
  *  width: number,
  *  height: number,
- *  type: number,
  *  data: Float32Array
  * }} _
  */
-function makeSizedTexture({ gl, width, height, type, data }) {
+function makeSizedTexture({ gl, width, height, data }) {
   // Create the texture
   const texture = gl.createTexture();
   if (!texture) throw new Error('Failed to create texture.');
@@ -314,17 +314,19 @@ function makeSizedTexture({ gl, width, height, type, data }) {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   // Pixel format and data for the texture
   gl.texImage2D(
-    gl.TEXTURE_2D, // Target, matches bind above.
-    0,             // Level of detail.
-    gl.RGBA,       // Internal format.
-    width,         // Width - normalized to s.
-    height,        // Height - normalized to t.
-    0,             // Always 0 in OpenGL ES.
-    gl.RGBA,       // Format for each pixel.
-    type,          // Data type for each chanel.
-    data);         // Image data in the described format, or null.
+    gl.TEXTURE_2D, // target - matches bind above.
+    0, // level - of detail.
+    gl.RGBA, // internalFormat - RGBA32F
+    width, // width - normalized to s.
+    height, // height - normalized to t.
+    0, // border - always 0 in OpenGL ES.
+    gl.RGBA, // format - for each pixel: RGBA32F
+    gl.FLOAT, // type - for each chanel.: FLOAT
+    data // Image data in the described format, or null.
+  );
+
   // Unbind the texture.
-  gl.bindTexture(gl.TEXTURE_2D, null);
+  // gl.bindTexture(gl.TEXTURE_2D, null);
 
   return texture;
 }
@@ -520,7 +522,7 @@ function getStandardVertices(gl) {
     if (!buf) throw new Error('Failed to create buffer.');
     standardVertices = buf;
     gl.bindBuffer(gl.ARRAY_BUFFER, standardVertices);
-    gl.bufferData(gl.ARRAY_BUFFER, this.getStandardGeometry(), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, getStandardGeometry(), gl.STATIC_DRAW);
   }
   else {
     gl.bindBuffer(gl.ARRAY_BUFFER, standardVertices);
@@ -530,6 +532,18 @@ function getStandardVertices(gl) {
 
 /** @type {WebGLBuffer} */
 var standardVertices;
+
+function getStandardGeometry() {
+  if (standardGeometry) return standardGeometry;
+  // Sets of x,y,z(=0),s,t coordinates.
+  return standardGeometry = new Float32Array([-1.0, 1.0, 0.0, 0.0, 1.0,  // upper left
+  -1.0, -1.0, 0.0, 0.0, 0.0,  // lower left
+    1.0, 1.0, 0.0, 1.0, 1.0,  // upper right
+    1.0, -1.0, 0.0, 1.0, 0.0]);// lower right
+}
+
+/** @type {Float32Array} */
+var standardGeometry;
 
 
 /**
