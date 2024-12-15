@@ -20,6 +20,7 @@ import { version as dexiePkgVersion } from './node_modules/dexie/package.json';
 import { breakFeedURIPostOnly, breakPostURL, defineCachedStore, detectProfileURL } from './package';
 import { version } from './package.json';
 import { ShowReadme } from './widgets/show-readme/show-readme';
+import { bootWorker } from './worker';
 
 /** @typedef {ReturnType<typeof defineCachedStore>} DBAccess */
 /** @type {DBAccess} */
@@ -34,7 +35,27 @@ export function getGlobalCachedStore() {
   return db || (db = defineCachedStore({ dbName: DB_NAME }));
 }
 
+function initiateWebWorker() {
+  if (typeof Worker !== 'undefined') {
+    const indexJSPath = [...document.scripts].reverse().find(scr => scr.src)?.src;
+    if (indexJSPath) {
+      const worker = new Worker(indexJSPath);
+      worker.onmessage = (event) => {
+        console.log('Message from worker:', event.data);
+      };
+      worker.onerror = (error) => {
+        console.error('Worker error:', error);
+      };
+      console.log('Worker created:', worker, indexJSPath);
+
+      return worker;
+    }
+  }
+}
+
 function runApp() {
+
+  const workerRef = initiateWebWorker();
 
   getGlobalCachedStore();
 
@@ -226,4 +247,9 @@ function runApp() {
   );
 }
 
-runApp();
+if (typeof window !== 'undefined')
+  runApp();
+else if (typeof self !== 'undefined')
+  bootWorker();
+else
+  throw new Error('Cannot run in this environment: neither browser nor worker.');

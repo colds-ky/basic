@@ -35228,7 +35228,7 @@ async function readCAR(did, messageBuf, options) {
   }
 }
 
-var version = "0.2.89";
+var version = "0.2.91";
 
 // @ts-check
 
