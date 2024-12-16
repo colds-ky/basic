@@ -4,6 +4,7 @@
  * @typedef {{
  *  x: number,
  *  y: number,
+ *  mass: number
  * }} LayoutNode
  */
 
@@ -11,6 +12,16 @@ const defaultVariables = {
   gravity: 10,
   speed: 0.1
 };
+
+/**
+ * @typedef {{
+ *  cellNodes: LayoutNode[],
+ *  avg: { x: number, y: number, mass: number },
+ *  max: LayoutNode
+ * }} Cell
+ */
+
+const CELL_COUNT = 16;
 
 /**
  * @param {{
@@ -21,6 +32,74 @@ const defaultVariables = {
  * }} _
  */
 export function layoutCalculator({ nodes, edges, speed, gravity }) {
+  if (typeof speed !== 'number') speed = defaultVariables.speed;
+  if (typeof gravity !== 'number') gravity = defaultVariables.gravity;
+
+  /** @type {Cell[]} */
+  let cells = orderCells(nodes);
+
+  // TODO: run node/node layout within 3x3 cell areas, and node/cell outside of that
+}
+
+/**
+ * @param {LayoutNode[]} nodes
+ */
+function orderCells(nodes) {
+  /** @type {Cell[]} */
+  const cells = [];
+
+  const sortHNodes = nodes.slice().sort((a, b) => a.x - b.x);
+  for (let xCellIndex = 0; xCellIndex < CELL_COUNT; xCellIndex++) {
+    const iXStart = Math.floor(xCellIndex * nodes.length / CELL_COUNT);
+    const iXEnd = xCellIndex === CELL_COUNT - 1 ? nodes.length - 1 :
+      Math.floor((xCellIndex + 1) * nodes.length / CELL_COUNT);
+
+    for (let yCellIndex = 0; yCellIndex < CELL_COUNT; yCellIndex++) {
+      const columnNodes = sortHNodes.slice(iXStart, iXEnd + 1);
+      columnNodes.sort((a, b) => a.y - b.y);
+
+      const iYStart = Math.floor(yCellIndex * columnNodes.length / CELL_COUNT);
+      const iYEnd = yCellIndex === CELL_COUNT - 1 ? columnNodes.length - 1 :
+        Math.floor((yCellIndex + 1) * columnNodes.length / CELL_COUNT);
+
+      const cellNodes = columnNodes.slice(iYStart, iYEnd + 1);
+
+      const avg = { x: columnNodes[0].x, y: columnNodes[0].y, mass: columnNodes[0].mass };
+      let max = columnNodes[0];
+
+      for (let i = 1; i < cellNodes.length; i++) {
+        const n = cellNodes[i];
+        avg.x += n.x;
+        avg.y += n.y;
+
+        if (n.mass > max.mass) max = n;
+      }
+
+      avg.x = (avg.x - max.x) / (cellNodes.length - 1);
+      avg.y = (avg.y - max.y) / (cellNodes.length - 1);
+      avg.mass = (avg.mass - max.mass) / (cellNodes.length - 1);
+
+      if (cells.length !== xCellIndex * CELL_COUNT + yCellIndex) {
+        console.warn('Cell index mismatch, expected ' + (xCellIndex * CELL_COUNT + yCellIndex) + ' actual ' + cells.length);
+      }
+
+      cells.push({ cellNodes, avg, max });
+    }
+  }
+
+  return cells;
+}
+
+
+/**
+ * @param {{
+ *  nodes: LayoutNode[],
+ *  edges: [source: LayoutNode, target: LayoutNode][]
+ *  speed?: number,
+ *  gravity?: number
+ * }} _
+ */
+export function layoutCalculatorGL({ nodes, edges, speed, gravity }) {
   if (typeof speed !== 'number') speed = defaultVariables.speed;
   if (typeof gravity !== 'number') gravity = defaultVariables.gravity;
 

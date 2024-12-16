@@ -76,12 +76,12 @@ export function boot(elem, unmountPromise) {
   function onRedrawRare() {
     if (profilePositions.length < 10) return;
 
-    const layout = layoutCalculator({
-      nodes: profilePositions,
-      edges: profileLinks
-    });
+    // const layout = layoutCalculator({
+    //   nodes: profilePositions,
+    //   edges: profileLinks
+    // });
 
-    layout.run(100);
+    // layout.run(100);
   }
 
   async function* streamAccountPositions() {

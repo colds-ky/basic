@@ -9,9 +9,9 @@ import { setupOrbitControls } from './setup-orbit-controls';
  */
 export function setupScene(clock) {
   const camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.00001, 10000);
-  camera.position.x = 0.18;
-  camera.position.y = 0.49;
-  camera.position.z = 0.88;
+  camera.position.x = 0.18 * 2;
+  camera.position.y = 0.49 * 2;
+  camera.position.z = 0.88 * 2;
 
   const scene = new Scene();
 
