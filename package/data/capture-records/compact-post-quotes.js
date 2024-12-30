@@ -18,7 +18,7 @@ export function detectQuoting(url, quotes) {
 }
 
 /**
- * @param {import('../../firehose').RepoRecord$Typed['app.bsky.feed.post']} record
+ * @param {import('../../firehose').RepositoryRecordTypes$['app.bsky.feed.post']} record
  */
 export function allQuoting(record) {
   /** @type {string[] | undefined} */

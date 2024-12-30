@@ -9,7 +9,7 @@ import { detectWordStartsNormalized } from './capture-records/compact-post-words
 /**
  * @param {string} repo
  * @param {string} uri
- * @param {import('../firehose').RepoRecord$Typed['app.bsky.feed.post']} record
+ * @param {import('../firehose').RepositoryRecordTypes$['app.bsky.feed.post']} record
  * @param {number} asOf
  */
 export function makeCompactPost(repo, uri, record, asOf) {

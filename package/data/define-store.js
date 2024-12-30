@@ -31,7 +31,7 @@ export function defineStore(intercepts) {
   };
 
   /**
-   * @param {import('../firehose').FirehoseRecord} record
+   * @param {import('../firehose').FirehoseRepositoryRecord<keyof import('../firehose').RepositoryRecordTypes$>} record
    * @param {number} now
    */
   function captureRecord(record, now) {

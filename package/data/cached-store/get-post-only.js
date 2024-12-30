@@ -34,7 +34,7 @@ async function getPostOnlyAsync({ uri, dbStore, agent_getRepoRecord_throttled })
   if (!parsedURL) throw new Error('Invalid post URI ' + JSON.stringify(uri));
 
   const postRecord = /**
-     * @type {import('../../firehose').FirehoseRecord$Typed<'app.bsky.feed.post'>} */(
+     * @type {import('../../firehose').FirehoseRepositoryRecord<'app.bsky.feed.post'>} */(
       (await agent_getRepoRecord_throttled(
         unwrapShortDID(parsedURL.shortDID),
         parsedURL.postID,

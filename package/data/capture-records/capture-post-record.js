@@ -6,7 +6,7 @@ import { makeCompactPost } from '../compact-post';
 /**
  * @param {string} repo
  * @param {string} uri
- * @param {import('../..').RepoRecord$Typed['app.bsky.feed.post']} postRecord
+ * @param {import('../..').RepositoryRecordTypes$['app.bsky.feed.post']} postRecord
  * @param {Map<string, import('../store-data').RepositoryData>} store
  * @param {number} asOf
  * @param {import('../define-store').Intercepts} [intercepts]

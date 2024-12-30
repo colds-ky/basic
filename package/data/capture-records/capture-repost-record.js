@@ -6,7 +6,7 @@ import { createSpeculativePost } from './speculative-post';
 
 /**
  * @param {string} repo
- * @param {import('../..').RepoRecord$Typed['app.bsky.feed.repost']} repostRecord
+ * @param {import('../..').RepositoryRecordTypes$['app.bsky.feed.repost']} repostRecord
  * @param {Map<string, import('../store-data').RepositoryData>} store
  * @param {import('../define-store').Intercepts} [intercepts]
  */

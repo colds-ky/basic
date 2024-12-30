@@ -62,7 +62,7 @@ export function firehoseThreads(db) {
       }
 
       /**
-       * @param {import('../package/firehose').FirehoseRecord$Typed<'app.bsky.feed.like'>} msg 
+       * @param {import('../package/firehose').FirehoseRepositoryRecord<'app.bsky.feed.like'>} msg 
        */
       async function handleLike(msg) {
         const thread = await getPostThreadCached(msg.subject.uri);
@@ -71,7 +71,7 @@ export function firehoseThreads(db) {
       }
 
       /**
-       * @param {import('../package/firehose').FirehoseRecord$Typed<'app.bsky.feed.post'>} msg 
+       * @param {import('../package/firehose').FirehoseRepositoryRecord<'app.bsky.feed.post'>} msg 
        */
       async function handlePost(msg) {
         const thread = await getPostThreadCached('at://' + msg.repo + '/' + msg.path);
@@ -80,7 +80,7 @@ export function firehoseThreads(db) {
       }
 
       /**
-       * @param {import('../package/firehose').FirehoseRecord$Typed<'app.bsky.feed.repost'>} msg 
+       * @param {import('../package/firehose').FirehoseRepositoryRecord<'app.bsky.feed.repost'>} msg 
        */
       async function handleRepost(msg) {
         const thread = await getPostThreadCached(msg.subject.uri);

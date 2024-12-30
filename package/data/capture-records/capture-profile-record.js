@@ -6,7 +6,7 @@ import { detectWordStartsNormalized } from './compact-post-words';
 
 /**
  * @param {string} repo
- * @param {import('../..').RepoRecord$Typed['app.bsky.actor.profile']} profileRecord
+ * @param {import('../..').RepositoryRecordTypes$['app.bsky.actor.profile']} profileRecord
  * @param {Map<string, import('../store-data').RepositoryData>} store
  * @param {number} asOf
  * @param {import('../define-store').Intercepts} [intercepts]

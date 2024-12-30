@@ -6,7 +6,7 @@ import { addToArray } from '../compact-post';
 
 /**
  * @param {string} shortDID
- * @param {import('../../firehose').RepoRecord$Typed['app.bsky.feed.post']['embed'] | undefined} embed
+ * @param {import('../../firehose').RepositoryRecordTypes$['app.bsky.feed.post']['embed'] | undefined} embed
  */
 export function extractEmbeds(shortDID, embed) {
   if (!embed) return;

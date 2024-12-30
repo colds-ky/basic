@@ -10,19 +10,6 @@ import { CarBufferReader as ipld_CarBufferReader } from '@ipld/car/buffer-reader
 
 /**
  * @typedef {{
- *   receiveTimestamp: number,
- *   since: string,
- *   time: string,
- *   messages: FirehoseRecord[],
- *   deletes?: FirehoseRecord[],
- *   unexpected?: FirehoseRecord[],
- *   error?: { message: string, [prop: string]: any }[],
- *   parseTime: number
- * }} FirehoseBlock
- */
-
-/**
- * @typedef {{
  *  'app.bsky.feed.like': import('@atproto/api').AppBskyFeedLike.Record,
  *  'app.bsky.feed.post': import('@atproto/api').AppBskyFeedPost.Record,
  *  'app.bsky.feed.repost': import('@atproto/api').AppBskyFeedRepost.Record,
@@ -37,55 +24,96 @@ import { CarBufferReader as ipld_CarBufferReader } from '@ipld/car/buffer-reader
  *  'app.bsky.feed.postgate': import('@atproto/api').AppBskyFeedPostgate.Record
  *  'chat.bsky.actor.declaration': import('@atproto/api').ChatBskyActorDeclaration.Record,
  *  'app.bsky.graph.starterpack': import('@atproto/api').AppBskyGraphStarterpack.Record
- * }} RepoRecord$Typed
+ * }} RepositoryRecordTypes$
  */
 
 /**
- * @template {keyof RepoRecord$Typed} $Type
- * @typedef {{ repo: string, uri: string, action: 'create' | 'delete' | 'update', path: string, $type: $Type } &
- *  RepoRecord$Typed[$Type]
- * } FirehoseRecord$Typed
+ * @template {keyof RepositoryRecordTypes$} $Type
+ * @typedef {RepositoryRecordTypes$[$Type] & {
+ *  repo: string,
+ *  uri: string,
+ *  action: 'create' | 'update',
+ *  path: string,
+ *  $type: $Type,
+ *  since: string,
+ *  time: string,
+ *  receiveTimestamp: number,
+ *  parseTime: number
+ * }} FirehoseRepositoryRecord
  */
+
+/**
+ * @typedef {{
+ *  repo: string,
+ *  uri: string,
+ *  action: 'delete',
+ *  path: string,
+ *  $type: keyof RepositoryRecordTypes$,
+ *  since: string,
+ *  time: string,
+ *  receiveTimestamp: number,
+ *  parseTime: number
+ * }} FirehoseDeleteRecord
+ */
+
 
 /**
  * @typedef {{
  *  $type: '#identity',
  *  repo: string,
+ *  action?: never,
  *  handle: string,
- *  time: string
- * }} FirehoseRecordIdentity
+ *  time: string,
+ *  receiveTimestamp: number,
+ *  parseTime: number
+ * }} FirehoseIdentityRecord
  */
 
 /**
  * @typedef {{
  *  $type: '#identity',
  *  repo: string,
+ *  action?: never,
  *  active: boolean,
- *  time: string
- * }} FirehoseRecordAccount
+ *  time: string,
+ *  receiveTimestamp: number,
+ *  parseTime: number
+ * }} FirehoseAccountRecord
  */
 
 /**
- * @typedef {FirehoseRecord$Typed<'app.bsky.feed.like'> |
- * FirehoseRecord$Typed<'app.bsky.feed.post'> |
- * FirehoseRecord$Typed<'app.bsky.feed.repost'> |
- * FirehoseRecord$Typed<'app.bsky.feed.threadgate'> |
- * FirehoseRecord$Typed<'app.bsky.graph.follow'> |
- * FirehoseRecord$Typed<'app.bsky.graph.block'> |
- * FirehoseRecord$Typed<'app.bsky.graph.list'> |
- * FirehoseRecord$Typed<'app.bsky.graph.listitem'> |
- * FirehoseRecord$Typed<'app.bsky.graph.listblock'> |
- * FirehoseRecord$Typed<'app.bsky.actor.profile'> |
- * FirehoseRecord$Typed<'app.bsky.feed.generator'> |
- * FirehoseRecord$Typed<'app.bsky.feed.postgate'> |
- * FirehoseRecord$Typed<'chat.bsky.actor.declaration'> |
- * FirehoseRecord$Typed<'app.bsky.graph.starterpack'> |
- * FirehoseRecordIdentity |
- * FirehoseRecordAccount
+ * @typedef {{
+ *  $type: 'error',
+ *  action?: never,
+ *  message: string,
+ *  receiveTimestamp: number,
+ *  parseTime: number
+ * } & Record<string, unknown>} FirehoseErrorRecord
+ */
+
+/**
+ * @typedef {FirehoseRepositoryRecord<'app.bsky.feed.like'> |
+ * FirehoseRepositoryRecord<'app.bsky.feed.post'> |
+ * FirehoseRepositoryRecord<'app.bsky.feed.repost'> |
+ * FirehoseRepositoryRecord<'app.bsky.feed.threadgate'> |
+ * FirehoseRepositoryRecord<'app.bsky.graph.follow'> |
+ * FirehoseRepositoryRecord<'app.bsky.graph.block'> |
+ * FirehoseRepositoryRecord<'app.bsky.graph.list'> |
+ * FirehoseRepositoryRecord<'app.bsky.graph.listitem'> |
+ * FirehoseRepositoryRecord<'app.bsky.graph.listblock'> |
+ * FirehoseRepositoryRecord<'app.bsky.actor.profile'> |
+ * FirehoseRepositoryRecord<'app.bsky.feed.generator'> |
+ * FirehoseRepositoryRecord<'app.bsky.feed.postgate'> |
+ * FirehoseRepositoryRecord<'chat.bsky.actor.declaration'> |
+ * FirehoseRepositoryRecord<'app.bsky.graph.starterpack'> |
+ * FirehoseDeleteRecord |
+ * FirehoseIdentityRecord |
+ * FirehoseAccountRecord |
+ * FirehoseErrorRecord
  * } FirehoseRecord
  */
 
-export const known$Types = [
+export const known$Types = /** @type {const} */([
   'app.bsky.feed.like', 'app.bsky.feed.post', 'app.bsky.feed.repost', 'app.bsky.feed.threadgate',
   'app.bsky.graph.follow', 'app.bsky.graph.block', 'app.bsky.graph.list', 'app.bsky.graph.listitem', 'app.bsky.graph.listblock',
   'app.bsky.actor.profile',
@@ -93,30 +121,9 @@ export const known$Types = [
   'app.bsky.feed.postgate',
   'chat.bsky.actor.declaration',
   'app.bsky.graph.starterpack'
-];
+]);
 
 firehose.knownTypes = known$Types;
-
-let cbor_x_extended = false;
-
-export async function* firehoseRecords() {
-  for await (const { messages, deletes, unexpected, ...rest } of firehose()) {
-    if (deletes?.length) {
-      for (const record of deletes) {
-        yield { ...rest, action: 'delete', record };
-      }
-    }
-
-    if (!messages.length) continue;
-    for (const record of messages) {
-      yield { ...rest, record };
-    }
-
-    for (const record of unexpected || []) {
-      yield { ...rest, action: 'unexpected', record };
-    }
-  }
-}
 
 function requireWebsocket() {
   const globalObj = typeof global !== 'undefined' && global || typeof globalThis !== 'undefined' && globalThis;
@@ -126,7 +133,7 @@ function requireWebsocket() {
 }
 
 /**
- * @returns {AsyncGenerator<FirehoseBlock, void, void>}
+ * @returns {AsyncGenerator<FirehoseRecord[], void, void>}
  */
 export async function* firehose() {
   ensureCborXExtended();
@@ -150,13 +157,16 @@ export async function* firehose() {
 
     while (true) {
       await buf.promise;
-      const block = buf.block;
-      buf = createAwaitPromise();
-      if (closed) {
-        if (block.messages.length || block.deletes?.length || block.unexpected?.length) yield block;
-        break;
+      if (buf.block?.length) {
+        const block = buf.block;
+        buf = createAwaitPromise();
+        if (closed) {
+          block['messages'] = block; // backwards compatibility trick
+          if (block.length) yield block;
+          break;
+        }
+        yield block;
       }
-      yield block;
     }
   } finally {
     if (!closed) {
@@ -172,78 +182,123 @@ export async function* firehose() {
 
   function handleMessage(event) {
     const receiveTimestamp = Date.now();
-    buf.block.receiveTimestamp = receiveTimestamp;
 
     if (typeof event.data?.byteLength === 'number') {
-      parseMessageBufAndResolve(event.data);
+      parseMessageBufAndResolve(receiveTimestamp, event.data);
     } else if (typeof event.data?.arrayBuffer === 'function') {
-      event.data.arrayBuffer().then(parseMessageBufAndResolve)
+      event.data.arrayBuffer().then(arrayBuffer => parseMessageBufAndResolve(receiveTimestamp, arrayBuffer))
     } else {
-      addBufError('WebSocket message type not supported ' + typeof event.data);
+      buf.block.push({
+        $type: 'error',
+        message: 'WebSocket message type not supported.',
+        data: event.data,
+        receiveTimestamp,
+        parseTime: 0
+      });
       buf.resolve();
     }
   }
 
-  function parseMessageBufAndResolve(messageBuf) {
-    parseMessageBuf(messageBuf);
+  /**
+   * @param {number} receiveTimestamp
+   * @param {ArrayBuffer} arrayBuf
+   */
+  function parseMessageBufAndResolve(receiveTimestamp, arrayBuf) {
+    parseMessageBuf(receiveTimestamp, new Uint8Array(arrayBuf));
     buf.resolve();
   }
 
-  function parseMessageBuf(messageBuf) {
+  /**
+   * @param {number} receiveTimestamp
+   * @param {Uint8Array} messageBuf
+   */
+  function parseMessageBuf(receiveTimestamp, messageBuf) {
+    const parseStart = Date.now();
     try {
-      parseMessageBufWorker(messageBuf);
+      parseMessageBufWorker(receiveTimestamp, parseStart, messageBuf);
       buf.resolve();
     } catch (parseError) {
-      addBufError(parseError.message);
+      buf.block.push({
+        $type: 'error',
+        message: parseError.message,
+        receiveTimestamp,
+        parseTime: Date.now() - parseStart
+      });
     }
 
     buf.resolve();
   }
 
   /**
-   * @param {ArrayBuffer} messageBuf
+   * @param {number} receiveTimestamp
+   * @param {number} parseStart
+   * @param {Uint8Array} messageBuf
    */
-  function parseMessageBufWorker(messageBuf) {
-    const parseStart = Date.now();
+  function parseMessageBufWorker(receiveTimestamp, parseStart, messageBuf) {
 
-    const entry = /** @type {any[]} */(cbor_x_decodeMultiple(new Uint8Array(messageBuf)));
+    const entry = /** @type {any[]} */(cbor_x_decodeMultiple(messageBuf));
 
-    if (!entry) return addBufError('CBOR decodeMultiple returned empty.');
-    if (entry[0]?.op !== 1) return addBufError('Expected CBOR op:1, received:' + entry[0]?.op);
+    if (!entry)
+      return buf.block.push({
+        $type: 'error',
+        message: 'CBOR decodeMultiple returned empty.',
+        receiveTimestamp,
+        parseTime: Date.now() - parseStart
+      });
+
+    if (entry[0]?.op !== 1) return buf.block.push({
+      $type: 'error',
+      message: 'Expected CBOR op:1.',
+      receiveTimestamp,
+      parseTime: Date.now() - parseStart,
+      entry: entry
+    });
 
     const commit = entry[1];
     const t = entry[0].t;
     if (t === '#identity' && commit.did) {
-      /** @type {FirehoseRecordIdentity} */
+      /** @type {FirehoseIdentityRecord} */
       const identityRecord = {
         $type: '#identity',
         repo: commit.did,
         handle: commit.handle,
-        time: commit.time
+        time: commit.time,
+        receiveTimestamp,
+        parseTime: Date.now() - parseStart
       };
-      buf.block.messages.push(identityRecord);
+      buf.block.push(identityRecord);
       return;
     } else if (t === '#account' && commit.did) {
-      /** @type {FirehoseRecordAccount} */
+      /** @type {FirehoseAccountRecord} */
       const accountRecord = {
         $type: '#identity',
         repo: commit.did,
         active: commit.active,
-        time: commit.time
+        time: commit.time,
+        receiveTimestamp,
+        parseTime: Date.now() - parseStart
       };
-      buf.block.messages.push(accountRecord);
+      buf.block.push(accountRecord);
       return;
     }
 
-    if (!commit.blocks) return addBufError('Expected operation with commit.blocks, received ' + commit.blocks);
-    if (!commit.ops?.length) return addBufError('Expected operation with commit.ops, received ' + commit.ops);
+    if (!commit.blocks?.length) return buf.block.push({
+      $type: 'error',
+      message: 'Expected operation with commit.blocks.',
+      receiveTimestamp,
+      parseTime: Date.now() - parseStart,
+      commit
+    });
+
+    if (!commit.ops?.length) return buf.block.push({
+      $type: 'error',
+      message: 'Expected operation with commit.ops.',
+      receiveTimestamp,
+      parseTime: Date.now() - parseStart,
+      commit
+    });
 
     const car = ipld_CarBufferReader.fromBytes(commit.blocks);
-
-    if (!buf.block.since)
-      buf.block.since = commit.since;
-
-    buf.block.time = commit.time;
 
     let opIndex = 0;
     for (const op of commit.ops) {
@@ -251,65 +306,60 @@ export async function* firehose() {
 
       if (!op.cid) {
         if (op.action === 'delete') {
-          /** @type {FirehoseRecord} */
+          const posPathSlash = op.path?.indexOf('/');
+          const type = posPathSlash > 0 ? op.path.slice(0, posPathSlash) : op.path;
+          /** @type {FirehoseDeleteRecord} */
           const deleteRecord = {
             repo: commit.repo,
-            path: op.path,
             uri: 'at://' + commit.repo + '/' + op.path,
             action: 'delete',
-            $type: /** @type {*} */(null)
+            path: op.path,
+            $type: type,
+            since: commit.since,
+            time: commit.time,
+            receiveTimestamp,
+            parseTime: Date.now() - parseStart
           };
-          if (!buf.block.deletes) buf.block.deletes = [deleteRecord];
-          else buf.block.deletes.push(deleteRecord);
+          buf.block.push(deleteRecord);
         } else {
-          addBufError('Missing commit[' + (opIndex - 1) + '].op.cid: ' + op.cid);
+          buf.block.push({
+            $type: 'error',
+            message: 'Missing commit.ops[' + (opIndex - 1) + '].cid.',
+            receiveTimestamp,
+            parseTime: Date.now() - parseStart,
+            commit
+          });
         }
         continue;
       }
 
       const block = car.get(/** @type {*} */(op.cid));
       if (!block) {
-        addBufError('Unresolvable commit[' + (opIndex - 1) + '].op.cid: ' + op.cid);
+        buf.block.push({
+          $type: 'error',
+          message: 'Unresolvable commit.ops[' + (opIndex - 1) + '].cid.',
+          receiveTimestamp,
+          parseTime: Date.now() - parseStart,
+          commit
+        });
         continue;
       }
 
+      /** @type {FirehoseRepositoryRecord<keyof RepositoryRecordTypes$>} */
       const record = cbor_x_decode(block.bytes);
-      // record.seq = commit.seq; 471603945
-      // record.since = /** @type {string} */(commit.since); 3ksfhcmgghv2g
-      // record.action = op.action;
-      // record.cid = cid;
-      // record.path = op.path;
-      // record.timestamp = commit.time ? Date.parse(commit.time) : Date.now(); 2024-05-13T19:59:10.457Z
-
       record.repo = commit.repo;
       record.uri = 'at://' + commit.repo + '/' + op.path;
       record.action = op.action;
+      record.path = op.path;
+      record.since = commit.since;
+      record.time = commit.time;
+      record.receiveTimestamp = receiveTimestamp;
+      record.parseTime = Date.now() - parseStart;
 
-      let unexpected =
-        (op.action !== 'create' && op.action !== 'update' && op.action !== 'delete') ||
-        known$Types.indexOf(record.$type) < 0;
+      record['seq'] = commit.seq;
 
-      if (unexpected) {
-        console.warn('unexpected ', record);
-        if (!buf.block.unexpected) buf.block.unexpected = [];
-        buf.block.unexpected.push(record);
-      } else if (op.action === 'delete') {
-        if (!buf.block.deletes) buf.block.deletes = [];
-        buf.block.deletes.push(record);
-      } else {
-        buf.block.messages.push(record);
-      }
-
-      buf.block.parseTime += Date.now() - parseStart;
+      buf.block.push(/** @type {FirehoseRecord} */(record));
     }
-  }
-
-  /**
-   * @param {string} errorStr
-   */
-  function addBufError(errorStr) {
-    if (!buf.block.error) buf.block.error = [];
-    buf.block.error.push({ message: errorStr });
   }
 
   function handleError(error) {
@@ -321,22 +371,17 @@ export async function* firehose() {
 
 }
 
-/** @returns {{
- *  block: FirehoseBlock,
+/**
+ * @returns {{
+ *  block: FirehoseRecord[],
  *  resolve: () => void,
  *  reject: (reason?: any) => void,
  *  promise: Promise<void>
  * }} */
 function createAwaitPromise() {
   const result = {
-    /** @type {FirehoseBlock} */
-    block: {
-      receiveTimestamp: 0,
-      since: '',
-      time: '',
-      messages: [],
-      parseTime: 0
-    }
+    /** @type {FirehoseRecord[]} */
+    block: []
   };
   result.promise = new Promise((resolve, reject) => {
     result.resolve = resolve;
@@ -344,6 +389,8 @@ function createAwaitPromise() {
   });
   return /** @type {*} */(result);
 }
+
+let cbor_x_extended = false;
 
 export function ensureCborXExtended() {
   if (cbor_x_extended) return;

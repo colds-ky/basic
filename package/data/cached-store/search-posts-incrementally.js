@@ -283,7 +283,7 @@ async function* indexAccountHistoryPostsFromRepository(args) {
 
     if (moreData?.data?.records?.length) {
       for (const rec of moreData.data.records) {
-        /** @type {import('../../firehose').FirehoseRecord$Typed<'app.bsky.feed.post'>} */
+        /** @type {import('../../firehose').FirehoseRepositoryRecord<'app.bsky.feed.post'>} */
         const recEx = /** @type {*} */(rec.value);
         recEx.$type = 'app.bsky.feed.post';
         recEx.uri = rec.uri;

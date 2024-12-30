@@ -1,6 +1,6 @@
 {
   "name": "coldsky",
-  "version": "0.2.102",
+  "version": "0.3.0",
   "description": "Library and the app for BlueSky",
   "main": "libs.js",
   "module": "package/index.js",
@@ -11,9 +11,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "bluesky",
+    "bluesky", "blueski", "bluski", "bski", "bsky",
     "coldsky",
     "atproto",
+    "social",
     "social media"
   ],
   "author": "Oleg Mihailik",

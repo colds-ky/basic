@@ -19,16 +19,24 @@ export async function* firehose(dbStore) {
     /** @type {import('../../firehose').FirehoseRecord[]} */
     const messages = [];
 
-    /** @type {import('../../firehose').FirehoseRecord[] | undefined} */
+    /** @type {import('../../firehose').FirehoseDeleteRecord[] | undefined} */
     let deletes;
 
-    /** @type {import('../../firehose').FirehoseRecord[] | undefined} */
-    let unexpecteds;
+    /** @type {import('../../firehose').FirehoseErrorRecord[] | undefined} */
+    let errors;
 
-    if (block.messages) {
-      for (const rec of block.messages) {
+    for (const rec of block) {
+      if (rec.$type === 'error') {
+        if (!errors) errors = [];
+        errors.push(rec);
+      } else if (rec.action === 'delete') {
+        dbStore.deleteRecord(rec);
+        if (!deletes) deletes = [];
+        deletes.push(rec);
+      } else if (rec.action === 'create' || rec.action === 'update') {
         messages.push(rec);
-        const updated = dbStore.captureRecord(rec, block.receiveTimestamp);
+
+        const updated = dbStore.captureRecord(rec, rec.receiveTimestamp);
         if (updated) {
           if ('uri' in updated) updatedPosts.set(updated.uri, updated);
           else updatedProfiles.set(updated.shortDID, updated);
@@ -36,26 +44,12 @@ export async function* firehose(dbStore) {
       }
     }
 
-    if (block.deletes?.length) {
-      if (!deletes) deletes = [];
-      for (const rec of block.deletes) {
-        dbStore.deleteRecord(rec);
-        deletes.push(rec);
-      }
-    }
-
-    if (block.unexpected?.length) {
-      if (!unexpecteds) unexpecteds = block.unexpected;
-      else if (block.unexpected.length === 1) unexpecteds.push(block.unexpected[0]);
-      else unexpecteds = unexpecteds.concat(block.unexpected);
-    }
-
     yield {
       messages,
       posts: [...updatedPosts.values()],
       profiles: [...updatedProfiles.values()],
       deletes,
-      unexpecteds
+      errors
     };
   }
 }

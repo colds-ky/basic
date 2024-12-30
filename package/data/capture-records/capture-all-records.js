@@ -5,12 +5,10 @@ import { capturePostRecord } from './capture-post-record';
 import { captureProfileRecord } from './capture-profile-record';
 import { captureRepostRecord } from './capture-repost-record';
 
-/** @typedef {import('../../firehose').RepoRecord$Typed} RepoRecord$Typed */
-
 /**
  * @param {string} repo
  * @param {string} uri
- * @param {RepoRecord$Typed[keyof RepoRecord$Typed]} rec
+ * @param {import('../../firehose').FirehoseRepositoryRecord<keyof import('../../firehose').RepositoryRecordTypes$>} rec
  * @param {Map<string, import('../store-data').RepositoryData>} store
  * @param {number} asOf
  * @param {import('../define-store').Intercepts} [intercepts]
@@ -18,15 +16,15 @@ import { captureRepostRecord } from './capture-repost-record';
 export function captureAllRecords(repo, uri, rec, store, asOf, intercepts) {
   switch (rec['$type']) {
     case 'app.bsky.feed.like':
-      return captureLikeRecord(repo, /** @type {RepoRecord$Typed['app.bsky.feed.like']} */(rec), store, intercepts);
+      return captureLikeRecord(repo, /** @type {import('../../firehose').RepositoryRecordTypes$['app.bsky.feed.like']} */(rec), store, intercepts);
 
     case 'app.bsky.feed.repost':
-      return captureRepostRecord(repo, /** @type {RepoRecord$Typed['app.bsky.feed.repost']} */(rec), store, intercepts);
+      return captureRepostRecord(repo, /** @type {import('../../firehose').RepositoryRecordTypes$['app.bsky.feed.repost']} */(rec), store, intercepts);
 
     case 'app.bsky.feed.post':
-      return capturePostRecord(repo, uri, /** @type {RepoRecord$Typed['app.bsky.feed.post']} */(rec), store, asOf, intercepts);
+      return capturePostRecord(repo, uri, /** @type {import('../../firehose').RepositoryRecordTypes$['app.bsky.feed.post']} */(rec), store, asOf, intercepts);
 
     case 'app.bsky.actor.profile':
-      return captureProfileRecord(repo, /** @type {RepoRecord$Typed['app.bsky.actor.profile']} */(rec), store, asOf, intercepts);
+      return captureProfileRecord(repo, /** @type {import('../../firehose').RepositoryRecordTypes$['app.bsky.actor.profile']} */(rec), store, asOf, intercepts);
   }
 }
