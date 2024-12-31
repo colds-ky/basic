@@ -8396,13 +8396,15 @@ async function* firehose() {
       parseTime: Date.now() - parseStart,
       commit
     });
-    if (!commit.ops?.length) return buf.block.push({
-      $type: 'error',
-      message: 'Expected operation with commit.ops.',
-      receiveTimestamp,
-      parseTime: Date.now() - parseStart,
-      commit
-    });
+    if (!commit.ops?.length) {
+      return buf.block.push({
+        $type: 'error',
+        message: 'Expected operation with commit.ops.',
+        receiveTimestamp,
+        parseTime: Date.now() - parseStart,
+        commit
+      });
+    }
     const car = CarBufferReader.fromBytes(commit.blocks);
     let opIndex = 0;
     for (const op of commit.ops) {

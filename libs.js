@@ -35089,13 +35089,15 @@ async function* firehose$1() {
       parseTime: Date.now() - parseStart,
       commit
     });
-    if (!commit.ops?.length) return buf.block.push({
-      $type: 'error',
-      message: 'Expected operation with commit.ops.',
-      receiveTimestamp,
-      parseTime: Date.now() - parseStart,
-      commit
-    });
+    if (!commit.ops?.length) {
+      return buf.block.push({
+        $type: 'error',
+        message: 'Expected operation with commit.ops.',
+        receiveTimestamp,
+        parseTime: Date.now() - parseStart,
+        commit
+      });
+    }
     const car = CarBufferReader.fromBytes(commit.blocks);
     let opIndex = 0;
     for (const op of commit.ops) {
@@ -35306,7 +35308,7 @@ async function readCAR(did, messageBuf, options) {
   }
 }
 
-var version = "0.3.0";
+var version = "0.3.1";
 
 // @ts-check
 
@@ -42326,7 +42328,10 @@ async function* firehose(dbStore) {
     const updatedProfiles = new Map();
 
     /** @type {import('../../firehose').FirehoseRecord[]} */
-    const messages = [];
+    const all = [];
+
+    /** @type {import('../../firehose').FirehoseRepositoryRecord<keyof import('../../firehose').RepositoryRecordTypes$>[]} */
+    const records = [];
 
     /** @type {import('../../firehose').FirehoseDeleteRecord[] | undefined} */
     let deletes;
@@ -42334,6 +42339,7 @@ async function* firehose(dbStore) {
     /** @type {import('../../firehose').FirehoseErrorRecord[] | undefined} */
     let errors;
     for (const rec of block) {
+      all.push(rec);
       if (rec.$type === 'error') {
         if (!errors) errors = [];
         errors.push(rec);
@@ -42342,7 +42348,7 @@ async function* firehose(dbStore) {
         if (!deletes) deletes = [];
         deletes.push(rec);
       } else if (rec.action === 'create' || rec.action === 'update') {
-        messages.push(rec);
+        records.push(rec);
         const updated = dbStore.captureRecord(rec, rec.receiveTimestamp);
         if (updated) {
           if ('uri' in updated) updatedPosts.set(updated.uri, updated);else updatedProfiles.set(updated.shortDID, updated);
@@ -42350,9 +42356,10 @@ async function* firehose(dbStore) {
       }
     }
     yield {
-      messages,
+      records,
       posts: [...updatedPosts.values()],
       profiles: [...updatedProfiles.values()],
+      all,
       deletes,
       errors
     };
@@ -43298,6 +43305,11 @@ function defineCachedStore({
       dbStore,
       agent_getPostThread_throttled
     }),
+    /** @param {string | null | undefined} didOrHandle */
+    getProfileOnly: didOrHandle => {
+      const profile = dbStore.getProfile(didOrHandle || undefined);
+      if (profile && !isPromise(profile)) return profile;
+    },
     /** @param {string | null | undefined} didOrHandle */
     getProfileIncrementally: didOrHandle => getProfileIncrementally({
       didOrHandle,

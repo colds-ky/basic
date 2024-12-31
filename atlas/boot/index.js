@@ -60,10 +60,9 @@ export function boot(elem, unmountPromise) {
 
   const box = new BoxGeometry(1, 1, 1);
   const geo = new EdgesGeometry(/** @type {*} */(box));
-  const mat = new LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+  const mat = new LineBasicMaterial({ color: 0xffffff, linewidth: 1, opacity: 0.24, transparent: true });
   const wireframe = new LineSegments(geo, mat);
   scene.add(wireframe);
-
 
   function onRedrawLive() {
     const delta = lastRender ? clock.nowMSec - lastRender : 0;

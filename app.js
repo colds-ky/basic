@@ -18,9 +18,11 @@ import { History } from './history';
 import { Landing } from './landing';
 import { version as dexiePkgVersion } from './node_modules/dexie/package.json';
 import { breakFeedURIPostOnly, breakPostURL, defineCachedStore, detectProfileURL } from './package';
-import { version } from './package.json';
+import { StatsComponent } from './stats';
 import { ShowReadme } from './widgets/show-readme/show-readme';
 import { bootWorker } from './worker';
+
+import { version } from './package.json';
 
 /** @typedef {ReturnType<typeof defineCachedStore>} DBAccess */
 /** @type {DBAccess} */
@@ -118,6 +120,7 @@ function runApp() {
         { path: '/', Component: Landing },
         { path: '/index.html', Component: Landing },
         { path: '/atlas', Component: AtlasComponent },
+        { path: '/stats', Component: StatsComponent },
         {
           path: '/db', Component: () => {
             const [result, setResult] = useState(/** @type {*} */({ app: 'initialising...' }));

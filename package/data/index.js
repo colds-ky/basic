@@ -80,11 +80,12 @@ export function isCompactPost(obj) {
 
 /**
  * @typedef {{
- *  messages: import('../firehose').FirehoseRecord[],
+ *  records: import('../firehose').FirehoseRepositoryRecord<keyof import('../firehose').RepositoryRecordTypes$>[],
  *  posts: CompactPost[],
  *  profiles: CompactProfile[],
  *  deletes: import('../firehose').FirehoseDeleteRecord[] | undefined,
- *  errors: import('../firehose').FirehoseErrorRecord[] | undefined
+ *  errors: import('../firehose').FirehoseErrorRecord[] | undefined,
+ *  all: import('../firehose').FirehoseRecord[]
  * }} CompactFirehoseBlock
  */
 

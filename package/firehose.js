@@ -290,13 +290,15 @@ export async function* firehose() {
       commit
     });
 
-    if (!commit.ops?.length) return buf.block.push({
-      $type: 'error',
-      message: 'Expected operation with commit.ops.',
-      receiveTimestamp,
-      parseTime: Date.now() - parseStart,
-      commit
-    });
+    if (!commit.ops?.length) {
+      return buf.block.push({
+        $type: 'error',
+        message: 'Expected operation with commit.ops.',
+        receiveTimestamp,
+        parseTime: Date.now() - parseStart,
+        commit
+      });
+    }
 
     const car = ipld_CarBufferReader.fromBytes(commit.blocks);
 

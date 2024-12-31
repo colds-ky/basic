@@ -13,6 +13,7 @@ import { getTimelineIncrementally } from './get-timeline-incrementally';
 import { searchPostsIncrementally } from './search-posts-incrementally';
 import { searchProfilesIncrementally } from './search-profiles-incrementally';
 import { syncRepo } from './sync-repo';
+import { isPromise } from '../../is-promise';
 
 /** @typedef {import('..').CompactPost} CompactPost */
 /** @typedef {import('..').CompactProfile} CompactProfile */
@@ -62,6 +63,12 @@ export function defineCachedStore({ dbName, service } = {}) {
     /** @param {string | null | undefined} uri */
     getPostThreadIncrementally: (uri) =>
       getPostThreadIncrementally({ uri, dbStore, agent_getPostThread_throttled }),
+
+    /** @param {string | null | undefined} didOrHandle */
+    getProfileOnly: (didOrHandle) => {
+      const profile = dbStore.getProfile(didOrHandle || undefined);
+      if (profile && !isPromise(profile)) return profile;
+    },
 
     /** @param {string | null | undefined} didOrHandle */
     getProfileIncrementally: (didOrHandle) =>

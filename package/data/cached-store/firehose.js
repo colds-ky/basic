@@ -17,7 +17,10 @@ export async function* firehose(dbStore) {
     const updatedProfiles = new Map();
 
     /** @type {import('../../firehose').FirehoseRecord[]} */
-    const messages = [];
+    const all = [];
+
+    /** @type {import('../../firehose').FirehoseRepositoryRecord<keyof import('../../firehose').RepositoryRecordTypes$>[]} */
+    const records = [];
 
     /** @type {import('../../firehose').FirehoseDeleteRecord[] | undefined} */
     let deletes;
@@ -26,6 +29,7 @@ export async function* firehose(dbStore) {
     let errors;
 
     for (const rec of block) {
+      all.push(rec);
       if (rec.$type === 'error') {
         if (!errors) errors = [];
         errors.push(rec);
@@ -34,7 +38,7 @@ export async function* firehose(dbStore) {
         if (!deletes) deletes = [];
         deletes.push(rec);
       } else if (rec.action === 'create' || rec.action === 'update') {
-        messages.push(rec);
+        records.push(rec);
 
         const updated = dbStore.captureRecord(rec, rec.receiveTimestamp);
         if (updated) {
@@ -45,9 +49,10 @@ export async function* firehose(dbStore) {
     }
 
     yield {
-      messages,
+      records,
       posts: [...updatedPosts.values()],
       profiles: [...updatedProfiles.values()],
+      all,
       deletes,
       errors
     };

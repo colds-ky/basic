@@ -40,7 +40,7 @@ export function firehoseThreads(db) {
       async function keepMonitoringFirehose() {
         for await (const chunk of db.firehose()) {
           if (streaming.isEnded) break;
-          for (const msg of chunk.messages) {
+          for (const msg of chunk.records) {
             switch (msg.$type) {
               case 'app.bsky.feed.like': handleLike(msg); continue;
               case 'app.bsky.feed.post': handlePost(msg); continue;
