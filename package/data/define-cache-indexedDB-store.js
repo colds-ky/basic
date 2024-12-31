@@ -313,6 +313,30 @@ export function defineCacheIndexedDBStore(dbName) {
 
       if (!root) root = current;
     }
+
+    const knownUris = new Set(all.map(p => p.uri));
+    const completeMissing = all.slice();
+    while (true) {
+      const p = completeMissing.pop();
+      if (!p) break;
+
+      if (p.replyTo && !knownUris.has(p.replyTo)) {
+        const replyTo = await db.posts.get(p.replyTo);
+        if (replyTo) {
+          all.push(replyTo);
+          knownUris.add(replyTo.uri);
+          completeMissing.push(p);
+        } else {
+          const replyToShortDID = breakFeedURIPostOnly(p.replyTo)?.shortDID;
+          if (replyToShortDID) {
+            const speculative = createSpeculativePost(replyToShortDID, p.replyTo);
+            all.push(speculative);
+            knownUris.add(speculative.uri);
+          }
+        }
+      }
+    }
+
     return { all, root, current };
   }
 

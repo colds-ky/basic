@@ -27,18 +27,29 @@ export function PostEmbedsSection({ compact, post, linkTimestamp, linkAuthor, al
   const images = [];
   const dummies = [];
 
+  let embedCount = 0;
+
   for (const embed of post.embeds) {
     const parsedURL = breakFeedURIPostOnly(embed.url) || breakPostURL(embed.url);
     if (parsedURL) {
       posts.push({ parsedURL, embed });
+      embedCount++;
     } else if (embed.url) {
       links.push(embed);
+      embedCount++;
     } else if (embed.imgSrc) {
       images.push(embed);
+      embedCount++;
     } else {
       dummies.push(embed);
     }
   }
+
+  if (dummies?.length) {
+    console.log('Dummy embeds in post ', post, dummies);
+  }
+
+  if (!embedCount) return null;
 
   return (
     <div className={
@@ -51,10 +62,6 @@ export function PostEmbedsSection({ compact, post, linkTimestamp, linkAuthor, al
       {
         !images?.length ? null :
           <EmbedImages post={post} images={images} />
-      }
-      {
-        !dummies?.length ? null :
-          <EmbedLinks post={post} links={dummies} />
       }
       {
         allowEmbedDepth === 0 ?

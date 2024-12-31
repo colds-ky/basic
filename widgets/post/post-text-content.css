@@ -4,7 +4,7 @@
 
 .facet-mention .account-avatar-chip {
   margin-right: 0;
-  transform: scale(0.85) translateY(0.2em);
+  transform: scale(0.85) translateY(0.1em);
   filter: contrast(1.5) brightness(1.1);
   box-shadow: inset 1px 0.5px 2px #1919eea3;
 }

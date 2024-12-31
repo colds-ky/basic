@@ -28,11 +28,14 @@ export function EmbedLinks({ className, post, links, ...rest }) {
                     </a>
                   </div>
               }
-              <div className='post-embed-link-url'>
-                <a href={link.url} target="_blank" rel="noopener noreferrer">
-                  <LinkURL url={link.url} />
-                </a>
-              </div>
+              {
+                !link.url ? undefined :
+                  <div className='post-embed-link-url'>
+                    <a href={link.url} target="_blank" rel="noopener noreferrer">
+                      <LinkURL url={link.url} />
+                    </a>
+                  </div>
+              }
               {
                 !link.description && !link.imgSrc ? undefined :
                   !link.description ?
