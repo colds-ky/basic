@@ -34,9 +34,7 @@ export function HistoryLayout({
   const [timeout] = React.useState({ timeout: 0, searchText: '' });
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const searchText = searchParams.get('q') || '';
-  const searchWith = searchParams.get('with');
-  const searchLikesAndReposts = /likes/i.test(searchWith || '');
+  const { searchText, searchLikesAndReposts } = useInitialSearchParams();
 
   /**
    * @param {{
@@ -185,4 +183,15 @@ export function HistoryLayout({
 function suffixClassWhenEmpty(className, value, hasPlaceholder) {
   const withEmpty = value ? className : className + ' ' + className + '-empty';
   return hasPlaceholder?.placeholder ? withEmpty + ' ' + className + '-placeholder' : withEmpty;
+}
+
+export function useInitialSearchParams() {
+  const [searchParams] = useSearchParams();
+  const searchText = searchParams.get('q') || '';
+  const searchWith = searchParams.get('with');
+  const searchLikesAndReposts = /likes/i.test(searchWith || '');
+  return {
+    searchText,
+    searchLikesAndReposts
+  };
 }

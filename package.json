@@ -1,6 +1,6 @@
 {
   "name": "coldsky",
-  "version": "0.2.97",
+  "version": "0.2.99",
   "description": "Library and the app for BlueSky",
   "main": "libs.js",
   "module": "package/index.js",

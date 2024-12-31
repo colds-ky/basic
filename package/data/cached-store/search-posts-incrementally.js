@@ -3,9 +3,11 @@
 import { isCompactPost } from '..';
 import { streamEvery } from '../../../package/akpa';
 import { ColdskyAgent } from '../../coldsky-agent';
+import { isPromise } from '../../is-promise';
 import { plcDirectoryHistoryRaw } from '../../plc-directory';
-import { unwrapShortDID, unwrapShortHandle } from '../../shorten';
+import { breakFeedURI, detectProfileURL, likelyDID, shortenDID, unwrapShortDID, unwrapShortHandle } from '../../shorten';
 import { breakIntoWords } from '../capture-records/compact-post-words';
+import { extractKnownArguments } from './cached-store';
 import { getPostOnly } from './get-post-only';
 import { syncRepo } from './sync-repo';
 
@@ -41,14 +43,19 @@ export function searchPostsIncrementally(args) {
  * @param {Args} args
  */
 export async function* searchAccountHistoryPostsIncrementally(args) {
-  const { shortDID, searchQuery, likesAndReposts, dbStore, agent_searchPosts_throttled } = args;
+  const { shortDID, searchQuery: searchQueryOriginal, likesAndReposts, dbStore, agent_getProfile_throttled, agent_searchPosts_throttled } = args;
+
+  const knownArgs = searchQueryOriginal ? extractKnownArguments(searchQueryOriginal) : undefined;
+  const searchQuery = knownArgs ? knownArgs.reduced : searchQueryOriginal;
+
+  const hasSearch = searchQuery || knownArgs?.to?.length;
 
   let REPORT_UPDATES_FREQUENCY_MSEC = 700;
 
   const cachedMatchesPromise = dbStore.searchPosts(shortDID, searchQuery, likesAndReposts);
   /** @type {Set<string> | undefined} */
   const missingLikesAndReposts = !likesAndReposts ? undefined : new Set();
-  const allCachedHistoryPromise = !searchQuery ? cachedMatchesPromise :
+  const allCachedHistoryPromise = !hasSearch ? cachedMatchesPromise :
     dbStore.searchPosts(shortDID, undefined, likesAndReposts, missingLikesAndReposts);
 
   const plcDirHistoryPromise = plcDirectoryHistoryRaw(/** @type {string} */(shortDID));
@@ -58,10 +65,17 @@ export async function* searchAccountHistoryPostsIncrementally(args) {
   let processedBatch;
   let anyUpdates = false;
 
-  /** @type {import('.').IncrementalMatchCompactPosts | undefined} */
-  let lastMatches = await cachedMatchesPromise;
+  /** @type {Set<string> | undefined | Promise<Set<string> | undefined>} */
+  let toShortDIDsPromise = !knownArgs?.to?.length ? undefined : Promise.all(
+    knownArgs.to.map(handle => resolveUserLocalOrRemote(handle))).then(shortDIDs => {
+      const res = /** @type {Set<string>} */(new Set(shortDIDs.filter(Boolean)));
+      return (toShortDIDsPromise = res.size ? res : undefined);
+    });
 
-  const allHistory = await allCachedHistoryPromise;
+  /** @type {import('.').IncrementalMatchCompactPosts} */
+  let lastMatches = await filterWithTo(await cachedMatchesPromise, toShortDIDsPromise);
+
+  const allHistory = await filterWithTo(await allCachedHistoryPromise, toShortDIDsPromise);
 
   /** @type {Set<string> | undefined} */
   let knownHistoryUri = new Set((allHistory || []).map(rec => rec.uri));
@@ -123,7 +137,7 @@ export async function* searchAccountHistoryPostsIncrementally(args) {
           }
         }
 
-        streaming.yield(batch);
+        streaming.yield(await filterWithTo(batch, toShortDIDsPromise));
       }
 
       async function downloadFullRepoAndIndex() {
@@ -139,7 +153,7 @@ export async function* searchAccountHistoryPostsIncrementally(args) {
                 isCompactPost(post) && post.shortDID === shortDID)
             );
 
-        streaming.yield(ownPostsOnly);
+        streaming.yield(await filterWithTo(ownPostsOnly, toShortDIDsPromise));
         fullRepoIndexed = true;
       }
     });
@@ -160,7 +174,8 @@ export async function* searchAccountHistoryPostsIncrementally(args) {
     }
   };
 
-  for await (const searchResult of parallelSearch) {
+  for await (const searchResultRaw of parallelSearch) {
+    const searchResult = await filterWithTo(searchResultRaw || [], toShortDIDsPromise)
     if (searchResult) {
       if (!processedBatch) processedBatch = searchResult;
       else processedBatch = processedBatch.concat(searchResult);
@@ -168,7 +183,9 @@ export async function* searchAccountHistoryPostsIncrementally(args) {
 
     if (Date.now() - lastSearchReport > REPORT_UPDATES_FREQUENCY_MSEC) {
       /** @type {import('.').IncrementalMatchCompactPosts} */
-      const newMatches = await dbStore.searchPosts(shortDID, searchQuery, likesAndReposts, missingLikesAndReposts);
+      const newMatches = await filterWithTo(
+        await dbStore.searchPosts(shortDID, searchQuery, likesAndReposts, missingLikesAndReposts),
+        toShortDIDsPromise);
       addMissingLikesAndRepostsToTheQueue();
 
       lastMatches = newMatches;
@@ -189,13 +206,50 @@ export async function* searchAccountHistoryPostsIncrementally(args) {
   }
 
   /** @type {import('.').IncrementalMatchCompactPosts} */
-  const finalMatches = await dbStore.searchPosts(shortDID, searchQuery, likesAndReposts, missingLikesAndReposts);
+  const finalMatches = await filterWithTo(
+    await dbStore.searchPosts(shortDID, searchQuery, likesAndReposts, missingLikesAndReposts),
+    toShortDIDsPromise);
   addMissingLikesAndRepostsToTheQueue();
   finalMatches.processedBatch = processedBatch;
   if (!finalMatches.processedAllCount)
     finalMatches.processedAllCount = knownHistoryUri.size;
   processedBatch = undefined;
   yield finalMatches;
+
+  /** @param {string} handle */
+  function resolveUserLocalOrRemote(handle) {
+    if (likelyDID(handle)) return handle;
+
+    const dbResolve = dbStore.getProfile(unwrapShortHandle(handle.trim().replace(/^@/, '')));
+    if (dbResolve) {
+      if (!isPromise(dbResolve)) return dbResolve.shortDID;
+
+      return dbResolve.then(
+        res => {
+          if (res) return res.shortDID;
+
+          return resolveRemote();
+        },
+        err => {
+          return resolveRemote();
+        });
+    } else {
+      return resolveRemote();
+    }
+
+    async function resolveRemote() {
+      let dt;
+      try {
+        dt = await agent_getProfile_throttled(handle);
+      } catch (getProfileError) {
+        return;
+      }
+
+      if (!dt.data) return;
+      const profile = dbStore.captureProfileView(dt.data, Date.now());
+      return profile.shortDID;
+    }
+  }
 }
 
 /**
@@ -302,4 +356,70 @@ async function* searchAllPostsIncrementally(args) {
 
     if (!remoteSearchData?.cursor) break;
   }
+}
+
+/**
+ * @param {import('..').MatchCompactPost[]} matches
+ * @param {Set<string> | undefined | Promise<Set<string> | undefined} toShortDIDsPromise
+ */
+function filterWithTo(matches, toShortDIDsPromise) {
+  if (!toShortDIDsPromise) return matches;
+
+  if (isPromise(toShortDIDsPromise)) {
+    return toShortDIDsPromise.then(shortDIDs => {
+      if (!shortDIDs) return matches;
+      else return filterWithToSet(matches, shortDIDs);
+    });
+  } else {
+    return filterWithToSet(matches, toShortDIDsPromise);
+  }
+}
+
+/**
+ * @param {import('..').MatchCompactPost[]} matches
+ * @param {Set<string>} toShortDIDs
+ */
+function filterWithToSet(matches, toShortDIDs) {
+  const filtered = matches.filter(match => {
+    if (match.replyTo) {
+      const ref = breakFeedURI(match.replyTo);
+      if (ref && toShortDIDs.has(ref.shortDID)) return true;
+    }
+
+    if (match.threadStart) {
+      const ref = breakFeedURI(match.threadStart);
+      if (ref && toShortDIDs.has(ref.shortDID)) return true;
+    }
+
+    if (match.quoting?.length) {
+      for (const q of match.quoting) {
+        const ref = breakFeedURI(q);
+        if (ref && toShortDIDs.has(ref.shortDID)) return true;
+      }
+    }
+
+    if (match.embeds?.length) {
+      for (const emb of match.embeds) {
+        if (emb.url) {
+          const ref = breakFeedURI(emb.url);
+          if (ref && toShortDIDs.has(ref.shortDID)) return true;
+          const prof = detectProfileURL(emb.url);
+          if (prof && toShortDIDs.has(prof)) return true;
+        }
+      }
+    }
+
+    if (match.facets?.length) {
+      for (const fa of match.facets) {
+        if (fa.url) {
+          const ref = breakFeedURI(fa.url);
+          if (ref && toShortDIDs.has(ref.shortDID)) return true;
+          const prof = detectProfileURL(fa.url);
+          if (prof && toShortDIDs.has(prof)) return true;
+        }
+      }
+    }
+  });
+
+  return filtered;
 }

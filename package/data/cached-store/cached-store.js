@@ -126,3 +126,30 @@ export function defineCachedStore({ dbName, service } = {}) {
   };
 
 }
+
+/** @param {string} search */
+export function extractKnownArguments(search) {
+  let toArguments = [];
+  let dateOrTimeArguments = [];
+  const reducedSearch = search.replace(
+    /\s?(to\:([^\s]+))|(date|time\:([^\s]+))\s?/g,
+    (m, to, toSlice, dateOrTime, dateSlice) => {
+      let anyMatched = false;
+      if (toSlice) {
+        anyMatched = true;
+        toArguments.push(toSlice);
+      }
+
+      const dt = new Date(dateSlice);
+      if (dt.getTime() > 0) {
+        dateOrTimeArguments.push(dt);
+        anyMatched = true;
+      }
+
+      if (anyMatched) return ' ';
+      else return m;
+    });
+
+  if (toArguments?.length || dateOrTimeArguments?.length)
+    return { to: toArguments, dateOrTime: dateOrTimeArguments, reduced: reducedSearch.trim() };
+}

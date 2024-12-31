@@ -10,7 +10,7 @@ import { localise } from '../app-shared/localise';
 import { likelyDID, makeFeedUri, plcDirectoryHistoryCompact, plcDirectoryHistoryRaw, shortenDID, unwrapShortPDS } from '../package';
 import { downloadCAR } from '../package/data/cached-store/sync-repo';
 import { Thread } from '../widgets/post/thread';
-import { HistoryLayout } from './history-layout';
+import { HistoryLayout, useInitialSearchParams } from './history-layout';
 import { HistoryPageDecorations } from './history-page-decorations';
 import { Timeline } from './timeline';
 
@@ -44,8 +44,10 @@ function HistoryCore() {
 
   setGlobalAppView(handle ? { account: handle } : undefined);
 
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const [likesAndReposts, setLikesAndReposts] = React.useState(false);
+  const initialSearchParams = useInitialSearchParams();
+
+  const [searchQuery, setSearchQuery] = React.useState(initialSearchParams.searchText);
+  const [likesAndReposts, setLikesAndReposts] = React.useState(initialSearchParams.searchLikesAndReposts);
 
   const searchQueryStartsWithSlash = (searchQuery || '').trim().startsWith('/');
 
