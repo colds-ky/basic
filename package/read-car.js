@@ -2,7 +2,7 @@
 
 import { decode as cbor_x_decode } from 'cbor-x';
 import { CID } from 'multiformats';
-import { CarReader as ipld_CarReader } from '@ipld/car/reader';
+import { CarBufferReader as ipld_CarBufferReader } from '@ipld/car/buffer-reader';
 
 import { ensureCborXExtended } from './firehose';
 import { unwrapShortDID } from './shorten';
@@ -17,9 +17,12 @@ var COLLECTING_CYCLES_BEFORE_REST = 15000;
  */
 export async function readCAR(did, messageBuf, options) {
   const fullDID = unwrapShortDID(did);
+
+  const parseStart = Date.now();
+
   const bytes = messageBuf instanceof ArrayBuffer ? new Uint8Array(messageBuf) : messageBuf;
 
-  const car = await ipld_CarReader.fromBytes(bytes);
+  const car = ipld_CarBufferReader.fromBytes(bytes);
   ensureCborXExtended();
 
   const recordsByCID = new Map();
@@ -29,7 +32,7 @@ export async function readCAR(did, messageBuf, options) {
   const blocks = typeof car._blocks === 'object' && car._blocks && Array.isArray(car._blocks) ? car._blocks : car.blocks();
 
   let entriesChunk = 0;
-  for await (const block of blocks) {
+  for (const block of blocks) {
     entriesChunk++;
     if (entriesChunk > READING_CYCLES_BEFORE_REST) {
       entriesChunk = 0;
@@ -74,8 +77,8 @@ export async function readCAR(did, messageBuf, options) {
     }
   }
 
-  /** @type {import('./firehose').FirehoseRecord[]} */
-  const records = [];
+  /** @type {import('./firehose').FirehoseRecord[] & { parseTime: number }} */
+  const records = /** @type {*} */([]);
 
   entriesChunk = 0;
   for (const entry of recordsByCID) {
@@ -108,7 +111,9 @@ export async function readCAR(did, messageBuf, options) {
 
     // record.repo = fullDID;
     // record.uri = fullDID + '/' + 'op.path';
-    // record.action = 'create';
+  // record.action = 'create';
+  
+  records.parseTime = Date.now() - parseStart;
 
   return records;
 

@@ -6,7 +6,7 @@ import {
   decode as cbor_x_decode
 } from 'cbor-x';
 import { CID as multiformats_CID } from 'multiformats';
-import { CarReader as ipld_CarReader } from '@ipld/car/reader';
+import { CarBufferReader as ipld_CarBufferReader } from '@ipld/car/buffer-reader';
 
 /**
  * @typedef {{
@@ -15,7 +15,9 @@ import { CarReader as ipld_CarReader } from '@ipld/car/reader';
  *   time: string,
  *   messages: FirehoseRecord[],
  *   deletes?: FirehoseRecord[],
- *   unexpected?: FirehoseRecord[]
+ *   unexpected?: FirehoseRecord[],
+ *   error?: { message: string, [prop: string]: any }[],
+ *   parseTime: number
  * }} FirehoseBlock
  */
 
@@ -96,6 +98,13 @@ export async function* firehoseRecords() {
   }
 }
 
+function requireWebsocket() {
+  const globalObj = typeof global !== 'undefined' && global || typeof globalThis !== 'undefined' && globalThis;
+  const requireFn = globalObj?.['require'];
+  if (typeof requireFn === 'function') return /** @type {typeof WebSocket} */(requireFn('ws'));
+  throw new Error('WebSocket not available');
+}
+
 /**
  * @returns {AsyncGenerator<FirehoseBlock, void, void>}
  */
@@ -104,11 +113,12 @@ export async function* firehose() {
 
   /** @type {typeof WebSocket} */
   const WebSocketImpl = typeof WebSocket === 'function' ? WebSocket :
-    /** @type {typeof WebSocket} */(require('ws'));
+    requireWebsocket();
 
   const wsAddress = 'wss://bsky.network/xrpc/com.atproto.sync.subscribeRepos';
 
   const ws = new WebSocketImpl(wsAddress);
+  ws.binaryType = 'arraybuffer';
   ws.addEventListener('message', handleMessage);
   ws.addEventListener('error', handleError);
   ws.addEventListener('close', handleClose)
@@ -142,32 +152,70 @@ export async function* firehose() {
 
   function handleMessage(event) {
     const receiveTimestamp = Date.now();
+    buf.block.receiveTimestamp = receiveTimestamp;
 
-    if (typeof event.data?.arrayBuffer === 'function')
-      return event.data.arrayBuffer().then(arrayBuf => convertMessageBuf(receiveTimestamp, arrayBuf));
-    else if (typeof event.data?.byteLength === 'number')
-      return convertMessageBuf(receiveTimestamp, event.data);
+    if (typeof event.data?.byteLength === 'number') {
+      parseMessageBufAndResolve(event.data);
+    } else if (typeof event.data?.arrayBuffer === 'function') {
+      event.data.arrayBuffer().then(parseMessageBufAndResolve)
+    } else {
+      addBufError('WebSocket message type not supported ' + typeof event.data);
+      buf.resolve();
+    }
   }
 
-  /** @param {ArrayBuffer} messageBuf */
-  async function convertMessageBuf(receiveTimestamp, messageBuf) {
+  function parseMessageBufAndResolve(messageBuf) {
+    parseMessageBuf(messageBuf);
+    buf.resolve();
+  }
+
+  function parseMessageBuf(messageBuf) {
+    try {
+      parseMessageBufWorker(messageBuf);
+      buf.resolve();
+    } catch (parseError) {
+      addBufError(parseError.message);
+    }
+
+    buf.resolve();
+  }
+
+  /**
+   * @param {ArrayBuffer} messageBuf
+   */
+  function parseMessageBufWorker(messageBuf) {
+    const parseStart = Date.now();
+
     const entry = /** @type {any[]} */(cbor_x_decodeMultiple(new Uint8Array(messageBuf)));
-    if (!entry || entry[0]?.op !== 1) return;
+
+    if (!entry) return addBufError('CBOR decodeMultiple returned empty.');
+    if (entry[0]?.op !== 1) return addBufError('Expected CBOR op:1, received:' + entry[0]?.op);
 
     const commit = entry[1];
-    if (!commit.blocks) return; // TODO: alert unusual commit
+    if (!commit.blocks) return addBufError('Expected operation with commit.blocks, received ' + commit.blocks);
+    if (!commit.ops?.length) return addBufError('Expected operation with commit.ops, received ' + commit.ops);
 
-    if (!commit.ops?.length) return; // TODO: alert unusual commit
+    const car = ipld_CarBufferReader.fromBytes(commit.blocks);
 
-    const car = await ipld_CarReader.fromBytes(commit.blocks);
+    if (!buf.block.since)
+      buf.block.since = commit.since;
 
-    buf.block.receiveTimestamp = receiveTimestamp;
-    buf.block.since = commit.since;
     buf.block.time = commit.time;
 
+    let opIndex = 0;
     for (const op of commit.ops) {
-      const block = op.cid && await car.get(/** @type {*} */(op.cid));
-      if (!block) continue; // TODO: alert unusual op
+      opIndex++;
+
+      if (!op.cid) {
+        addBufError('Missing commit[' + (opIndex - 1) + '].op.cid: ' + op.cid);
+        continue;
+      }
+
+      const block = car.get(/** @type {*} */(op.cid));
+      if (!block) {
+        addBufError('Unresolvable commit[' + (opIndex - 1) + '].op.cid: ' + op.cid);
+        continue;
+      }
 
       const record = cbor_x_decode(block.bytes);
       // record.seq = commit.seq; 471603945
@@ -195,9 +243,17 @@ export async function* firehose() {
       } else {
         buf.block.messages.push(record);
       }
-    }
 
-    buf.resolve();
+      buf.block.parseTime += Date.now() - parseStart;
+    }
+  }
+
+  /**
+   * @param {string} errorStr
+   */
+  function addBufError(errorStr) {
+    if (!buf.block.error) buf.block.error = [];
+    buf.block.error.push({ message: errorStr });
   }
 
   function handleError(error) {
@@ -216,7 +272,16 @@ export async function* firehose() {
  *  promise: Promise<void>
  * }} */
 function createAwaitPromise() {
-  const result = { block: { messages: [] } };
+  const result = {
+    /** @type {FirehoseBlock} */
+    block: {
+      receiveTimestamp: 0,
+      since: '',
+      time: '',
+      messages: [],
+      parseTime: 0
+    }
+  };
   result.promise = new Promise((resolve, reject) => {
     result.resolve = resolve;
     result.reject = reject;

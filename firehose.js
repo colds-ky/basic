@@ -7791,28 +7791,27 @@ const CarV1HeaderOrV2Pragma = {
  * @typedef {import('./api').Block} Block
  * @typedef {import('./api').BlockHeader} BlockHeader
  * @typedef {import('./api').BlockIndex} BlockIndex
- * @typedef {import('./coding').BytesReader} BytesReader
+ * @typedef {import('./coding').BytesBufferReader} BytesBufferReader
  * @typedef {import('./coding').CarHeader} CarHeader
  * @typedef {import('./coding').CarV2Header} CarV2Header
  * @typedef {import('./coding').CarV2FixedHeader} CarV2FixedHeader
- * @typedef {import('./coding').CarDecoder} CarDecoder
  */
 
 /**
  * Reads header data from a `BytesReader`. The header may either be in the form
  * of a `CarHeader` or `CarV2Header` depending on the CAR being read.
  *
- * @name async decoder.readHeader(reader)
- * @param {BytesReader} reader
+ * @name decoder.readHeader(reader)
+ * @param {BytesBufferReader} reader
  * @param {number} [strictVersion]
- * @returns {Promise<CarHeader|CarV2Header>}
+ * @returns {CarHeader | CarV2Header}
  */
-async function readHeader(reader, strictVersion) {
-  const length = decodeVarint(await reader.upTo(8), reader);
+function readHeader(reader, strictVersion) {
+  const length = decodeVarint(reader.upTo(8), reader);
   if (length === 0) {
     throw new Error('Invalid CAR header (zero length)');
   }
-  const header = await reader.exactly(length, true);
+  const header = reader.exactly(length, true);
   const block = decode$5(header);
   if (CarV1HeaderOrV2Pragma.toTyped(block) === undefined) {
     throw new Error('Invalid CAR header format');
@@ -7831,54 +7830,56 @@ async function readHeader(reader, strictVersion) {
   if (block.roots !== undefined) {
     throw new Error('Invalid CAR header format');
   }
-  const v2Header = decodeV2Header(await reader.exactly(V2_HEADER_LENGTH, true));
+  const v2Header = decodeV2Header(reader.exactly(V2_HEADER_LENGTH, true));
   reader.seek(v2Header.dataOffset - reader.pos);
-  const v1Header = await readHeader(reader, 1);
+  const v1Header = readHeader(reader, 1);
   return Object.assign(v1Header, v2Header);
 }
 
 /**
- * @param {BytesReader} reader
- * @returns {Promise<CID>}
+ * Reads CID sync
+ *
+ * @param {BytesBufferReader} reader
+ * @returns {CID}
  */
-async function readCid(reader) {
-  const first = await reader.exactly(2, false);
+function readCid(reader) {
+  const first = reader.exactly(2, false);
   if (first[0] === CIDV0_BYTES.SHA2_256 && first[1] === CIDV0_BYTES.LENGTH) {
     // cidv0 32-byte sha2-256
-    const bytes = await reader.exactly(34, true);
+    const bytes = reader.exactly(34, true);
     const multihash = decode$1(bytes);
     return CID.create(0, CIDV0_BYTES.DAG_PB, multihash);
   }
-  const version = decodeVarint(await reader.upTo(8), reader);
+  const version = decodeVarint(reader.upTo(8), reader);
   if (version !== 1) {
     throw new Error(`Unexpected CID version (${version})`);
   }
-  const codec = decodeVarint(await reader.upTo(8), reader);
-  const bytes = await reader.exactly(getMultihashLength(await reader.upTo(8)), true);
+  const codec = decodeVarint(reader.upTo(8), reader);
+  const bytes = reader.exactly(getMultihashLength(reader.upTo(8)), true);
   const multihash = decode$1(bytes);
   return CID.create(version, codec, multihash);
 }
 
 /**
  * Reads the leading data of an individual block from CAR data from a
- * `BytesReader`. Returns a `BlockHeader` object which contains
+ * `BytesBufferReader`. Returns a `BlockHeader` object which contains
  * `{ cid, length, blockLength }` which can be used to either index the block
  * or read the block binary data.
  *
  * @name async decoder.readBlockHead(reader)
- * @param {BytesReader} reader
- * @returns {Promise<BlockHeader>}
+ * @param {BytesBufferReader} reader
+ * @returns {BlockHeader}
  */
-async function readBlockHead(reader) {
+function readBlockHead(reader) {
   // length includes a CID + Binary, where CID has a variable length
   // we have to deal with
   const start = reader.pos;
-  let length = decodeVarint(await reader.upTo(8), reader);
+  let length = decodeVarint(reader.upTo(8), reader);
   if (length === 0) {
     throw new Error('Invalid CAR section (zero length)');
   }
   length += reader.pos - start;
-  const cid = await readCid(reader);
+  const cid = readCid(reader);
   const blockLength = length - Number(reader.pos - start); // subtract CID length
 
   return {
@@ -7889,95 +7890,51 @@ async function readBlockHead(reader) {
 }
 
 /**
- * @param {BytesReader} reader
- * @returns {Promise<Block>}
- */
-async function readBlock(reader) {
-  const {
-    cid,
-    blockLength
-  } = await readBlockHead(reader);
-  const bytes = await reader.exactly(blockLength, true);
-  return {
-    bytes,
-    cid
-  };
-}
-
-/**
- * @param {BytesReader} reader
- * @returns {Promise<BlockIndex>}
- */
-async function readBlockIndex(reader) {
-  const offset = reader.pos;
-  const {
-    cid,
-    length,
-    blockLength
-  } = await readBlockHead(reader);
-  const index = {
-    cid,
-    length,
-    blockLength,
-    offset,
-    blockOffset: reader.pos
-  };
-  reader.seek(index.blockLength);
-  return index;
-}
-
-/**
- * Creates a `CarDecoder` from a `BytesReader`. The `CarDecoder` is as async
- * interface that will consume the bytes from the `BytesReader` to yield a
- * `header()` and either `blocks()` or `blocksIndex()` data.
+ * Returns Car header and blocks from a Uint8Array
  *
- * @name decoder.createDecoder(reader)
- * @param {BytesReader} reader
- * @returns {CarDecoder}
+ * @param {Uint8Array} bytes
+ * @returns {{ header : CarHeader | CarV2Header , blocks: Block[]}}
  */
-function createDecoder(reader) {
-  const headerPromise = (async () => {
-    const header = await readHeader(reader);
-    if (header.version === 2) {
-      const v1length = reader.pos - header.dataOffset;
-      reader = limitReader(reader, header.dataSize - v1length);
-    }
-    return header;
-  })();
+function fromBytes(bytes) {
+  let reader = bytesReader(bytes);
+  const header = readHeader(reader);
+  if (header.version === 2) {
+    const v1length = reader.pos - header.dataOffset;
+    reader = limitReader(reader, header.dataSize - v1length);
+  }
+  const blocks = [];
+  while (reader.upTo(8).length > 0) {
+    const {
+      cid,
+      blockLength
+    } = readBlockHead(reader);
+    blocks.push({
+      cid,
+      bytes: reader.exactly(blockLength, true)
+    });
+  }
   return {
-    header: () => headerPromise,
-    async *blocks() {
-      await headerPromise;
-      while ((await reader.upTo(8)).length > 0) {
-        yield await readBlock(reader);
-      }
-    },
-    async *blocksIndex() {
-      await headerPromise;
-      while ((await reader.upTo(8)).length > 0) {
-        yield await readBlockIndex(reader);
-      }
-    }
+    header,
+    blocks
   };
 }
 
 /**
- * Creates a `BytesReader` from a `Uint8Array`.
+ * Creates a `BytesBufferReader` from a `Uint8Array`.
  *
  * @name decoder.bytesReader(bytes)
  * @param {Uint8Array} bytes
- * @returns {BytesReader}
+ * @returns {BytesBufferReader}
  */
 function bytesReader(bytes) {
   let pos = 0;
 
-  /** @type {BytesReader} */
+  /** @type {BytesBufferReader} */
   return {
-    async upTo(length) {
-      const out = bytes.subarray(pos, pos + Math.min(length, bytes.length - pos));
-      return out;
+    upTo(length) {
+      return bytes.subarray(pos, pos + Math.min(length, bytes.length - pos));
     },
-    async exactly(length, seek = false) {
+    exactly(length, seek = false) {
       if (length > bytes.length - pos) {
         throw new Error('Unexpected end of data');
       }
@@ -7997,125 +7954,29 @@ function bytesReader(bytes) {
 }
 
 /**
- * @ignore
- * reusable reader for streams and files, we just need a way to read an
- * additional chunk (of some undetermined size) and a way to close the
- * reader when finished
- * @param {() => Promise<Uint8Array|null>} readChunk
- * @returns {BytesReader}
- */
-function chunkReader(readChunk /*, closer */) {
-  let pos = 0;
-  let have = 0;
-  let offset = 0;
-  let currentChunk = new Uint8Array(0);
-  const read = async (/** @type {number} */length) => {
-    have = currentChunk.length - offset;
-    const bufa = [currentChunk.subarray(offset)];
-    while (have < length) {
-      const chunk = await readChunk();
-      if (chunk == null) {
-        break;
-      }
-      /* c8 ignore next 8 */
-      // undo this ignore ^ when we have a fd implementation that can seek()
-      if (have < 0) {
-        // because of a seek()
-        /* c8 ignore next 4 */
-        // toohard to test the else
-        if (chunk.length > have) {
-          bufa.push(chunk.subarray(-have));
-        } // else discard
-      } else {
-        bufa.push(chunk);
-      }
-      have += chunk.length;
-    }
-    currentChunk = new Uint8Array(bufa.reduce((p, c) => p + c.length, 0));
-    let off = 0;
-    for (const b of bufa) {
-      currentChunk.set(b, off);
-      off += b.length;
-    }
-    offset = 0;
-  };
-
-  /** @type {BytesReader} */
-  return {
-    async upTo(length) {
-      if (currentChunk.length - offset < length) {
-        await read(length);
-      }
-      return currentChunk.subarray(offset, offset + Math.min(currentChunk.length - offset, length));
-    },
-    async exactly(length, seek = false) {
-      if (currentChunk.length - offset < length) {
-        await read(length);
-      }
-      if (currentChunk.length - offset < length) {
-        throw new Error('Unexpected end of data');
-      }
-      const out = currentChunk.subarray(offset, offset + length);
-      if (seek) {
-        pos += length;
-        offset += length;
-      }
-      return out;
-    },
-    seek(length) {
-      pos += length;
-      offset += length;
-    },
-    get pos() {
-      return pos;
-    }
-  };
-}
-
-/**
- * Creates a `BytesReader` from an `AsyncIterable<Uint8Array>`, which allows for
- * consumption of CAR data from a streaming source.
- *
- * @name decoder.asyncIterableReader(asyncIterable)
- * @param {AsyncIterable<Uint8Array>} asyncIterable
- * @returns {BytesReader}
- */
-function asyncIterableReader(asyncIterable) {
-  const iterator = asyncIterable[Symbol.asyncIterator]();
-  async function readChunk() {
-    const next = await iterator.next();
-    if (next.done) {
-      return null;
-    }
-    return next.value;
-  }
-  return chunkReader(readChunk);
-}
-
-/**
- * Wraps a `BytesReader` in a limiting `BytesReader` which limits maximum read
+ * Wraps a `BytesBufferReader` in a limiting `BytesBufferReader` which limits maximum read
  * to `byteLimit` bytes. It _does not_ update `pos` of the original
- * `BytesReader`.
+ * `BytesBufferReader`.
  *
  * @name decoder.limitReader(reader, byteLimit)
- * @param {BytesReader} reader
+ * @param {BytesBufferReader} reader
  * @param {number} byteLimit
- * @returns {BytesReader}
+ * @returns {BytesBufferReader}
  */
 function limitReader(reader, byteLimit) {
   let bytesRead = 0;
 
-  /** @type {BytesReader} */
+  /** @type {BytesBufferReader} */
   return {
-    async upTo(length) {
-      let bytes = await reader.upTo(length);
+    upTo(length) {
+      let bytes = reader.upTo(length);
       if (bytes.length + bytesRead > byteLimit) {
         bytes = bytes.subarray(0, byteLimit - bytesRead);
       }
       return bytes;
     },
-    async exactly(length, seek = false) {
-      const bytes = await reader.exactly(length, seek);
+    exactly(length, seek = false) {
+      const bytes = reader.exactly(length, seek);
       if (bytes.length + bytesRead > byteLimit) {
         throw new Error('Unexpected end of data');
       }
@@ -8137,8 +7998,7 @@ function limitReader(reader, byteLimit) {
 /**
  * @typedef {import('multiformats').CID} CID
  * @typedef {import('./api').Block} Block
- * @typedef {import('./api').CarReader} CarReaderIface
- * @typedef {import('./coding').BytesReader} BytesReader
+ * @typedef {import('./api').CarBufferReader} ICarBufferReader
  * @typedef {import('./coding').CarHeader} CarHeader
  * @typedef {import('./coding').CarV2Header} CarV2Header
  */
@@ -8146,39 +8006,39 @@ function limitReader(reader, byteLimit) {
 /**
  * Provides blockstore-like access to a CAR.
  *
- * Implements the `RootsReader` interface:
- * {@link CarReader.getRoots `getRoots()`}. And the `BlockReader` interface:
- * {@link CarReader.get `get()`}, {@link CarReader.has `has()`},
- * {@link CarReader.blocks `blocks()`} (defined as a `BlockIterator`) and
- * {@link CarReader.cids `cids()`} (defined as a `CIDIterator`).
+ * Implements the `RootsBufferReader` interface:
+ * {@link ICarBufferReader.getRoots `getRoots()`}. And the `BlockBufferReader` interface:
+ * {@link ICarBufferReader.get `get()`}, {@link ICarBufferReader.has `has()`},
+ * {@link ICarBufferReader.blocks `blocks()`} and
+ * {@link ICarBufferReader.cids `cids()`}.
  *
- * Load this class with either `import { CarReader } from '@ipld/car/reader'`
- * (`const { CarReader } = require('@ipld/car/reader')`). Or
- * `import { CarReader } from '@ipld/car'` (`const { CarReader } = require('@ipld/car')`).
+ * Load this class with either `import { CarBufferReader } from '@ipld/car/buffer-reader'`
+ * (`const { CarBufferReader } = require('@ipld/car/buffer-reader')`). Or
+ * `import { CarBufferReader } from '@ipld/car'` (`const { CarBufferReader } = require('@ipld/car')`).
  * The former will likely result in smaller bundle sizes where this is
  * important.
  *
- * @name CarReader
+ * @name CarBufferReader
  * @class
- * @implements {CarReaderIface}
+ * @implements {ICarBufferReader}
  * @property {number} version The version number of the CAR referenced by this
  * reader (should be `1` or `2`).
  */
-class CarReader {
+class CarBufferReader {
   /**
-   * @constructs CarReader
+   * @constructs CarBufferReader
    * @param {CarHeader|CarV2Header} header
    * @param {Block[]} blocks
    */
   constructor(header, blocks) {
     this._header = header;
     this._blocks = blocks;
-    this._keys = blocks.map(b => b.cid.toString());
+    this._cids = undefined;
   }
 
   /**
-   * @property
-   * @memberof CarReader
+   * @property version
+   * @memberof CarBufferReader
    * @instance
    */
   get version() {
@@ -8190,12 +8050,11 @@ class CarReader {
    * zero or more `CID`s.
    *
    * @function
-   * @memberof CarReader
+   * @memberof CarBufferReader
    * @instance
-   * @async
-   * @returns {Promise<CID[]>}
+   * @returns {CID[]}
    */
-  async getRoots() {
+  getRoots() {
     return this._header.roots;
   }
 
@@ -8204,14 +8063,13 @@ class CarReader {
    * reader.
    *
    * @function
-   * @memberof CarReader
+   * @memberof CarBufferReader
    * @instance
-   * @async
    * @param {CID} key
-   * @returns {Promise<boolean>}
+   * @returns {boolean}
    */
-  async has(key) {
-    return this._keys.indexOf(key.toString()) > -1;
+  has(key) {
+    return this._blocks.some(b => b.cid.equals(key));
   }
 
   /**
@@ -8221,107 +8079,63 @@ class CarReader {
    * returned.
    *
    * @function
-   * @memberof CarReader
+   * @memberof CarBufferReader
    * @instance
-   * @async
    * @param {CID} key
-   * @returns {Promise<Block | undefined>}
+   * @returns {Block | undefined}
    */
-  async get(key) {
-    const index = this._keys.indexOf(key.toString());
-    return index > -1 ? this._blocks[index] : undefined;
+  get(key) {
+    return this._blocks.find(b => b.cid.equals(key));
   }
 
   /**
-   * Returns a `BlockIterator` (`AsyncIterable<Block>`) that iterates over all
-   * of the `Block`s (`{ cid:CID, bytes:Uint8Array }` pairs) contained within
+   * Returns a `Block[]` of the `Block`s (`{ cid:CID, bytes:Uint8Array }` pairs) contained within
    * the CAR referenced by this reader.
    *
    * @function
-   * @memberof CarReader
+   * @memberof CarBufferReader
    * @instance
-   * @async
-   * @generator
-   * @returns {AsyncGenerator<Block>}
+   * @returns {Block[]}
    */
-  async *blocks() {
-    for (const block of this._blocks) {
-      yield block;
-    }
+  blocks() {
+    return this._blocks;
   }
 
   /**
-   * Returns a `CIDIterator` (`AsyncIterable<CID>`) that iterates over all of
-   * the `CID`s contained within the CAR referenced by this reader.
+   * Returns a `CID[]` of the `CID`s contained within the CAR referenced by this reader.
    *
    * @function
-   * @memberof CarReader
+   * @memberof CarBufferReader
    * @instance
-   * @async
-   * @generator
-   * @returns {AsyncGenerator<CID>}
+   * @returns {CID[]}
    */
-  async *cids() {
-    for (const block of this._blocks) {
-      yield block.cid;
+  cids() {
+    if (!this._cids) {
+      this._cids = this._blocks.map(b => b.cid);
     }
+    return this._cids;
   }
 
   /**
-   * Instantiate a {@link CarReader} from a `Uint8Array` blob. This performs a
+   * Instantiate a {@link CarBufferReader} from a `Uint8Array` blob. This performs a
    * decode fully in memory and maintains the decoded state in memory for full
    * access to the data via the `CarReader` API.
    *
-   * @async
    * @static
-   * @memberof CarReader
+   * @memberof CarBufferReader
    * @param {Uint8Array} bytes
-   * @returns {Promise<CarReader>}
+   * @returns {CarBufferReader}
    */
-  static async fromBytes(bytes) {
+  static fromBytes(bytes) {
     if (!(bytes instanceof Uint8Array)) {
       throw new TypeError('fromBytes() requires a Uint8Array');
     }
-    return decodeReaderComplete(bytesReader(bytes));
+    const {
+      header,
+      blocks
+    } = fromBytes(bytes);
+    return new CarBufferReader(header, blocks);
   }
-
-  /**
-   * Instantiate a {@link CarReader} from a `AsyncIterable<Uint8Array>`, such as
-   * a [modern Node.js stream](https://nodejs.org/api/stream.html#stream_streams_compatibility_with_async_generators_and_async_iterators).
-   * This performs a decode fully in memory and maintains the decoded state in
-   * memory for full access to the data via the `CarReader` API.
-   *
-   * Care should be taken for large archives; this API may not be appropriate
-   * where memory is a concern or the archive is potentially larger than the
-   * amount of memory that the runtime can handle.
-   *
-   * @async
-   * @static
-   * @memberof CarReader
-   * @param {AsyncIterable<Uint8Array>} asyncIterable
-   * @returns {Promise<CarReader>}
-   */
-  static async fromIterable(asyncIterable) {
-    if (!asyncIterable || !(typeof asyncIterable[Symbol.asyncIterator] === 'function')) {
-      throw new TypeError('fromIterable() requires an async iterable');
-    }
-    return decodeReaderComplete(asyncIterableReader(asyncIterable));
-  }
-}
-
-/**
- * @private
- * @param {BytesReader} reader
- * @returns {Promise<CarReader>}
- */
-async function decodeReaderComplete(reader) {
-  const decoder = createDecoder(reader);
-  const header = await decoder.header();
-  const blocks = [];
-  for await (const block of decoder.blocks()) {
-    blocks.push(block);
-  }
-  return new CarReader(header, blocks);
 }
 
 // @ts-check
@@ -8334,7 +8148,9 @@ async function decodeReaderComplete(reader) {
  *   time: string,
  *   messages: FirehoseRecord[],
  *   deletes?: FirehoseRecord[],
- *   unexpected?: FirehoseRecord[]
+ *   unexpected?: FirehoseRecord[],
+ *   error?: { message: string, [prop: string]: any }[],
+ *   parseTime: number
  * }} FirehoseBlock
  */
 
@@ -8417,6 +8233,12 @@ async function* firehoseRecords() {
     }
   }
 }
+function requireWebsocket() {
+  const globalObj = typeof global !== 'undefined' && global || typeof globalThis !== 'undefined' && globalThis;
+  const requireFn = globalObj?.['require'];
+  if (typeof requireFn === 'function') return /** @type {typeof WebSocket} */requireFn('ws');
+  throw new Error('WebSocket not available');
+}
 
 /**
  * @returns {AsyncGenerator<FirehoseBlock, void, void>}
@@ -8425,9 +8247,10 @@ async function* firehose() {
   ensureCborXExtended();
 
   /** @type {typeof WebSocket} */
-  const WebSocketImpl = typeof WebSocket === 'function' ? WebSocket : (/** @type {typeof WebSocket} */require('ws'));
+  const WebSocketImpl = typeof WebSocket === 'function' ? WebSocket : requireWebsocket();
   const wsAddress = 'wss://bsky.network/xrpc/com.atproto.sync.subscribeRepos';
   const ws = new WebSocketImpl(wsAddress);
+  ws.binaryType = 'arraybuffer';
   ws.addEventListener('message', handleMessage);
   ws.addEventListener('error', handleError);
   ws.addEventListener('close', handleClose);
@@ -8457,26 +8280,56 @@ async function* firehose() {
   }
   function handleMessage(event) {
     const receiveTimestamp = Date.now();
-    if (typeof event.data?.arrayBuffer === 'function') return event.data.arrayBuffer().then(arrayBuf => convertMessageBuf(receiveTimestamp, arrayBuf));else if (typeof event.data?.byteLength === 'number') return convertMessageBuf(receiveTimestamp, event.data);
+    buf.block.receiveTimestamp = receiveTimestamp;
+    if (typeof event.data?.byteLength === 'number') {
+      parseMessageBufAndResolve(event.data);
+    } else if (typeof event.data?.arrayBuffer === 'function') {
+      event.data.arrayBuffer().then(parseMessageBufAndResolve);
+    } else {
+      addBufError('WebSocket message type not supported ' + typeof event.data);
+      buf.resolve();
+    }
+  }
+  function parseMessageBufAndResolve(messageBuf) {
+    parseMessageBuf(messageBuf);
+    buf.resolve();
+  }
+  function parseMessageBuf(messageBuf) {
+    try {
+      parseMessageBufWorker(messageBuf);
+      buf.resolve();
+    } catch (parseError) {
+      addBufError(parseError.message);
+    }
+    buf.resolve();
   }
 
-  /** @param {ArrayBuffer} messageBuf */
-  async function convertMessageBuf(receiveTimestamp, messageBuf) {
+  /**
+   * @param {ArrayBuffer} messageBuf
+   */
+  function parseMessageBufWorker(messageBuf) {
+    const parseStart = Date.now();
     const entry = /** @type {any[]} */decodeMultiple(new Uint8Array(messageBuf));
-    if (!entry || entry[0]?.op !== 1) return;
+    if (!entry) return addBufError('CBOR decodeMultiple returned empty.');
+    if (entry[0]?.op !== 1) return addBufError('Expected CBOR op:1, received:' + entry[0]?.op);
     const commit = entry[1];
-    if (!commit.blocks) return; // TODO: alert unusual commit
-
-    if (!commit.ops?.length) return; // TODO: alert unusual commit
-
-    const car = await CarReader.fromBytes(commit.blocks);
-    buf.block.receiveTimestamp = receiveTimestamp;
-    buf.block.since = commit.since;
+    if (!commit.blocks) return addBufError('Expected operation with commit.blocks, received ' + commit.blocks);
+    if (!commit.ops?.length) return addBufError('Expected operation with commit.ops, received ' + commit.ops);
+    const car = CarBufferReader.fromBytes(commit.blocks);
+    if (!buf.block.since) buf.block.since = commit.since;
     buf.block.time = commit.time;
+    let opIndex = 0;
     for (const op of commit.ops) {
-      const block = op.cid && (await car.get(/** @type {*} */op.cid));
-      if (!block) continue; // TODO: alert unusual op
-
+      opIndex++;
+      if (!op.cid) {
+        addBufError('Missing commit[' + (opIndex - 1) + '].op.cid: ' + op.cid);
+        continue;
+      }
+      const block = car.get(/** @type {*} */op.cid);
+      if (!block) {
+        addBufError('Unresolvable commit[' + (opIndex - 1) + '].op.cid: ' + op.cid);
+        continue;
+      }
       const record = decode$f(block.bytes);
       // record.seq = commit.seq; 471603945
       // record.since = /** @type {string} */(commit.since); 3ksfhcmgghv2g
@@ -8499,8 +8352,18 @@ async function* firehose() {
       } else {
         buf.block.messages.push(record);
       }
+      buf.block.parseTime += Date.now() - parseStart;
     }
-    buf.resolve();
+  }
+
+  /**
+   * @param {string} errorStr
+   */
+  function addBufError(errorStr) {
+    if (!buf.block.error) buf.block.error = [];
+    buf.block.error.push({
+      message: errorStr
+    });
   }
   function handleError(error) {
     console.error(error);
@@ -8517,8 +8380,13 @@ async function* firehose() {
  * }} */
 function createAwaitPromise() {
   const result = {
+    /** @type {FirehoseBlock} */
     block: {
-      messages: []
+      receiveTimestamp: 0,
+      since: '',
+      time: '',
+      messages: [],
+      parseTime: 0
     }
   };
   result.promise = new Promise((resolve, reject) => {

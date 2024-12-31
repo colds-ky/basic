@@ -4,6 +4,8 @@
  * @typedef {{
  *  x: number,
  *  y: number,
+ *  vx?: number,
+ *  vy?: number,
  *  mass: number
  * }} LayoutNode
  */
@@ -21,12 +23,12 @@ const defaultVariables = {
  * }} Cell
  */
 
-const CELL_COUNT = 16;
+const CELL_DIMENSION_COUNT = 16;
 
 /**
  * @param {{
  *  nodes: LayoutNode[],
- *  edges: [source: LayoutNode, target: LayoutNode][]
+ *  edges: [source: LayoutNode, target: LayoutNode, strength: number][]
  *  speed?: number,
  *  gravity?: number
  * }} _
@@ -37,8 +39,67 @@ export function layoutCalculator({ nodes, edges, speed, gravity }) {
 
   /** @type {Cell[]} */
   let cells = orderCells(nodes);
+  console.log('orderCells ', cells);
 
   // TODO: run node/node layout within 3x3 cell areas, and node/cell outside of that
+
+  return { run };
+
+  function run(timeBudget) {
+    const start = Date.now();
+    const expectEnd = start + (timeBudget || 0);
+    let stepStart = start;
+    let cycles = 0;
+    while (true) {
+      runOnce();
+      cycles++;
+      const stepEnd = Date.now();
+
+      if (stepEnd > expectEnd) break;
+      const avgCycle = (stepEnd - stepStart) / cycles;
+      if (stepEnd + avgCycle > expectEnd + avgCycle * 0.1) break;
+    }
+
+    console.log('Ran ' + cycles + ' cycles in ' + (Date.now() - start) + 'ms with budget ' + (timeBudget || 0) + 'ms');
+  }
+
+  function runOnce() {
+    for (let iX = 0; iX < CELL_DIMENSION_COUNT; iX++) {
+      for (let iY = 0; iY < CELL_DIMENSION_COUNT; iY++) {
+        runCell(iX, iY, cells);
+      }
+    }
+  }
+
+  /**
+   * @param {number} iX
+   * @param {number} iY
+   * @param {Cell[]} cells 
+   */
+  function runCell(iX, iY, cells) {
+    const cell = cells[iX * CELL_DIMENSION_COUNT + iY];
+
+    // TODO: calculate forces between nodes in the cell
+    for (let iNode = 0; iNode < cells.length - 1; iNode++) {
+      const node = cell.cellNodes[iNode];
+
+      for (let jNode = iNode + 1; jNode < cells.length; jNode++) {
+        const other = cell.cellNodes[jNode];
+        const dx = other.x - node.x;
+        const dy = other.y - node.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        const repulsiveF = gravity / dist;
+
+        const dxNorm = dx / dist;
+        const dyNorm = dy / dist;
+        node.vx -= dxNorm * repulsiveF;
+        node.vy -= dyNorm * repulsiveF;
+        other.vx += dxNorm * repulsiveF;
+        other.vy += dyNorm * repulsiveF;
+      }
+    }
+  }
 }
 
 /**
@@ -49,18 +110,18 @@ function orderCells(nodes) {
   const cells = [];
 
   const sortHNodes = nodes.slice().sort((a, b) => a.x - b.x);
-  for (let xCellIndex = 0; xCellIndex < CELL_COUNT; xCellIndex++) {
-    const iXStart = Math.floor(xCellIndex * nodes.length / CELL_COUNT);
-    const iXEnd = xCellIndex === CELL_COUNT - 1 ? nodes.length - 1 :
-      Math.floor((xCellIndex + 1) * nodes.length / CELL_COUNT);
+  for (let xCellIndex = 0; xCellIndex < CELL_DIMENSION_COUNT; xCellIndex++) {
+    const iXStart = Math.floor(xCellIndex * nodes.length / CELL_DIMENSION_COUNT);
+    const iXEnd = xCellIndex === CELL_DIMENSION_COUNT - 1 ? nodes.length - 1 :
+      Math.floor((xCellIndex + 1) * nodes.length / CELL_DIMENSION_COUNT);
 
-    for (let yCellIndex = 0; yCellIndex < CELL_COUNT; yCellIndex++) {
+    for (let yCellIndex = 0; yCellIndex < CELL_DIMENSION_COUNT; yCellIndex++) {
       const columnNodes = sortHNodes.slice(iXStart, iXEnd + 1);
       columnNodes.sort((a, b) => a.y - b.y);
 
-      const iYStart = Math.floor(yCellIndex * columnNodes.length / CELL_COUNT);
-      const iYEnd = yCellIndex === CELL_COUNT - 1 ? columnNodes.length - 1 :
-        Math.floor((yCellIndex + 1) * columnNodes.length / CELL_COUNT);
+      const iYStart = Math.floor(yCellIndex * columnNodes.length / CELL_DIMENSION_COUNT);
+      const iYEnd = yCellIndex === CELL_DIMENSION_COUNT - 1 ? columnNodes.length - 1 :
+        Math.floor((yCellIndex + 1) * columnNodes.length / CELL_DIMENSION_COUNT);
 
       const cellNodes = columnNodes.slice(iYStart, iYEnd + 1);
 
@@ -79,8 +140,8 @@ function orderCells(nodes) {
       avg.y = (avg.y - max.y) / (cellNodes.length - 1);
       avg.mass = (avg.mass - max.mass) / (cellNodes.length - 1);
 
-      if (cells.length !== xCellIndex * CELL_COUNT + yCellIndex) {
-        console.warn('Cell index mismatch, expected ' + (xCellIndex * CELL_COUNT + yCellIndex) + ' actual ' + cells.length);
+      if (cells.length !== xCellIndex * CELL_DIMENSION_COUNT + yCellIndex) {
+        console.warn('Cell index mismatch, expected ' + (xCellIndex * CELL_DIMENSION_COUNT + yCellIndex) + ' actual ' + cells.length);
       }
 
       cells.push({ cellNodes, avg, max });

@@ -22,7 +22,7 @@ export function boot(elem, unmountPromise) {
   const db = defineCachedStore({ dbName: DB_NAME });
   /** @type {ProfilePosition[]} */
   const profilePositions = [];
-  /** @type {[ProfilePosition,ProfilePosition][]} */
+  /** @type {[ProfilePosition,ProfilePosition, strength: number][]} */
   const profileLinks = [];
 
   let lastRender = clock.nowMSec;
@@ -76,12 +76,12 @@ export function boot(elem, unmountPromise) {
   function onRedrawRare() {
     if (profilePositions.length < 10) return;
 
-    // const layout = layoutCalculator({
-    //   nodes: profilePositions,
-    //   edges: profileLinks
-    // });
+    const layout = layoutCalculator({
+      nodes: profilePositions,
+      edges: profileLinks
+    });
 
-    // layout.run(100);
+    layout?.run?.(5);
   }
 
   async function* streamAccountPositions() {
@@ -153,8 +153,8 @@ export function boot(elem, unmountPromise) {
                       const linkedProfileIndex = profileIndexByShortDID[post.shortDID];
                       if (typeof linkedProfileIndex === 'number') {
                         const linkedProfile = profilePositions[linkedProfileIndex];
-                        profileLinks.push([linkedProfile, newProfilePos]);
-                        profileLinks.push([newProfilePos, linkedProfile]);
+                        profileLinks.push([linkedProfile, newProfilePos, 1]);
+                        profileLinks.push([newProfilePos, linkedProfile, 1]);
                         linked.add(linkedProfile.shortDID);
                       }
                     }
