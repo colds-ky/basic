@@ -13,6 +13,8 @@ export * from './plc-directory';
 
 export * from './data';
 
+export * from './throttled-async-cache';
+
 
 export const atproto = atproto_api_import;
 
