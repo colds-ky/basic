@@ -34994,6 +34994,38 @@ async function decodeReaderComplete(reader) {
 const known$Types = ['app.bsky.feed.like', 'app.bsky.feed.post', 'app.bsky.feed.repost', 'app.bsky.feed.threadgate', 'app.bsky.graph.follow', 'app.bsky.graph.block', 'app.bsky.graph.list', 'app.bsky.graph.listitem', 'app.bsky.graph.listblock', 'app.bsky.actor.profile', 'app.bsky.feed.generator', 'app.bsky.feed.postgate', 'chat.bsky.actor.declaration', 'app.bsky.graph.starterpack'];
 firehose$1.knownTypes = known$Types;
 let cbor_x_extended = false;
+async function* firehoseRecords() {
+  for await (const {
+    messages,
+    deletes,
+    unexpected,
+    ...rest
+  } of firehose$1()) {
+    if (deletes?.length) {
+      for (const record of deletes) {
+        yield {
+          ...rest,
+          action: 'delete',
+          record
+        };
+      }
+    }
+    if (!messages.length) continue;
+    for (const record of messages) {
+      yield {
+        ...rest,
+        record
+      };
+    }
+    for (const record of unexpected || []) {
+      yield {
+        ...rest,
+        action: 'unexpected',
+        record
+      };
+    }
+  }
+}
 
 /**
  * @returns {AsyncGenerator<FirehoseBlock, void, void>}
@@ -35228,7 +35260,7 @@ async function readCAR(did, messageBuf, options) {
   }
 }
 
-var version = "0.2.94";
+var version = "0.2.95";
 
 // @ts-check
 
@@ -45824,5 +45856,5 @@ const atproto = atproto_api_import;
 //   }
 // }
 
-export { BSKY_NETWORK_URL, BSKY_PUBLIC_URL, BSKY_SOCIAL_URL, ColdskyAgent, atproto, breakFeedURI, breakFeedURIPostOnly, breakIntoWords, breakPostURL, defineCacheIndexedDBStore, defineCachedStore, defineStore, detectProfileURL, detectWordStartsNormalized, ensureCborXExtended, firehose$1 as firehose, firehoseShortDIDs, getFeedBlobUrl, getFeedVideoBlobUrl, getProfileBlobUrl, isCompactPost, isPromise, known$Types, likelyDID, makeBskyPostURL, makeFeedUri, parseTimestampOffset, plcDirectoryCompact, plcDirectoryHistoryCompact, plcDirectoryHistoryRaw, plcDirectoryRaw, readCAR, shortenDID, shortenHandle, shortenPDS, throttledAsyncCache, timestampOffsetToString, unwrapShortDID, unwrapShortHandle, unwrapShortPDS, version };
+export { BSKY_NETWORK_URL, BSKY_PUBLIC_URL, BSKY_SOCIAL_URL, ColdskyAgent, atproto, breakFeedURI, breakFeedURIPostOnly, breakIntoWords, breakPostURL, defineCacheIndexedDBStore, defineCachedStore, defineStore, detectProfileURL, detectWordStartsNormalized, ensureCborXExtended, firehose$1 as firehose, firehoseRecords, firehoseShortDIDs, getFeedBlobUrl, getFeedVideoBlobUrl, getProfileBlobUrl, isCompactPost, isPromise, known$Types, likelyDID, makeBskyPostURL, makeFeedUri, parseTimestampOffset, plcDirectoryCompact, plcDirectoryHistoryCompact, plcDirectoryHistoryRaw, plcDirectoryRaw, readCAR, shortenDID, shortenHandle, shortenPDS, throttledAsyncCache, timestampOffsetToString, unwrapShortDID, unwrapShortHandle, unwrapShortPDS, version };
 //# sourceMappingURL=libs.js.map

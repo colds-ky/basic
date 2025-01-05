@@ -77,6 +77,25 @@ firehose.knownTypes = known$Types;
 
 let cbor_x_extended = false;
 
+export async function* firehoseRecords() {
+  for await (const { messages, deletes, unexpected, ...rest } of firehose()) {
+    if (deletes?.length) {
+      for (const record of deletes) {
+        yield { ...rest, action: 'delete', record };
+      }
+    }
+
+    if (!messages.length) continue;
+    for (const record of messages) {
+      yield { ...rest, record };
+    }
+
+    for (const record of unexpected || []) {
+      yield { ...rest, action: 'unexpected', record };
+    }
+  }
+}
+
 /**
  * @returns {AsyncGenerator<FirehoseBlock, void, void>}
  */

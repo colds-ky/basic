@@ -11,9 +11,14 @@ const mode = process.argv.some(arg => /^\-*serve$/i.test(arg)) ? 'serve' :
     undefined;
 
 rollupBuilder();
+rollupBuilder({ input: 'package/firehose.js', output: 'firehose.js' });
 esbuildBuilder();
 
-async function rollupBuilder() {
+/** @param {{ input?: string, output?: string }} [_] */
+async function rollupBuilder({ input, output } = {}) {
+  if (!input) input = 'package/index.js';
+  if (!output) output = 'libs.js';
+
   const { nodeResolve } = require('@rollup/plugin-node-resolve');
   const json = /** @type {(options?: import('@rollup/plugin-json').RollupJsonOptions) => import('rollup').Plugin} */(/** @type {*} */(
     require('@rollup/plugin-json')));
@@ -22,7 +27,7 @@ async function rollupBuilder() {
   const { babel } = require('@rollup/plugin-babel');
 
   const watcher = (mode === 'serve' || mode === 'watch' ? rollup.watch : rollup.rollup)({
-    input: 'package/index.js',
+    input,
     plugins: [
       nodeResolve({
         // @ts-ignore
@@ -39,7 +44,7 @@ async function rollupBuilder() {
       sourcemap: true,
       format: 'esm',
       exports: 'named',
-      file: 'libs.js',
+      file: output,
       globals: { crypto: 'crypto' },
       name: 'coldsky'
     }
