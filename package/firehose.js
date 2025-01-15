@@ -207,6 +207,19 @@ export async function* firehose() {
       opIndex++;
 
       if (!op.cid) {
+        if (op.action === 'delete') {
+          /** @type {FirehoseRecord} */
+          const deleteRecord = {
+            repo: commit.repo,
+            path: op.path,
+            uri: 'at://' + commit.repo + '/' + op.path,
+            action: 'delete',
+            $type: /** @type {*} */(null)
+          };
+          if (!buf.block.deletes) buf.block.deletes = [deleteRecord];
+          else buf.block.deletes.push(deleteRecord);
+        }
+
         addBufError('Missing commit[' + (opIndex - 1) + '].op.cid: ' + op.cid);
         continue;
       }

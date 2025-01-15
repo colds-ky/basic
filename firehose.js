@@ -1454,12 +1454,12 @@ let Encoder$3 = class Encoder extends Decoder$3 {
           }
         } else if (!this.alwaysUseFloat && value >> 0 === value) {
           // negative integer
-          if (value >= -24) {
+          if (value >= -0x18) {
             target[position++] = 0x1f - value;
-          } else if (value >= -256) {
+          } else if (value >= -0x100) {
             target[position++] = 0x38;
             target[position++] = ~value;
-          } else if (value >= -65536) {
+          } else if (value >= -0x10000) {
             target[position++] = 0x39;
             targetView.setUint16(position, ~value);
             position += 2;
@@ -1470,7 +1470,7 @@ let Encoder$3 = class Encoder extends Decoder$3 {
           }
         } else {
           let useFloat32;
-          if ((useFloat32 = this.useFloat32) > 0 && value < 0x100000000 && value >= -2147483648) {
+          if ((useFloat32 = this.useFloat32) > 0 && value < 0x100000000 && value >= -0x80000000) {
             target[position++] = 0xfa;
             targetView.setFloat32(position, value);
             let xShifted;
@@ -2111,14 +2111,14 @@ extensions = [{
         packedObjectMap[valuesArray[i]] = i;
       }
     }
-    {
+    if (sharedStructures) {
       targetView.setUint32(position, 0xd9dffe00);
       position += 3;
       let definitions = sharedStructures.slice(0);
       definitions.unshift(0xe000);
       definitions.push(new Tag(sharedData.version, 0x53687264));
       encode(definitions);
-    }
+    } else encode(new Tag(sharedData.version, 0x53687264));
   }
 }];
 function typedArrayEncoder(tag, size) {
@@ -2209,7 +2209,8 @@ const THROW_ON_ITERABLE = 2048;
 
 var encode_1$3 = encode$5;
 var MSB$3 = 128,
-  MSBALL$2 = -128,
+  REST$3 = 127,
+  MSBALL$2 = ~REST$3,
   INT$2 = Math.pow(2, 31);
 function encode$5(num, out, offset) {
   out = out || [];
@@ -5722,7 +5723,8 @@ baseX$1({
 /* eslint-disable */
 var encode_1$2 = encode$2;
 var MSB$2 = 0x80,
-  MSBALL$1 = -128,
+  REST$2 = 0x7F,
+  MSBALL$1 = ~REST$2,
   INT$1 = Math.pow(2, 31);
 /**
  * @param {number} num
@@ -6866,7 +6868,8 @@ baseX({
 /* eslint-disable */
 var encode_1$1 = encode;
 var MSB = 0x80,
-  MSBALL = -128,
+  REST = 0x7F,
+  MSBALL = ~REST,
   INT = Math.pow(2, 31);
 /**
  * @param {number} num
@@ -7407,7 +7410,8 @@ function requireEncode() {
   hasRequiredEncode = 1;
   encode_1 = encode;
   var MSB = 0x80,
-    MSBALL = -128,
+    REST = 0x7F,
+    MSBALL = ~REST,
     INT = Math.pow(2, 31);
   function encode(num, out, offset) {
     if (Number.MAX_SAFE_INTEGER && num > Number.MAX_SAFE_INTEGER) {
@@ -8322,6 +8326,17 @@ async function* firehose() {
     for (const op of commit.ops) {
       opIndex++;
       if (!op.cid) {
+        if (op.action === 'delete') {
+          /** @type {FirehoseRecord} */
+          const deleteRecord = {
+            repo: commit.repo,
+            path: op.path,
+            uri: 'at://' + commit.repo + '/' + op.path,
+            action: 'delete',
+            $type: (/** @type {*} */null)
+          };
+          if (!buf.block.deletes) buf.block.deletes = [deleteRecord];else buf.block.deletes.push(deleteRecord);
+        }
         addBufError('Missing commit[' + (opIndex - 1) + '].op.cid: ' + op.cid);
         continue;
       }
