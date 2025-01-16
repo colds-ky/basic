@@ -48,6 +48,24 @@ import { CarBufferReader as ipld_CarBufferReader } from '@ipld/car/buffer-reader
  */
 
 /**
+ * @typedef {{
+ *  $type: '#identity',
+ *  repo: string,
+ *  handle: string,
+ *  time: string
+ * }} FirehoseRecordIdentity
+ */
+
+/**
+ * @typedef {{
+ *  $type: '#identity',
+ *  repo: string,
+ *  active: boolean,
+ *  time: string
+ * }} FirehoseRecordAccount
+ */
+
+/**
  * @typedef {FirehoseRecord$Typed<'app.bsky.feed.like'> |
  * FirehoseRecord$Typed<'app.bsky.feed.post'> |
  * FirehoseRecord$Typed<'app.bsky.feed.repost'> |
@@ -61,7 +79,9 @@ import { CarBufferReader as ipld_CarBufferReader } from '@ipld/car/buffer-reader
  * FirehoseRecord$Typed<'app.bsky.feed.generator'> |
  * FirehoseRecord$Typed<'app.bsky.feed.postgate'> |
  * FirehoseRecord$Typed<'chat.bsky.actor.declaration'> |
- * FirehoseRecord$Typed<'app.bsky.graph.starterpack'>
+ * FirehoseRecord$Typed<'app.bsky.graph.starterpack'> |
+ * FirehoseRecordIdentity |
+ * FirehoseRecordAccount
  * } FirehoseRecord
  */
 
@@ -192,6 +212,29 @@ export async function* firehose() {
     if (entry[0]?.op !== 1) return addBufError('Expected CBOR op:1, received:' + entry[0]?.op);
 
     const commit = entry[1];
+    const t = entry[0].t;
+    if (t === '#identity' && commit.did) {
+      /** @type {FirehoseRecordIdentity} */
+      const identityRecord = {
+        $type: '#identity',
+        repo: commit.did,
+        handle: commit.handle,
+        time: commit.time
+      };
+      buf.block.messages.push(identityRecord);
+      return;
+    } else if (t === '#account' && commit.did) {
+      /** @type {FirehoseRecordAccount} */
+      const accountRecord = {
+        $type: '#identity',
+        repo: commit.did,
+        active: commit.active,
+        time: commit.time
+      };
+      buf.block.messages.push(accountRecord);
+      return;
+    }
+
     if (!commit.blocks) return addBufError('Expected operation with commit.blocks, received ' + commit.blocks);
     if (!commit.ops?.length) return addBufError('Expected operation with commit.ops, received ' + commit.ops);
 
@@ -218,9 +261,9 @@ export async function* firehose() {
           };
           if (!buf.block.deletes) buf.block.deletes = [deleteRecord];
           else buf.block.deletes.push(deleteRecord);
+        } else {
+          addBufError('Missing commit[' + (opIndex - 1) + '].op.cid: ' + op.cid);
         }
-
-        addBufError('Missing commit[' + (opIndex - 1) + '].op.cid: ' + op.cid);
         continue;
       }
 

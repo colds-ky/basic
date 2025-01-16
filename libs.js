@@ -34508,6 +34508,24 @@ class CarBufferReader {
  */
 
 /**
+ * @typedef {{
+ *  $type: '#identity',
+ *  repo: string,
+ *  handle: string,
+ *  time: string
+ * }} FirehoseRecordIdentity
+ */
+
+/**
+ * @typedef {{
+ *  $type: '#identity',
+ *  repo: string,
+ *  active: boolean,
+ *  time: string
+ * }} FirehoseRecordAccount
+ */
+
+/**
  * @typedef {FirehoseRecord$Typed<'app.bsky.feed.like'> |
  * FirehoseRecord$Typed<'app.bsky.feed.post'> |
  * FirehoseRecord$Typed<'app.bsky.feed.repost'> |
@@ -34521,7 +34539,9 @@ class CarBufferReader {
  * FirehoseRecord$Typed<'app.bsky.feed.generator'> |
  * FirehoseRecord$Typed<'app.bsky.feed.postgate'> |
  * FirehoseRecord$Typed<'chat.bsky.actor.declaration'> |
- * FirehoseRecord$Typed<'app.bsky.graph.starterpack'>
+ * FirehoseRecord$Typed<'app.bsky.graph.starterpack'> |
+ * FirehoseRecordIdentity |
+ * FirehoseRecordAccount
  * } FirehoseRecord
  */
 
@@ -34640,6 +34660,28 @@ async function* firehose$1() {
     if (!entry) return addBufError('CBOR decodeMultiple returned empty.');
     if (entry[0]?.op !== 1) return addBufError('Expected CBOR op:1, received:' + entry[0]?.op);
     const commit = entry[1];
+    const t = entry[0].t;
+    if (t === '#identity' && commit.did) {
+      /** @type {FirehoseRecordIdentity} */
+      const identityRecord = {
+        $type: '#identity',
+        repo: commit.did,
+        handle: commit.handle,
+        time: commit.time
+      };
+      buf.block.messages.push(identityRecord);
+      return;
+    } else if (t === '#account' && commit.did) {
+      /** @type {FirehoseRecordAccount} */
+      const accountRecord = {
+        $type: '#identity',
+        repo: commit.did,
+        active: commit.active,
+        time: commit.time
+      };
+      buf.block.messages.push(accountRecord);
+      return;
+    }
     if (!commit.blocks) return addBufError('Expected operation with commit.blocks, received ' + commit.blocks);
     if (!commit.ops?.length) return addBufError('Expected operation with commit.ops, received ' + commit.ops);
     const car = CarBufferReader.fromBytes(commit.blocks);
@@ -34659,8 +34701,9 @@ async function* firehose$1() {
             $type: (/** @type {*} */null)
           };
           if (!buf.block.deletes) buf.block.deletes = [deleteRecord];else buf.block.deletes.push(deleteRecord);
+        } else {
+          addBufError('Missing commit[' + (opIndex - 1) + '].op.cid: ' + op.cid);
         }
-        addBufError('Missing commit[' + (opIndex - 1) + '].op.cid: ' + op.cid);
         continue;
       }
       const block = car.get(/** @type {*} */op.cid);
@@ -34859,7 +34902,7 @@ async function readCAR(did, messageBuf, options) {
   }
 }
 
-var version = "0.2.101";
+var version = "0.2.102";
 
 // @ts-check
 
