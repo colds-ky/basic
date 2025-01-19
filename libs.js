@@ -35409,7 +35409,7 @@ async function readCAR(did, messageBuf, options) {
   }
 }
 
-var version = "0.3.4";
+var version = "0.3.5";
 
 // @ts-check
 

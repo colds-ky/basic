@@ -11,6 +11,9 @@ export function streamStats(db) {
   let count = 0;
   let batchCount = 0;
 
+  let pauseTime = 0;
+  let pauseStart = 0;
+
   /** @type {Record<string, number>} */
   const posters = {};
 
@@ -23,65 +26,77 @@ export function streamStats(db) {
   return run;
 
   async function* run() {
-    for await (const block of firehose()) {
-      batchCount++;
-      count += block.length;
-      if (!receiveStart) receiveStart = Date.now();
-
-      for (const msg of block) {
-        byType[msg.$type] = (byType[msg.$type] || 0) + 1;
-        parseTime += msg.parseTime;
-
-        if (msg.$type === 'error') {
-          errors[msg.message] = (errors[msg.message] || 0) + 1;
+    try {
+      let first = true;
+      for await (const block of firehose()) {
+        if (first) {
+          first = false;
+          if (pauseStart) pauseTime += Date.now() - pauseStart;
         }
 
-        if (msg.$type === 'app.bsky.feed.post' && Math.random() > -20) {
-          const shortDID = shortenDID(msg.repo);
+        batchCount++;
+        count += block.length;
 
-          posters[shortDID] = (posters[shortDID] || 0) + 1;
-        } if (msg.$type === 'app.bsky.feed.like' && msg.action === 'create' && Math.random() > 20) {
-          const shortDID = shortenDID(msg.repo);
-          const subject = breakFeedURIPostOnly(msg.subject.uri);
-          if (subject) {
-            likeds[subject.shortDID] = (likeds[subject.shortDID] || 0) + 1;
+        if (!receiveStart) receiveStart = Date.now();
+
+        for (const msg of block) {
+          byType[msg.$type] = (byType[msg.$type] || 0) + 1;
+          parseTime += msg.parseTime;
+
+          if (msg.$type === 'error') {
+            errors[msg.message] = (errors[msg.message] || 0) + 1;
           }
 
-          const likerPromise = getProfile(shortDID);
-          const likedPromise = getProfile(subject?.shortDID);
+          if (msg.$type === 'app.bsky.feed.post' && Math.random() > -20) {
+            const shortDID = shortenDID(msg.repo);
 
-          let liker = likerPromise && !isPromise(likerPromise) ? likerPromise : undefined;
-          let liked = likedPromise && !isPromise(likedPromise) ? likedPromise : undefined;
+            posters[shortDID] = (posters[shortDID] || 0) + 1;
+          } if (msg.$type === 'app.bsky.feed.like' && msg.action === 'create' && Math.random() > 20) {
+            const shortDID = shortenDID(msg.repo);
+            const subject = breakFeedURIPostOnly(msg.subject.uri);
+            if (subject) {
+              likeds[subject.shortDID] = (likeds[subject.shortDID] || 0) + 1;
+            }
 
-          if (!liker || !liked)
-            [liker, liked] = await Promise.all([likerPromise, likedPromise]);
+            const likerPromise = getProfile(shortDID);
+            const likedPromise = getProfile(subject?.shortDID);
 
-          const likerHandle = liker?.handle || shortDID;
-          const likedHandle = liked?.handle || subject?.shortDID;
+            let liker = likerPromise && !isPromise(likerPromise) ? likerPromise : undefined;
+            let liked = likedPromise && !isPromise(likedPromise) ? likedPromise : undefined;
 
-          if (likerHandle) likers[likerHandle] = (likers[likerHandle] || 0) + 1;
-          if (likedHandle) likeds[likedHandle] = (likeds[likedHandle] || 0) + 1;
+            if (!liker || !liked)
+              [liker, liked] = await Promise.all([likerPromise, likedPromise]);
+
+            const likerHandle = liker?.handle || shortDID;
+            const likedHandle = liked?.handle || subject?.shortDID;
+
+            if (likerHandle) likers[likerHandle] = (likers[likerHandle] || 0) + 1;
+            if (likedHandle) likeds[likedHandle] = (likeds[likedHandle] || 0) + 1;
+          }
         }
+
+        let [topPosters, topLikers, topLikeds] = [posters, likers, likeds].map(topAndResolveHandles);
+        const anyPromises = isPromise(topPosters) || isPromise(topLikers) || isPromise(topLikeds);
+        if (anyPromises) {
+          [topPosters, topLikers, topLikeds] = await Promise.all([topPosters, topLikers, topLikeds]);
+        }
+
+        yield {
+          count,
+          perSecond: count * 1000 / (Date.now() - receiveStart - pauseTime),
+          perBatch: count / batchCount,
+          parsePerMessage: parseTime / count,
+          topPosters,
+          topLikers,
+          topLikeds,
+          errors: { ...errors },
+          ...byType,
+        };
+
+        await new Promise(resolve => setTimeout(resolve, 220));
       }
-
-      let [topPosters, topLikers, topLikeds] = [posters, likers, likeds].map(topAndResolveHandles);
-      const anyPromises = isPromise(topPosters) || isPromise(topLikers) || isPromise(topLikeds);
-      if (anyPromises) {
-        [topPosters, topLikers, topLikeds] = await Promise.all([topPosters, topLikers, topLikeds]);
-      }
-
-      yield {
-        perSecond: count * 1000 / (Date.now() - receiveStart),
-        perBatch: count / batchCount,
-        parsePerMessage: parseTime / count,
-        topPosters,
-        topLikers,
-        topLikeds,
-        errors: { ...errors },
-        ...byType,
-      };
-
-      await new Promise(resolve => setTimeout(resolve, 220));
+    } finally {
+      pauseStart = Date.now();
     }
   }
 
