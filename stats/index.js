@@ -4,6 +4,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { streamStats } from './stream-stats';
 import { useDB } from '../app';
 import { Button } from '@mui/material';
+import { version } from '../package';
 
 /** @typedef {ReturnType<typeof streamStats>} StreamStatsIterable */
 
@@ -33,7 +34,10 @@ export function StatsComponent() {
     }
   }, [running]);
 
-  const jsonLines = stats ? JSON.stringify(stats, null, 2).split('\n') : [''];
+  const jsonLines = stats ? JSON.stringify({
+    ...stats,
+    version
+  }, null, 2).split('\n') : [''];
 
   return (
     <div className='stats'>
