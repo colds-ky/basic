@@ -9,7 +9,7 @@ import { Button } from '@mui/material';
 
 export function StatsComponent() {
   const db = useDB();
-  const [running, setRunning] = useState(true);
+  const [running, setRunning] = useState(false);
   let [run, setRun] = useState(/** @type {[StreamStatsIterable] | undefined} */(undefined));
   const [stats, setStats] = useState(/** @type {*} */(undefined));
   useEffect(() => {
@@ -38,8 +38,10 @@ export function StatsComponent() {
   return (
     <div className='stats'>
       <h1>Stats</h1>
-      <Button onClick={() => setRunning(!running)}>
-        {running ? 'Pause' : 'Run'}
+      <Button
+        variant='contained'
+        onClick={() => setRunning(!running)}>
+        {running ? 'Pause' : 'Run stats on firehose'}
       </Button>
       <pre>
         {

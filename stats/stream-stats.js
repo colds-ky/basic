@@ -23,12 +23,12 @@ export function streamStats(db) {
   return run;
 
   async function* run() {
-    for await (const block of db.firehose()) {
+    for await (const block of firehose()) {
       batchCount++;
-      count += block.all.length;
+      count += block.length;
       if (!receiveStart) receiveStart = Date.now();
 
-      for (const msg of block.all) {
+      for (const msg of block) {
         byType[msg.$type] = (byType[msg.$type] || 0) + 1;
         parseTime += msg.parseTime;
 
