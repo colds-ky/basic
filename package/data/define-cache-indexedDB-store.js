@@ -430,7 +430,7 @@ export function defineCacheIndexedDBStore(dbName) {
       return allPosts;
     }
 
-    const FUSE_THRESHOLD = 0.6;
+    const FUSE_THRESHOLD = 0.7;
 
     const fuse = new Fuse(allPosts, {
       includeScore: true,

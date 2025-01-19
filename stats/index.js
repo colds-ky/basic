@@ -1,20 +1,58 @@
 // @ts-check
 
-import React from 'react';
-import { forAwait } from '../app-shared/forAwait';
+import React, { Fragment, useEffect, useState } from 'react';
 import { streamStats } from './stream-stats';
 import { useDB } from '../app';
+import { Button } from '@mui/material';
+
+/** @typedef {ReturnType<typeof streamStats>} StreamStatsIterable */
 
 export function StatsComponent() {
   const db = useDB();
-  const stats = forAwait('', streamStats(db));
+  const [running, setRunning] = useState(true);
+  let [run, setRun] = useState(/** @type {[StreamStatsIterable] | undefined} */(undefined));
+  const [stats, setStats] = useState(/** @type {*} */(undefined));
+  useEffect(() => {
+    if (!running) return;
+    let stop = false;
+    iterate();
+    return () => {
+      stop = true;
+    };
+
+    async function iterate() {
+      if (!run) {
+        run = [streamStats(db)];
+        setRun(run);
+      }
+
+      for await (const statsData of run[0]()) {
+        if (stop) return;
+        setStats(statsData);
+      }
+    }
+  }, [running]);
+
+  const jsonLines = stats ? JSON.stringify(stats, null, 2).split('\n') : [''];
 
   return (
     <div className='stats'>
       <h1>Stats</h1>
+      <Button onClick={() => setRunning(!running)}>
+        {running ? 'Pause' : 'Run'}
+      </Button>
       <pre>
         {
-          JSON.stringify(stats, null, 2)
+          jsonLines.map((line, i) => (
+            <Fragment key={i}>
+              {
+                line.split(':').map((part, i) => (
+                  <Fragment key={i}>
+                    {i ? ':' : ''}{part}
+                  </Fragment>
+                ))
+              }<br /></Fragment>
+          ))
         }
       </pre>
     </div>
