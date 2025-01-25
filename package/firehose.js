@@ -139,16 +139,17 @@ firehose.all = each;
 firehose.version = version;
 
 /**
+ * @param {string} [address]
  * @returns {AsyncGenerator<FirehoseRecord[], void, void>}
  */
-export async function* firehose() {
+export async function* firehose(address) {
   ensureCborXExtended();
 
   /** @type {typeof WebSocket} */
   const WebSocketImpl = typeof WebSocket === 'function' ? WebSocket :
     requireWebsocket();
 
-  const wsAddress = 'wss://bsky.network/xrpc/com.atproto.sync.subscribeRepos';
+  const wsAddress = address || 'wss://bsky.network/xrpc/com.atproto.sync.subscribeRepos';
 
   const ws = new WebSocketImpl(wsAddress);
   ws.binaryType = 'arraybuffer';
