@@ -373,6 +373,14 @@ export async function* firehose() {
 
 }
 
+async function* each() {
+  for await (const block of firehose()) {
+    yield* block;
+  }
+}
+
+firehose.all = each;
+
 /**
  * @returns {{
  *  block: FirehoseRecord[],

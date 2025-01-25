@@ -35288,6 +35288,12 @@ async function* firehose$1() {
     buf.reject(new Error(errorText));
   }
 }
+async function* each() {
+  for await (const block of firehose$1()) {
+    yield* block;
+  }
+}
+firehose$1.all = each;
 
 /**
  * @returns {{
@@ -35434,7 +35440,7 @@ async function readCAR(did, messageBuf, options) {
   }
 }
 
-var version = "0.3.6";
+var version = "0.3.7";
 
 // @ts-check
 
