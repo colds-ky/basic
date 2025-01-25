@@ -8138,7 +8138,7 @@ class CarBufferReader {
   }
 }
 
-var version = "0.3.9";
+var version = "0.3.10";
 
 // @ts-check
 
@@ -8255,7 +8255,7 @@ function requireWebsocket() {
   if (typeof requireFn === 'function') return /** @type {typeof WebSocket} */requireFn('ws');
   throw new Error('WebSocket not available');
 }
-firehose.all = each;
+firehose.each = each;
 firehose.version = version;
 
 /**

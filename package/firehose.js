@@ -135,7 +135,7 @@ function requireWebsocket() {
   throw new Error('WebSocket not available');
 }
 
-firehose.all = each;
+firehose.each = each;
 firehose.version = version;
 
 /**
