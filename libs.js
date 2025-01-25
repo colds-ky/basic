@@ -34957,6 +34957,8 @@ class CarBufferReader {
   }
 }
 
+var version = "0.3.8";
+
 // @ts-check
 
 
@@ -35072,6 +35074,8 @@ function requireWebsocket() {
   if (typeof requireFn === 'function') return /** @type {typeof WebSocket} */requireFn('ws');
   throw new Error('WebSocket not available');
 }
+firehose$1.all = each;
+firehose$1.version = version;
 
 /**
  * @returns {AsyncGenerator<FirehoseRecord[], void, void>}
@@ -35293,7 +35297,6 @@ async function* each() {
     yield* block;
   }
 }
-firehose$1.all = each;
 
 /**
  * @returns {{
@@ -35439,8 +35442,6 @@ async function readCAR(did, messageBuf, options) {
     lastRest = Date.now();
   }
 }
-
-var version = "0.3.7";
 
 // @ts-check
 

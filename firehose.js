@@ -3008,9 +3008,9 @@ const hidden = {
   enumerable: false,
   configurable: false
 };
-const version = '0.0.0-dev';
+const version$1 = '0.0.0-dev';
 const deprecate = (range, message) => {
-  if (range.test(version)) {
+  if (range.test(version$1)) {
     console.warn(message);
   } else {
     throw new Error(message);
@@ -8138,6 +8138,8 @@ class CarBufferReader {
   }
 }
 
+var version = "0.3.8";
+
 // @ts-check
 
 
@@ -8253,6 +8255,8 @@ function requireWebsocket() {
   if (typeof requireFn === 'function') return /** @type {typeof WebSocket} */requireFn('ws');
   throw new Error('WebSocket not available');
 }
+firehose.all = each;
+firehose.version = version;
 
 /**
  * @returns {AsyncGenerator<FirehoseRecord[], void, void>}
@@ -8469,6 +8473,11 @@ async function* firehose() {
     buf.reject(new Error(errorText));
   }
 }
+async function* each() {
+  for await (const block of firehose()) {
+    yield* block;
+  }
+}
 
 /**
  * @returns {{
@@ -8505,5 +8514,5 @@ function ensureCborXExtended() {
   cbor_x_extended = true;
 }
 
-export { ensureCborXExtended, firehose, known$Types };
+export { ensureCborXExtended, firehose, known$Types, version };
 //# sourceMappingURL=firehose.js.map

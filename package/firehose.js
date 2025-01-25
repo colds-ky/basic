@@ -8,6 +8,9 @@ import {
 import { CID as multiformats_CID } from 'multiformats';
 import { CarBufferReader as ipld_CarBufferReader } from '@ipld/car/buffer-reader';
 
+import { version } from '../package.json';
+export { version } from '../package.json';
+
 /**
  * @typedef {{
  *  'app.bsky.feed.like': import('@atproto/api').AppBskyFeedLike.Record,
@@ -131,6 +134,9 @@ function requireWebsocket() {
   if (typeof requireFn === 'function') return /** @type {typeof WebSocket} */(requireFn('ws'));
   throw new Error('WebSocket not available');
 }
+
+firehose.all = each;
+firehose.version = version;
 
 /**
  * @returns {AsyncGenerator<FirehoseRecord[], void, void>}
@@ -378,8 +384,6 @@ async function* each() {
     yield* block;
   }
 }
-
-firehose.all = each;
 
 /**
  * @returns {{
