@@ -1,6 +1,6 @@
 {
   "name": "coldsky",
-  "version": "0.3.10",
+  "version": "0.3.11",
   "description": "Library and the app for BlueSky",
   "main": "libs.js",
   "module": "package/index.js",
@@ -11,7 +11,11 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "bluesky", "blueski", "bluski", "bski", "bsky",
+    "bluesky",
+    "blueski",
+    "bluski",
+    "bski",
+    "bsky",
     "coldsky",
     "atproto",
     "social",
@@ -21,8 +25,7 @@
   "license": "not yet",
   "dependencies": {
     "@atproto/api": "*",
-    "@ipld/car": "*",
-    "cbor-x": "*"
+    "bski": "^0.9.5"
   },
   "devDependencies": {
     "@babel/core": "*",
