@@ -1,6 +1,6 @@
 {
   "name": "coldsky",
-  "version": "0.3.11",
+  "version": "0.3.12",
   "description": "Library and the app for BlueSky",
   "main": "libs.js",
   "module": "package/index.js",
@@ -25,7 +25,7 @@
   "license": "not yet",
   "dependencies": {
     "@atproto/api": "*",
-    "bski": "^0.9.5"
+    "bski": "*"
   },
   "devDependencies": {
     "@babel/core": "*",
@@ -39,7 +39,7 @@
     "@rollup/plugin-node-resolve": "*",
     "ag-grid-community": "^33.0.2",
     "ag-grid-react": "^33.0.2",
-    "dexie": "^4.0.10",
+    "dexie": "^4.0.11",
     "eld": "^1.0.0",
     "esbuild": "*",
     "fuse.js": "^6.6.2",
@@ -48,10 +48,16 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
     "rollup": "*",
-    "three": "^0.172.0",
-    "troika-three-text": "^0.52.2"
+    "three": "*",
+    "troika-three-text": "*"
   },
   "optionalDependencies": {
     "gpu.js": "^2.16.0"
+  },
+  "overrides": {
+    "three": "$three",
+    "rollup": "$rollup",
+    "react": "$react",
+    "react-dom": "$react-dom"
   }
 }

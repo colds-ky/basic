@@ -543,7 +543,7 @@ const readCar = buffer => {
   return createCarReader(reader);
 };
 
-var version = "0.9.5";
+var version = "0.9.7";
 
 // @ts-check
 /// <reference types='@atproto/api' />
@@ -869,8 +869,13 @@ async function* firehose$1(address) {
     buf.reject(new Error(errorText));
   }
 }
-async function* each() {
-  for await (const block of firehose$1()) {
+
+/**
+ * @param {string} [address]
+ * @returns {AsyncGenerator<FirehoseRecord, void, void>}
+ */
+async function* each(address) {
+  for await (const block of firehose$1(address)) {
     yield* block;
   }
 }
