@@ -1,48 +1,32 @@
-// @ts-check
-
+new TextEncoder();
+const textDecoder = new TextDecoder();
 /**
- * @typedef {{
- *  readonly pos: number;
- *  upto(size: number): Uint8Array;
- *  exactly(size: number, seek: boolean): Uint8Array;
- *  seek(size: number): void;
- * }} SyncByteReader
+ * creates an Uint8Array of the requested size, with the contents zeroed
  */
-
-/**
- * @param {Uint8Array} buf
- * @returns {SyncByteReader}
- */
-const createUint8Reader = buf => {
-  let pos = 0;
-  return {
-    get pos() {
-      return pos;
-    },
-    seek(size) {
-      pos += size;
-    },
-    upto(size) {
-      return buf.subarray(pos, pos + Math.min(size, buf.length - pos));
-    },
-    exactly(size, seek) {
-      if (size > buf.length - pos) {
-        throw new RangeError('unexpected end of data');
-      }
-      const slice = buf.subarray(pos, pos + size);
-      if (seek) {
-        pos += size;
-      }
-      return slice;
-    }
-  };
-};
-
-// @ts-check
-
-const allocUnsafe = size => {
+const alloc = size => {
   return new Uint8Array(size);
 };
+/**
+ * creates an Uint8Array of the requested size, where the contents may not be
+ * zeroed out. only use if you're certain that the contents will be overwritten
+ */
+const allocUnsafe = alloc;
+/**
+ * decodes a UTF-8 string from a buffer
+ */
+const decodeUtf8From = (from, offset, length) => {
+  let buffer;
+  if (offset === undefined) {
+    buffer = from;
+  } else if (length === undefined) {
+    buffer = from.subarray(offset);
+  } else {
+    buffer = from.subarray(offset, offset + length);
+  }
+  const result = textDecoder.decode(buffer);
+  return result;
+};
+
 const createRfc4648Encode = (alphabet, bitsPerChar, pad) => {
   return bytes => {
     const mask = (1 << bitsPerChar) - 1;
@@ -63,6 +47,12 @@ const createRfc4648Encode = (alphabet, bitsPerChar, pad) => {
     if (bits !== 0) {
       str += alphabet[mask & buffer << bitsPerChar - bits];
     }
+    // Add padding characters until we hit a byte boundary:
+    if (pad) {
+      while ((str.length * bitsPerChar & 7) !== 0) {
+        str += '=';
+      }
+    }
     return str;
   };
 };
@@ -75,7 +65,7 @@ const createRfc4648Decode = (alphabet, bitsPerChar, pad) => {
   return str => {
     // Count the padding bytes:
     let end = str.length;
-    while (pad) {
+    while (pad && str[end - 1] === '=') {
       --end;
     }
     // Allocate the output:
@@ -107,49 +97,40 @@ const createRfc4648Decode = (alphabet, bitsPerChar, pad) => {
   };
 };
 
-// @ts-check
+const HAS_UINT8_BASE64_SUPPORT = 'fromBase64' in Uint8Array;
+const BASE64_CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+const WS_PAD_RE = /[\s=]/;
+// #region base64
+/** @internal */
+const _fromBase64Polyfill = /*#__PURE__*/createRfc4648Decode(BASE64_CHARSET, 6, false);
+/** @internal */
+const _toBase64Polyfill = /*#__PURE__*/createRfc4648Encode(BASE64_CHARSET, 6, false);
+/** @internal */
+const _fromBase64Native = str => {
+  if (str.length % 4 === 1 || WS_PAD_RE.test(str)) {
+    throw new SyntaxError(`invalid base64 string`);
+  }
+  return Uint8Array.fromBase64(str, {
+    alphabet: 'base64',
+    lastChunkHandling: 'loose'
+  });
+};
+/** @internal */
+const _toBase64Native = bytes => {
+  return bytes.toBase64({
+    alphabet: 'base64',
+    omitPadding: true
+  });
+};
+const fromBase64 = !HAS_UINT8_BASE64_SUPPORT ? _fromBase64Polyfill : _fromBase64Native;
+const toBase64 = !HAS_UINT8_BASE64_SUPPORT ? _toBase64Polyfill : _toBase64Native;
+// #endregion
 
 const BASE32_CHARSET = 'abcdefghijklmnopqrstuvwxyz234567';
-const toBase32 = /*#__PURE__*/createRfc4648Encode(BASE32_CHARSET, 5);
-
-// @ts-check
+const toBase32 = /*#__PURE__*/createRfc4648Encode(BASE32_CHARSET, 5, false);
 
 const MSB = 0x80;
 const REST = 0x7f;
-const MSBALL = -128;
-const INT = 2 ** 31;
-const N1 = 2 ** 7;
-const N2 = 2 ** 14;
-const N3 = 2 ** 21;
-const N4 = 2 ** 28;
-const N5 = 2 ** 35;
-const N6 = 2 ** 42;
-const N7 = 2 ** 49;
-const N8 = 2 ** 56;
-const N9 = 2 ** 63;
-/**
- * Encodes a varint
- * @param num Number to encode
- * @param buf Buffer to write on
- * @param offset Starting position on the buffer
- * @returns The amount of bytes written
- */
-const encode$1 = (num, buf, offset = 0) => {
-  if (num > Number.MAX_SAFE_INTEGER) {
-    throw new RangeError('could not encode varint');
-  }
-  const start = offset;
-  while (num >= INT) {
-    buf[offset++] = num & 0xff | MSB;
-    num /= 128;
-  }
-  while (num & MSBALL) {
-    buf[offset++] = num & 0xff | MSB;
-    num >>>= 7;
-  }
-  buf[offset] = num | 0;
-  return offset - start + 1;
-};
 /**
  * Decodes a varint
  * @param buf Buffer to read from
@@ -173,53 +154,30 @@ const decode$1 = (buf, offset = 0) => {
   } while (b >= MSB);
   return [res, counter - offset];
 };
-/**
- * Returns encoding length
- * @param num The number to encode
- * @returns Amount of bytes needed for encoding
- */
-const encodingLength = num => {
-  return num < N1 ? 1 : num < N2 ? 2 : num < N3 ? 3 : num < N4 ? 4 : num < N5 ? 5 : num < N6 ? 6 : num < N7 ? 7 : num < N8 ? 8 : num < N9 ? 9 : 10;
-};
 
-// @ts-check
+const CID_VERSION = 1;
+const HASH_SHA256 = 0x12;
+const CODEC_RAW = 0x55;
+const CODEC_DCBOR = 0x71;
 
-const encode = (version, code, multihash) => {
-  const codeOffset = encodingLength(version);
-  const hashOffset = codeOffset + encodingLength(code);
-  const bytes = new Uint8Array(hashOffset + multihash.byteLength);
-  encode$1(version, bytes, 0);
-  encode$1(code, bytes, codeOffset);
-  bytes.set(multihash, hashOffset);
-  return bytes;
-};
-
-// @ts-check
-
-const BASE64_CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-const HAS_UINT8_BASE64_SUPPORT = 'fromBase64' in Uint8Array;
-const _fromBase64Polyfill = /*#__PURE__*/createRfc4648Decode(BASE64_CHARSET, 6, false);
-const _toBase64Polyfill = /*#__PURE__*/createRfc4648Encode(BASE64_CHARSET, 6);
-const WS_PAD_RE = /[\s=]/;
-const _fromBase64Native = str => {
-  if (str.length % 4 === 1 || WS_PAD_RE.test(str)) {
-    throw new SyntaxError(`invalid base64 string`);
+class CidLinkWrapper {
+  bytes;
+  constructor(bytes) {
+    this.bytes = bytes;
   }
-  return /** @type {*} */Uint8Array.fromBase64(str, {
-    alphabet: 'base64',
-    lastChunkHandling: 'loose'
-  });
+  get $link() {
+    const encoded = toBase32(this.bytes);
+    return `b${encoded}`;
+  }
+  toJSON() {
+    return {
+      $link: this.$link
+    };
+  }
+}
+const toCidLink = cid => {
+  return new CidLinkWrapper(cid.bytes);
 };
-const _toBase64Native = bytes => {
-  return bytes.toBase64({
-    alphabet: 'base64',
-    omitPadding: true
-  });
-};
-const fromBase64 = !HAS_UINT8_BASE64_SUPPORT ? _fromBase64Polyfill : _fromBase64Native;
-const toBase64 = !HAS_UINT8_BASE64_SUPPORT ? _toBase64Polyfill : _toBase64Native;
-
-// @ts-check
 
 class BytesWrapper {
   buf;
@@ -245,153 +203,251 @@ const fromBytes = bytes => {
   return fromBase64(bytes.$bytes);
 };
 
-// @ts-check
-
-const toCIDLink = value => {
-  return 'b' + toBase32(value.bytes || value);
-};
-
-// @ts-check
-
-const utf8d = new TextDecoder();
 const readArgument = (state, info) => {
   if (info < 24) {
     return info;
   }
   switch (info) {
     case 24:
-      return readUint8(state);
+      {
+        return readUint8(state);
+      }
     case 25:
-      return readUint16(state);
+      {
+        return readUint16(state);
+      }
     case 26:
-      return readUint32(state);
+      {
+        return readUint32(state);
+      }
     case 27:
-      return readUint64(state);
+      {
+        return readUint53(state);
+      }
   }
   throw new Error(`invalid argument encoding; got ${info}`);
 };
 const readFloat64 = state => {
-  const value = state.v.getFloat64(state.p);
+  const view = state.v ??= new DataView(state.b.buffer, state.b.byteOffset, state.b.byteLength);
+  const value = view.getFloat64(state.p);
   state.p += 8;
   return value;
 };
 const readUint8 = state => {
-  const value = state.v.getUint8(state.p);
-  state.p += 1;
-  return value;
+  return state.b[state.p++];
 };
 const readUint16 = state => {
-  const value = state.v.getUint16(state.p);
-  state.p += 2;
+  let pos = state.p;
+  const buf = state.b;
+  const value = buf[pos++] << 8 | buf[pos++];
+  state.p = pos;
   return value;
 };
 const readUint32 = state => {
-  const value = state.v.getUint32(state.p);
-  state.p += 4;
+  let pos = state.p;
+  const buf = state.b;
+  const value = (buf[pos++] << 24 | buf[pos++] << 16 | buf[pos++] << 8 | buf[pos++]) >>> 0;
+  state.p = pos;
   return value;
 };
-const readUint64 = state => {
-  const hi = state.v.getUint32(state.p);
-  const lo = state.v.getUint32(state.p + 4);
+const readUint53 = state => {
+  let pos = state.p;
+  const buf = state.b;
+  const hi = (buf[pos++] << 24 | buf[pos++] << 16 | buf[pos++] << 8 | buf[pos++]) >>> 0;
   if (hi > 0x1fffff) {
     throw new RangeError(`can't decode integers beyond safe integer range`);
   }
-  // prettier-ignore
+  const lo = (buf[pos++] << 24 | buf[pos++] << 16 | buf[pos++] << 8 | buf[pos++]) >>> 0;
   const value = hi * 2 ** 32 + lo;
-  state.p += 8;
+  state.p = pos;
   return value;
 };
 const readString = (state, length) => {
-  const slice = state.b.subarray(state.p, state.p += length);
-  return utf8d.decode(slice);
+  const string = decodeUtf8From(state.b, state.p, length);
+  state.p += length;
+  return string;
 };
 const readBytes = (state, length) => {
   const slice = state.b.subarray(state.p, state.p += length);
   return toBytes(slice);
 };
+const readTypeInfo = state => {
+  const prelude = readUint8(state);
+  return [prelude >> 5, prelude & 0x1f];
+};
 const readCid$1 = (state, length) => {
   // CID bytes are prefixed with 0x00 for historical reasons, apparently.
   const slice = state.b.subarray(state.p + 1, state.p += length);
-  return toCIDLink(slice);
+  return new CidLinkWrapper(slice);
 };
-const readValue = state => {
-  const prelude = readUint8(state);
-  const type = prelude >> 5;
-  const info = prelude & 0x1f;
-  if (type === 0) {
-    const value = readArgument(state, info);
-    return value;
-  }
-  if (type === 1) {
-    const value = readArgument(state, info);
-    return -1 - value;
-  }
-  if (type === 2) {
-    const len = readArgument(state, info);
-    return readBytes(state, len);
-  }
-  if (type === 3) {
-    const len = readArgument(state, info);
-    return readString(state, len);
-  }
-  if (type === 4) {
-    const len = readArgument(state, info);
-    const array = new Array(len);
-    for (let idx = 0; idx < len; idx++) {
-      array[idx] = readValue(state);
-    }
-    return array;
-  }
-  if (type === 5) {
-    const len = readArgument(state, info);
-    const object = {};
-    for (let idx = 0; idx < len; idx++) {
-      const key = readValue(state);
-      if (typeof key !== 'string') {
-        throw new TypeError(`expected map to only have string keys; got ${typeof key}`);
-      }
-      object[key] = readValue(state);
-    }
-    return object;
-  }
-  if (type === 6) {
-    const tag = readArgument(state, info);
-    if (tag === 42) {
-      const prelude = readUint8(state);
-      const type = prelude >> 5;
-      const info = prelude & 0x1f;
-      if (type !== 2) {
-        throw new TypeError(`expected cid tag to have bytes value; got ${type}`);
-      }
-      const len = readArgument(state, info);
-      return readCid$1(state, len);
-    }
-    throw new TypeError(`unsupported tag; got ${tag}`);
-  }
-  if (type === 7) {
-    switch (info) {
-      case 20:
-        return false;
-      case 21:
-        return true;
-      case 22:
-        return null;
-      case 27:
-        return readFloat64(state);
-    }
-    throw new Error(`invalid simple value; got ${info}`);
-  }
-  throw new TypeError(`invalid type; got ${type}`);
-};
+var ContainerType;
+(function (ContainerType) {
+  ContainerType[ContainerType["MAP"] = 0] = "MAP";
+  ContainerType[ContainerType["ARRAY"] = 1] = "ARRAY";
+})(ContainerType || (ContainerType = {}));
 const decodeFirst = buf => {
+  const len = buf.length;
   const state = {
     b: buf,
-    v: new DataView(buf.buffer, buf.byteOffset, buf.byteLength),
+    v: null,
     p: 0
   };
-  const value = readValue(state);
-  const remainder = buf.subarray(state.p);
-  return [value, remainder];
+  let stack = null;
+  let result;
+  jump: while (state.p < len) {
+    const prelude = readUint8(state);
+    const type = prelude >> 5;
+    const info = prelude & 0x1f;
+    const arg = type < 7 ? readArgument(state, info) : 0;
+    let value;
+    switch (type) {
+      case 0:
+        {
+          value = arg;
+          break;
+        }
+      case 1:
+        {
+          value = -1 - arg;
+          break;
+        }
+      case 2:
+        {
+          value = readBytes(state, arg);
+          break;
+        }
+      case 3:
+        {
+          value = readString(state, arg);
+          break;
+        }
+      case 4:
+        {
+          const arr = new Array(arg);
+          value = arr;
+          if (arg > 0) {
+            stack = {
+              t: ContainerType.ARRAY,
+              c: arr,
+              k: null,
+              r: arg,
+              n: stack
+            };
+            continue jump;
+          }
+          break;
+        }
+      case 5:
+        {
+          const obj = {};
+          value = obj;
+          if (arg > 0) {
+            // `arg * 2` because we're reading both keys and values
+            stack = {
+              t: ContainerType.MAP,
+              c: obj,
+              k: null,
+              r: arg * 2,
+              n: stack
+            };
+            continue jump;
+          }
+          break;
+        }
+      case 6:
+        {
+          switch (arg) {
+            case 42:
+              {
+                const [type, info] = readTypeInfo(state);
+                if (type !== 2) {
+                  throw new TypeError(`expected cid-link to be type 2 (bytes); got type ${type}`);
+                }
+                const len = readArgument(state, info);
+                value = readCid$1(state, len);
+                break;
+              }
+            default:
+              {
+                throw new TypeError(`unsupported tag; got ${arg}`);
+              }
+          }
+          break;
+        }
+      case 7:
+        {
+          switch (info) {
+            case 20:
+            case 21:
+              {
+                value = info === 21;
+                break;
+              }
+            case 22:
+              {
+                value = null;
+                break;
+              }
+            case 27:
+              {
+                value = readFloat64(state);
+                break;
+              }
+            default:
+              {
+                throw new Error(`invalid simple value; got ${info}`);
+              }
+          }
+          break;
+        }
+      default:
+        {
+          throw new TypeError(`invalid type; got ${type}`);
+        }
+    }
+    while (stack !== null) {
+      const node = stack;
+      switch (node.t) {
+        case ContainerType.ARRAY:
+          {
+            const index = node.c.length - node.r;
+            node.c[index] = value;
+            break;
+          }
+        case ContainerType.MAP:
+          {
+            if (node.k === null) {
+              if (typeof value !== 'string') {
+                throw new TypeError(`expected map to only have string keys; got ${type}`);
+              }
+              node.k = value;
+            } else {
+              if (node.k === '__proto__') {
+                // Guard against prototype pollution. CWE-1321
+                Object.defineProperty(node.c, node.k, {
+                  enumerable: true,
+                  configurable: true,
+                  writable: true
+                });
+              }
+              node.c[node.k] = value;
+              node.k = null;
+            }
+            break;
+          }
+      }
+      if (--node.r !== 0) {
+        // We still have more values to decode, continue
+        continue jump;
+      }
+      // Unwrap the stack
+      value = node.c;
+      stack = node.n;
+    }
+    result = value;
+    break;
+  }
+  return [result, buf.subarray(state.p)];
 };
 const decode = buf => {
   const [value, remainder] = decodeFirst(buf);
@@ -401,17 +457,34 @@ const decode = buf => {
   return value;
 };
 
-// @ts-check
+const createUint8Reader = buf => {
+  let pos = 0;
+  return {
+    get pos() {
+      return pos;
+    },
+    seek(size) {
+      if (size > buf.length - pos) {
+        throw new RangeError('unexpected end of data');
+      }
+      pos += size;
+    },
+    upto(size) {
+      return buf.subarray(pos, pos + Math.min(size, buf.length - pos));
+    },
+    exactly(size, seek) {
+      if (size > buf.length - pos) {
+        throw new RangeError('unexpected end of data');
+      }
+      const slice = buf.subarray(pos, pos + size);
+      if (seek) {
+        pos += size;
+      }
+      return slice;
+    }
+  };
+};
 
-
-/**
- * @typedef {{
- *  version: 1;
- *  roots: string[];
- * }} CarV1Header
- */
-
-/** @returns {value is CarV1Header} */
 const isCarV1Header = value => {
   if (value === null || typeof value !== 'object') {
     return false;
@@ -420,13 +493,9 @@ const isCarV1Header = value => {
     version,
     roots
   } = value;
-  return version === 1 && Array.isArray(roots) && roots.every(root => typeof root === 'string');
+  return version === 1 && Array.isArray(roots) && roots.every(root => root instanceof CidLinkWrapper);
 };
 
-/**
- * @param {import('./byte-reader').SyncByteReader} reader
- * @param {number} size
- */
 const readVarint = (reader, size) => {
   const buf = reader.upto(size);
   if (buf.length === 0) {
@@ -436,10 +505,6 @@ const readVarint = (reader, size) => {
   reader.seek(read);
   return int;
 };
-
-/**
- * @param {import('./byte-reader').SyncByteReader} reader
- */
 const readHeader = reader => {
   const length = readVarint(reader, 8);
   if (length === 0) {
@@ -452,47 +517,34 @@ const readHeader = reader => {
   }
   return header;
 };
-
-/**
- * @param {import('./byte-reader').SyncByteReader} reader
- */
-const readMultihashDigest = reader => {
-  const first = reader.upto(8);
-  const [code, codeOffset] = decode$1(first);
-  const [size, sizeOffset] = decode$1(first.subarray(codeOffset));
-  const offset = codeOffset + sizeOffset;
-  const bytes = reader.exactly(offset + size, true);
-  const digest = bytes.subarray(offset);
-  return {
-    code: code,
-    size: size,
-    digest: digest,
-    bytes: bytes
-  };
-};
-
-/**
- * @param {import('./byte-reader').SyncByteReader} reader
- */
 const readCid = reader => {
-  const version = readVarint(reader, 8);
-  if (version !== 1) {
-    throw new Error(`expected a cidv1`);
+  const head = reader.upto(3 + 4);
+  const version = head[0];
+  const codec = head[1];
+  const digestCodec = head[2];
+  if (version !== CID_VERSION) {
+    throw new RangeError(`incorrect cid version (got v${version})`);
   }
-  const codec = readVarint(reader, 8);
-  const digest = readMultihashDigest(reader);
+  if (codec !== CODEC_DCBOR && codec !== CODEC_RAW) {
+    throw new RangeError(`incorrect cid codec (got 0x${codec.toString(16)})`);
+  }
+  if (digestCodec !== HASH_SHA256) {
+    throw new RangeError(`incorrect cid hash type (got 0x${digestCodec.toString(16)})`);
+  }
+  const [digestSize, digestLebSize] = decode$1(head, 3);
+  const bytes = reader.exactly(3 + digestLebSize + digestSize, true);
+  const digest = bytes.subarray(3 + digestLebSize);
   const cid = {
     version: version,
-    code: codec,
-    digest: digest,
-    bytes: encode(version, codec, digest.bytes)
+    codec: codec,
+    digest: {
+      codec: digestCodec,
+      contents: digest
+    },
+    bytes: bytes
   };
   return cid;
 };
-
-/**
- * @param {import('./byte-reader').SyncByteReader} reader
- */
 const readBlockHeader = reader => {
   const start = reader.pos;
   let size = readVarint(reader, 8);
@@ -501,23 +553,18 @@ const readBlockHeader = reader => {
   }
   size += reader.pos - start;
   const cid = readCid(reader);
-  const blockSize = size - Number(reader.pos - start);
+  const blockSize = size - (reader.pos - start);
   return {
     cid,
     blockSize
   };
 };
-
-/**
- * @param {import('./byte-reader').SyncByteReader} reader
- */
 const createCarReader = reader => {
   const {
     roots
   } = readHeader(reader);
   return {
     roots,
-    /** @returns {Generator<{ cid: import('../../cbor/cid').CID; bytes: Uint8Array }>} */
     *iterate() {
       while (reader.upto(8).length > 0) {
         const {
@@ -534,16 +581,12 @@ const createCarReader = reader => {
   };
 };
 
-// @ts-check
-
-
-/** @param {Uint8Array} buffer */
 const readCar = buffer => {
   const reader = createUint8Reader(buffer);
   return createCarReader(reader);
 };
 
-var version = "0.9.7";
+var version = "0.9.13";
 
 // @ts-check
 /// <reference types='@atproto/api' />
@@ -802,7 +845,7 @@ async function* firehose$1(address) {
         const op = commit.ops[opIndex];
         const action = op.action;
         const now = performance.now();
-        const record = op.cid ? car.get(op.cid) : undefined;
+        const record = op.cid ? car.get(op.cid.$link) : undefined;
         if (action === 'create' || action === 'update') {
           if (!op.cid) {
             buf.block.push({
@@ -906,7 +949,7 @@ function readCarToMap(buffer) {
     cid,
     bytes
   } of readCar(buffer).iterate()) {
-    records.set(toCIDLink(cid), decode(bytes));
+    records.set(toCidLink(cid).$link, decode(bytes));
   }
   return records;
 }
