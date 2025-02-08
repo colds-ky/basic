@@ -4,20 +4,25 @@ import { throttledAsyncCache } from '../package/throttled-async-cache';
 import { streamBuffer } from '../package/akpa';
 
 /**
- * @typedef {import('@atproto/api/dist/client/types/app/bsky/feed/defs').ThreadViewPost} ThreadViewPost
+ * @typedef {import('../package').CompactThreadPostSet & {
+ *  hotInteractions?: number
+ * }} HotThread
  */
-
 
 /**
  * @param {import('../app').DBAccess} db
- * @returns {AsyncIterable<import('../package').CompactThreadPostSet[]>}
  */
-export function firehoseThreads(db) {
+export function* getFirehoseConversationThreads(db) {
   return streamBuffer(
     /**
      * @param {import('../package/akpa').StreamParameters<import('../package').CompactThreadPostSet, import('../package').CompactThreadPostSet[]>} streaming 
      */
     async streaming => {
+
+      /**
+       * @type {Map<string, HotThread>}
+      */
+      const hotThreads = new Map();
 
       const getPostThreadCached = throttledAsyncCache(
         async (uri) => {
@@ -41,7 +46,8 @@ export function firehoseThreads(db) {
         for await (const chunk of db.firehose()) {
           if (streaming.isEnded) break;
           for (const msg of chunk.records) {
-            if (msg.action !== 'create') continue;
+            if (msg.action === 'delete') continue;
+
             switch (msg.$type) {
               case 'app.bsky.feed.like': handleLike(msg); continue;
               case 'app.bsky.feed.post': handlePost(msg); continue;
@@ -55,6 +61,16 @@ export function firehoseThreads(db) {
        * @param {import('../package').CompactThreadPostSet} thread 
        */
       function yieldThread(thread) {
+        let hot = hotThreads.get(thread.root.uri);
+        if (!hot) {
+          hot = thread;
+          hot.hotInteractions = 1;
+        } else {
+          const hotInteractions = (hot.hotInteractions || 0) + 1;
+          hot = thread;
+          hot.hotInteractions = hotInteractions;
+        }
+
         streaming.yield(thread, buf => {
           if (!buf) return [thread];
           buf.push(thread);
@@ -75,7 +91,7 @@ export function firehoseThreads(db) {
        * @param {import('bski').FirehoseRepositoryRecord<'app.bsky.feed.post'>} msg 
        */
       async function handlePost(msg) {
-        const thread = await getPostThreadCached('at://' + msg.repo + '/' + msg.path);
+        const thread = await getPostThreadCached(msg.uri);
         if (!thread) return;
         yieldThread(thread);
       }

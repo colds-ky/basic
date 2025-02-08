@@ -69,6 +69,13 @@ export function boot(elem, unmountPromise) {
     lastRender = clock.nowMSec;
     orbit.controls?.update?.(Math.min(delta / 1000, 0.2));
 
+    const layout = layoutCalculator({
+      nodes: profilePositions,
+      edges: profileLinks
+    });
+
+    layout?.run?.(5);
+
     atlasRenderer.redraw(camera);
   }
 
@@ -120,7 +127,8 @@ export function boot(elem, unmountPromise) {
       const retrieveProfiles = [];
       for (const th of distinctThreads) {
         const thWithPos = /** @type {ThreadWithPosition} */(th);
-        calcPos(thWithPos);
+        if (!thWithPos.x && !thWithPos.y)
+          calcPos(thWithPos);
 
         const existingProfileIndex = profileIndexByShortDID[th.root.shortDID];
         if (typeof existingProfileIndex === 'number') {

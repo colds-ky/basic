@@ -78,25 +78,28 @@ export function layoutCalculator({ nodes, edges, speed, gravity }) {
    */
   function runCell(iX, iY, cells) {
     const cell = cells[iX * CELL_DIMENSION_COUNT + iY];
+    if (!cell) return;
+    const { cellNodes } = cell;
 
     // TODO: calculate forces between nodes in the cell
-    for (let iNode = 0; iNode < cells.length - 1; iNode++) {
-      const node = cell.cellNodes[iNode];
+    for (let iNode = 0; iNode < cellNodes.length - 1; iNode++) {
+      const node = cellNodes[iNode];
 
-      for (let jNode = iNode + 1; jNode < cells.length; jNode++) {
-        const other = cell.cellNodes[jNode];
+      for (let jNode = iNode + 1; jNode < cellNodes.length; jNode++) {
+        const other = cellNodes[jNode];
         const dx = other.x - node.x;
         const dy = other.y - node.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
+        if (!dist) continue;
 
-        const repulsiveF = gravity / dist;
+        const repulsiveF = (gravity || defaultVariables.gravity) / dist;
 
         const dxNorm = dx / dist;
         const dyNorm = dy / dist;
-        node.vx -= dxNorm * repulsiveF;
-        node.vy -= dyNorm * repulsiveF;
-        other.vx += dxNorm * repulsiveF;
-        other.vy += dyNorm * repulsiveF;
+        node.vx = (node.vx || 0) - dxNorm * repulsiveF;
+        node.vy = (node.vy || 0) - dyNorm * repulsiveF;
+        other.vx = (other.vx || 0) + dxNorm * repulsiveF;
+        other.vy = (other.vy || 0) + dyNorm * repulsiveF;
       }
     }
   }
@@ -117,6 +120,7 @@ function orderCells(nodes) {
 
     for (let yCellIndex = 0; yCellIndex < CELL_DIMENSION_COUNT; yCellIndex++) {
       const columnNodes = sortHNodes.slice(iXStart, iXEnd + 1);
+      if (!columnNodes.length) continue;
       columnNodes.sort((a, b) => a.y - b.y);
 
       const iYStart = Math.floor(yCellIndex * columnNodes.length / CELL_DIMENSION_COUNT);

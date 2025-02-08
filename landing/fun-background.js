@@ -1,13 +1,14 @@
 // @ts-check
 
 import React from "react";
+import { useNavigate } from 'react-router-dom';
 
-import "./fun-background.css";
+import { useDB } from "../app";
 import { calcHash, firehoseThreads, nextRandom } from "../app-shared";
 import { forAwait } from "../app-shared/forAwait";
-import { useDB } from "../app";
 import { Post } from "../widgets/post/post";
-import { useNavigate } from 'react-router-dom';
+
+import "./fun-background.css";
 
 const POST_DEBOUNCE_MSEC = 5000;
 const POST_MAX_AGE = 1000 * 40;

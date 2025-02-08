@@ -586,29 +586,29 @@ const readCar = buffer => {
   return createCarReader(reader);
 };
 
-var version = "0.9.13";
+var version = "0.9.15";
 
 // @ts-check
-/// <reference types='@atproto/api' />
+/// <reference types='./records' />
 
 const emptyUint8Array = new Uint8Array();
 
 /**
  * @typedef {{
- *  'app.bsky.feed.like': import('@atproto/api').AppBskyFeedLike.Record,
- *  'app.bsky.feed.post': import('@atproto/api').AppBskyFeedPost.Record,
- *  'app.bsky.feed.repost': import('@atproto/api').AppBskyFeedRepost.Record,
- *  'app.bsky.feed.threadgate': import('@atproto/api').AppBskyFeedThreadgate.Record,
- *  'app.bsky.graph.follow': import('@atproto/api').AppBskyGraphFollow.Record,
- *  'app.bsky.graph.block': import('@atproto/api').AppBskyGraphBlock.Record,
- *  'app.bsky.graph.list': import('@atproto/api').AppBskyGraphList.Record,
- *  'app.bsky.graph.listitem': import('@atproto/api').AppBskyGraphListitem.Record,
- *  'app.bsky.graph.listblock': import('@atproto/api').AppBskyGraphListblock.Record,
- *  'app.bsky.actor.profile': import('@atproto/api').AppBskyActorProfile.Record
- *  'app.bsky.feed.generator': import('@atproto/api').AppBskyFeedGenerator.Record
- *  'app.bsky.feed.postgate': import('@atproto/api').AppBskyFeedPostgate.Record
- *  'chat.bsky.actor.declaration': import('@atproto/api').ChatBskyActorDeclaration.Record,
- *  'app.bsky.graph.starterpack': import('@atproto/api').AppBskyGraphStarterpack.Record
+ *  'app.bsky.feed.like': AppBskyFeedLike,
+ *  'app.bsky.feed.post': AppBskyFeedPost,
+ *  'app.bsky.feed.repost': AppBskyFeedRepost,
+ *  'app.bsky.feed.threadgate': AppBskyFeedThreadgate,
+ *  'app.bsky.graph.follow': AppBskyGraphFollow,
+ *  'app.bsky.graph.block': AppBskyGraphBlock,
+ *  'app.bsky.graph.list': AppBskyGraphList,
+ *  'app.bsky.graph.listitem': AppBskyGraphListitem,
+ *  'app.bsky.graph.listblock': AppBskyGraphListblock,
+ *  'app.bsky.actor.profile': AppBskyActorProfile
+ *  'app.bsky.feed.generator': AppBskyFeedGenerator
+ *  'app.bsky.feed.postgate': AppBskyFeedPostgate
+ *  'chat.bsky.actor.declaration': ChatBskyActorDeclaration,
+ *  'app.bsky.graph.starterpack': AppBskyGraphStarterpack
  * }} RepositoryRecordTypes$
  */
 
@@ -844,10 +844,11 @@ async function* firehose$1(address) {
       for (let opIndex = 0; opIndex < commit.ops.length; opIndex++) {
         const op = commit.ops[opIndex];
         const action = op.action;
+        const cid = op.cid?.$link;
         const now = performance.now();
-        const record = op.cid ? car.get(op.cid.$link) : undefined;
+        const record = cid ? car.get(cid) : undefined;
         if (action === 'create' || action === 'update') {
-          if (!op.cid) {
+          if (!cid) {
             buf.block.push({
               $type: 'error',
               message: 'Missing commit.ops[' + (opIndex - 1) + '].cid.',
@@ -861,7 +862,7 @@ async function* firehose$1(address) {
           if (!record) {
             buf.block.push({
               $type: 'error',
-              message: 'Unresolved commit.ops[' + (opIndex - 1) + '].cid ' + op.cid,
+              message: 'Unresolved commit.ops[' + (opIndex - 1) + '].cid ' + cid,
               receiveTimestamp,
               parseTime: now - parseStart,
               commit
@@ -872,13 +873,13 @@ async function* firehose$1(address) {
           record.action = action;
           record.uri = 'at://' + commit.repo + '/' + op.path;
           record.path = op.path;
-          record.cid = op.cid;
+          record.cid = cid;
           record.receiveTimestamp = receiveTimestamp;
           record.parseTime = now - parseStart;
           buf.block.push(record);
           continue;
         } else if (action === 'delete') {
-          buf.block.push({
+          buf.block.push(/** @type {FirehoseDeleteRecord} */{
             action,
             path: op.path,
             receiveTimestamp,

@@ -8,7 +8,7 @@ import { captureRepostRecord } from './capture-repost-record';
 /**
  * @param {string} repo
  * @param {string} uri
- * @param {import('../../firehose').FirehoseRepositoryRecord<keyof import('../../firehose').RepositoryRecordTypes$>} rec
+ * @param {import('bski').FirehoseRecord} rec
  * @param {Map<string, import('../store-data').RepositoryData>} store
  * @param {number} asOf
  * @param {import('../define-store').Intercepts} [intercepts]
@@ -16,15 +16,15 @@ import { captureRepostRecord } from './capture-repost-record';
 export function captureAllRecords(repo, uri, rec, store, asOf, intercepts) {
   switch (rec['$type']) {
     case 'app.bsky.feed.like':
-      return captureLikeRecord(repo, /** @type {import('../../firehose').RepositoryRecordTypes$['app.bsky.feed.like']} */(rec), store, intercepts);
+      return captureLikeRecord(repo, /** @type {import('bski').RepositoryRecordTypes$['app.bsky.feed.like']} */(rec), store, intercepts);
 
     case 'app.bsky.feed.repost':
-      return captureRepostRecord(repo, /** @type {import('../../firehose').RepositoryRecordTypes$['app.bsky.feed.repost']} */(rec), store, intercepts);
+      return captureRepostRecord(repo, /** @type {import('bski').RepositoryRecordTypes$['app.bsky.feed.repost']} */(rec), store, intercepts);
 
     case 'app.bsky.feed.post':
-      return capturePostRecord(repo, uri, /** @type {import('../../firehose').RepositoryRecordTypes$['app.bsky.feed.post']} */(rec), store, asOf, intercepts);
+      return capturePostRecord(repo, uri, /** @type {import('bski').RepositoryRecordTypes$['app.bsky.feed.post']} */(rec), store, asOf, intercepts);
 
     case 'app.bsky.actor.profile':
-      return captureProfileRecord(repo, /** @type {import('../../firehose').RepositoryRecordTypes$['app.bsky.actor.profile']} */(rec), store, asOf, intercepts);
+      return captureProfileRecord(repo, /** @type {import('bski').RepositoryRecordTypes$['app.bsky.actor.profile']} */(rec), store, asOf, intercepts);
   }
 }

@@ -53,6 +53,8 @@ export function defineCachedStore({ dbName, service } = {}) {
   const agent_searchPosts_throttled = throttledAsyncCache((q, limit, sort, cursor) => agent.app.bsky.feed.searchPosts({ q, limit, sort, cursor }));
 
   return {
+    dbStore,
+
     firehose: () =>
       firehose(dbStore),
 

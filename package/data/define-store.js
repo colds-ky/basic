@@ -31,10 +31,11 @@ export function defineStore(intercepts) {
   };
 
   /**
-   * @param {import('../firehose').FirehoseRepositoryRecord<keyof import('../firehose').RepositoryRecordTypes$>} record
+   * @param {import('bski').FirehoseRecord} record
    * @param {number} now
    */
   function captureRecord(record, now) {
+    if (record.action !== 'create') return;
     return captureAllRecords(record.repo, record.uri, record, store.repos, now, intercepts);
   }
 

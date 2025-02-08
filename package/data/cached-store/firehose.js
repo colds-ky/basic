@@ -1,6 +1,6 @@
 // @ts-check
 
-import { firehose as rawFirehose } from '../../firehose';
+import { firehose as rawFirehose } from 'bski';
 
 /** @typedef {import('..').CompactPost} CompactPost */
 /** @typedef {import('..').CompactProfile} CompactProfile */
@@ -16,16 +16,16 @@ export async function* firehose(dbStore) {
     /** @type {Map<string, CompactProfile>} */
     const updatedProfiles = new Map();
 
-    /** @type {import('../../firehose').FirehoseRecord[]} */
+    /** @type {import('bski').FirehoseRecord[]} */
     const all = [];
 
-    /** @type {import('../../firehose').FirehoseRepositoryRecord<keyof import('../../firehose').RepositoryRecordTypes$>[]} */
+    /** @type {import('bski').FirehoseRecord[]} */
     const records = [];
 
-    /** @type {import('../../firehose').FirehoseDeleteRecord[] | undefined} */
+    /** @type {import('bski').FirehoseDeleteRecord[] | undefined} */
     let deletes;
 
-    /** @type {import('../../firehose').FirehoseErrorRecord[] | undefined} */
+    /** @type {import('bski').FirehoseErrorRecord[] | undefined} */
     let errors;
 
     for (const rec of block) {
