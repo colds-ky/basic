@@ -5,7 +5,7 @@
  */
 export async function overlayAvatar(avatarURL) {
 
-  const png = await fetch('https://corsproxy.io/?' + avatarURL).then(r => r.blob());
+  const png = await fetch('https://corsproxy.io/' + avatarURL).then(r => r.blob());
   const dataURI = await readBlob(png);
 
   const img = await awaitImageOnload(dataURI);

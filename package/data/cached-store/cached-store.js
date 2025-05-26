@@ -2,7 +2,7 @@
 
 import { AtpAgent } from '@atproto/api';
 
-import { BSKY_PUBLIC_URL, ColdskyAgent } from '../../coldsky-agent';
+import { BSKY_PUBLIC_URL, BSKY_REDUCED_PUBLIC_URL, ColdskyAgent } from '../../coldsky-agent';
 import { throttledAsyncCache } from '../../throttled-async-cache';
 import { defineCacheIndexedDBStore } from '../define-cache-indexedDB-store';
 import { firehose } from './firehose';
@@ -32,6 +32,9 @@ export function defineCachedStore({ dbName, service } = {}) {
   const agent = /** @type {*} */(new ColdskyAgent({
     service: service || BSKY_PUBLIC_URL
   }));
+  const agentSearch = /** @type {*} */(new ColdskyAgent({
+    service: service || BSKY_REDUCED_PUBLIC_URL
+  }));
 
   const agent_getProfile_throttled = throttledAsyncCache(actor => agent.getProfile({ actor }));
   const agent_resolveHandle_throttled = throttledAsyncCache(handle => agent.com.atproto.identity.resolveHandle({ handle }));
@@ -50,7 +53,7 @@ export function defineCachedStore({ dbName, service } = {}) {
   const agent_searchActorsTypeAhead_throttled = throttledAsyncCache((q, limit) => agent.searchActorsTypeahead({ q, limit }));
   const agent_searchActors_throttled = throttledAsyncCache((q, limit) => agent.searchActors({ q, limit }));
 
-  const agent_searchPosts_throttled = throttledAsyncCache((q, limit, sort, cursor) => agent.app.bsky.feed.searchPosts({ q, limit, sort, cursor }));
+  const agent_searchPosts_throttled = throttledAsyncCache((q, limit, sort, cursor) => agentSearch.app.bsky.feed.searchPosts({ q, limit, sort, cursor }));
 
   return {
     dbStore,

@@ -6,6 +6,7 @@ import { unwrapShortPDS } from './shorten';
 export const BSKY_SOCIAL_URL = 'https://bsky.social/';
 export const BSKY_NETWORK_URL = 'https://bsky.network/';
 export const BSKY_PUBLIC_URL = 'https://public.api.bsky.app/';
+export const BSKY_REDUCED_PUBLIC_URL = 'https://api.bsky.app/';
 
 /**
  * @typedef {Omit<import('@atproto/api').AtpAgentOptions, 'service'> & {
