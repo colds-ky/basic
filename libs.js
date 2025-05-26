@@ -31401,7 +31401,7 @@ async function* firehose$1(address) {
   }
 }
 
-var version = "0.3.15";
+var version = "0.3.16";
 
 // @ts-check
 
@@ -40236,7 +40236,7 @@ function defineStore(intercepts) {
    * @param {number} now
    */
   function captureRecord(record, now) {
-    if (record.action !== 'create') return;
+    if (record.action && record.action !== 'create') return;
     return captureAllRecords(record.repo, record.uri, record, store.repos, now, intercepts);
   }
 

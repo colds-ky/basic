@@ -35,7 +35,7 @@ export function defineStore(intercepts) {
    * @param {number} now
    */
   function captureRecord(record, now) {
-    if (record.action !== 'create') return;
+    if (record.action && record.action !== 'create') return;
     return captureAllRecords(record.repo, record.uri, record, store.repos, now, intercepts);
   }
 
